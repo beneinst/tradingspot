@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="it"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  
+<html lang="it">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panoramica Capitale Trading</title>
   <style>
@@ -146,10 +147,10 @@
       font-weight: bold;
     }
     
-    .coingecko { color: #e74c3c; }
-    .binance { color: #f39c12; }
+    .coingecko { color: #8bc53f; }
+    .binance { color: #ecb914; }
     .totale { color: #3498db; }
-    .capitale { color: #2ecc71; }
+    .capitale { color: #3498db; }
     
     .form-group {
       margin-bottom: 15px;
@@ -474,28 +475,24 @@
       
       // Imposta un gradiente per un effetto 3D migliorato
       const coinGeckoGradient = ctx.createLinearGradient(0, 0, 0, 400);
-      coinGeckoGradient.addColorStop(0, '#e74c3c');
-      coinGeckoGradient.addColorStop(1, '#c0392b');
+      coinGeckoGradient.addColorStop(0, '#8bc53f');
+      coinGeckoGradient.addColorStop(1, '#79a835');
       
       const binanceGradient = ctx.createLinearGradient(0, 0, 0, 400);
-      binanceGradient.addColorStop(0, '#f39c12');
-      binanceGradient.addColorStop(1, '#e67e22');
-      
-      const totaleInGradient = ctx.createLinearGradient(0, 0, 0, 400);
-      totaleInGradient.addColorStop(0, '#3498db');
-      totaleInGradient.addColorStop(1, '#2980b9');
+      binanceGradient.addColorStop(0, '#ecb914');
+      binanceGradient.addColorStop(1, '#d9a512');
       
       const capitaleGradient = ctx.createLinearGradient(0, 0, 0, 400);
-      capitaleGradient.addColorStop(0, '#2ecc71');
-      capitaleGradient.addColorStop(1, '#27ae60');
+      capitaleGradient.addColorStop(0, '#3498db');
+      capitaleGradient.addColorStop(1, '#2980b9');
       
       capitaleChart = new Chart(ctx, {
         type: "doughnut",
         data: {
-          labels: ["CoinGecko", "Binance", "Totale In", "Capitale Disponibile"],
+          labels: ["CoinGecko", "Binance", "Capitale Disponibile"],
           datasets: [{
-            data: [datiCapitale.coingecko, datiCapitale.binance, datiCapitale.totaleIn, datiCapitale.capitale],
-            backgroundColor: [coinGeckoGradient, binanceGradient, totaleInGradient, capitaleGradient],
+            data: [datiCapitale.coingecko, datiCapitale.binance, datiCapitale.capitale],
+            backgroundColor: [coinGeckoGradient, binanceGradient, capitaleGradient],
             borderColor: "white",
             borderWidth: 2,
             hoverOffset: 15
@@ -542,8 +539,7 @@
       if (capitaleChart) {
         capitaleChart.data.datasets[0].data = [
           datiCapitale.coingecko, 
-          datiCapitale.binance, 
-          datiCapitale.totaleIn,
+          datiCapitale.binance,
           datiCapitale.capitale
         ];
         capitaleChart.update();
@@ -632,6 +628,5 @@
     // Inizializza l'applicazione al caricamento
     window.addEventListener('DOMContentLoaded', inizializza);
   </script>
-
-
-</body></html>
+</body>
+</html>
