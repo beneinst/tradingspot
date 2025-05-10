@@ -10,7 +10,7 @@
       --secondary-color: #2ecc71;
       --accent-color: #e74c3c;
       --binance-color: #f39c12;
-      --background-color: #333;
+      --background-color: #D1D0CE;
       --card-color: #ffffff;
       --border-color: #e0e0e0;
       --text-color: #333333;
@@ -102,7 +102,7 @@
     }
     
     .info-box {
-      background-color: rgba(52, 152, 219, 0.8);
+      background-color: rgba(52, 152, 219, 0.6);
       border-left: 4px solid var(--primary-color);
       padding: 10px 15px;
       border-radius: 4px;
@@ -147,7 +147,7 @@
     }
     
     .stat-item {
-      background-color: rgba(0, 0, 0, 0.02);
+      background-color: rgba(0, 0, 0, 0.04);
       padding: 15px;
       border-radius: 6px;
       text-align: center;
@@ -161,13 +161,13 @@
     }
     
     .stat-label {
-      font-size: 14px;
+      font-size: 16px;
       color: var(--text-light);
       margin-bottom: 5px;
     }
     
     .stat-value {
-      font-size: 28px;
+      font-size: 34px;
       font-weight: bold;
     }
     
@@ -253,11 +253,24 @@
     }
     
     .footer {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 14px;
-      color: var(--text-light);
-    }
+  margin-top: 30px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  
+}
+
+.footer a {
+  color: black;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer a:hover {
+  color: #7BCCB5;
+}
+
     
     @media (max-width: 768px) {
       .stats-grid {
@@ -320,7 +333,7 @@
           <div class="stat-value totale" id="totaleIn">23</div>
         </div>
         <div class="stat-item">
-          <div class="stat-label">Capitale</div>
+          <div class="stat-label">A Capitale</div>
           <div class="stat-value capitale" id="capitale">43</div>
         </div>
       </div>
