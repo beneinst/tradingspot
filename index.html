@@ -184,6 +184,14 @@
             background-color: #0b7dda;
         }
         
+        button.delete-last {
+            background-color: #ff9800;
+        }
+        
+        button.delete-last:hover {
+            background-color: #e68a00;
+        }
+        
         .file-input {
             display: none;
         }
@@ -300,6 +308,7 @@
             <div class="input-group">
                 <input type="number" id="importInput" placeholder="Inserisci importo (es. 1,95)" step="0.01">
                 <button id="addButton">Aggiungi Importo</button>
+                <button id="deleteLastButton" class="delete-last">Cancella Ultimo</button>
                 <button id="closeMonthButton" class="close-month">Chiudi Mese</button>
             </div>
         </div>
@@ -338,7 +347,8 @@
         
         <div class="backup-container">
             <button id="scaricaDatiBtn" class="btn-secondary">Scarica Dati (JSON)</button>
-            <input type="file" id="fileInput" accept=".json">
+            <input type="file" id="fileInput" class="file-input" accept=".json">
+            <label for="fileInput" class="btn-secondary" style="cursor: pointer;">Seleziona File</label>
             <button id="caricaDatiBtn">Carica Dati</button>
         </div>
         
@@ -610,14 +620,14 @@ function fixDatabase() {
     }
 }
         
-      // Modificare la funzione closeMonth per permettere l'inserimento manuale del periodo
+// Funzione modificata per chiudere il mese
 function closeMonth() {
     if (currentMonthEntries.length === 0) {
         showMessage('Non ci sono importi da registrare per questo mese!', 'error');
         return;
     }
     
-    // Apriamo un modal o chiediamo input per le date
+    // Chiediamo input per le date tramite prompt del browser
     const startDateStr = prompt("Inserisci la data di inizio (formato GG.MM.AA):", "");
     if (!startDateStr) return; // L'utente ha annullato
     
@@ -661,146 +671,21 @@ function isValidDateFormat(dateStr) {
     return regex.test(dateStr);
 }
 
-// In alternativa, possiamo offrire una soluzione più user-friendly
-// con un modal HTML e date picker
-
-// Funzione per aprire il modal di chiusura mese
-function openCloseMonthModal() {
-    if (currentMonthEntries.length === 0) {
-        showMessage('Non ci sono importi da registrare per questo mese!', 'error');
+// Funzione per aggiungere un importo
+function addImport() {
+    const importInput = document.getElementById('importInput');
+    const importo = parseFloat(importInput.value.replace(',', '.'));
+    
+    if (isNaN(importo) || importo <= 0) {
+        showMessage('Inserisci un importo valido!', 'error');
         return;
     }
     
-    // Crea un modal direttamente nel DOM se non esiste
-    let modal = document.getElementById('closeMonthModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'closeMonthModal';
-        modal.className = 'modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>Chiudi Mese</h2>
-                <div class="form-group">
-                    <label for="startDate">Data inizio periodo:</label>
-                    <input type="text" id="startDate" placeholder="GG.MM.AA">
-                </div>
-                <div class="form-group">
-                    <label for="endDate">Data fine periodo:</label>
-                    <input type="text" id="endDate" placeholder="GG.MM.AA" value="${getCurrentDate()}">
-                </div>
-                <button id="confirmCloseMonth">Conferma</button>
-            </div>
-        `;
-        
-        // Aggiungi stile CSS per il modal
-        const style = document.createElement('style');
-        style.textContent = `
-            .modal {
-                display: none;
-                position: fixed;
-                z-index: 1000;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0,0,0,0.4);
-            }
-            .modal-content {
-                background-color: white;
-                margin: 15% auto;
-                padding: 20px;
-                border-radius: 8px;
-                width: 300px;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            }
-            .close {
-                color: #aaa;
-                float: right;
-                font-size: 28px;
-                font-weight: bold;
-                cursor: pointer;
-            }
-            .close:hover {
-                color: black;
-            }
-            .form-group {
-                margin-bottom: 15px;
-            }
-            .form-group label {
-                display: block;
-                margin-bottom: 5px;
-            }
-            .form-group input {
-                width: 100%;
-                padding: 8px;
-                box-sizing: border-box;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-            }
-            #confirmCloseMonth {
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                padding: 10px 15px;
-                border-radius: 4px;
-                cursor: pointer;
-                width: 100%;
-            }
-            #confirmCloseMonth:hover {
-                background-color: #45a049;
-            }
-        `;
-        document.head.appendChild(style);
-        document.body.appendChild(modal);
-        
-        // Event listeners per il modal
-        document.querySelector('.close').addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-        
-        document.getElementById('confirmCloseMonth').addEventListener('click', () => {
-            const startDateInput = document.getElementById('startDate').value;
-            const endDateInput = document.getElementById('endDate').value;
-            
-            if (!isValidDateFormat(startDateInput) || !isValidDateFormat(endDateInput)) {
-                showMessage('Il formato delle date deve essere GG.MM.AA!', 'error');
-                return;
-            }
-            
-            // Chiudi il mese con le date inserite
-            closeMonthWithDates(startDateInput, endDateInput);
-            modal.style.display = 'none';
-        });
-        
-        // Chiudi il modal se si clicca fuori
-        window.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-    }
-    
-    // Mostra il modal
-    modal.style.display = 'block';
-}
-
-// Funzione per chiudere il mese con le date specificate
-function closeMonthWithDates(startDateStr, endDateStr) {
-    // Calcoliamo il totale degli importi del mese corrente
-    const totalMonthValue = calculateCurrentMonthValue();
-    
-    // Creiamo una nuova entry per lo storico
-    const newHistoricalEntry = {
-        periodo: `dal ${startDateStr} al ${endDateStr}`,
-        importo: totalMonthValue
-    };
-    
-    // Aggiungiamo l'entry allo storico
-    historicalEntries.push(newHistoricalEntry);
-    
-    // Resettiamo gli importi del mese corrente
-    currentMonthEntries = [];
+    // Aggiungiamo l'importo alla lista del mese corrente
+    currentMonthEntries.push({
+        data: getCurrentDate(),
+        importo: importo
+    });
     
     // Salviamo nel localStorage
     saveToLocalStorage();
@@ -808,140 +693,149 @@ function closeMonthWithDates(startDateStr, endDateStr) {
     // Aggiorniamo l'interfaccia
     updateAll();
     
-    showMessage('Mese chiuso con successo!', 'success');
+    // Puliamo l'input
+    importInput.value = '';
+    
+    showMessage('Importo aggiunto con successo!', 'success');
 }
 
-// Modifica l'event listener per il pulsante di chiusura mese
-document.getElementById('closeMonthButton').removeEventListener('click', closeMonth);
-document.getElementById('closeMonthButton').addEventListener('click', openCloseMonthModal);
+// Funzione per eliminare l'ultimo dato inserito
+function deleteLastEntry() {
+    if (currentMonthEntries.length === 0) {
+        showMessage('Non ci sono importi da cancellare!', 'error');
+        return;
+    }
+    
+    // Rimuoviamo l'ultimo elemento
+    const removedEntry = currentMonthEntries.pop();
+    
+    // Salviamo nel localStorage
+    saveToLocalStorage();
+    
+    // Aggiorniamo l'interfaccia
+    updateAll();
+    
+    showMessage(`Ultimo importo (${formatImport(removedEntry.importo)}) cancellato con successo!`, 'success');
+}
 
+// Funzione per mostrare messaggi
+function showMessage(text, type) {
+    const messageDiv = document.getElementById('message');
+    messageDiv.textContent = text;
+    messageDiv.className = type; // 'error' o 'success'
+    
+    // Rimuoviamo il messaggio dopo 5 secondi
+    setTimeout(() => {
+        messageDiv.textContent = '';
+        messageDiv.className = '';
+    }, 5000);
+}
 
+// Funzione aggiornata per esportare i dati
+function scaricaDati() {
+    const data = {
+        currentMonthEntries,
+        historicalEntries
+    };
+    
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `trading_backup_${getCurrentDate().replace(/\./g, '-')}.json`;
+    link.click();
+    
+    URL.revokeObjectURL(url);
+    
+    showMessage('Backup effettuato con successo!', 'success');
+}
 
-
-        
-        // Funzione per mostrare messaggi
-        function showMessage(text, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = text;
-            messageDiv.className = type; // 'error' o 'success'
+// Funzione per importare i dati
+function caricaDati() {
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput.files.length === 0) {
+        showMessage('Seleziona un file da caricare', 'error');
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
             
-            // Rimuoviamo il messaggio dopo 5 secondi
-            setTimeout(() => {
-                messageDiv.textContent = '';
-                messageDiv.className = '';
-            }, 5000);
-        }
-        
-        // Funzione per esportare i dati
-        function scaricaDati() {
-            const data = {
-                currentMonthEntries,
-                historicalEntries
-            };
-            
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `trading_backup_${getCurrentDate().replace(/\./g, '-')}.json`;
-            link.click();
-            
-            URL.revokeObjectURL(url);
-            
-            showMessage('Backup effettuato con successo!', 'success');
-        }
-        
-        // Funzione per importare i dati
-        function caricaDati() {
-            const fileInput = document.getElementById('fileInput');
-            if (fileInput.files.length === 0) {
-                showMessage('Seleziona un file da caricare', 'error');
-                return;
-            }
-            
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    if (data.currentMonthEntries && data.historicalEntries) {
-                        currentMonthEntries = data.currentMonthEntries;
-                        historicalEntries = data.historicalEntries;
-                        
-                        // Salviamo nel localStorage
-                        saveToLocalStorage();
-                        
-                        // Aggiorniamo l'interfaccia
-                        updateAll();
-                        
-                        showMessage('Dati ripristinati con successo!', 'success');
-                    } else {
-                        showMessage('Il file di backup non è valido!', 'error');
-                    }
-                } catch (err) {
-                    showMessage('Errore durante il caricamento del backup: ' + err.message, 'error');
-                }
+            if (data.currentMonthEntries && data.historicalEntries) {
+                currentMonthEntries = data.currentMonthEntries;
+                historicalEntries = data.historicalEntries;
                 
-                // Reset del file input
-                fileInput.value = '';
-            };
-            
-            reader.readAsText(file);
-        }
-        
-        // Funzione per aggiornare tutto
-        function updateAll() {
-            updateCurrentMonthTable();
-            updateHistoricalTable();
-            updateDashboard();
-        }
-        
-        // Event listener per aggiungere un importo
-        document.getElementById('addButton').addEventListener('click', () => {
-            const importInput = document.getElementById('importInput');
-            const importo = parseFloat(importInput.value.replace(',', '.'));
-            
-            if (isNaN(importo) || importo <= 0) {
-                showMessage('Inserisci un importo valido!', 'error');
-                return;
+                // Salviamo nel localStorage
+                saveToLocalStorage();
+                
+                // Aggiorniamo l'interfaccia
+                updateAll();
+                
+                showMessage('Dati ripristinati con successo!', 'success');
+            } else {
+                showMessage('Il file di backup non è valido!', 'error');
             }
-            
-            // Aggiungiamo l'importo alla lista del mese corrente
-            currentMonthEntries.push({
-                data: getCurrentDate(),
-                importo: importo
-            });
-            
-            // Salviamo nel localStorage
-            saveToLocalStorage();
-            
-            // Aggiorniamo l'interfaccia
-            updateAll();
-            
-            // Puliamo l'input
-            importInput.value = '';
-            
-            showMessage('Importo aggiunto con successo!', 'success');
-        });
+        } catch (err) {
+            showMessage('Errore durante il caricamento del backup: ' + err.message, 'error');
+        }
         
-        // Event listener per chiudere il mese
-        document.getElementById('closeMonthButton').addEventListener('click', closeMonth);
-        
-        // Event listener per scarica dati
-        document.getElementById('scaricaDatiBtn').addEventListener('click', scaricaDati);
-        
-        // Event listener per carica dati
-        document.getElementById('caricaDatiBtn').addEventListener('click', caricaDati);
-        
-        // Carichiamo i dati dal localStorage all'avvio
-        loadFromLocalStorage();
-        
-        // Inizializzazione dell'applicazione
-        updateAll();
+        // Reset del file input
+        fileInput.value = '';
+    };
+    
+    reader.readAsText(file);
+}
+
+// Funzione per aggiornare tutto
+function updateAll() {
+    updateCurrentMonthTable();
+    updateHistoricalTable();
+    updateDashboard();
+}
+
+// Event listener per aggiungere un importo
+document.getElementById('addButton').addEventListener('click', addImport);
+
+// Event listener per il tasto Invio nell'input
+document.getElementById('importInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        addImport();
+    }
+});
+
+// Event listener per cancellare l'ultimo dato
+document.getElementById('deleteLastButton').addEventListener('click', deleteLastEntry);
+
+// Event listener per chiudere il mese
+document.getElementById('closeMonthButton').addEventListener('click', closeMonth);
+
+// Event listener per scarica dati
+document.getElementById('scaricaDatiBtn').addEventListener('click', scaricaDati);
+
+// Event listener per carica dati
+document.getElementById('caricaDatiBtn').addEventListener('click', caricaDati);
+
+// Stilizzazione del file input per migliorare l'esperienza utente
+document.getElementById('fileInput').addEventListener('change', function() {
+    const fileName = this.files[0]?.name;
+    if (fileName) {
+        this.nextElementSibling.textContent = fileName;
+    } else {
+        this.nextElementSibling.textContent = 'Seleziona File';
+    }
+});
+
+// Carichiamo i dati dal localStorage all'avvio
+loadFromLocalStorage();
+
+// Inizializzazione dell'applicazione
+updateAll();
     </script>
 </body>
 </html>
