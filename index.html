@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panoramica andamento delle mensilità di Trading</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+			color: #3498db;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .stats-box {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px;
+            border-radius: 6px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats-box.current {
+            background-color: #444;
+        }
+        
+        .stats-box.average {
+            background-color: #444;
+        }
+        
+        .stats-box.total {
+            background-color: #444;
+        }
+        
+        .stats-box h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .stats-box .value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .stats-box .current-value {
+            background-color: #fff9e6;
+            color: #000;
+            padding: 10px 30px;
+            border-radius: 4px;
+        }
+        
+        .stats-box .average-value {
+            background-color: #e6ffe6;
+            color: #000;
+            padding: 10px 30px;
+            border-radius: 4px;
+        }
+        
+        .stats-box .total-value {
+            background-color: #ffe6e6;
+            color: #000;
+            padding: 10px 30px;
+            border-radius: 4px;
+        }
+        
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        input, button {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        
+        input {
+            flex: 1;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button.close-month {
+            background-color: #f44336;
+        }
+        
+        button.close-month:hover {
+            background-color: #d32f2f;
+        }
+        
+        button.btn-secondary {
+            background-color: #2196F3;
+        }
+        
+        button.btn-secondary:hover {
+            background-color: #0b7dda;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .tables-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .table-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .date-display {
+            text-align: left;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .note {
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        
+        .error {
+            color: red;
+            margin-top: 5px;
+        }
+        
+        .success {
+            color: green;
+            margin-top: 5px;
+        }
+        
+        .backup-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            align-items: center;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        
+        /* Per la modalità mobile */
+        @media (max-width: 768px) {
+            .input-section, .backup-container, .input-group {
+                flex-direction: column;
+            }
+            
+            .stats-box, .table-section {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Operatività di Trading</h1>
+        </div>
+        
+        <div class="date-display">
+            Dal <span id="currentDate">09.05.2025</span>
+        </div>
+        
+        <div class="note">
+            Nota: Visita la <a href="panoramica-capitale.html" target="_blank">Panoramica Capitale</a> per informazioni dettagliate sul tuo trading.
+        </div>
+        
+        <div class="note">
+            La quota in mese corrente, è il guadagno da ritirare come tua mensilità, rispetto al tuo capitale e dal tuo trading.
+        </div>
+        
+        <div class="dashboard">
+            <div class="stats-box current">
+                <h3>Mese corrente</h3>
+                <div class="value current-value" id="currentMonthValue">0,00</div>
+            </div>
+            <div class="stats-box average">
+                <h3>Media Mensilità</h3>
+                <div class="value average-value" id="monthlyAverage">0,00</div>
+            </div>
+            <div class="stats-box total">
+                <h3>Totale Earn</h3>
+                <div class="value total-value" id="totalEarn">0,00</div>
+            </div>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <input type="number" id="importInput" placeholder="Inserisci importo (es. 1,95)" step="0.01">
+                <button id="addButton">Aggiungi Importo</button>
+                <button id="closeMonthButton" class="close-month">Chiudi Mese</button>
+            </div>
+        </div>
+        
+        <div class="tables-container">
+            <div class="table-section">
+                <h2>Importi Mese Corrente</h2>
+                <table id="currentMonthTable">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Importo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Contenuto dinamico -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="table-section">
+                <h2>Storico Mensile</h2>
+                <table id="historicalTable">
+                    <thead>
+                        <tr>
+                            <th>Periodo</th>
+                            <th>Importo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Contenuto dinamico -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="backup-container">
+            <button id="scaricaDatiBtn" class="btn-secondary">Scarica Dati (JSON)</button>
+            <input type="file" id="fileInput" accept=".json">
+            <button id="caricaDatiBtn">Carica Dati</button>
+        </div>
+        
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // Inizializzazione delle variabili
+        let currentMonthEntries = [];
+        let historicalEntries = [];
+        
+        // Caricare dati da localStorage se disponibili
+        function loadFromLocalStorage() {
+            const savedCurrentEntries = localStorage.getItem('currentMonthEntries');
+            const savedHistoricalEntries = localStorage.getItem('historicalEntries');
+            
+            if (savedCurrentEntries) {
+                currentMonthEntries = JSON.parse(savedCurrentEntries);
+            }
+            
+            if (savedHistoricalEntries) {
+                historicalEntries = JSON.parse(savedHistoricalEntries);
+            }
+        }
+        
+        // Salvare dati nel localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('currentMonthEntries', JSON.stringify(currentMonthEntries));
+            localStorage.setItem('historicalEntries', JSON.stringify(historicalEntries));
+        }
+        
+        // Funzione per formattare le date nel formato italiano
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = String(date.getFullYear()).slice(-2);
+            return `${day}.${month}.${year}`;
+        }
+        
+        // Funzione per formattare gli importi
+        function formatImport(value) {
+            return parseFloat(value).toFixed(2).replace('.', ',');
+        }
+        
+        // Funzione per ottenere la data attuale
+        function getCurrentDate() {
+            const now = new Date();
+            return formatDate(now);
+        }
+        
+        // Aggiornare la data corrente
+        document.getElementById('currentDate').textContent = getCurrentDate();
+        
+        // Funzione per calcolare la media degli importi mensili
+        function calculateMonthlyAverage() {
+            if (historicalEntries.length === 0) {
+                return 0;
+            }
+            const sum = historicalEntries.reduce((acc, entry) => acc + parseFloat(entry.importo), 0);
+            return sum / historicalEntries.length;
+        }
+        
+        // Funzione per calcolare il totale guadagnato
+        function calculateTotalEarned() {
+            const historicalSum = historicalEntries.reduce((acc, entry) => acc + parseFloat(entry.importo), 0);
+            const currentSum = currentMonthEntries.reduce((acc, entry) => acc + parseFloat(entry.importo), 0);
+            return historicalSum + currentSum;
+        }
+        
+        // Funzione per calcolare il valore del mese corrente
+        function calculateCurrentMonthValue() {
+            return currentMonthEntries.reduce((acc, entry) => acc + parseFloat(entry.importo), 0);
+        }
+        
+        // Funzione per aggiornare le dashboard
+        function updateDashboard() {
+            const currentMonthValue = calculateCurrentMonthValue();
+            const monthlyAverage = calculateMonthlyAverage();
+            const totalEarn = calculateTotalEarned();
+            
+            document.getElementById('currentMonthValue').textContent = formatImport(currentMonthValue);
+            document.getElementById('monthlyAverage').textContent = formatImport(monthlyAverage);
+            document.getElementById('totalEarn').textContent = formatImport(totalEarn);
+        }
+        
+        // Funzione per aggiornare la tabella del mese corrente
+        function updateCurrentMonthTable() {
+            const tableBody = document.querySelector('#currentMonthTable tbody');
+            tableBody.innerHTML = '';
+            
+            currentMonthEntries.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.data}</td>
+                    <td>${formatImport(entry.importo)}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Funzione per aggiornare la tabella storica
+        function updateHistoricalTable() {
+            const tableBody = document.querySelector('#historicalTable tbody');
+            tableBody.innerHTML = '';
+            
+            historicalEntries.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.periodo}</td>
+                    <td>${formatImport(entry.importo)}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Funzione per generare il periodo mensile con data inizio e data corrente
+        function generateMonthlyPeriod() {
+            const today = new Date();
+            
+            // Se ci sono entry storiche, prendiamo l'ultimo periodo e calcoliamo la data di inizio
+            // come giorno successivo alla data di fine dell'ultimo periodo
+            let startDate;
+            
+            if (historicalEntries.length > 0) {
+                const lastPeriod = historicalEntries[historicalEntries.length - 1].periodo;
+                // Estrai la data di fine (parte dopo "al ")
+                const endDateStr = lastPeriod.split("al ")[1];
+                
+                // Converti da formato italiano (gg.mm.aa) a Date
+                const [day, month, year] = endDateStr.split('.');
+                const endDate = new Date(`20${year}`, parseInt(month) - 1, parseInt(day));
+                
+                // La data di inizio è il giorno successivo
+                startDate = new Date(endDate);
+                startDate.setDate(startDate.getDate() + 1);
+            } else {
+                // Se non ci sono entry storiche, prendiamo il primo giorno del mese corrente
+                startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            }
+            
+            // Data di fine è la data corrente
+            const endDate = new Date(today);
+            
+            // Formattare le date
+            const formattedStartDate = formatDate(startDate);
+            const formattedEndDate = formatDate(endDate);
+            
+            return `dal ${formattedStartDate} al ${formattedEndDate}`;
+        }
+        
+        // Funzione per chiudere il mese
+        function closeMonth() {
+            if (currentMonthEntries.length === 0) {
+                showMessage('Non ci sono importi da registrare per questo mese!', 'error');
+                return;
+            }
+            
+            // Calcoliamo la media degli importi del mese corrente
+            const totalMonthValue = calculateCurrentMonthValue();
+            
+            // Creiamo una nuova entry per lo storico
+            const newHistoricalEntry = {
+                periodo: generateMonthlyPeriod(),
+                importo: totalMonthValue
+            };
+            
+            // Aggiungiamo l'entry allo storico
+            historicalEntries.push(newHistoricalEntry);
+            
+            // Resettiamo gli importi del mese corrente
+            currentMonthEntries = [];
+            
+            // Salviamo nel localStorage
+            saveToLocalStorage();
+            
+            // Aggiorniamo l'interfaccia
+            updateAll();
+            
+            showMessage('Mese chiuso con successo!', 'success');
+        }
+        
+        // Funzione per mostrare messaggi
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = type; // 'error' o 'success'
+            
+            // Rimuoviamo il messaggio dopo 5 secondi
+            setTimeout(() => {
+                messageDiv.textContent = '';
+                messageDiv.className = '';
+            }, 5000);
+        }
+        
+        // Funzione per esportare i dati
+        function scaricaDati() {
+            const data = {
+                currentMonthEntries,
+                historicalEntries
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `trading_backup_${getCurrentDate().replace(/\./g, '-')}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+            
+            showMessage('Backup effettuato con successo!', 'success');
+        }
+        
+        // Funzione per importare i dati
+        function caricaDati() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) {
+                showMessage('Seleziona un file da caricare', 'error');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.currentMonthEntries && data.historicalEntries) {
+                        currentMonthEntries = data.currentMonthEntries;
+                        historicalEntries = data.historicalEntries;
+                        
+                        // Salviamo nel localStorage
+                        saveToLocalStorage();
+                        
+                        // Aggiorniamo l'interfaccia
+                        updateAll();
+                        
+                        showMessage('Dati ripristinati con successo!', 'success');
+                    } else {
+                        showMessage('Il file di backup non è valido!', 'error');
+                    }
+                } catch (err) {
+                    showMessage('Errore durante il caricamento del backup: ' + err.message, 'error');
+                }
+                
+                // Reset del file input
+                fileInput.value = '';
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        // Funzione per aggiornare tutto
+        function updateAll() {
+            updateCurrentMonthTable();
+            updateHistoricalTable();
+            updateDashboard();
+        }
+        
+        // Event listener per aggiungere un importo
+        document.getElementById('addButton').addEventListener('click', () => {
+            const importInput = document.getElementById('importInput');
+            const importo = parseFloat(importInput.value.replace(',', '.'));
+            
+            if (isNaN(importo) || importo <= 0) {
+                showMessage('Inserisci un importo valido!', 'error');
+                return;
+            }
+            
+            // Aggiungiamo l'importo alla lista del mese corrente
+            currentMonthEntries.push({
+                data: getCurrentDate(),
+                importo: importo
+            });
+            
+            // Salviamo nel localStorage
+            saveToLocalStorage();
+            
+            // Aggiorniamo l'interfaccia
+            updateAll();
+            
+            // Puliamo l'input
+            importInput.value = '';
+            
+            showMessage('Importo aggiunto con successo!', 'success');
+        });
+        
+        // Event listener per chiudere il mese
+        document.getElementById('closeMonthButton').addEventListener('click', closeMonth);
+        
+        // Event listener per scarica dati
+        document.getElementById('scaricaDatiBtn').addEventListener('click', scaricaDati);
+        
+        // Event listener per carica dati
+        document.getElementById('caricaDatiBtn').addEventListener('click', caricaDati);
+        
+        // Carichiamo i dati dal localStorage all'avvio
+        loadFromLocalStorage();
+        
+        // Inizializzazione dell'applicazione
+        updateAll();
+    </script>
+</body>
+</html>
