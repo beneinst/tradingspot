@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blocco Note</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background-color: #4a6fa5;
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn-primary {
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #385d8a;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-secondary {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin-right: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+        
+        .notes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .note {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .note h3 {
+            margin-bottom: 10px;
+            color: #4a6fa5;
+        }
+        
+        .note p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .note-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .card-header {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .card-header h2 {
+            color: #4a6fa5;
+        }
+        
+        .backup-container {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        input[type="file"] {
+            max-width: 200px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #777;
+        }
+        
+        @media (max-width: 600px) {
+            .backup-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .backup-container button, .backup-container input {
+                margin: 5px 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Blocco Note</h1>
+        </div>
+        
+        <div class="form-container">
+            <h2>Aggiungi una Nuova Nota</h2>
+            <form id="note-form">
+                <input type="text" id="note-title" placeholder="Titolo della nota" required>
+                <textarea id="note-content" placeholder="Contenuto della nota" required></textarea>
+                <button type="submit" class="btn-primary">Salva Nota</button>
+            </form>
+        </div>
+        
+        <h2>Le Tue Note</h2>
+        <div id="notes-container" class="notes-container">
+            <!-- Le note saranno inserite qui dinamicamente -->
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>Backup &amp; Ripristino</h2>
+            </div>
+            
+            <p>Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
+            
+            <div class="backup-container">
+                <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
+                <input type="file" id="fileInput" accept=".json">
+                <button onclick="caricaDati()" class="btn-primary">Carica Dati</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Array per memorizzare le note
+        let notes = [];
+        
+        // Carica le note salvate al caricamento della pagina
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNotes();
+            renderNotes();
+        });
+        
+        // Gestione del form di invio delle note
+        document.getElementById('note-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const titleInput = document.getElementById('note-title');
+            const contentInput = document.getElementById('note-content');
+            
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            
+            if (title && content) {
+                addNote(title, content);
+                titleInput.value = '';
+                contentInput.value = '';
+            }
+        });
+        
+        // Funzione per aggiungere una nuova nota
+        function addNote(title, content) {
+            const note = {
+                id: Date.now(), // Usa il timestamp come id univoco
+                title: title,
+                content: content,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Aggiungi la nota all'inizio dell'array (per mostrarle in ordine inverso)
+            notes.unshift(note);
+            
+            // Salva e aggiorna la visualizzazione
+            saveNotes();
+            renderNotes();
+        }
+        
+        // Funzione per eliminare una nota
+        function deleteNote(id) {
+            notes = notes.filter(note => note.id !== id);
+            saveNotes();
+            renderNotes();
+        }
+        
+        // Funzione per salvare le note nel localStorage
+        function saveNotes() {
+            localStorage.setItem('notes', JSON.stringify(notes));
+        }
+        
+        // Funzione per caricare le note dal localStorage
+        function loadNotes() {
+            const savedNotes = localStorage.getItem('notes');
+            if (savedNotes) {
+                notes = JSON.parse(savedNotes);
+            }
+        }
+        
+        // Funzione per visualizzare le note
+        function renderNotes() {
+            const notesContainer = document.getElementById('notes-container');
+            notesContainer.innerHTML = '';
+            
+            if (notes.length === 0) {
+                notesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <p>Non hai ancora note. Aggiungi una nuova nota usando il form qui sopra.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            notes.forEach(note => {
+                const noteElement = document.createElement('div');
+                noteElement.className = 'note';
+                noteElement.innerHTML = `
+                    <h3>${note.title}</h3>
+                    <p>${note.content}</p>
+                    <div class="note-actions">
+                        <button onclick="deleteNote(${note.id})" class="btn-danger">Elimina</button>
+                    </div>
+                `;
+                notesContainer.appendChild(noteElement);
+            });
+        }
+        
+        // Funzione per scaricare i dati come file JSON
+        function scaricaDati() {
+            const data = JSON.stringify(notes, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `blocco-note-backup_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Funzione per caricare i dati da un file JSON
+        function caricaDati() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedNotes = JSON.parse(e.target.result);
+                        if (Array.isArray(importedNotes)) {
+                            // Opzione 1: Sostituisci tutte le note
+                            notes = importedNotes;
+                            
+                            // Opzione 2: Aggiungi le note importate alle note esistenti
+                            // Decommentare per usare questa opzione
+                            // notes = [...importedNotes, ...notes];
+                            
+                            saveNotes();
+                            renderNotes();
+                            alert('Dati importati con successo!');
+                            fileInput.value = '';
+                        } else {
+                            alert('Il file non contiene un formato di dati valido.');
+                        }
+                    } catch (error) {
+                        alert('Errore durante l\'importazione dei dati: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            } else {
+                alert('Seleziona un file da importare.');
+            }
+        }
+    </script>
+</body>
+</html>
