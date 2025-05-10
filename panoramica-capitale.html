@@ -32,14 +32,31 @@
     }
     
     .container {
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
     }
     
-    header {
-      text-align: center;
-      margin-bottom: 10px;
+    .header {
+            text-align: center;
+			
+            margin-bottom: 20px;
+			background-color: #4a6fa5;
+            color: #ffffff !important;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            
+            
     }
+	
+	.head2 {
+  text-align: center;
+  margin-bottom: 20px;
+  background-color: #4a6fa5;
+  color: #ffffff !important;
+  padding: 20px;
+  border-radius: 10px 10px 0 0;
+}
+
     
     h1 {
       color: var(--primary-color);
@@ -110,6 +127,13 @@
       border-bottom: 1px solid var(--border-color);
     }
     
+	.titolo-bianco {
+  color: #ffffff;
+  font-size: 28px;
+  margin: 0;
+  line-height: 28px;
+}
+
     .card h2 {
       color: var(--primary-color);
       font-size: 18px;
@@ -264,22 +288,14 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Panoramica del Capitale in Trading</h1>
+<div class="container">
+       <div class="head2" style="color: white !important;">
+  <p class="titolo-bianco"><strong>Panoramica del Capitale in Trading</strong></p>
+  </div>
+
+  
       
-      <div class="header-stats">
-        <div class="header-stat-item">
-          <div class="header-stat-label">Trade Totali</div>
-          <div class="header-stat-value" id="totaleTrade">56</div>
-        </div>
-        <div class="header-stat-item">
-          <div class="header-stat-label">$ per Trade</div>
-          <div class="header-stat-value">
-            <input type="number" id="quotaPerTrade" class="quota-input" value="40" min="1" onchange="aggiornaTotali()">
-          </div>
-        </div>
-      </div>
+      
       
    
 
@@ -333,6 +349,18 @@
       
       <button onclick="aggiornaTrade()">Aggiorna Trade</button>
     </div>
+	<div class="header-stats">
+        <div class="header-stat-item">
+          <div class="header-stat-label">Trade Totali</div>
+          <div class="header-stat-value" id="totaleTrade">56</div>
+        </div>
+        <div class="header-stat-item">
+          <div class="header-stat-label">$ per Trade</div>
+          <div class="header-stat-value">
+            <input type="number" id="quotaPerTrade" class="quota-input" value="40" min="1" onchange="aggiornaTotali()">
+          </div>
+        </div>
+      </div>
 	  <div class="info-box">
    
   <br><em><strong>Regola di ingresso:</strong></em> si effettuano al massimo <em><strong>2 o 3 trade ogni 24 ore</strong></em>, per un totale massimo di 6 in contemporanea.  
@@ -355,14 +383,13 @@
       </div>
     </div>
     
-   <div class="footer">
+    </div>
+	<div class="footer">
   Trading Spot Manager v1.1 | 
   <a href="index.html">Operatività</a> | 
   <a href="panoramica-capitale.html">Capitale</a> | 
-  <a href="blocco-note">Note</a>
+  <a href="blocco-note.html">Note</a>
 </div>
-
-  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <script>
