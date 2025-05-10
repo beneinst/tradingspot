@@ -147,10 +147,10 @@
       font-weight: bold;
     }
     
-    .coingecko { color: #8bc53f; }
-    .binance { color: #ecb914; }
-    .totale { color: #88001b; }
-    .capitale { color: #3498db; }
+    .coingecko { color: #A1C935; }
+    .binance { color: #FBB917; }
+    .totale { color: #F62817; }
+    .capitale { color: #008080; }
     
     .form-group {
       margin-bottom: 15px;
@@ -211,7 +211,7 @@
     }
     
     .chart-container {
-      height: 400px;
+      height: 490px;
       margin-top: 20px;
       position: relative;
     }
@@ -266,7 +266,7 @@
 <body>
   <div class="container">
     <header>
-      <h1>Panoramica Capitale Trading</h1>
+      <h1>Panoramica del Capitale in Trading</h1>
       
       <div class="header-stats">
         <div class="header-stat-item">
@@ -281,9 +281,14 @@
         </div>
       </div>
       
-      <div class="info-box">
-        Risultati su Capitale in <span id="infoTotaleTrade">56</span> Trade su TF 4H con 10 acquisti ogni 4 ore
-      </div>
+     <div class="info-box">
+   
+  <br><em><strong>Regola di ingresso:</strong></em> si effettuano al massimo <em><strong>2 o 3 trade ogni 24 ore</strong></em>, per un totale massimo di 6 in contemporanea.  
+  Ogni trade ha una durata di <em><strong>10 candele da 4 ore</strong></em> (circa 40 ore), alla fine delle quali si valuta un nuovo ingresso solo se il prezzo è in posizione favorevole.  
+  <br><em><strong>Obiettivo:</strong></em> proteggere il capitale e garantire una rendita costante nel tempo, suddividendo il totale in <em><strong>56 operazioni complessive</strong></em>.  
+  <br><em><strong>Stato attuale:</strong></em> l’intero capitale è attualmente impegnato nei 56 trade, ma <em><strong>i profitti iniziano fin da subito</strong></em>, non da un giorno futuro. Di seguito il Capitale nella situazione attuale per avere info sui  più info clicca qui. <span id="infoTotaleTrade">56</span></div>
+
+
     </header>
     
     <div class="card">
@@ -311,7 +316,7 @@
       </div>
       
       <div class="chart-container">
-        <canvas id="capitaleChart" width="960" height="400" style="display: block; box-sizing: border-box; height: 400px; width: 960px;"></canvas>
+        <canvas id="capitaleChart" width="960" height="580" style="display: block; box-sizing: border-box; height: 520px; width: 960px;"></canvas>
       </div>
     </div>
     
@@ -473,19 +478,21 @@
     function creaGraficoCapitale() {
       const ctx = document.getElementById("capitaleChart").getContext("2d");
       
-      // Imposta un gradiente per un effetto 3D migliorato
-      const coinGeckoGradient = ctx.createLinearGradient(0, 0, 0, 400);
-      coinGeckoGradient.addColorStop(0, '#8bc53f');
-      coinGeckoGradient.addColorStop(1, '#79a835');
-      
-      const binanceGradient = ctx.createLinearGradient(0, 0, 0, 400);
-      binanceGradient.addColorStop(0, '#ecb914');
-      binanceGradient.addColorStop(1, '#d9a512');
-      
-      const capitaleGradient = ctx.createLinearGradient(0, 0, 0, 400);
-      capitaleGradient.addColorStop(0, '#3498db');
-      capitaleGradient.addColorStop(1, '#2980b9');
-      
+   // Imposta un gradiente per un effetto 3D migliorato
+
+const coinGeckoGradient = ctx.createLinearGradient(0, 0, 0, 400);
+coinGeckoGradient.addColorStop(0, '#E56717');  // nuovo colore principale
+coinGeckoGradient.addColorStop(1, '#A1C935');  // variazione per effetto sfumato
+
+const binanceGradient = ctx.createLinearGradient(0, 0, 0, 400);
+binanceGradient.addColorStop(0, '#FBB917');
+binanceGradient.addColorStop(1, '#FFD700');  // tonalità più chiara per evidenziare
+
+const capitaleGradient = ctx.createLinearGradient(0, 0, 0, 400);
+capitaleGradient.addColorStop(0, '#008080');
+capitaleGradient.addColorStop(1, '#20B2AA');  // tonalità più chiara di teal
+
+
       capitaleChart = new Chart(ctx, {
         type: "doughnut",
         data: {
