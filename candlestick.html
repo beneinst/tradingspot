@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Candlestick per il Trading Spot su Criptovalute (H4)</title>
+    <style>
+        :root {
+            --primary-color: #2a71d0;
+            --secondary-color: #f8f9fa;
+            --bullish-color: #26a69a;
+            --bearish-color: #ef5350;
+            --neutral-color: #78909c;
+            --dark-bg: #263238;
+            --light-text: #eceff1;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #333;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: var(--dark-bg);
+            color: var(--light-text);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .intro {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        h1 {
+            font-size: 1.7rem;
+            margin-bottom: 1rem;
+            color: var(--light-text);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin: 1.5rem 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            font-size: 1.3rem;
+            margin: 1rem 0;
+            color: #455a64;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        .patterns-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .pattern-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .pattern-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .pattern-header {
+            padding: 1rem;
+            color: white;
+        }
+        
+        .bullish {
+            background-color: var(--bullish-color);
+        }
+        
+        .bearish {
+            background-color: var(--bearish-color);
+        }
+        
+        .neutral {
+            background-color: var(--neutral-color);
+        }
+        
+        .pattern-content {
+            padding: 1.5rem;
+        }
+        
+        .pattern-svg {
+            background-color: var(--secondary-color);
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+        
+        .description-list {
+            list-style-type: none;
+        }
+        
+        .description-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+        
+        .description-list li::before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .tips {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .tips ol {
+            padding-left: 1.5rem;
+        }
+        
+        .tips li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .conclusion {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+       .footer {
+      margin-top: 30px;
+	  margin-bottom: 30px;
+      text-align: center;
+      font-size: 16px;
+	  color: #F2BB66;
+      font-weight: normal;
+    }
+
+    .footer a {
+      color: #FAEBD7;
+      text-decoration: none;
+      margin: 0 8px;
+      transition: color 0.3s ease;
+    }
+
+    .footer a:hover {
+      color: #FFDB58;
+    }
+        /* Stile per il menu di navigazione */
+        .nav-container {
+            background-color: var(--dark-bg);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+        }
+        
+        .nav a {
+            color: var(--light-text);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .nav a:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        /* Stile per il pulsante che torna in alto */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .back-to-top.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        /* Stile per tooltip */
+        .tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dotted var(--primary-color);
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            text-align: center;
+            border-radius: 6px;
+            padding: 0.5rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            width: 200px;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Animazioni per le candele */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .svg-candle:hover {
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📘 Pattern Candlestick per il Trading Spot su Criptovalute (H4)</h1>
+    </header>
+    
+    <div class="nav-container">
+        <nav class="nav">
+            <a href="#intro">Introduzione</a>
+            <a href="#inversioni">Inversioni di Tendenza</a>
+            <a href="#continuazione">Pattern di Continuazione</a>
+            <a href="#suggerimenti">Suggerimenti Operativi</a>
+            <a href="#conclusione">Conclusione</a>
+        </nav>
+    </div>
+    
+    <div class="container">
+        <section id="intro" class="intro">
+            <p>L'analisi candlestick è uno strumento essenziale per il trader che vuole comprendere il comportamento del mercato attraverso la lettura delle candele giapponesi. Nel trading spot su criptovalute, in particolare sul timeframe a 4 ore (H4), i pattern candlestick possono fornire segnali preziosi per anticipare inversioni di tendenza o conferme di movimenti già in atto. Questo approccio è particolarmente adatto a chi non è costretto a operare in tempi rapidi (come nel day trading), ma preferisce osservare il mercato con più respiro.</p>
+        </section>
+        
+        <section id="inversioni">
+            <h2>🔄 Inversioni di Tendenza</h2>
+            <p>I pattern di <strong>inversione</strong> sono tra i più utili per chi vuole entrare in un mercato a buon prezzo o uscire prima che il trend si esaurisca. Ecco i principali:</p>
+            
+            <div class="patterns-grid">
+                <!-- Pattern 1: Hammer -->
+                <div class="pattern-card">
+                    <div class="pattern-header bullish">
+                        <h3>🔹 1. Hammer (Martello)</h3>
+                    </div>
+                    <div class="pattern-content">
+                        <div class="pattern-svg">
+                            <svg width="150" height="120" viewBox="0 0 150 120">
+                                <!-- Trend line down -->
+                                <path d="M10,40 Q50,60 90,90" stroke="#ef5350" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                                
+                                <!-- Previous red candles -->
+                                <rect x="30" y="35" width="15" height="25" fill="#ef5350" class="svg-candle"/>
+                                <line x1="37.5" y1="30" x2="37.5" y2="35" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="37.5" y1="60" x2="37.5" y2="65" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <rect x="50" y="40" width="15" height="30" fill="#ef5350" class="svg-candle"/>
+                                <line x1="57.5" y1="35" x2="57.5" y2="40" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="57.5" y1="70" x2="57.5" y2="75" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <rect x="70" y="50" width="15" height="20" fill="#ef5350" class="svg-candle"/>
+                                <line x1="77.5" y1="45" x2="77.5" y2="50" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="77.5" y1="70" x2="77.5" y2="80" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <!-- Hammer candle -->
+                                <rect x="90" y="55" width="15" height="10" fill="#26a69a" class="svg-candle"/>
+                                <line x1="97.5" y1="65" x2="97.5" y2="95" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="97.5" y1="52" x2="97.5" y2="55" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <!-- Next green candle -->
+                                <rect x="110" y="42" width="15" height="25" fill="#26a69a" class="svg-candle"/>
+                                <line x1="117.5" y1="37" x2="117.5" y2="42" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="117.5" y1="67" x2="117.5" y2="70" stroke="#26a69a" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <p><strong>Segnale:</strong> Inversione rialzista</p>
+                        <ul class="description-list">
+                            <li>Appare dopo una discesa</li>
+                            <li>Corpo piccolo in alto, lunga ombra inferiore</li>
+                            <li>Indica rifiuto dei prezzi bassi</li>
+                            <li>Conferma: Seguita da una candela verde forte</li>
+                        </ul>
+                        <p class="tooltip">Nota tecnica 
+                            <span class="tooltip-text">L'ombra inferiore dovrebbe essere almeno 2 volte la lunghezza del corpo. Più è lunga, più è potente il segnale.</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Pattern 2: Inverted Hammer -->
+                <div class="pattern-card">
+                    <div class="pattern-header bullish">
+                        <h3>🔹 2. Inverted Hammer (Martello Invertito)</h3>
+                    </div>
+                    <div class="pattern-content">
+                        <div class="pattern-svg">
+                            <svg width="150" height="120" viewBox="0 0 150 120">
+                                <!-- Trend line down -->
+                                <path d="M10,40 Q50,60 90,90" stroke="#ef5350" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                                
+                                <!-- Previous red candles -->
+                                <rect x="30" y="35" width="15" height="25" fill="#ef5350" class="svg-candle"/>
+                                <line x1="37.5" y1="30" x2="37.5" y2="35" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="37.5" y1="60" x2="37.5" y2="65" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <rect x="50" y="40" width="15" height="30" fill="#ef5350" class="svg-candle"/>
+                                <line x1="57.5" y1="35" x2="57.5" y2="40" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="57.5" y1="70" x2="57.5" y2="75" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <rect x="70" y="50" width="15" height="20" fill="#ef5350" class="svg-candle"/>
+                                <line x1="77.5" y1="45" x2="77.5" y2="50" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="77.5" y1="70" x2="77.5" y2="80" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <!-- Inverted Hammer candle -->
+                                <rect x="90" y="85" width="15" height="10" fill="#26a69a" class="svg-candle"/>
+                                <line x1="97.5" y1="55" x2="97.5" y2="85" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="97.5" y1="95" x2="97.5" y2="97" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <!-- Next green candle -->
+                                <rect x="110" y="70" width="15" height="25" fill="#26a69a" class="svg-candle"/>
+                                <line x1="117.5" y1="65" x2="117.5" y2="70" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="117.5" y1="95" x2="117.5" y2="97" stroke="#26a69a" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <p><strong>Segnale:</strong> Potenziale inversione rialzista</p>
+                        <ul class="description-list">
+                            <li>Meno affidabile del martello classico</li>
+                            <li>Corpo piccolo in basso, lunga ombra superiore</li>
+                            <li>Indica un tentativo di inversione</li>
+                            <li>Richiede conferma con candela successiva verde</li>
+                        </ul>
+                        <p class="tooltip">Nota tecnica 
+                            <span class="tooltip-text">L'inverted hammer ha una percentuale di successo inferiore rispetto al martello classico. Richiede maggiori conferme da altri indicatori.</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Pattern 3: Shooting Star -->
+                <div class="pattern-card">
+                    <div class="pattern-header bearish">
+                        <h3>🔹 3. Shooting Star</h3>
+                    </div>
+                    <div class="pattern-content">
+                        <div class="pattern-svg">
+                            <svg width="150" height="120" viewBox="0 0 150 120">
+                                <!-- Trend line up -->
+                                <path d="M10,90 Q50,70 90,40" stroke="#26a69a" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                                
+                                <!-- Previous green candles -->
+                                <rect x="30" y="70" width="15" height="25" fill="#26a69a" class="svg-candle"/>
+                                <line x1="37.5" y1="65" x2="37.5" y2="70" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="37.5" y1="95" x2="37.5" y2="100" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <rect x="50" y="60" width="15" height="30" fill="#26a69a" class="svg-candle"/>
+                                <line x1="57.5" y1="55" x2="57.5" y2="60" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="57.5" y1="90" x2="57.5" y2="95" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <rect x="70" y="50" width="15" height="20" fill="#26a69a" class="svg-candle"/>
+                                <line x1="77.5" y1="45" x2="77.5" y2="50" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="77.5" y1="70" x2="77.5" y2="75" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <!-- Shooting Star candle -->
+                                <rect x="90" y="45" width="15" height="10" fill="#ef5350" class="svg-candle"/>
+                                <line x1="97.5" y1="15" x2="97.5" y2="45" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="97.5" y1="55" x2="97.5" y2="57" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <!-- Next red candle -->
+                                <rect x="110" y="50" width="15" height="25" fill="#ef5350" class="svg-candle"/>
+                                <line x1="117.5" y1="45" x2="117.5" y2="50" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="117.5" y1="75" x2="117.5" y2="80" stroke="#ef5350" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <p><strong>Segnale:</strong> Inversione ribassista</p>
+                        <ul class="description-list">
+                            <li>Appare dopo una salita</li>
+                            <li>Corpo piccolo e lunga ombra superiore</li>
+                            <li>Indica esaurimento della forza rialzista</li>
+                            <li>Gli acquirenti hanno tentato di spingere il prezzo ma hanno fallito</li>
+                        </ul>
+                        <p class="tooltip">Nota tecnica 
+                            <span class="tooltip-text">L'ombra superiore dovrebbe essere almeno 2-3 volte la dimensione del corpo. Maggiore è la lunghezza dell'ombra, più forte è il segnale di esaurimento.</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Pattern 4: Bullish Engulfing -->
+                <div class="pattern-card">
+                    <div class="pattern-header bullish">
+                        <h3>🔹 4. Bullish Engulfing (Avvolgente Rialzista)</h3>
+                    </div>
+                    <div class="pattern-content">
+                        <div class="pattern-svg">
+                            <svg width="150" height="120" viewBox="0 0 150 120">
+                                <!-- Trend line down -->
+                                <path d="M10,40 Q50,60 90,90" stroke="#ef5350" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                                
+                                <!-- Previous red candles -->
+                                <rect x="30" y="40" width="15" height="20" fill="#ef5350" class="svg-candle"/>
+                                <line x1="37.5" y1="35" x2="37.5" y2="40" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="37.5" y1="60" x2="37.5" y2="65" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <rect x="50" y="50" width="15" height="25" fill="#ef5350" class="svg-candle"/>
+                                <line x1="57.5" y1="45" x2="57.5" y2="50" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="57.5" y1="75" x2="57.5" y2="80" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <!-- Morning Star pattern -->
+                                <rect x="70" y="60" width="15" height="20" fill="#ef5350" class="svg-candle"/>
+                                <line x1="77.5" y1="55" x2="77.5" y2="60" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="77.5" y1="80" x2="77.5" y2="85" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <rect x="90" y="75" width="10" height="5" fill="#78909c" class="svg-candle"/>
+                                <line x1="95" y1="72" x2="95" y2="75" stroke="#78909c" stroke-width="2"/>
+                                <line x1="95" y1="80" x2="95" y2="83" stroke="#78909c" stroke-width="2"/>
+                                
+                                <rect x="105" y="55" width="15" height="25" fill="#26a69a" class="svg-candle"/>
+                                <line x1="112.5" y1="50" x2="112.5" y2="55" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="112.5" y1="80" x2="112.5" y2="85" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <!-- Next green candle -->
+                                <rect x="125" y="40" width="15" height="25" fill="#26a69a" class="svg-candle"/>
+                                <line x1="132.5" y1="35" x2="132.5" y2="40" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="132.5" y1="65" x2="132.5" y2="70" stroke="#26a69a" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <p><strong>Segnale:</strong> Forte inversione rialzista</p>
+                        <ul class="description-list">
+                            <li>Struttura a tre candele: rossa → doji/piccola → verde forte</li>
+                            <li>La candela centrale rappresenta indecisione nel mercato</li>
+                            <li>La terza candela conferma la ripresa degli acquirenti</li>
+                            <li>Uno dei pattern di inversione più affidabili</li>
+                        </ul>
+                        <p class="tooltip">Nota tecnica 
+                            <span class="tooltip-text">L'efficacia del pattern è massima quando la candela verde finale chiude oltre la metà della prima candela rossa. Il gap tra le candele rafforza il segnale.</span>
+                        </p>
+                    </div>
+                </div>
+                <!-- Pattern 5: Bearish Engulfing -->
+                <div class="pattern-card">
+                    <div class="pattern-header bearish">
+                        <h3>🔹 5. Bearish Engulfing (Avvolgente Ribassista)</h3>
+                    </div>
+                    <div class="pattern-content">
+                        <div class="pattern-svg">
+                            <svg width="150" height="120" viewBox="0 0 150 120">
+                                <!-- Trend line up -->
+                                <path d="M10,90 Q50,70 90,40" stroke="#26a69a" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                                
+                                <!-- Previous green candles -->
+                                <rect x="30" y="70" width="15" height="20" fill="#26a69a" class="svg-candle"/>
+                                <line x1="37.5" y1="65" x2="37.5" y2="70" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="37.5" y1="90" x2="37.5" y2="95" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <rect x="50" y="60" width="15" height="25" fill="#26a69a" class="svg-candle"/>
+                                <line x1="57.5" y1="55" x2="57.5" y2="60" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="57.5" y1="85" x2="57.5" y2="90" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <!-- Engulfing pattern -->
+                                <rect x="75" y="50" width="12" height="15" fill="#26a69a" class="svg-candle"/>
+                                <line x1="81" y1="45" x2="81" y2="50" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="81" y1="65" x2="81" y2="70" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <rect x="91" y="40" width="18" height="30" fill="#ef5350" class="svg-candle"/>
+                                <line x1="100" y1="35" x2="100" y2="40" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="100" y1="70" x2="100" y2="75" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <!-- Next red candle -->
+                                <rect x="115" y="45" width="15" height="30" fill="#ef5350" class="svg-candle"/>
+                                <line x1="122.5" y1="40" x2="122.5" y2="45" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="122.5" y1="75" x2="122.5" y2="80" stroke="#ef5350" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <p><strong>Segnale:</strong> Inversione al ribasso</p>
+                        <ul class="description-list">
+                            <li>Una candela rossa che ingloba completamente una verde precedente</li>
+                            <li>Indica ripresa del controllo da parte dei venditori</li>
+                            <li>Più efficace dopo un lungo trend rialzista</li>
+                            <li>Maggiore è la dimensione della candela rossa, più forte è il segnale</li>
+                        </ul>
+                        <p class="tooltip">Nota tecnica 
+                            <span class="tooltip-text">Il bearish engulfing è uno dei pattern più affidabili quando si forma in prossimità di resistenze importanti o a fine di un trend rialzista esausto.</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Pattern 6: Morning Star -->
+				<div class="pattern-card">
+    <div class="pattern-header bullish">
+        <h3>🔹 6. Morning Star</h3>
+    </div>
+    <div class="pattern-content">
+        <div class="pattern-svg">
+            <svg width="150" height="120" viewBox="0 0 150 120">
+                <!-- Trend line down -->
+                <path d="M10,40 Q40,60 70,90" stroke="#ef5350" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                
+                <!-- Previous red candles -->
+                <rect x="30" y="40" width="15" height="25" fill="#ef5350" class="svg-candle"/>
+                <line x1="37.5" y1="35" x2="37.5" y2="40" stroke="#ef5350" stroke-width="2"/>
+                <line x1="37.5" y1="65" x2="37.5" y2="70" stroke="#ef5350" stroke-width="2"/>
+                
+                <rect x="50" y="50" width="15" height="25" fill="#ef5350" class="svg-candle"/>
+                <line x1="57.5" y1="45" x2="57.5" y2="50" stroke="#ef5350" stroke-width="2"/>
+                <line x1="57.5" y1="75" x2="57.5" y2="80" stroke="#ef5350" stroke-width="2"/>
+                
+                <!-- Morning star pattern -->
+                <rect x="70" y="75" width="15" height="20" fill="#ef5350" class="svg-candle"/>
+                <line x1="77.5" y1="70" x2="77.5" y2="75" stroke="#ef5350" stroke-width="2"/>
+                <line x1="77.5" y1="95" x2="77.5" y2="100" stroke="#ef5350" stroke-width="2"/>
+                
+                <rect x="90" y="80" width="10" height="5" fill="#cccccc" class="svg-candle"/>
+                <line x1="95" y1="75" x2="95" y2="80" stroke="#cccccc" stroke-width="2"/>
+                <line x1="95" y1="85" x2="95" y2="90" stroke="#cccccc" stroke-width="2"/>
+                
+                <rect x="105" y="60" width="15" height="25" fill="#26a69a" class="svg-candle"/>
+                <line x1="112.5" y1="55" x2="112.5" y2="60" stroke="#26a69a" stroke-width="2"/>
+                <line x1="112.5" y1="85" x2="112.5" y2="90" stroke="#26a69a" stroke-width="2"/>
+            </svg>
+        </div>
+        <p><strong>Segnale:</strong> Inversione al rialzo</p>
+        <ul class="description-list">
+            <li>Formazione a tre candele: una candela rossa lunga, seguita da un piccolo doji o piccola candela, e infine una candela verde lunga</li>
+            <li>La candela centrale (stella) indica esitazione del mercato</li>
+            <li>La terza candela verde conferma la ripresa del controllo da parte degli acquirenti</li>
+            <li>Più efficace quando si forma dopo un trend ribassista prolungato</li>
+        </ul>
+        <p class="tooltip">Nota tecnica 
+            <span class="tooltip-text">La stella mattutina è particolarmente efficace quando la candela verde finale (terza) chiude oltre la metà del corpo della prima candela rossa. Maggiore è il gap tra le candele, più forte è il segnale.</span>
+        </p>
+    </div>
+</div>
+                <!-- Pattern 7: Evening Star -->
+                <div class="pattern-card">
+                    <div class="pattern-header bearish">
+                        <h3>🔹 7. Evening Star</h3>
+                    </div>
+                    <div class="pattern-content">
+                        <div class="pattern-svg">
+                            <svg width="150" height="120" viewBox="0 0 150 120">
+                                <!-- Trend line up -->
+                                <path d="M10,90 Q40,70 70,40" stroke="#26a69a" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                                
+                                <!-- Previous green candles -->
+                                <rect x="30" y="70" width="15" height="25" fill="#26a69a" class="svg-candle"/>
+                                <line x1="37.5" y1="65" x2="37.5" y2="70" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="37.5" y1="95" x2="37.5" y2="100" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <rect x="50" y="60" width="15" height="25" fill="#26a69a" class="svg-candle"/>
+                                <line x1="57.5" y1="55" x2="57.5" y2="60" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="57.5" y1="85" x2="57.5" y2="90" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <!-- Evening Star pattern -->
+                                <rect x="70" y="45" width="15" height="20" fill="#26a69a" class="svg-candle"/>
+                                <line x1="77.5" y1="40" x2="77.5" y2="45" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="77.5" y1="65" x2="77.5" y2="70" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <rect x="90" y="40" width="10" height="5" fill="#78909c" class="svg-candle"/>
+                                <line x1="95" y1="37" x2="95" y2="40" stroke="#78909c" stroke-width="2"/>
+                                <line x1="95" y1="45" x2="95" y2="48" stroke="#78909c" stroke-width="2"/>
+                                
+                                <rect x="105" y="50" width="15" height="25" fill="#ef5350" class="svg-candle"/>
+                                <line x1="112.5" y1="45" x2="112.5" y2="50" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="112.5" y1="75" x2="112.5" y2="80" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <!-- Next red candle -->
+                                <rect x="125" y="65" width="15" height="25" fill="#ef5350" class="svg-candle"/>
+                                <line x1="132.5" y1="60" x2="132.5" y2="65" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="132.5" y1="90" x2="132.5" y2="95" stroke="#ef5350" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <p><strong>Segnale:</strong> Forte inversione ribassista</p>
+                        <ul class="description-list">
+                            <li>Struttura a tre candele: verde → doji/piccola → rossa forte</li>
+                            <li>Speculare al Morning Star</li>
+                            <li>La candela centrale mostra esitazione nel trend rialzista</li>
+                            <li>La terza candela conferma la presa di controllo dei venditori</li>
+                        </ul>
+                        <p class="tooltip">Nota tecnica 
+                            <span class="tooltip-text">Quando la candela centrale presenta un gap sia rispetto alla prima che alla terza candela, il pattern diventa ancora più potente. La dimensione della terza candela è indicativa della forza del movimento in arrivo.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="continuazione">
+            <h2>📈 Pattern di Continuazione</h2>
+            <p>Utili per confermare la direzione già in atto del mercato. Più indicati per seguire un trend in corso.</p>
+            
+            <div class="patterns-grid">
+                <!-- Pattern 8: Rising Three Methods -->
+                <div class="pattern-card">
+                    <div class="pattern-header bullish">
+                        <h3>🔹 8. Rising Three Methods</h3>
+                    </div>
+                    <div class="pattern-content">
+                        <div class="pattern-svg">
+                            <svg width="150" height="120" viewBox="0 0 150 120">
+                                <!-- Trend line up -->
+                                <path d="M10,90 Q70,70 130,30" stroke="#26a69a" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                                
+                                <!-- Rising Three Methods pattern -->
+                                <rect x="20" y="55" width="15" height="30" fill="#26a69a" class="svg-candle"/>
+                                <line x1="27.5" y1="50" x2="27.5" y2="55" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="27.5" y1="85" x2="27.5" y2="90" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <rect x="40" y="60" width="10" height="10" fill="#ef5350" class="svg-candle"/>
+                                <line x1="45" y1="57" x2="45" y2="60" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="45" y1="70" x2="45" y2="73" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <rect x="55" y="65" width="10" height="7" fill="#ef5350" class="svg-candle"/>
+                                <line x1="60" y1="62" x2="60" y2="65" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="60" y1="72" x2="60" y2="75" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <rect x="70" y="68" width="10" height="5" fill="#ef5350" class="svg-candle"/>
+                                <line x1="75" y1="65" x2="75" y2="68" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="75" y1="73" x2="75" y2="76" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <rect x="90" y="40" width="15" height="35" fill="#26a69a" class="svg-candle"/>
+                                <line x1="97.5" y1="35" x2="97.5" y2="40" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="97.5" y1="75" x2="97.5" y2="80" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <!-- Next green candle -->
+                                <rect x="110" y="30" width="15" height="20" fill="#26a69a" class="svg-candle"/>
+                                <line x1="117.5" y1="25" x2="117.5" y2="30" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="117.5" y1="50" x2="117.5" y2="55" stroke="#26a69a" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <p><strong>Segnale:</strong> Continuazione del trend rialzista</p>
+                        <ul class="description-list">
+                            <li>Struttura: Lunga candela verde → tre piccole rosse o laterali → altra verde forte</li>
+                            <li>Le tre candele intermedie rappresentano una pausa/consolidamento</li>
+                            <li>I prezzi non scendono sotto il minimo della prima candela verde</li>
+                            <li>L'ultima candela conferma la ripresa del trend rialzista</li>
+                        </ul>
+                        <p class="tooltip">Nota tecnica 
+                            <span class="tooltip-text">Le tre piccole candele centrali dovrebbero rimanere nel range della prima candela verde. L'ultima candela verde dovrebbe chiudere sopra il massimo della prima candela verde.</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Pattern 9: Falling Three Methods -->
+                <div class="pattern-card">
+                    <div class="pattern-header bearish">
+                        <h3>🔹 9. Falling Three Methods</h3>
+                    </div>
+                    <div class="pattern-content">
+                        <div class="pattern-svg">
+                            <svg width="150" height="120" viewBox="0 0 150 120">
+                                <!-- Trend line down -->
+                                <path d="M10,30 Q70,50 130,90" stroke="#ef5350" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+                                
+                                <!-- Falling Three Methods pattern -->
+                                <rect x="20" y="40" width="15" height="30" fill="#ef5350" class="svg-candle"/>
+                                <line x1="27.5" y1="35" x2="27.5" y2="40" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="27.5" y1="70" x2="27.5" y2="75" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <rect x="40" y="50" width="10" height="10" fill="#26a69a" class="svg-candle"/>
+                                <line x1="45" y1="47" x2="45" y2="50" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="45" y1="60" x2="45" y2="63" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <rect x="55" y="53" width="10" height="7" fill="#26a69a" class="svg-candle"/>
+                                <line x1="60" y1="50" x2="60" y2="53" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="60" y1="60" x2="60" y2="63" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <rect x="70" y="57" width="10" height="5" fill="#26a69a" class="svg-candle"/>
+                                <line x1="75" y1="54" x2="75" y2="57" stroke="#26a69a" stroke-width="2"/>
+                                <line x1="75" y1="62" x2="75" y2="65" stroke="#26a69a" stroke-width="2"/>
+                                
+                                <rect x="90" y="65" width="15" height="35" fill="#ef5350" class="svg-candle"/>
+                                <line x1="97.5" y1="60" x2="97.5" y2="65" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="97.5" y1="100" x2="97.5" y2="105" stroke="#ef5350" stroke-width="2"/>
+                                
+                                <!-- Next red candle -->
+                                <rect x="110" y="75" width="15" height="25" fill="#ef5350" class="svg-candle"/>
+                                <line x1="117.5" y1="70" x2="117.5" y2="75" stroke="#ef5350" stroke-width="2"/>
+                                <line x1="117.5" y1="100" x2="117.5" y2="105" stroke="#ef5350" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <p><strong>Segnale:</strong> Continuazione del trend ribassista</p>
+                        <ul class="description-list">
+                            <li>Struttura: Lunga candela rossa → tre piccole verdi/laterali → altra candela rossa forte</li>
+                            <li>Speculare al Rising Three Methods</li>
+                            <li>Le tre candele centrali non superano il massimo della prima candela rossa</li>
+                            <li>Indica che il mercato ha preso una pausa prima di continuare la discesa</li>
+                        </ul>
+                        <p class="tooltip">Nota tecnica 
+                            <span class="tooltip-text">Il pattern è più affidabile quando l'ultima candela rossa scende sotto il minimo della prima candela rossa, confermando la forza dei venditori e la continuazione del trend discendente.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="suggerimenti" class="tips">
+            <h2>🧠 Suggerimenti Operativi</h2>
+            <ol>
+                <li><strong>Mai usare un pattern da solo.</strong> Serve sempre il <strong>contesto</strong>: trend, volumi, supporti e resistenze.</li>
+                <li><strong>Conferme tecniche:</strong> Un pattern è più affidabile se confermato da:
+                    <ul>
+                        <li>RSI o MACD (per divergenze).</li>
+                        <li>Medie mobili (EMA 50 o EMA 200).</li>
+                        <li>Livelli chiave statici.</li>
+                    </ul>
+                </li>
+                <li><strong>Volumi:</strong> I volumi alti sulla candela di conferma rafforzano la validità del segnale.</li>
+                <li><strong>Affidabilità:</strong> Nessun pattern è infallibile. L'abilità è nel <strong>riconoscere la probabilità favorevole</strong>, non la certezza.</li>
+            </ol>
+        </section>
+        
+        <section id="conclusione" class="conclusion">
+            <h2>🧭 Conclusione</h2>
+            <p>I pattern candlestick sono uno strumento semplice ma potente per leggere l'intenzione del mercato in tempo reale. Nell'ambito del <strong>trading spot di criptovalute su timeframe H4</strong>, offrono un equilibrio ideale tra frequenza di segnali e affidabilità. Usati con giudizio e combinati con altri strumenti di analisi tecnica, possono costituire una base solida per operare in modo consapevole e strategico.</p>
+        </section>
+    </div>
+    
+    <a href="#" class="back-to-top">↑</a>
+    
+   <div class="footer">
+  Trading Spot Manager v1.1 | 
+  <a href="index.html">Operatività</a> | 
+  <a href="panoramica-capitale.html">Capitale</a> | 
+  <a href="blocco-note.html">Note</a> | 
+  <a href="candlestick.html">Candlestick</a><br>
+</div>
+    
+    <script>
+        // JavaScript per gestire il pulsante "torna in alto"
+        const backToTopButton = document.querySelector('.back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('show');
+            } else {
+                backToTopButton.classList.remove('show');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        // JavaScript per il menu di navigazione
+        document.querySelectorAll('.nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // JavaScript per animazioni sui pattern all'hover
+        document.querySelectorAll('.pattern-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                const svg = this.querySelector('.pattern-svg svg');
+                if (svg) {
+                    svg.style.transform = 'scale(1.05)';
+                    svg.style.transition = 'transform 0.3s ease';
+                }
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                const svg = this.querySelector('.pattern-svg svg');
+                if (svg) {
+                    svg.style.transform = 'scale(1)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
