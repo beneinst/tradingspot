@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Chart Patterns Cheat Sheet</title>
+   <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+        background-color: #333;
+        color: #e0e0e0;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #34495e;
+        padding-bottom: 15px;
+    }
+    
+    .header h1 {
+        color: #f39c12;
+        margin-bottom: 10px;
+        font-size: 2.5rem;
+    }
+    
+    .header p {
+        color: #bdc3c7;
+        font-size: 1.1rem;
+    }
+    
+    .patterns-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+    
+    .pattern-card {
+        background-color: #1e2940;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* AGGIUNTA FONDAMENTALE PER NASCONDERE LE CARD */
+    .pattern-card.hidden {
+        display: none !important; /* Rimuove completamente l'elemento dal layout */
+    }
+    /* FINE AGGIUNTA */
+    
+    .pattern-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+    
+    .pattern-image {
+        width: 100%;
+        height: 180px;
+        background-color: #2c3e50;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+    }
+    
+    .pattern-image img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    .pattern-info {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .pattern-name {
+        color: #3498db;
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+        text-align: center;
+        border-bottom: 1px solid #34495e;
+        padding-bottom: 8px;
+    }
+    
+    .pattern-type {
+        background-color: #2980b9;
+        color: white;
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .pattern-type.continuation {
+        background-color: #27ae60;
+    }
+    
+    .pattern-type.reversal {
+        background-color: #e74c3c;
+    }
+    
+    .pattern-type.neutral {
+        background-color: #f39c12;
+    }
+    
+    .pattern-type.special {
+        background-color: #9b59b6;
+    }
+    
+    .pattern-description {
+        color: #bdc3c7;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        flex-grow: 1;
+    }
+    
+    .pattern-tips {
+        background-color: #2c3e50;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        margin-top: auto;
+    }
+    
+    .pattern-tips h4 {
+        color: #f39c12;
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+    
+    .pattern-tips ul {
+        padding-left: 20px;
+        color: #ecf0f1;
+    }
+    
+    .pattern-tips li {
+        margin-bottom: 5px;
+    }
+    
+    .filter-section {
+        margin-bottom: 30px;
+        padding: 15px;
+        background-color: #1e2940;
+        border-radius: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .filter-section p {
+        margin-right: 15px;
+        font-weight: bold;
+        color: #3498db;
+    }
+    
+    .filter-btn {
+        background-color: #2c3e50;
+        color: #ecf0f1;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin: 5px;
+    }
+    
+    .filter-btn:hover {
+        background-color: #34495e;
+    }
+    
+    .filter-btn.active {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    .active-continuation {
+        background-color: #27ae60;
+        color: white;
+    }
+    
+    .active-reversal {
+        background-color: #e74c3c;
+        color: white;
+    }
+    
+    .active-neutral {
+        background-color: #f39c12;
+        color: white;
+    }
+    
+    .active-special {
+        background-color: #9b59b6;
+        color: white;
+    }
+    
+    .trading-notes {
+        background-color: #1e2940;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 30px 0;
+    }
+    
+    .trading-notes h3 {
+        color: #f39c12;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+        border-bottom: 1px solid #34495e;
+        padding-bottom: 8px;
+    }
+    
+    .trading-notes ul {
+        padding-left: 20px;
+    }
+    
+    .trading-notes li {
+        margin-bottom: 10px;
+        line-height: 1.6;
+    }
+    
+    @media (max-width: 768px) {
+        .patterns-container {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+        }
+        
+        .pattern-name {
+            font-size: 1.2rem;
+        }
+    }
+    .footer {
+        margin-top: 40px;
+        margin-bottom: 10px;
+        text-align: center;
+        font-size: 16px;
+        color: #F2BB66;
+        font-weight: normal;
+    }
+
+    .footer a {
+        color: #FAEBD7;
+        text-decoration: none;
+        margin: 0 8px;
+        transition: color 0.3s ease;
+    }
+
+    .footer a:hover {
+        color: #FFDB58;
+    }
+</style>
+</head>
+<body>
+    <div class="header">
+        <h1>Crypto Chart Patterns Cheat Sheet</h1>
+        <p>Patterns più utili per il trading spot a 4H sulle criptovalute</p>
+    </div>
+    
+    <div class="filter-section">
+        <p>Filtra per tipo:</p>
+        <button class="filter-btn active" data-filter="all">Tutti</button>
+        <button class="filter-btn" data-filter="continuation">Continuazione</button>
+        <button class="filter-btn" data-filter="reversal">Inversione</button>
+        <button class="filter-btn" data-filter="neutral">Neutrale</button>
+        <button class="filter-btn" data-filter="special">Speciale</button>
+    </div>
+    
+    <div class="patterns-container" id="patternsContainer">
+        <!-- Bullish Flag -->
+        <div class="pattern-card" data-type="continuation">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gQnVsbGlzaCBGbGFnIC0tPgogICAgPGxpbmUgeDE9IjUwIiB5MT0iMTUwIiB4Mj0iNTAiIHkyPSI1MCIgc3Ryb2tlPSJncmVlbiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTAsMTAwIDE1MCw3MCAxNTAsMTMwIDUwLDEwMCIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+CiAgICA8bGluZSB4MT0iMTUwIiB5MT0iMTAwIiB4Mj0iMjUwIiB5Mj0iNTAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgICA8IS0tIEFycm93cyAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAsNjAgNTAsNTAgNjAsNjAiIGZpbGw9ImdyZWVuIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjI0MCw2MCAyNTAsNTAgMjYwLDYwIiBmaWxsPSJncmVlbiIvPgogICAgPHRleHQgeD0iMTUwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNlMGUwZTAiIGZvbnQtc2l6ZT0iMTYiPkJ1bGxpc2ggRmxhZzwvdGV4dD4KPC9zdmc+" alt="Bullish Flag Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Bullish Flag</h3>
+                <span class="pattern-type continuation">Continuazione</span>
+                <p class="pattern-description">
+                    Un modello di continuazione rialzista che appare dopo un forte movimento verso l'alto (asta della bandiera), seguito da una fase di consolidamento con un canale discendente (bandiera).
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Entra quando il prezzo rompe sopra la bandiera</li>
+                        <li>Target: lunghezza dell'asta aggiunta al punto di breakout</li>
+                        <li>Stop loss sotto il punto più basso della bandiera</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bearish Flag -->
+        <div class="pattern-card" data-type="continuation">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gQmVhcmlzaCBGbGFnIC0tPgogICAgPGxpbmUgeDE9IjUwIiB5MT0iNTAiIHgyPSI1MCIgeTI9IjE1MCIgc3Ryb2tlPSJyZWQiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjUwLDEwMCAxNTAsMTMwIDE1MCw3MCA1MCwxMDAiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIvPgogICAgPGxpbmUgeDE9IjE1MCIgeTE9IjEwMCIgeDI9IjI1MCIgeTI9IjE1MCIgc3Ryb2tlPSJyZWQiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgICA8IS0tIEFycm93cyAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAsMTQwIDUwLDE1MCA2MCwxNDAiIGZpbGw9InJlZCIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIyNDAsMTQwIDI1MCwxNTAgMjYwLDE0MCIgZmlsbD0icmVkIi8+CiAgICA8dGV4dCB4PSIxNTAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2UwZTBlMCIgZm9udC1zaXplPSIxNiI+QmVhcmlzaCBGbGFnPC90ZXh0Pgo8L3N2Zz4=" alt="Bearish Flag Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Bearish Flag</h3>
+                <span class="pattern-type continuation">Continuazione</span>
+                <p class="pattern-description">
+                    Un modello di continuazione ribassista che appare dopo un forte movimento verso il basso (asta della bandiera), seguito da una fase di consolidamento con un canale ascendente (bandiera).
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Entra quando il prezzo rompe sotto la bandiera</li>
+                        <li>Target: lunghezza dell'asta sottratta al punto di breakout</li>
+                        <li>Stop loss sopra il punto più alto della bandiera</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pennant -->
+        <div class="pattern-card" data-type="continuation">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gUGVubmFudCAtLT4KICAgIDxsaW5lIHgxPSI1MCIgeTE9IjE1MCIgeDI9IjUwIiB5Mj0iNTAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjUwLDEwMCAxNTAsMTIwIDE1MCw4MCA1MCwxMDAiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIvPgogICAgPGxpbmUgeDE9IjE1MCIgeTE9IjEwMCIgeDI9IjI1MCIgeTI9IjUwIiBzdHJva2U9ImdyZWVuIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1kYXNoYXJyYXk9IjUsNSIvPgogICAgPCEtLSBBcnJvd3MgLS0+CiAgICA8cG9seWdvbiBwb2ludHM9IjQwLDYwIDUwLDUwIDYwLDYwIiBmaWxsPSJncmVlbiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIyNDAsNjAgMjUwLDUwIDI2MCw2MCIgZmlsbD0iZ3JlZW4iLz4KICAgIDx0ZXh0IHg9IjE1MCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZTBlMGUwIiBmb250LXNpemU9IjE2Ij5QZW5uYW50PC90ZXh0Pgo8L3N2Zz4=" alt="Pennant Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Pennant</h3>
+                <span class="pattern-type continuation">Continuazione</span>
+                <p class="pattern-description">
+                    Simile alla bandiera ma con una forma triangolare convergente. Appare dopo un forte movimento iniziale (asta) e rappresenta una breve pausa prima della continuazione del trend.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Aspetta la rottura della linea di tendenza inferiore o superiore</li>
+                        <li>Target: lunghezza dell'asta proiettata dal punto di breakout</li>
+                        <li>Volume in diminuzione durante la formazione e aumento alla rottura</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ascending Triangle -->
+        <div class="pattern-card" data-type="neutral">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gQXNjZW5kaW5nIFRyaWFuZ2xlIC0tPgogICAgPGxpbmUgeDE9IjUwIiB5MT0iMTAwIiB4Mj0iMjAwIiB5Mj0iMTAwIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjMiLz4KICAgIDxsaW5lIHgxPSI1MCIgeTE9IjE1MCIgeDI9IjIwMCIgeTI9IjEwMCIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICAgIDxsaW5lIHgxPSIyMDAiIHkxPSIxMDAiIHgyPSIyNTAiIHkyPSI1MCIgc3Ryb2tlPSJncmVlbiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICAgIDwhLS0gQXJyb3dzIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSIyNDAsNjAgMjUwLDUwIDI2MCw2MCIgZmlsbD0iZ3JlZW4iLz4KICAgIDxsaW5lIHgxPSI3MCIgeTE9IjE0MCIgeDI9IjkwIiB5Mj0iMTEwIiBzdHJva2U9ImdyZWVuIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iODUsMTE1IDkwLDExMCA5NSwxMTUiIGZpbGw9ImdyZWVuIi8+CiAgICA8dGV4dCB4PSIxNTAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2UwZTBlMCIgZm9udC1zaXplPSIxNiI+QXNjZW5kaW5nIFRyaWFuZ2xlPC90ZXh0Pgo8L3N2Zz4=" alt="Ascending Triangle Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Triangolo Ascendente</h3>
+                <span class="pattern-type neutral">Neutrale</span>
+                <p class="pattern-description">
+                    Formazione con una resistenza orizzontale in alto e una linea di tendenza ascendente in basso. Generalmente considerato rialzista, ma è necessario attendere la rottura.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Previsto breakout verso l'alto (rialzista)</li>
+                        <li>Target: altezza del triangolo aggiunta al punto di breakout</li>
+                        <li>Stop loss sotto l'ultimo minimo del triangolo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Descending Triangle -->
+        <div class="pattern-card" data-type="neutral">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gRGVzY2VuZGluZyBUcmlhbmdsZSAtLT4KICAgIDxsaW5lIHgxPSI1MCIgeTE9IjEwMCIgeDI9IjIwMCIgeTI9IjEwMCIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgICA8bGluZSB4MT0iNTAiIHkxPSI1MCIgeDI9IjIwMCIgeTI9IjEwMCIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICAgIDxsaW5lIHgxPSIyMDAiIHkxPSIxMDAiIHgyPSIyNTAiIHkyPSIxNTAiIHN0cm9rZT0icmVkIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1kYXNoYXJyYXk9IjUsNSIvPgogICAgPCEtLSBBcnJvd3MgLS0+CiAgICA8cG9seWdvbiBwb2ludHM9IjI0MCwxNDAgMjUwLDE1MCAyNjAsMTQwIiBmaWxsPSJyZWQiLz4KICAgIDxsaW5lIHgxPSI3MCIgeTE9IjYwIiB4Mj0iOTAiIHkyPSI5MCIgc3Ryb2tlPSJyZWQiIHN0cm9rZS13aWR0aD0iMiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI4NSw4NSA5MCw5MCA5NSw4NSIgZmlsbD0icmVkIi8+CiAgICA8dGV4dCB4PSIxNTAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2UwZTBlMCIgZm9udC1zaXplPSIxNiI+RGVzY2VuZGluZyBUcmlhbmdsZTwvdGV4dD4KPC9zdmc+" alt="Descending Triangle Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Triangolo Discendente</h3>
+                <span class="pattern-type neutral">Neutrale</span>
+                <p class="pattern-description">
+                    Formazione con un supporto orizzontale in basso e una linea di tendenza discendente in alto. Generalmente considerato ribassista, ma è necessario attendere la rottura.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Previsto breakout verso il basso (ribassista)</li>
+                        <li>Target: altezza del triangolo sottratta al punto di breakout</li>
+                        <li>Stop loss sopra l'ultimo massimo del triangolo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Symmetrical Triangle -->
+        <div class="pattern-card" data-type="neutral">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gU3ltbWV0cmljYWwgVHJpYW5nbGUgLS0+CiAgICA8bGluZSB4MT0iNTAiIHkxPSI1MCIgeDI9IjIwMCIgeTI9IjEwMCIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICAgIDxsaW5lIHgxPSI1MCIgeTE9IjE1MCIgeDI9IjIwMCIgeTI9IjEwMCIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICAgIDxsaW5lIHgxPSIyMDAiIHkxPSIxMDAiIHgyPSIyNTAiIHkyPSI1MCIgc3Ryb2tlPSJvcmFuZ2UiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgICA8bGluZSB4MT0iMjAwIiB5MT0iMTAwIiB4Mj0iMjUwIiB5Mj0iMTUwIiBzdHJva2U9Im9yYW5nZSIgc3Ryb2tlLXwidth="3" stroke-dasharray="5,5"/>
+    <!-- Arrows -->
+    <polygon points="240,60 250,50 260,60" fill="orange"/>
+    <polygon points="240,140 250,150 260,140" fill="orange"/>
+    <text x="150" y="180" text-anchor="middle" fill="#e0e0e0" font-size="16">Symmetrical Triangle</text>
+</svg>" alt="Symmetrical Triangle Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Triangolo Simmetrico</h3>
+                <span class="pattern-type neutral">Neutrale</span>
+                <p class="pattern-description">
+                    Modello di consolidamento con linee di tendenza convergenti sia dall'alto che dal basso. La direzione del breakout spesso segue il trend precedente ma può essere in entrambe le direzioni.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Attendi la conferma della direzione del breakout</li>
+                        <li>Target: altezza del triangolo proiettata dal punto di breakout</li>
+                        <li>Volume in diminuzione durante la formazione e aumento alla rottura</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Head and Shoulders -->
+        <div class="pattern-card" data-type="reversal">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gSGVhZCBhbmQgU2hvdWxkZXJzIC0tPgogICAgPHBhdGggZD0iTTUwLDEyMCBDNjAsMTAwIDgwLDkwIDkwLDEwMCBDMTAwLDExMCAxMTAsMTEwIDEyMCwxMDAgQzEzMCw5MCAxNTAsNzAgMTcwLDgwIEMxOTAsOTAgMjAwLDkwIDIxMCw4MCBDMjIwLDcwIDI0MCw4MCAyNTAsMTAwIEMyNjAsMTIwIDI3MCwxNDAgMjgwLDE1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjMiLz4KICAgIDxsaW5lIHgxPSI5MCIgeTE9IjEwMCIgeDI9IjI1MCIgeTI9IjEwMCIgc3Ryb2tlPSIjZTc0YzNjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUsNSIvPgogICAgPGxpbmUgeDE9IjI1MCIgeTE9IjEwMCIgeDI9IjI4MCIgeTI9IjE1MCIgc3Ryb2tlPSIjZTc0YzNjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUsNSIvPgogICAgPHRleHQgeD0iMTUwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNlMGUwZTAiIGZvbnQtc2l6ZT0iMTYiPkhlYWQgYW5kIFNob3VsZGVyczwvdGV4dD4KPC9zdmc+" alt="Head and Shoulders Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Testa e Spalle</h3>
+                <span class="pattern-type reversal">Inversione</span>
+                <p class="pattern-description">
+                    Un importante pattern di inversione con tre picchi: una spalla sinistra, una testa (più alta) e una spalla destra. La rottura della neckline segnala spesso una forte inversione rialzista-ribassista.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Entra quando il prezzo rompe la neckline (discendente)</li>
+                        <li>Target: distanza dalla testa alla neckline sottratta al punto di breakout</li>
+                        <li>Possibile pullback alla neckline dopo la rottura</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Inverse Head and Shoulders -->
+        <div class="pattern-card" data-type="reversal">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gSW52ZXJzZSBIZWFkIGFuZCBTaG91bGRlcnMgLS0+CiAgICA8cGF0aCBkPSJNNTAsODAgQzYwLDEwMCA4MCwxMTAgOTAsMTAwIEMxMDAsMTEwIDExMCwxMTAgMTIwLDEyMCBDMTMwLDEzMCAxNTAsMTUwIDE3MCwxNDAgQzE5MCwxMzAgMjAwLDEzMCAyMTAsMTIwIEMyMjAsMTEwIDI0MCwxMjAgMjUwLDEwMCBDMjYwLDgwIDI3MCw2MCAyODAsNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgICA8bGluZSB4MT0iOTAiIHkxPSIxMDAiIHgyPSIyNTAiIHkyPSIxMDAiIHN0cm9rZT0iIzI3YWU2MCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICAgIDxsaW5lIHgxPSIyNTAiIHkxPSIxMDAiIHgyPSIyODAiIHkyPSI1MCIgc3Ryb2tlPSIjMjdhZTYwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUsNSIvPgogICAgPHRleHQgeD0iMTUwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNlMGUwZTAiIGZvbnQtc2l6ZT0iMTYiPkludmVyc2UgSGVhZCBhbmQgU2hvdWxkZXJzPC90ZXh0Pgo8L3N2Zz4=" alt="Inverse Head and Shoulders Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Testa e Spalle Inverso</h3>
+                <span class="pattern-type reversal">Inversione</span>
+                <p class="pattern-description">
+                    La versione speculare del testa e spalle, con tre minimi: spalla sinistra, testa (più bassa) e spalla destra. Segnala un'inversione di tendenza da ribassista a rialzista.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Entra quando il prezzo rompe la neckline (ascendente)</li>
+                        <li>Target: distanza dalla testa alla neckline aggiunta al punto di breakout</li>
+                        <li>Volume crescente sulla formazione della spalla destra e breakout</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Double Top -->
+        <div class="pattern-card" data-type="reversal">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gRG91YmxlIFRvcCAtLT4KICAgIDxwYXRoIGQ9Ik01MCwxMjAgQzcwLDEwMCA4MCw3MCAxMDAsNTAgQzEyMCw3MCAxMzAsMTAwIDE1MCwxMjAgQzE3MCwxMDAgMTgwLDcwIDIwMCw1MCBDMjIwLDcwIDIzMCwxMDAgMjUwLDE1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjMiLz4KICAgIDxsaW5lIHgxPSIxMDAiIHkxPSI1MCIgeDI9IjIwMCIgeTI9IjUwIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUsNSIvPgogICAgPGxpbmUgeDE9IjE1MCIgeTE9IjEyMCIgeDI9IjI1MCIgeTI9IjE1MCIgc3Ryb2tlPSIjZTc0YzNjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUsNSIvPgogICAgPHRleHQgeD0iMTUwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNlMGUwZTAiIGZvbnQtc2l6ZT0iMTYiPkRvdWJsZSBUb3A8L3RleHQ+Cjwvc3ZnPg==" alt="Double Top Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Doppio Massimo</h3>
+                <span class="pattern-type reversal">Inversione</span>
+                <p class="pattern-description">
+                    Pattern di inversione ribassista che si forma quando il prezzo raggiunge due volte lo stesso livello di resistenza senza riuscire a superarlo, per poi scendere sotto il supporto intermedio.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Entra quando il prezzo rompe sotto il supporto (neckline)</li>
+                        <li>Target: altezza dal massimo al supporto sottratta al punto di breakout</li>
+                        <li>Volume in diminuzione sul secondo massimo e aumento sul breakout</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Double Bottom -->
+        <div class="pattern-card" data-type="reversal">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gRG91YmxlIEJvdHRvbSAtLT4KICAgIDxwYXRoIGQ9Ik01MCw4MCBDNzAsMTAwIDgwLDEzMCAxMDAsMTUwIEMxMjAsMTMwIDEzMCwxMDAgMTUwLDgwIEMxNzAsMTAwIDE4MCwxMzAgMjAwLDE1MCBDMjIwLDEzMCAyMzAsMTAwIDI1MCw1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjMiLz4KICAgIDxsaW5lIHgxPSIxMDAiIHkxPSIxNTAiIHgyPSIyMDAiIHkyPSIxNTAiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgICA8bGluZSB4MT0iMTUwIiB5MT0iODAiIHgyPSIyNTAiIHkyPSI1MCIgc3Ryb2tlPSIjMjdhZTYwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUsNSIvPgogICAgPHRleHQgeD0iMTUwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNlMGUwZTAiIGZvbnQtc2l6ZT0iMTYiPkRvdWJsZSBCb3R0b208L3RleHQ+Cjwvc3ZnPg==" alt="Double Bottom Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Doppio Minimo</h3>
+                <span class="pattern-type reversal">Inversione</span>
+                <p class="pattern-description">
+                    Pattern di inversione rialzista che si forma quando il prezzo raggiunge due volte lo stesso livello di supporto senza romperlo, per poi salire sopra la resistenza intermedia.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Entra quando il prezzo rompe sopra la resistenza (neckline)</li>
+                        <li>Target: altezza dal minimo alla resistenza aggiunta al punto di breakout</li>
+                        <li>Volume in diminuzione sul secondo minimo e aumento sul breakout</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Falling Wedge -->
+        <div class="pattern-card" data-type="reversal">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gRmFsbGluZyBXZWRnZSAtLT4KICAgIDxsaW5lIHgxPSI1MCIgeTE9IjUwIiB4Mj0iMjAwIiB5Mj0iMTIwIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1kYXNoYXJyYXk9IjUsNSIvPgogICAgPGxpbmUgeDE9IjUwIiB5MT0iODAiIHgyPSIyMDAiIHkyPSIxMTUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgICA8bGluZSB4MT0iMjAwIiB5MT0iMTE3LjUiIHgyPSIyNTAiIHkyPSI3MCIgc3Ryb2tlPSIjMjdhZTYwIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1kYXNoYXJyYXk9IjUsNSIvPgogICAgPCEtLSBBcnJvd3MgLS0+CiAgICA8cG9seWdvbiBwb2ludHM9IjI0MCw4MCAyNTAsNzAgMjYwLDgwIiBmaWxsPSIjMjdhZTYwIi8+CiAgICA8dGV4dCB4PSIxNTAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2UwZTBlMCIgZm9udC1zaXplPSIxNiI+RmFsbGluZyBXZWRnZTwvdGV4dD4KPC9zdmc+" alt="Falling Wedge Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Cuneo Discendente</h3>
+                <span class="pattern-type reversal">Inversione</span>
+                <p class="pattern-description">
+                    Pattern formato da due linee di tendenza convergenti al ribasso. Malgrado la tendenza discendente, è considerato un pattern di inversione rialzista, soprattutto quando si forma in un trend ribassista.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Entra quando il prezzo rompe sopra la resistenza superiore</li>
+                        <li>Target: ampiezza iniziale del cuneo proiettata dal punto di breakout</li>
+                        <li>Stop loss sotto il minimo più recente del cuneo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rising Wedge -->
+        <div class="pattern-card" data-type="reversal">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gUmlzaW5nIFdlZGdlIC0tPgogICAgPGxpbmUgeDE9IjUwIiB5MT0iMTUwIiB4Mj0iMjAwIiB5Mj0iODAiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgICA8bGluZSB4MT0iNTAiIHkxPSIxMjAiIHgyPSIyMDAiIHkyPSI4NSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICAgIDxsaW5lIHgxPSIyMDAiIHkxPSI4Mi41IiB4Mj0iMjUwIiB5Mj0iMTMwIiBzdHJva2U9IiNlNzRjM2MiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgICA8IS0tIEFycm93cyAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjQwLDEyMCAyNTAsMTMwIDI2MCwxMjAiIGZpbGw9IiNlNzRjM2MiLz4KICAgIDx0ZXh0IHg9IjE1MCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZTBlMGUwIiBmb250LXNpemU9IjE2Ij5SaXNpbmcgV2VkZ2U8L3RleHQ+Cjwvc3ZnPg==" alt="Rising Wedge Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Cuneo Ascendente</h3>
+                <span class="pattern-type reversal">Inversione</span>
+                <p class="pattern-description">
+                    Pattern formato da due linee di tendenza convergenti al rialzo. Malgrado la tendenza ascendente, è considerato un pattern di inversione ribassista, soprattutto quando si forma in un trend rialzista.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Entra quando il prezzo rompe sotto il supporto inferiore</li>
+                        <li>Target: ampiezza iniziale del cuneo proiettata dal punto di breakout</li>
+                        <li>Stop loss sopra il massimo più recente del cuneo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cup and Handle -->
+        <div class="pattern-card" data-type="continuation">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gQ3VwIGFuZCBIYW5kbGUgLS0+CiAgICA8cGF0aCBkPSJNNTAsNzAgTDgwLDcwIEM5MCwxMDAgMTAwLDEyMCAxMjAsMTMwIEMxNDAsMTQwIDE2MCwxNDAgMTgwLDEzMCBDMjAwLDEyMCAyMTAsMTAwIDIyMCw3MCBMMjQwLDcwIEMyMzAsODAgMjI1LDkwIDIzMCwxMDAgQzIzNSwxMTAgMjQ1LDEwMCAyNTAsOTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgICA8bGluZSB4MT0iODAiIHkxPSI3MCIgeDI9IjI0MCIgeTI9IjcwIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUsNSIvPgogICAgPGxpbmUgeDE9IjI1MCIgeTE9IjkwIiB4Mj0iMjgwIiB5Mj0iNTAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgICA8IS0tIEFycm93cyAtLT4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjcwLDYwIDI4MCw1MCAyOTAsNjAiIGZpbGw9ImdyZWVuIi8+CiAgICA8dGV4dCB4PSIxNTAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2UwZTBlMCIgZm9udC1zaXplPSIxNiI+Q3VwIGFuZCBIYW5kbGU8L3RleHQ+Cjwvc3ZnPg==" alt="Cup and Handle Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Tazza con Manico</h3>
+                <span class="pattern-type continuation">Continuazione</span>
+                <p class="pattern-description">
+                    Pattern di continuazione rialzista che somiglia a una tazza seguita da un piccolo ribasso (manico). Si verifica generalmente durante un trend rialzista e segnala la continuazione del trend.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Entra quando il prezzo rompe sopra la resistenza del bordo della tazza</li>
+                        <li>Target: profondità della tazza aggiunta al punto di breakout</li>
+                        <li>Volume in aumento sul breakout come conferma</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+     <!-- Broadening Formation -->
+        <div class="pattern-card" data-type="special">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gQnJvYWRlbmluZyBGb3JtYXRpb24gLS0+CiAgICA8bGluZSB4MT0iNTAiIHkxPSIxMDAiIHgyPSIyMDAiIHkyPSI1MCIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICAgIDxsaW5lIHgxPSI1MCIgeTE9IjEwMCIgeDI9IjIwMCIgeTI9IjE1MCIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICAgIDxwb2x5bGluZSBwb2ludHM9IjUwLDEwMCA4MCw4MCAxMjAsMTIwIDE2MCw4MCAyMDAsMTMwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIHN0cm9rZS13aWR0aD0iMiIvPgogICAgPHRleHQgeD0iMTUwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNlMGUwZTAiIGZvbnQtc2l6ZT0iMTYiPkJyb2FkZW5pbmcgRm9ybWF0aW9uPC90ZXh0Pgo8L3N2Zz4=" alt="Broadening Formation Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Formazione di Espansione</h3>
+                <span class="pattern-type special">Speciale</span>
+                <p class="pattern-description">
+                    Pattern che si forma quando il prezzo crea massimi e minimi sempre più lontani tra loro. Indica un mercato indeciso con una volatilità crescente.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Trading rischioso a causa dell'alta volatilità</li>
+                        <li>Considera di operare solo sui tocchi di linea di trend</li>
+                        <li>Usa stop loss più ampi del normale</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Head and Shoulders -->
+        <div class="pattern-card" data-type="reversal">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gSGVhZCBhbmQgU2hvdWxkZXJzIC0tPgogICAgPHBvbHlsaW5lIHBvaW50cz0iNTAsOTAgODAsNzAgMTAwLDkwIDEzMCw1MCAxNjAsOTAgMTgwLDcwIDIxMCw5MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjMiLz4KICAgIDxsaW5lIHgxPSI1MCIgeTE9IjkwIiB4Mj0iMjEwIiB5Mj0iOTAiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSw1Ii8+CiAgICA8bGluZSB4MT0iMjEwIiB5MT0iOTAiIHgyPSIyNTAiIHkyPSIxMzAiIHN0cm9rZT0icmVkIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUsMCIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIyNDAsMTIwIDI1MCwxMzAgMjQwLDE0MCIgZmlsbD0icmVkIi8+CiAgICA8dGV4dCB4PSIxNTAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2UwZTBlMCIgZm9udC1zaXplPSIxNiI+SGVhZCBhbmQgU2hvdWxkZXJzPC90ZXh0Pgo8L3N2Zz4=" alt="Head and Shoulders Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Testa e Spalle</h3>
+                <span class="pattern-type reversal">Inversione</span>
+                <p class="pattern-description">
+                    Pattern di inversione che si forma alla fine di un trend rialzista, costituito da tre picchi con quello centrale (testa) più alto dei due laterali (spalle).
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Entra quando il prezzo rompe la neckline al ribasso</li>
+                        <li>Target: distanza tra il top della testa e la neckline, proiettata al ribasso</li>
+                        <li>Conferma con l'aumento di volume nella rottura della neckline</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Double Bottom -->
+        <div class="pattern-card" data-type="reversal">
+            <div class="pattern-image">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj4KICAgIDwhLS0gRG91YmxlIEJvdHRvbSAtLT4KICAgIDxwb2x5bGluZSBwb2ludHM9IjUwLDUwIDgwLDEyMCAxMzAsODAgMTgwLDEyMCAyMTAsNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgICA8bGluZSB4MT0iMTMwIiB5MT0iODAiIHgyPSIxMzAiIHkyPSI0MCIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI1LDUiLz4KICAgIDxsaW5lIHgxPSIyMTAiIHkxPSI1MCIgeDI9IjI1MCIgeTI9IjIwIiBzdHJva2U9ImdyZWVuIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUsMCIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIyNDAsMzAgMjUwLDIwIDI2MCwzMCIgZmlsbD0iZ3JlZW4iLz4KICAgIDx0ZXh0IHg9IjE1MCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZTBlMGUwIiBmb250LXNpemU9IjE2Ij5Eb3VibGUgQm90dG9tPC90ZXh0Pgo8L3N2Zz4=" alt="Double Bottom Pattern">
+            </div>
+            <div class="pattern-info">
+                <h3 class="pattern-name">Doppio Minimo</h3>
+                <span class="pattern-type reversal">Inversione</span>
+                <p class="pattern-description">
+                    Pattern di inversione che si forma dopo un trend ribassista, caratterizzato da due minimi consecutivi approssimativamente allo stesso livello di prezzo.
+                </p>
+                <div class="pattern-tips">
+                    <h4>Trading Tips:</h4>
+                    <ul>
+                        <li>Entra quando il prezzo rompe sopra il massimo centrale tra i due minimi</li>
+                        <li>Target: altezza del pattern proiettata al rialzo dal punto di breakout</li>
+                        <li>Verifica la convergenza di indicatori come RSI e MACD</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+		</div>
+		<div class="footer">
+  Trading Spot Manager v1.1 | 
+  <a href="index.html">Operatività</a> | 
+  <a href="panoramica-capitale.html">Capitale</a> | 
+  <a href="blocco-note.html">Note</a> | 
+  <a href="candlestick.html">Candlestick</a> | 
+  <a href="cheat-sheet.html">Patterns</a>
+</div>
+ <script>
+   document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const patternsContainer = document.getElementById('patternsContainer');
+    // Otteniamo tutte le card una volta, come array statico, per mantenere l'ordine originale
+    const originalPatternCards = Array.from(patternsContainer.children);
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // --- 1. Gestione classe 'active' per i pulsanti ---
+            // Rimuove la classe 'active' da tutti i pulsanti
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            // Aggiunge la classe 'active' al pulsante cliccato
+            this.classList.add('active');
+
+            const filterType = this.dataset.filter; // Ottiene il valore di data-filter dal pulsante cliccato
+
+            // --- 2. Preparazione per il riordinamento e il filtraggio ---
+            const matchingCards = []; // Contiene le card che corrispondono al filtro (o tutte se "all")
+            const otherCards = [];    // Contiene le card che non corrispondono al filtro
+
+            // Popola gli array basandosi sul tipo di filtro
+            originalPatternCards.forEach(card => {
+                const cardType = card.dataset.type;
+                if (filterType === 'all' || cardType === filterType) {
+                    matchingCards.push(card);
+                } else {
+                    otherCards.push(card);
+                }
+            });
+
+            // --- 3. Riordinamento nel DOM ---
+            // Rimuove tutti gli elementi attuali dal contenitore per poterli riaggiungere nell'ordine desiderato
+            patternsContainer.innerHTML = '';
+
+            // Aggiunge prima le card che corrispondono al filtro
+            matchingCards.forEach(card => {
+                card.classList.remove('hidden'); // Assicura che queste card siano visibili
+                patternsContainer.appendChild(card);
+            });
+
+            // Aggiunge poi le altre card
+            otherCards.forEach(card => {
+                if (filterType !== 'all') {
+                    // Se il filtro non è "all", nasconde le card non corrispondenti
+                    card.classList.add('hidden');
+                } else {
+                    // Se il filtro è "all", assicura che anche queste card siano visibili
+                    card.classList.remove('hidden');
+                }
+                patternsContainer.appendChild(card);
+            });
+        });
+    });
+
+    // Esegui il filtro "all" all'avvio per assicurare che tutte le card siano visibili
+    // e che il pulsante "Tutti" sia attivo fin da subito.
+    document.querySelector('.filter-btn[data-filter="all"]').click();
+});
+    </script>
+
+</body>
+</html>
