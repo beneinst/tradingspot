@@ -11,7 +11,7 @@
       --secondary-color: #2ecc71;
       --accent-color: #e74c3c;
       --binance-color: #f39c12;
-      --background-color: #D1D0CE;
+      --background-color: #333;
       --card-color: #ffffff;
       --border-color: #e0e0e0;
       --text-color: #333333;
@@ -38,26 +38,22 @@
     }
     
     .header {
-            text-align: center;
-			
-            margin-bottom: 20px;
-			background-color: #4a6fa5;
-            color: #ffffff !important;
-            padding: 20px;
-            border-radius: 10px 10px 0 0;
-            
-            
+      text-align: center;
+      margin-bottom: 20px;
+      background-color: #4a6fa5;
+      color: #ffffff !important;
+      padding: 20px;
+      border-radius: 10px 10px 0 0;
     }
 	
-	.head2 {
-  text-align: center;
-  margin-bottom: 20px;
-  background-color: #4a6fa5;
-  color: #ffffff !important;
-  padding: 20px;
-  border-radius: 10px 10px 0 0;
-}
-
+    .head2 {
+      text-align: center;
+      margin-bottom: 20px;
+      background-color: #4a6fa5;
+      color: #ffffff !important;
+      padding: 20px;
+      border-radius: 10px 10px 0 0;
+    }
     
     h1 {
       color: var(--primary-color);
@@ -74,7 +70,7 @@
     }
     
     .header-stat-item {
-      background-color: rgba(0, 0, 0, 0.03);
+      background-color: rgba(52, 152, 219, 0.2);
       padding: 10px 20px;
       border-radius: 6px;
       text-align: center;
@@ -103,7 +99,7 @@
     }
     
     .info-box {
-      background-color: rgba(52, 152, 219, 0.6);
+      background-color: rgba(52, 152, 219, 0.2);
       border-left: 4px solid var(--primary-color);
       padding: 10px 15px;
       border-radius: 4px;
@@ -128,12 +124,12 @@
       border-bottom: 1px solid var(--border-color);
     }
     
-	.titolo-bianco {
-  color: #ffffff;
-  font-size: 28px;
-  margin: 0;
-  line-height: 28px;
-}
+    .titolo-bianco {
+      color: #ffffff;
+      font-size: 28px;
+      margin: 0;
+      line-height: 28px;
+    }
 
     .card h2 {
       color: var(--primary-color);
@@ -235,10 +231,12 @@
       background-color: #c0392b;
     }
     
+    /* Modificata l'altezza per evitare il taglio durante l'hover */
     .chart-container {
-      height: 490px;
+      height: 600px;
       margin-top: 20px;
       position: relative;
+      padding: 20px 0;
     }
     
     .backup-container {
@@ -254,24 +252,23 @@
     }
     
     .footer {
-  margin-top: 30px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: bold;
-  
-}
+      margin-top: 30px;
+      text-align: center;
+      font-size: 16px;
+	  color: #F2BB66;
+      font-weight: normal;
+    }
 
-.footer a {
-  color: black;
-  text-decoration: none;
-  margin: 0 8px;
-  transition: color 0.3s ease;
-}
+    .footer a {
+      color: #FAEBD7;
+      text-decoration: none;
+      margin: 0 8px;
+      transition: color 0.3s ease;
+    }
 
-.footer a:hover {
-  color: #7BCCB5;
-}
-
+    .footer a:hover {
+      color: #FFDB58;
+    }
     
     @media (max-width: 768px) {
       .stats-grid {
@@ -303,384 +300,395 @@
 </head>
 <body>
 <div class="container">
-       <div class="head2" style="color: white !important;">
-  <p class="titolo-bianco"><strong>Panoramica del Capitale in Trading</strong></p>
+  <div class="head2" style="color: white !important;">
+    <p class="titolo-bianco"><strong>Panoramica del Capitale in Trading</strong></p>
   </div>
 
-  
-      
-      
-      
-   
-
-    </header>
+  <div class="card">
+    <div class="card-header">
+      <h2>Distribuzione Capitale</h2>
+    </div>
     
-    <div class="card">
-      <div class="card-header">
-        <h2>Distribuzione Capitale</h2>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-label">CoinGecko</div>
+        <div class="stat-value coingecko" id="coingecko">21</div>
       </div>
-      
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-label">CoinGecko</div>
-          <div class="stat-value coingecko" id="coingecko">21</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Binance</div>
-          <div class="stat-value binance" id="binance">2</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Totale In</div>
-          <div class="stat-value totale" id="totaleIn">23</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">A Capitale</div>
-          <div class="stat-value capitale" id="capitale">43</div>
-        </div>
+      <div class="stat-item">
+        <div class="stat-label">Binance</div>
+        <div class="stat-value binance" id="binance">2</div>
       </div>
-      
-     <div class="chart-container" style="padding-top: 10px;">
-  <canvas id="capitaleChart" width="1200" height="1200" style="display: block; box-sizing: border-box; height: 1300px; width: 1300px;"></canvas>
+      <div class="stat-item">
+        <div class="stat-label">Totale In</div>
+        <div class="stat-value totale" id="totaleIn">23</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">A Capitale</div>
+        <div class="stat-value capitale" id="capitale">43</div>
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <canvas id="capitaleChart"></canvas>
+    </div>
+  </div>
+    
+  <div class="card">
+    <div class="card-header">
+      <h2>Gestione Trade</h2>
+    </div>
+    
+    <div class="input-group">
+      <div class="form-group">
+        <label for="inputCoinGecko">CoinGecko</label>
+        <input type="number" id="inputCoinGecko" value="22" min="0">
+      </div>
+      <div class="form-group">
+        <label for="inputBinance">Binance</label>
+        <input type="number" id="inputBinance" value="4" min="0">
+      </div>
+    </div>
+    
+    <button onclick="aggiornaTrade()">Aggiorna Trade</button>
+  </div>
+ <div class="card">
+  <div class="card-header">
+    <h2>Regola</h2>
+  </div>
+  <div class="header-stats">
+    <div class="header-stat-item">
+      <div class="header-stat-label">Trade Totali</div>
+      <div class="header-stat-value" id="totaleTrade">56</div>
+    </div>
+    <div class="header-stat-item">
+      <div class="header-stat-label">$ per Trade</div>
+      <div class="header-stat-value">
+        <input type="number" id="quotaPerTrade" class="quota-input" value="40" min="1" onchange="aggiornaTotali()">
+      </div>
+    </div>
+    <div class="info-box">
+      <br><em><strong>Regola di ingresso:</strong></em> si effettuano al massimo <em><strong>2 o 3 trade ogni 24 ore</strong></em>, per un totale massimo di 6 in contemporanea.  
+      Ogni trade ha una durata di <em><strong>10 candele da 4 ore</strong></em> (circa 40 ore), alla fine delle quali si valuta un nuovo ingresso solo se il prezzo è in posizione favorevole.  
+      <br><em><strong>Obiettivo:</strong></em> proteggere il capitale e garantire una rendita costante nel tempo, suddividendo il totale in <em><strong>56 operazioni complessive</strong></em>.  
+      <br><em><strong>Stato attuale:</strong></em> l'intero capitale è attualmente impegnato nei 56 trade, ma <em><strong>i profitti iniziano fin da subito</strong></em>, non da un giorno futuro. Di seguito il Capitale nella situazione attuale. Maggiori Info Mensilità <a href="index.html" target="_blank">clicca qui</a>. <span id="infoTotaleTrade">56</span>
+    </div>
+  </div>
+</div> 
+
+  
+  
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Backup &amp; Ripristino</h2>
+    </div>
+    
+    <p>Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
+    
+    <div class="backup-container">
+      <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
+      <input type="file" id="fileInput" accept=".json">
+      <button onclick="caricaDati()">Carica Dati</button>
+    </div>
+  </div>
 </div>
 
-    </div>
-    
-    <div class="card">
-      <div class="card-header">
-        <h2>Gestione Trade</h2>
-      </div>
-      
-      <div class="input-group">
-        <div class="form-group">
-          <label for="inputCoinGecko">CoinGecko</label>
-          <input type="number" id="inputCoinGecko" value="22" min="0">
-        </div>
-        <div class="form-group">
-          <label for="inputBinance">Binance</label>
-          <input type="number" id="inputBinance" value="4" min="0">
-        </div>
-      </div>
-      
-      <button onclick="aggiornaTrade()">Aggiorna Trade</button>
-    </div>
-	<div class="header-stats">
-        <div class="header-stat-item">
-          <div class="header-stat-label">Trade Totali</div>
-          <div class="header-stat-value" id="totaleTrade">56</div>
-        </div>
-        <div class="header-stat-item">
-          <div class="header-stat-label">$ per Trade</div>
-          <div class="header-stat-value">
-            <input type="number" id="quotaPerTrade" class="quota-input" value="40" min="1" onchange="aggiornaTotali()">
-          </div>
-        </div>
-      </div>
-	  <div class="info-box">
-   
-  <br><em><strong>Regola di ingresso:</strong></em> si effettuano al massimo <em><strong>2 o 3 trade ogni 24 ore</strong></em>, per un totale massimo di 6 in contemporanea.  
-  Ogni trade ha una durata di <em><strong>10 candele da 4 ore</strong></em> (circa 40 ore), alla fine delle quali si valuta un nuovo ingresso solo se il prezzo è in posizione favorevole.  
-  <br><em><strong>Obiettivo:</strong></em> proteggere il capitale e garantire una rendita costante nel tempo, suddividendo il totale in <em><strong>56 operazioni complessive</strong></em>.  
-  <br><em><strong>Stato attuale:</strong></em> l’intero capitale è attualmente impegnato nei 56 trade, ma <em><strong>i profitti iniziano fin da subito</strong></em>, non da un giorno futuro. Di seguito il Capitale nella situazione attuale. Maggiori Info Mensilità <a href="index.html" target="_blank">clicca qui</a>. <span id="infoTotaleTrade">56</span></div>
-
-    
-    <div class="card">
-      <div class="card-header">
-        <h2>Backup &amp; Ripristino</h2>
-      </div>
-      
-      <p>Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
-      
-      <div class="backup-container">
-        <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
-        <input type="file" id="fileInput" accept=".json">
-        <button onclick="caricaDati()">Carica Dati</button>
-      </div>
-    </div>
-    
-    </div>
-	<div class="footer">
+<div class="footer">
   Trading Spot Manager v1.1 | 
   <a href="index.html">Operatività</a> | 
   <a href="panoramica-capitale.html">Capitale</a> | 
   <a href="blocco-note.html">Note</a>
 </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-  <script>
-    // Dati principali dell'applicazione
-    const datiCapitale = {
-      coingecko: 22,
-      binance: 4,
-      totaleIn: 26,
-      capitale: 40,
-      totaleTrade: 56,
-      quotaPerTrade: 40,
-      storicoCapitale: []
-    };
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+  // Dati principali dell'applicazione
+  const datiCapitale = {
+    coingecko: 22,
+    binance: 4,
+    totaleIn: 26,
+    capitale: 40,
+    totaleTrade: 56,
+    quotaPerTrade: 40,
+    storicoCapitale: []
+  };
+  
+  // Variabile per il grafico
+  let capitaleChart = null;
+  
+  // Funzione di inizializzazione
+  function inizializza() {
+    // Carica dati salvati se disponibili
+    caricaDatiLocali();
     
-    // Variabile per il grafico
-    let capitaleChart = null;
-    
-    // Funzione di inizializzazione
-    function inizializza() {
-      // Carica dati salvati se disponibili
-      caricaDatiLocali();
-      
-      // Aggiorna l'interfaccia con i dati attuali
-      aggiornaInterfaccia();
-      
-      // Crea il grafico iniziale
-      creaGraficoCapitale();
-    }
-    
-    // Aggiorna i totali
-    function aggiornaTotali() {
-      datiCapitale.quotaPerTrade = parseFloat(document.getElementById("quotaPerTrade").value) || datiCapitale.quotaPerTrade;
-      
-      // Aggiorna l'interfaccia
-      aggiornaInterfaccia();
-      
-      // Salva lo stato nei dati storici
-      salvaStorico();
-      
-      // Salva i dati in localStorage
-      salvaDatiLocali();
-      
-      // Aggiorna il grafico
-      aggiornaGrafico();
-    }
-    
-    // Aggiorna i dati dei trade
-    function aggiornaTrade() {
-      const nuovoCoinGecko = parseInt(document.getElementById("inputCoinGecko").value);
-      const nuovoBinance = parseInt(document.getElementById("inputBinance").value);
-      
-      if (!isNaN(nuovoCoinGecko)) {
-        datiCapitale.coingecko = nuovoCoinGecko;
-      }
-      
-      if (!isNaN(nuovoBinance)) {
-        datiCapitale.binance = nuovoBinance;
-      }
-      
-      // Calcola il totale in
-      datiCapitale.totaleIn = datiCapitale.coingecko + datiCapitale.binance;
-      
-      // Aggiorna il capitale disponibile
-      calcolaCapitale();
-      
-      // Aggiorna l'interfaccia
-      aggiornaInterfaccia();
-      
-      // Salva lo stato nei dati storici
-      salvaStorico();
-      
-      // Salva i dati in localStorage
-      salvaDatiLocali();
-      
-      // Aggiorna il grafico
-      aggiornaGrafico();
-    }
-    
-    // Calcola il capitale disponibile
-    function calcolaCapitale() {
-      datiCapitale.capitale = datiCapitale.totaleTrade - datiCapitale.totaleIn;
-    }
-    
-    // Aggiorna tutti gli elementi dell'interfaccia
-    function aggiornaInterfaccia() {
-      document.getElementById("coingecko").textContent = datiCapitale.coingecko;
-      document.getElementById("binance").textContent = datiCapitale.binance;
-      document.getElementById("totaleIn").textContent = datiCapitale.totaleIn;
-      document.getElementById("capitale").textContent = datiCapitale.capitale;
-      document.getElementById("totaleTrade").textContent = datiCapitale.totaleTrade;
-      document.getElementById("infoTotaleTrade").textContent = datiCapitale.totaleTrade;
-      document.getElementById("quotaPerTrade").value = datiCapitale.quotaPerTrade;
-      
-      // Aggiorna anche i valori degli input
-      document.getElementById("inputCoinGecko").value = datiCapitale.coingecko;
-      document.getElementById("inputBinance").value = datiCapitale.binance;
-    }
-    
-    // Salva lo stato attuale nei dati storici
-    function salvaStorico() {
-      const oggi = new Date();
-      const timestamp = oggi.toISOString();
-      
-      datiCapitale.storicoCapitale.push({
-        data: timestamp,
-        coingecko: datiCapitale.coingecko,
-        binance: datiCapitale.binance,
-        totaleIn: datiCapitale.totaleIn,
-        capitale: datiCapitale.capitale
-      });
-      
-      // Mantieni solo le ultime 50 registrazioni
-      if (datiCapitale.storicoCapitale.length > 50) {
-        datiCapitale.storicoCapitale.shift();
-      }
-    }
+    // Aggiorna l'interfaccia con i dati attuali
+    aggiornaInterfaccia();
     
     // Crea il grafico iniziale
-    function creaGraficoCapitale() {
-      const ctx = document.getElementById("capitaleChart").getContext("2d");
-      
-   // Imposta un gradiente per un effetto 3D migliorato
-
-const coinGeckoGradient = ctx.createLinearGradient(0, 0, 0, 400);
-coinGeckoGradient.addColorStop(0, '#E56717');  // nuovo colore principale
-coinGeckoGradient.addColorStop(1, '#A1C935');  // variazione per effetto sfumato
-
-const binanceGradient = ctx.createLinearGradient(0, 0, 0, 400);
-binanceGradient.addColorStop(0, '#FBB917');
-binanceGradient.addColorStop(1, '#FFD700');  // tonalità più chiara per evidenziare
-
-const capitaleGradient = ctx.createLinearGradient(0, 0, 0, 400);
-capitaleGradient.addColorStop(0, '#008080');
-capitaleGradient.addColorStop(1, '#20B2AA');  // tonalità più chiara di teal
-
-
-      capitaleChart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-          labels: ["CoinGecko", "Binance", "Capitale Disponibile"],
-          datasets: [{
-            data: [datiCapitale.coingecko, datiCapitale.binance, datiCapitale.capitale],
-            backgroundColor: [coinGeckoGradient, binanceGradient, capitaleGradient],
-            borderColor: "white",
-            borderWidth: 2,
-            hoverOffset: 15
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '60%',
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: {
-                font: {
-                  size: 14,
-                  weight: 'bold'
-                },
-                padding: 20
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  const label = context.label || '';
-                  const value = context.formattedValue;
-                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                  const percentage = Math.round((context.raw / total) * 100);
-                  const dollarValue = context.raw * datiCapitale.quotaPerTrade;
-                  return `${label}: ${value} trade (${percentage}%) - $${dollarValue.toFixed(2)}`;
-                }
-              }
-            }
-          },
-          animation: {
-            animateRotate: true,
-            animateScale: true
-          }
-        }
-      });
-    }
+    creaGraficoCapitale();
+  }
+  
+  // Aggiorna i totali
+  function aggiornaTotali() {
+    datiCapitale.quotaPerTrade = parseFloat(document.getElementById("quotaPerTrade").value) || datiCapitale.quotaPerTrade;
     
-    // Aggiorna il grafico con i dati attuali
-    function aggiornaGrafico() {
-      if (capitaleChart) {
-        capitaleChart.data.datasets[0].data = [
-          datiCapitale.coingecko, 
-          datiCapitale.binance,
-          datiCapitale.capitale
-        ];
-        capitaleChart.update();
-      }
-    }
+    // Aggiorna l'interfaccia
+    aggiornaInterfaccia();
+    
+    // Salva lo stato nei dati storici
+    salvaStorico();
     
     // Salva i dati in localStorage
-    function salvaDatiLocali() {
-      localStorage.setItem('tradingCapitaleData', JSON.stringify(datiCapitale));
+    salvaDatiLocali();
+    
+    // Aggiorna il grafico
+    aggiornaGrafico();
+  }
+  
+  // Aggiorna i dati dei trade
+  function aggiornaTrade() {
+    const nuovoCoinGecko = parseInt(document.getElementById("inputCoinGecko").value);
+    const nuovoBinance = parseInt(document.getElementById("inputBinance").value);
+    
+    if (!isNaN(nuovoCoinGecko)) {
+      datiCapitale.coingecko = nuovoCoinGecko;
     }
     
-    // Carica i dati da localStorage
-    function caricaDatiLocali() {
-      const dataSalvati = localStorage.getItem('tradingCapitaleData');
-      if (dataSalvati) {
-        try {
-          const parsed = JSON.parse(dataSalvati);
-          Object.assign(datiCapitale, parsed);
-          return true;
-        } catch (e) {
-          console.error("Errore nel caricamento dei dati:", e);
-          return false;
+    if (!isNaN(nuovoBinance)) {
+      datiCapitale.binance = nuovoBinance;
+    }
+    
+    // Calcola il totale in
+    datiCapitale.totaleIn = datiCapitale.coingecko + datiCapitale.binance;
+    
+    // Aggiorna il capitale disponibile
+    calcolaCapitale();
+    
+    // Aggiorna l'interfaccia
+    aggiornaInterfaccia();
+    
+    // Salva lo stato nei dati storici
+    salvaStorico();
+    
+    // Salva i dati in localStorage
+    salvaDatiLocali();
+    
+    // Aggiorna il grafico
+    aggiornaGrafico();
+  }
+  
+  // Calcola il capitale disponibile
+  function calcolaCapitale() {
+    datiCapitale.capitale = datiCapitale.totaleTrade - datiCapitale.totaleIn;
+  }
+  
+  // Aggiorna tutti gli elementi dell'interfaccia
+  function aggiornaInterfaccia() {
+    document.getElementById("coingecko").textContent = datiCapitale.coingecko;
+    document.getElementById("binance").textContent = datiCapitale.binance;
+    document.getElementById("totaleIn").textContent = datiCapitale.totaleIn;
+    document.getElementById("capitale").textContent = datiCapitale.capitale;
+    document.getElementById("totaleTrade").textContent = datiCapitale.totaleTrade;
+    document.getElementById("infoTotaleTrade").textContent = datiCapitale.totaleTrade;
+    document.getElementById("quotaPerTrade").value = datiCapitale.quotaPerTrade;
+    
+    // Aggiorna anche i valori degli input
+    document.getElementById("inputCoinGecko").value = datiCapitale.coingecko;
+    document.getElementById("inputBinance").value = datiCapitale.binance;
+  }
+  
+  // Salva lo stato attuale nei dati storici
+  function salvaStorico() {
+    const oggi = new Date();
+    const timestamp = oggi.toISOString();
+    
+    datiCapitale.storicoCapitale.push({
+      data: timestamp,
+      coingecko: datiCapitale.coingecko,
+      binance: datiCapitale.binance,
+      totaleIn: datiCapitale.totaleIn,
+      capitale: datiCapitale.capitale
+    });
+    
+    // Mantieni solo le ultime 50 registrazioni
+    if (datiCapitale.storicoCapitale.length > 50) {
+      datiCapitale.storicoCapitale.shift();
+    }
+  }
+  
+  // Crea il grafico iniziale
+  function creaGraficoCapitale() {
+    const ctx = document.getElementById("capitaleChart").getContext("2d");
+    
+    // Imposta un gradiente per un effetto 3D migliorato
+    const coinGeckoGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    coinGeckoGradient.addColorStop(0, '#E56717');  // nuovo colore principale
+    coinGeckoGradient.addColorStop(1, '#A1C935');  // variazione per effetto sfumato
+
+    const binanceGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    binanceGradient.addColorStop(0, '#FBB917');
+    binanceGradient.addColorStop(1, '#FFD700');  // tonalità più chiara per evidenziare
+
+    const capitaleGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    capitaleGradient.addColorStop(0, '#008080');
+    capitaleGradient.addColorStop(1, '#20B2AA');  // tonalità più chiara di teal
+
+    capitaleChart = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["CoinGecko", "Binance", "Capitale Disponibile"],
+        datasets: [{
+          data: [datiCapitale.coingecko, datiCapitale.binance, datiCapitale.capitale],
+          backgroundColor: [coinGeckoGradient, binanceGradient, capitaleGradient],
+          borderColor: "white",
+          borderWidth: 2,
+          hoverOffset: 12  // Ridotto per evitare il taglio
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        layout: {
+          padding: {
+            top: 20,    // Aumentato il padding per evitare il taglio con hover
+            bottom: 20,
+            left: 10,
+            right: 10
+          }
+        },
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              font: {
+                size: 14,  // Aumentato a 16px come richiesto
+                weight: 'bold'
+              },
+              padding: 20
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.formattedValue;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((context.raw / total) * 100);
+                const dollarValue = context.raw * datiCapitale.quotaPerTrade;
+                return ` ${label}: ${value} trade (${percentage}%) | $${dollarValue.toFixed(2)}`;
+              }
+            },
+            titleFont: {
+              size: 22  // Aumentato font del titolo tooltip
+            },
+            bodyFont: {
+              size: 22  // Aumentato font del corpo tooltip
+            },
+            padding: 12
+          }
+        },
+        animation: {
+          animateRotate: true,
+          animateScale: true
         }
       }
-      return false;
+    });
+  }
+  
+  // Aggiorna il grafico con i dati attuali
+  function aggiornaGrafico() {
+    if (capitaleChart) {
+      capitaleChart.data.datasets[0].data = [
+        datiCapitale.coingecko, 
+        datiCapitale.binance,
+        datiCapitale.capitale
+      ];
+      capitaleChart.update();
     }
-    
-    // Scarica i dati in formato JSON
-    function scaricaDati() {
-      const dataStr = JSON.stringify(datiCapitale, null, 2);
-      const dataBlob = new Blob([dataStr], { type: "application/json" });
-      const url = URL.createObjectURL(dataBlob);
-      
-      const downloadLink = document.createElement("a");
-      downloadLink.href = url;
-      downloadLink.download = `trading_capitale_${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-    }
-    
-    // Carica dati da file JSON
-    function caricaDati() {
-      const fileInput = document.getElementById("fileInput");
-      const file = fileInput.files[0];
-      
-      if (file) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-          try {
-            const datiCaricati = JSON.parse(e.target.result);
-            
-            // Verifica che i dati abbiano la struttura corretta
-            if (datiCaricati.hasOwnProperty('coingecko') && 
-                datiCaricati.hasOwnProperty('binance') && 
-                datiCaricati.hasOwnProperty('totaleTrade')) {
-              
-              // Aggiorna i dati
-              Object.assign(datiCapitale, datiCaricati);
-              
-              // Aggiorna l'interfaccia
-              aggiornaInterfaccia();
-              
-              // Aggiorna il grafico
-              aggiornaGrafico();
-              
-              // Salva in localStorage
-              salvaDatiLocali();
-              
-              alert("Dati caricati con successo!");
-            } else {
-              alert("Il file non contiene dati validi per questa applicazione.");
-            }
-          } catch (error) {
-            alert("Errore nel caricamento del file: " + error.message);
-          }
-        };
-        
-        reader.readAsText(file);
-      } else {
-        alert("Seleziona un file prima di procedere.");
+  }
+  
+  // Salva i dati in localStorage
+  function salvaDatiLocali() {
+    localStorage.setItem('tradingCapitaleData', JSON.stringify(datiCapitale));
+  }
+  
+  // Carica i dati da localStorage
+  function caricaDatiLocali() {
+    const dataSalvati = localStorage.getItem('tradingCapitaleData');
+    if (dataSalvati) {
+      try {
+        const parsed = JSON.parse(dataSalvati);
+        Object.assign(datiCapitale, parsed);
+        return true;
+      } catch (e) {
+        console.error("Errore nel caricamento dei dati:", e);
+        return false;
       }
     }
+    return false;
+  }
+  
+  // Scarica i dati in formato JSON
+  function scaricaDati() {
+    const dataStr = JSON.stringify(datiCapitale, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
     
-    // Inizializza l'applicazione al caricamento
-    window.addEventListener('DOMContentLoaded', inizializza);
-  </script>
+    const downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = `trading_capitale_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
+  
+  // Carica dati da file JSON
+  function caricaDati() {
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+    
+    if (file) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        try {
+          const datiCaricati = JSON.parse(e.target.result);
+          
+          // Verifica che i dati abbiano la struttura corretta
+          if (datiCaricati.hasOwnProperty('coingecko') && 
+              datiCaricati.hasOwnProperty('binance') && 
+              datiCaricati.hasOwnProperty('totaleTrade')) {
+            
+            // Aggiorna i dati
+            Object.assign(datiCapitale, datiCaricati);
+            
+            // Aggiorna l'interfaccia
+            aggiornaInterfaccia();
+            
+            // Aggiorna il grafico
+            aggiornaGrafico();
+            
+            // Salva in localStorage
+            salvaDatiLocali();
+            
+            alert("Dati caricati con successo!");
+          } else {
+            alert("Il file non contiene dati validi per questa applicazione.");
+          }
+        } catch (error) {
+          alert("Errore nel caricamento del file: " + error.message);
+        }
+      };
+      
+      reader.readAsText(file);
+    } else {
+      alert("Seleziona un file prima di procedere.");
+    }
+  }
+  
+  // Inizializza l'applicazione al caricamento
+  window.addEventListener('DOMContentLoaded', inizializza);
+</script>
 </body>
 </html>
