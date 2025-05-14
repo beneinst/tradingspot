@@ -239,6 +239,63 @@
       padding: 20px 0;
     }
     
+    /* Nuova classe per il grafico storico */
+    .storico-chart-container {
+      height: 400px;
+      margin-top: 20px;
+      position: relative;
+      padding: 20px 0;
+    }
+    
+    .time-range-selector {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .time-range-btn {
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .time-range-btn.active {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+    
+    .distribution-stats {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin: 15px 0;
+    }
+    
+    .distribution-item {
+      background-color: rgba(0, 0, 0, 0.03);
+      padding: 10px;
+      border-radius: 4px;
+      text-align: center;
+      min-width: 120px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin: 5px;
+    }
+    
+    .distribution-label {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+    
+    .distribution-value {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    
     .backup-container {
       display: flex;
       gap: 10px;
@@ -271,6 +328,42 @@
       color: #FFDB58;
     }
     
+    .tab-container {
+      margin-bottom: 15px;
+    }
+    
+    .tab-buttons {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .tab-button {
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--text-light);
+    }
+    
+    .tab-button.active {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+    }
+    
+    .tab-content {
+      padding-top: 15px;
+    }
+    
+    .tab-panel {
+      display: none;
+    }
+    
+    .tab-panel.active {
+      display: block;
+    }
+    
     @media (max-width: 768px) {
       .stats-grid {
         grid-template-columns: 1fr 1fr;
@@ -289,6 +382,10 @@
       .header-stat-item {
         width: 100%;
         max-width: 300px;
+      }
+      
+      .time-range-selector {
+        flex-wrap: wrap;
       }
     }
     
@@ -331,6 +428,80 @@
     
     <div class="chart-container">
       <canvas id="capitaleChart"></canvas>
+    </div>
+  </div>
+  
+  <!-- Nuova card per il grafico storico -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Storico Distribuzione Capitale</h2>
+    </div>
+    
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-button active" onclick="cambiaTab(event, 'tab-distribuzione')">Distribuzione nel Tempo</button>
+        <button class="tab-button" onclick="cambiaTab(event, 'tab-percentuale')">Analisi Percentuale</button>
+      </div>
+      
+      <div class="tab-content">
+        <div id="tab-distribuzione" class="tab-panel active">
+          <div class="time-range-selector">
+            <button class="time-range-btn active" data-days="30" onclick="cambiaRangeTempo(this)">30 Giorni</button>
+            <button class="time-range-btn" data-days="90" onclick="cambiaRangeTempo(this)">90 Giorni</button>
+            <button class="time-range-btn" data-days="180" onclick="cambiaRangeTempo(this)">6 Mesi</button>
+            <button class="time-range-btn" data-days="365" onclick="cambiaRangeTempo(this)">1 Anno</button>
+            <button class="time-range-btn" data-days="all" onclick="cambiaRangeTempo(this)">Tutto</button>
+          </div>
+          
+          <div class="header-stats">
+            <div class="header-stat-item">
+              <div class="header-stat-label">Media Trade CoinGecko</div>
+              <div class="header-stat-value" id="mediaTradeCoingecko">0</div>
+            </div>
+            <div class="header-stat-item">
+              <div class="header-stat-label">Media Trade Binance</div>
+              <div class="header-stat-value" id="mediaTradeBinance">0</div>
+            </div>
+            <div class="header-stat-item">
+              <div class="header-stat-label">Media $ in Trading</div>
+              <div class="header-stat-value" id="mediaDollariTrading">$0</div>
+            </div>
+          </div>
+          
+          <div class="storico-chart-container">
+            <canvas id="storicoCapitaleChart"></canvas>
+          </div>
+        </div>
+        
+        <div id="tab-percentuale" class="tab-panel">
+          <div class="info-box">
+            Analisi del tempo in cui il capitale è stato allocato nelle seguenti percentuali in dollari.
+          </div>
+          
+          <div class="distribution-stats">
+            <div class="distribution-item">
+              <div class="distribution-label">0-25% in Dollari</div>
+              <div class="distribution-value" id="percentuale0_25">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">25-50% in Dollari</div>
+              <div class="distribution-value" id="percentuale25_50">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">50-75% in Dollari</div>
+              <div class="distribution-value" id="percentuale50_75">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">75-100% in Dollari</div>
+              <div class="distribution-value" id="percentuale75_100">0 giorni</div>
+            </div>
+          </div>
+          
+          <div class="storico-chart-container">
+            <canvas id="percentualeCapitaleChart"></canvas>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
     
@@ -376,9 +547,6 @@
   </div>
 </div> 
 
-  
-  
-
   <div class="card">
     <div class="card-header">
       <h2>Backup &amp; Ripristino</h2>
@@ -395,7 +563,7 @@
 </div>
 
 <div class="footer">
-  Trading Spot Manager v1.1 | 
+  Trading Spot Manager v1.2 | 
   <a href="index.html">Operatività</a> | 
   <a href="panoramica-capitale.html">Capitale</a> | 
   <a href="blocco-note.html">Note</a> | 
@@ -413,22 +581,75 @@
     capitale: 40,
     totaleTrade: 56,
     quotaPerTrade: 40,
-    storicoCapitale: []
+    storicoCapitale: [],
+    ultimoAggiornamento: new Date().toISOString()
   };
   
-  // Variabile per il grafico
+  // Variabili per i grafici
   let capitaleChart = null;
+  let storicoCapitaleChart = null;
+  let percentualeCapitaleChart = null;
+  let periodoVisualizzato = 30; // default: 30 giorni
   
   // Funzione di inizializzazione
   function inizializza() {
     // Carica dati salvati se disponibili
     caricaDatiLocali();
     
+    // Se non ci sono dati storici, crea un punto iniziale
+    if (datiCapitale.storicoCapitale.length === 0) {
+      creaStoricoIniziale();
+    }
+    
     // Aggiorna l'interfaccia con i dati attuali
     aggiornaInterfaccia();
     
     // Crea il grafico iniziale
     creaGraficoCapitale();
+    
+    // Crea il grafico storico
+    creaGraficoStoricoCapitale();
+    
+    // Crea il grafico percentuale
+    creaGraficoPercentualeCapitale();
+    
+    // Calcola e mostra le statistiche sulla percentuale di tempo
+    calcolaStatistichePercentuali();
+  }
+  
+  // Crea uno storico iniziale con valori di default retroattivi
+  function creaStoricoIniziale() {
+    const oggi = new Date();
+    const inizioStorico = new Date(oggi);
+    inizioStorico.setDate(oggi.getDate() - 120); // Crea uno storico di 4 mesi
+    
+    // Valori di default per lo storico iniziale
+    const valoriDefault = {
+      coingecko: 20,
+      binance: 2,
+      totaleIn: 22,
+      capitale: datiCapitale.totaleTrade - 22
+    };
+    
+    // Crea un punto dati ogni 3 giorni per gli ultimi 4 mesi
+    for (let d = new Date(inizioStorico); d <= oggi; d.setDate(d.getDate() + 3)) {
+      datiCapitale.storicoCapitale.push({
+        data: new Date(d).toISOString(),
+        coingecko: valoriDefault.coingecko,
+        binance: valoriDefault.binance,
+        totaleIn: valoriDefault.totaleIn,
+        capitale: valoriDefault.capitale
+      });
+    }
+    
+    // Aggiungi i valori attuali come ultimo punto
+    datiCapitale.storicoCapitale.push({
+      data: new Date().toISOString(),
+      coingecko: datiCapitale.coingecko,
+      binance: datiCapitale.binance,
+      totaleIn: datiCapitale.totaleIn,
+      capitale: datiCapitale.capitale
+    });
   }
   
   // Aggiorna i totali
@@ -444,8 +665,13 @@
     // Salva i dati in localStorage
     salvaDatiLocali();
     
-    // Aggiorna il grafico
+    // Aggiorna i grafici
     aggiornaGrafico();
+    aggiornaGraficoStorico();
+    aggiornaGraficoPercentuale();
+    
+    // Ricalcola le statistiche percentuali
+    calcolaStatistichePercentuali();
   }
   
   // Aggiorna i dati dei trade
@@ -467,6 +693,9 @@
     // Aggiorna il capitale disponibile
     calcolaCapitale();
     
+    // Aggiorna l'ultimo aggiornamento
+    datiCapitale.ultimoAggiornamento = new Date().toISOString();
+    
     // Aggiorna l'interfaccia
     aggiornaInterfaccia();
     
@@ -476,8 +705,13 @@
     // Salva i dati in localStorage
     salvaDatiLocali();
     
-    // Aggiorna il grafico
+    // Aggiorna i grafici
     aggiornaGrafico();
+    aggiornaGraficoStorico();
+    aggiornaGraficoPercentuale();
+    
+    // Ricalcola le statistiche percentuali
+    calcolaStatistichePercentuali();
   }
   
   // Calcola il capitale disponibile
@@ -498,6 +732,25 @@
     // Aggiorna anche i valori degli input
     document.getElementById("inputCoinGecko").value = datiCapitale.coingecko;
     document.getElementById("inputBinance").value = datiCapitale.binance;
+    
+    // Calcola e aggiorna le medie
+    const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+    
+    if (datiPeriodo.length > 0) {
+      const mediaCoingecko = calcolaMedia(datiPeriodo.map(item => item.coingecko));
+      const mediaBinance = calcolaMedia(datiPeriodo.map(item => item.binance));
+      const mediaDollari = (mediaCoingecko + mediaBinance) * datiCapitale.quotaPerTrade;
+      
+      document.getElementById("mediaTradeCoingecko").textContent = mediaCoingecko.toFixed(1);
+      document.getElementById("mediaTradeBinance").textContent = mediaBinance.toFixed(1);
+      document.getElementById("mediaDollariTrading").textContent = `$${mediaDollari.toFixed(2)}`;
+    }
+  }
+  
+  // Calcola la media di un array di numeri
+  function calcolaMedia(array) {
+    if (array.length === 0) return 0;
+    return array.reduce((sum, val) => sum + val, 0) / array.length;
   }
   
   // Salva lo stato attuale nei dati storici
@@ -505,68 +758,69 @@
     const oggi = new Date();
     const timestamp = oggi.toISOString();
     
-    datiCapitale.storicoCapitale.push({
-      data: timestamp,
-      coingecko: datiCapitale.coingecko,
-      binance: datiCapitale.binance,
-      totaleIn: datiCapitale.totaleIn,
-      capitale: datiCapitale.capitale
-    });
+    // Controlla se c'è già un record per oggi
+    const oggiString = oggi.toISOString().split('T')[0];
+    const recordOggi = datiCapitale.storicoCapitale.find(record => 
+      record.data.split('T')[0] === oggiString
+    );
     
-    // Mantieni solo le ultime 50 registrazioni
-    if (datiCapitale.storicoCapitale.length > 50) {
-      datiCapitale.storicoCapitale.shift();
-    }
+    if (recordOggi) {
+  // Aggiorna il record esistente per oggi
+  recordOggi.coingecko = datiCapitale.coingecko;
+  recordOggi.binance = datiCapitale.binance;
+  recordOggi.totaleIn = datiCapitale.totaleIn;
+  recordOggi.capitale = datiCapitale.capitale;
+}
+    
+    // Ordina lo storico per data
+    datiCapitale.storicoCapitale.sort((a, b) => new Date(a.data) - new Date(b.data));
   }
   
-  // Crea il grafico iniziale
-  function creaGraficoCapitale() {
-    const ctx = document.getElementById("capitaleChart").getContext("2d");
+  // Filtra i dati storici per il periodo visualizzato
+  function filtraDatiPerPeriodo(dati, giorni) {
+    if (!dati || dati.length === 0) return [];
     
-    // Imposta un gradiente per un effetto 3D migliorato
-    const coinGeckoGradient = ctx.createLinearGradient(0, 0, 0, 400);
-    coinGeckoGradient.addColorStop(0, '#E56717');  // nuovo colore principale
-    coinGeckoGradient.addColorStop(1, '#A1C935');  // variazione per effetto sfumato
-
-    const binanceGradient = ctx.createLinearGradient(0, 0, 0, 400);
-    binanceGradient.addColorStop(0, '#FBB917');
-    binanceGradient.addColorStop(1, '#FFD700');  // tonalità più chiara per evidenziare
-
-    const capitaleGradient = ctx.createLinearGradient(0, 0, 0, 400);
-    capitaleGradient.addColorStop(0, '#008080');
-    capitaleGradient.addColorStop(1, '#20B2AA');  // tonalità più chiara di teal
-
+    if (giorni === 'all') return dati;
+    
+    const oggi = new Date();
+    const dataLimite = new Date(oggi);
+    dataLimite.setDate(oggi.getDate() - giorni);
+    
+    return dati.filter(item => new Date(item.data) >= dataLimite);
+  }
+  
+  // Crea il grafico principale della distribuzione del capitale
+  function creaGraficoCapitale() {
+    const ctx = document.getElementById('capitaleChart').getContext('2d');
+    
     capitaleChart = new Chart(ctx, {
-      type: "doughnut",
+      type: 'doughnut',
       data: {
-        labels: ["CoinGecko", "Binance", "Capitale Disponibile"],
+        labels: ['CoinGecko', 'Binance', 'A Capitale'],
         datasets: [{
-          data: [datiCapitale.coingecko, datiCapitale.binance, datiCapitale.capitale],
-          backgroundColor: [coinGeckoGradient, binanceGradient, capitaleGradient],
-          borderColor: "white",
-          borderWidth: 2,
-          hoverOffset: 12  // Ridotto per evitare il taglio
+          data: [
+            datiCapitale.coingecko, 
+            datiCapitale.binance, 
+            datiCapitale.capitale
+          ],
+          backgroundColor: [
+            '#A1C935',  // Verde CoinGecko
+            '#FBB917',  // Giallo Binance
+            '#008080'   // Teal Capitale
+          ],
+          borderColor: 'white',
+          borderWidth: 2
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '60%',
-        layout: {
-          padding: {
-            top: 20,    // Aumentato il padding per evitare il taglio con hover
-            bottom: 20,
-            left: 10,
-            right: 10
-          }
-        },
         plugins: {
           legend: {
-            position: "bottom",
+            position: 'bottom',
             labels: {
               font: {
-                size: 14,  // Aumentato a 16px come richiesto
-                weight: 'bold'
+                size: 16
               },
               padding: 20
             }
@@ -575,123 +829,469 @@
             callbacks: {
               label: function(context) {
                 const label = context.label || '';
-                const value = context.formattedValue;
+                const value = context.raw || 0;
                 const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = Math.round((context.raw / total) * 100);
-                const dollarValue = context.raw * datiCapitale.quotaPerTrade;
-                return ` ${label}: ${value} trade (${percentage}%) | $${dollarValue.toFixed(2)}`;
+                const percentage = Math.round((value / total) * 100);
+                const dollari = value * datiCapitale.quotaPerTrade;
+                return `${label}: ${value} trade (${percentage}%) = $${dollari}`;
               }
-            },
-            titleFont: {
-              size: 22  // Aumentato font del titolo tooltip
-            },
-            bodyFont: {
-              size: 22  // Aumentato font del corpo tooltip
-            },
-            padding: 12
+            }
           }
         },
-        animation: {
-          animateRotate: true,
-          animateScale: true
-        }
+        cutout: '50%'
       }
     });
   }
   
-  // Aggiorna il grafico con i dati attuali
+  // Aggiorna il grafico principale
   function aggiornaGrafico() {
     if (capitaleChart) {
       capitaleChart.data.datasets[0].data = [
         datiCapitale.coingecko, 
-        datiCapitale.binance,
+        datiCapitale.binance, 
         datiCapitale.capitale
       ];
       capitaleChart.update();
     }
   }
   
+  // Crea il grafico storico della distribuzione del capitale
+  function creaGraficoStoricoCapitale() {
+    const ctx = document.getElementById('storicoCapitaleChart').getContext('2d');
+    const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+    
+    storicoCapitaleChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: datiPeriodo.map(item => {
+          const data = new Date(item.data);
+          return `${data.getDate()}/${data.getMonth() + 1}`;
+        }),
+        datasets: [
+          {
+            label: 'CoinGecko',
+            data: datiPeriodo.map(item => item.coingecko),
+            backgroundColor: 'rgba(161, 201, 53, 0.2)',
+            borderColor: '#A1C935',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 3
+          },
+          {
+            label: 'Binance',
+            data: datiPeriodo.map(item => item.binance),
+            backgroundColor: 'rgba(251, 185, 23, 0.2)',
+            borderColor: '#FBB917',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 3
+          },
+          {
+            label: 'Totale in Trading',
+            data: datiPeriodo.map(item => item.totaleIn),
+            backgroundColor: 'rgba(246, 40, 23, 0.2)',
+            borderColor: '#F62817',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 3
+          },
+          {
+            label: 'A Capitale',
+            data: datiPeriodo.map(item => item.capitale),
+            backgroundColor: 'rgba(0, 128, 128, 0.2)',
+            borderColor: '#008080',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Numero di Trade'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Data'
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.dataset.label || '';
+                const value = context.raw || 0;
+                const dollari = value * datiCapitale.quotaPerTrade;
+                return `${label}: ${value} trade = $${dollari}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // Aggiorna il grafico storico
+  function aggiornaGraficoStorico() {
+    if (storicoCapitaleChart) {
+      const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+      
+      storicoCapitaleChart.data.labels = datiPeriodo.map(item => {
+        const data = new Date(item.data);
+        return `${data.getDate()}/${data.getMonth() + 1}`;
+      });
+      
+      storicoCapitaleChart.data.datasets[0].data = datiPeriodo.map(item => item.coingecko);
+      storicoCapitaleChart.data.datasets[1].data = datiPeriodo.map(item => item.binance);
+      storicoCapitaleChart.data.datasets[2].data = datiPeriodo.map(item => item.totaleIn);
+      storicoCapitaleChart.data.datasets[3].data = datiPeriodo.map(item => item.capitale);
+      
+      storicoCapitaleChart.update();
+    }
+  }
+  
+  // Cambia il range di tempo visualizzato
+  function cambiaRangeTempo(elemento) {
+    // Rimuovi la classe active da tutti i bottoni
+    document.querySelectorAll('.time-range-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    // Aggiungi la classe active all'elemento cliccato
+    elemento.classList.add('active');
+    
+    // Aggiorna il periodo visualizzato
+    periodoVisualizzato = elemento.dataset.days;
+    
+    // Aggiorna i grafici
+    aggiornaGraficoStorico();
+    aggiornaGraficoPercentuale();
+    
+    // Aggiorna le statistiche
+    aggiornaInterfaccia();
+    
+    // Ricalcola le statistiche percentuali
+    calcolaStatistichePercentuali();
+  }
+  
+  // Cambia tab attivo
+  function cambiaTab(event, tabId) {
+    // Nascondi tutti i pannelli
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+      panel.classList.remove('active');
+    });
+    
+    // Rimuovi active da tutti i bottoni
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    // Mostra il pannello selezionato
+    document.getElementById(tabId).classList.add('active');
+    
+    // Attiva il bottone cliccato
+    event.currentTarget.classList.add('active');
+    
+    // Aggiorna i grafici se necessario
+    if (tabId === 'tab-distribuzione') {
+      aggiornaGraficoStorico();
+    } else if (tabId === 'tab-percentuale') {
+      aggiornaGraficoPercentuale();
+      calcolaStatistichePercentuali();
+    }
+  }
+  
+  // Crea il grafico percentuale
+  function creaGraficoPercentualeCapitale() {
+    const ctx = document.getElementById('percentualeCapitaleChart').getContext('2d');
+    const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+    
+    // Calcola le percentuali del capitale in dollari
+    const percentuali = datiPeriodo.map(item => {
+      const totaleInDollari = item.totaleIn * datiCapitale.quotaPerTrade;
+      const totaleComplessivo = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
+      return (totaleInDollari / totaleComplessivo) * 100;
+    });
+    
+    percentualeCapitaleChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: datiPeriodo.map(item => {
+          const data = new Date(item.data);
+          return `${data.getDate()}/${data.getMonth() + 1}`;
+        }),
+        datasets: [{
+          label: '% Capitale in Trading',
+          data: percentuali,
+          backgroundColor: 'rgba(52, 152, 219, 0.2)',
+          borderColor: '#3498db',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Percentuale in Trading (%)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Data'
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const value = context.raw || 0;
+                return `Capitale in Trading: ${value.toFixed(1)}%`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // Aggiorna il grafico percentuale
+  function aggiornaGraficoPercentuale() {
+    if (percentualeCapitaleChart) {
+      const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+      
+      // Aggiorna le etichette
+      percentualeCapitaleChart.data.labels = datiPeriodo.map(item => {
+        const data = new Date(item.data);
+        return `${data.getDate()}/${data.getMonth() + 1}`;
+      });
+      
+      // Calcola le nuove percentuali
+      const percentuali = datiPeriodo.map(item => {
+        const totaleInDollari = item.totaleIn * datiCapitale.quotaPerTrade;
+        const totaleComplessivo = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
+        return (totaleInDollari / totaleComplessivo) * 100;
+      });
+      
+      percentualeCapitaleChart.data.datasets[0].data = percentuali;
+      percentualeCapitaleChart.update();
+    }
+  }
+  
+  // Calcola le statistiche per le percentuali di tempo
+  function calcolaStatistichePercentuali() {
+    const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+    
+    if (datiPeriodo.length === 0) {
+      return;
+    }
+    
+    // Contatori per ciascuna fascia percentuale
+    let count0_25 = 0;
+    let count25_50 = 0;
+    let count50_75 = 0;
+    let count75_100 = 0;
+    
+    // Calcola le percentuali per ogni giorno e incrementa i contatori
+    datiPeriodo.forEach(item => {
+      const totaleInDollari = item.totaleIn * datiCapitale.quotaPerTrade;
+      const totaleComplessivo = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
+      const percentuale = (totaleInDollari / totaleComplessivo) * 100;
+      
+      if (percentuale <= 25) {
+        count0_25++;
+      } else if (percentuale <= 50) {
+        count25_50++;
+      } else if (percentuale <= 75) {
+        count50_75++;
+      } else {
+        count75_100++;
+      }
+    });
+    
+    // Aggiorna i contatori nell'interfaccia
+    document.getElementById("percentuale0_25").textContent = `${count0_25} giorni`;
+    document.getElementById("percentuale25_50").textContent = `${count25_50} giorni`;
+    document.getElementById("percentuale50_75").textContent = `${count50_75} giorni`;
+    document.getElementById("percentuale75_100").textContent = `${count75_100} giorni`;
+  }
+  
   // Salva i dati in localStorage
   function salvaDatiLocali() {
-    localStorage.setItem('tradingCapitaleData', JSON.stringify(datiCapitale));
+    localStorage.setItem('datiCapitale', JSON.stringify(datiCapitale));
   }
   
   // Carica i dati da localStorage
   function caricaDatiLocali() {
-    const dataSalvati = localStorage.getItem('tradingCapitaleData');
-    if (dataSalvati) {
-      try {
-        const parsed = JSON.parse(dataSalvati);
-        Object.assign(datiCapitale, parsed);
-        return true;
-      } catch (e) {
-        console.error("Errore nel caricamento dei dati:", e);
-        return false;
-      }
+    const datiSalvati = localStorage.getItem('datiCapitale');
+    if (datiSalvati) {
+      const datiParsati = JSON.parse(datiSalvati);
+      
+      // Aggiorna i dati dell'applicazione
+      Object.assign(datiCapitale, datiParsati);
     }
-    return false;
   }
   
-  // Scarica i dati in formato JSON
+  // Scarica i dati come file JSON
   function scaricaDati() {
     const dataStr = JSON.stringify(datiCapitale, null, 2);
-    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
     const url = URL.createObjectURL(dataBlob);
     
-    const downloadLink = document.createElement("a");
-    downloadLink.href = url;
-    downloadLink.download = `trading_capitale_${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `capitale-trading-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
   
-  // Carica dati da file JSON
+  // Carica i dati da un file JSON
   function caricaDati() {
-    const fileInput = document.getElementById("fileInput");
+    const fileInput = document.getElementById('fileInput');
     const file = fileInput.files[0];
     
-    if (file) {
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        try {
-          const datiCaricati = JSON.parse(e.target.result);
-          
-          // Verifica che i dati abbiano la struttura corretta
-          if (datiCaricati.hasOwnProperty('coingecko') && 
-              datiCaricati.hasOwnProperty('binance') && 
-              datiCaricati.hasOwnProperty('totaleTrade')) {
-            
-            // Aggiorna i dati
-            Object.assign(datiCapitale, datiCaricati);
-            
-            // Aggiorna l'interfaccia
-            aggiornaInterfaccia();
-            
-            // Aggiorna il grafico
-            aggiornaGrafico();
-            
-            // Salva in localStorage
-            salvaDatiLocali();
-            
-            alert("Dati caricati con successo!");
-          } else {
-            alert("Il file non contiene dati validi per questa applicazione.");
-          }
-        } catch (error) {
-          alert("Errore nel caricamento del file: " + error.message);
+    if (!file) {
+      alert('Seleziona un file JSON prima di procedere.');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const datiCaricati = JSON.parse(e.target.result);
+        
+        // Verifica che i dati caricati abbiano la struttura corretta
+        if (!datiCaricati.hasOwnProperty('coingecko') || 
+            !datiCaricati.hasOwnProperty('binance') || 
+            !datiCaricati.hasOwnProperty('totaleIn') || 
+            !datiCaricati.hasOwnProperty('capitale')) {
+          alert('Il file non contiene dati validi.');
+          return;
         }
-      };
-      
-      reader.readAsText(file);
+        
+        // Aggiorna i dati dell'applicazione
+        Object.assign(datiCapitale, datiCaricati);
+        
+        // Aggiorna l'interfaccia
+        aggiornaInterfaccia();
+        
+        // Aggiorna i grafici
+        aggiornaGrafico();
+        aggiornaGraficoStorico();
+        aggiornaGraficoPercentuale();
+        
+        // Ricalcola le statistiche percentuali
+        calcolaStatistichePercentuali();
+        
+        // Salva i dati in localStorage
+        salvaDatiLocali();
+        
+        alert('Dati caricati con successo!');
+      } catch (error) {
+        alert('Errore durante il caricamento dei dati: ' + error.message);
+      }
+    };
+    
+    reader.readAsText(file);
+  }
+  
+  // Funzione per aggiungere un indicatore del tempo del capitale
+  function aggiungiIndicatoreTempo() {
+    // Ottieni i dati più recenti
+    const datiRecenti = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, 30); // ultimi 30 giorni
+    
+    if (datiRecenti.length < 2) return; // Servono almeno 2 punti dati per calcolare una tendenza
+    
+    // Calcola il trend del capitale in trading
+    const primoValore = datiRecenti[0].totaleIn;
+    const ultimoValore = datiRecenti[datiRecenti.length - 1].totaleIn;
+    const differenza = ultimoValore - primoValore;
+    
+    // Calcola la velocità media di variazione (trade al giorno)
+    const giorniPassati = (new Date(datiRecenti[datiRecenti.length - 1].data) - new Date(datiRecenti[0].data)) / (1000 * 60 * 60 * 24);
+    const velocitaMediaGiornaliera = giorniPassati > 0 ? differenza / giorniPassati : 0;
+    
+    // Calcola il tempo stimato per raggiungere il 100% o tornare allo 0% del capitale in trading
+    let tempoStimato = 0;
+    let messaggio = "";
+    
+    if (velocitaMediaGiornaliera > 0) {
+      // Stiamo aumentando il capitale in trading, calcoliamo quanto tempo per arrivare al 100%
+      const tradeRimanenti = datiCapitale.totaleTrade - ultimoValore;
+      tempoStimato = velocitaMediaGiornaliera > 0 ? Math.ceil(tradeRimanenti / velocitaMediaGiornaliera) : Infinity;
+      messaggio = `Al ritmo attuale, il 100% del capitale sarà in trading tra circa ${tempoStimato} giorni`;
+    } else if (velocitaMediaGiornaliera < 0) {
+      // Stiamo diminuendo il capitale in trading, calcoliamo quanto tempo per tornare allo 0%
+      tempoStimato = velocitaMediaGiornaliera < 0 ? Math.ceil(ultimoValore / Math.abs(velocitaMediaGiornaliera)) : Infinity;
+      messaggio = `Al ritmo attuale, il capitale in trading sarà esaurito tra circa ${tempoStimato} giorni`;
     } else {
-      alert("Seleziona un file prima di procedere.");
+      messaggio = "Il capitale in trading è stabile, nessuna variazione rilevata nell'ultimo periodo";
+    }
+    
+    // Crea o aggiorna l'elemento HTML per l'indicatore del tempo
+    let indicatoreElement = document.getElementById("indicatoreTempo");
+    if (!indicatoreElement) {
+      indicatoreElement = document.createElement("div");
+      indicatoreElement.id = "indicatoreTempo";
+      indicatoreElement.className = "info-box";
+      
+      // Inseriscilo prima del grafico percentuale
+      const container = document.getElementById("tab-percentuale");
+      const graficoContainer = container.querySelector(".storico-chart-container");
+      container.insertBefore(indicatoreElement, graficoContainer);
+    }
+    
+    // Aggiorna il contenuto dell'indicatore
+    indicatoreElement.innerHTML = `
+      <strong>Indicatore di Tendenza:</strong> ${messaggio}<br>
+      <span class="distribution-label">Variazione media: ${velocitaMediaGiornaliera.toFixed(2)} trade al giorno</span>
+    `;
+    
+    // Aggiungi un colore in base alla tendenza
+    if (velocitaMediaGiornaliera > 0) {
+      indicatoreElement.style.borderLeft = "4px solid var(--accent-color)";
+    } else if (velocitaMediaGiornaliera < 0) {
+      indicatoreElement.style.borderLeft = "4px solid var(--secondary-color)";
+    } else {
+      indicatoreElement.style.borderLeft = "4px solid var(--primary-color)";
     }
   }
   
-  // Inizializza l'applicazione al caricamento
-  window.addEventListener('DOMContentLoaded', inizializza);
-</script>
+  // Inizializza l'applicazione quando il documento è pronto
+  document.addEventListener('DOMContentLoaded', function() {
+    inizializza();
+    
+    // Aggiungi l'indicatore del tempo dopo l'inizializzazione
+    aggiungiIndicatoreTempo();
+    
+    // Aggiorna l'indicatore quando cambia il range di tempo
+    document.querySelectorAll('.time-range-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        aggiungiIndicatoreTempo();
+      });
+    });
+  });
+    </script>
+
 </body>
 </html>
