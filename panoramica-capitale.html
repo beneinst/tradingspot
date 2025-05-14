@@ -558,6 +558,7 @@
       <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
       <input type="file" id="fileInput" accept=".json">
       <button onclick="caricaDati()">Carica Dati</button>
+	  <button onclick="resettaDati()" class="btn-secondary">Resetta Dati</button>
     </div>
   </div>
 </div>
@@ -673,6 +674,32 @@
     // Ricalcola le statistiche percentuali
     calcolaStatistichePercentuali();
   }
+  
+  // Funzione per resettare tutti i dati
+function resettaDati() {
+  // Resetta i dati principali
+  datiCapitale.coingecko = 0;
+  datiCapitale.binance = 0;
+  datiCapitale.totaleIn = 0;
+  datiCapitale.capitale = datiCapitale.totaleTrade;
+  datiCapitale.storicoCapitale = [];
+  datiCapitale.ultimoAggiornamento = new Date().toISOString();
+  
+  // Crea un nuovo storico iniziale
+  creaStoricoIniziale();
+  
+  // Aggiorna l'interfaccia e i grafici
+  aggiornaInterfaccia();
+  aggiornaGrafico();
+  aggiornaGraficoStorico();
+  aggiornaGraficoPercentuale();
+  calcolaStatistichePercentuali();
+  
+  // Salva i dati in localStorage
+  salvaDatiLocali();
+  
+  alert('Dati resettati con successo!');
+}
   
   // Aggiorna i dati dei trade
   function aggiornaTrade() {
