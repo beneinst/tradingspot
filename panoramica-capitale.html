@@ -739,6 +739,10 @@ function resettaDati() {
     
     // Ricalcola le statistiche percentuali
     calcolaStatistichePercentuali();
+	setTimeout(() => {
+  salvaDatiLocali();
+  aggiornaGraficoStorico();
+}, 100);
   }
   
   // Calcola il capitale disponibile
@@ -746,6 +750,12 @@ function resettaDati() {
     datiCapitale.capitale = datiCapitale.totaleTrade - datiCapitale.totaleIn;
   }
   
+  function verificaDatiStorico() {
+  console.log('Dati storico attuali:', datiCapitale.storicoCapitale);
+  console.log('Ultimo aggiornamento:', datiCapitale.ultimoAggiornamento);
+  console.log('LocalStorage:', JSON.parse(localStorage.getItem('datiCapitale')));
+}
+
   // Aggiorna tutti gli elementi dell'interfaccia
   function aggiornaInterfaccia() {
     document.getElementById("coingecko").textContent = datiCapitale.coingecko;
@@ -1194,6 +1204,7 @@ function salvaStorico() {
     
     const a = document.createElement('a');
     a.href = url;
+	
     a.download = `capitale-trading-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
@@ -1241,7 +1252,7 @@ function salvaStorico() {
         
         // Salva i dati in localStorage
         salvaDatiLocali();
-        
+     
         alert('Dati caricati con successo!');
       } catch (error) {
         alert('Errore durante il caricamento dei dati: ' + error.message);
