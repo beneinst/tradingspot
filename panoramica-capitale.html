@@ -241,7 +241,7 @@
     
     /* Nuova classe per il grafico storico */
     .storico-chart-container {
-      height: 400px;
+      height: 480px;
       margin-top: 20px;
       position: relative;
       padding: 20px 0;
@@ -958,36 +958,37 @@ function salvaStorico() {
         ]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Numero di Trade'
-            }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Data'
-            }
-          }
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const label = context.dataset.label || '';
-                const value = context.raw || 0;
-                const dollari = value * datiCapitale.quotaPerTrade;
-                return `${label}: ${value} trade = $${dollari}`;
-              }
-            }
-          }
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    y: {
+      beginAtZero: true,
+      max: 56,  // Aggiungi questa riga per fissare il massimo a 56
+      title: {
+        display: true,
+        text: 'Numero di Trade'
+      }
+    },
+    x: {
+      title: {
+        display: true,
+        text: 'Data'
+      }
+    }
+  },
+  plugins: {
+    tooltip: {
+      callbacks: {
+        label: function(context) {
+          const label = context.dataset.label || '';
+          const value = context.raw || 0;
+          const dollari = value * datiCapitale.quotaPerTrade;
+          return `${label}: ${value} trade = $${dollari}`;
         }
       }
+    }
+  }
+}
     });
   }
   
