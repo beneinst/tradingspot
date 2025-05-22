@@ -529,15 +529,20 @@
   </div>
   <div class="header-stats">
     <div class="header-stat-item">
-      <div class="header-stat-label">Trade Totali</div>
-      <div class="header-stat-value" id="totaleTrade">56</div>
+        <div class="header-stat-label">Trade Totali</div>
+        <div class="header-stat-value" id="totaleTrade">56</div>
     </div>
     <div class="header-stat-item">
-      <div class="header-stat-label">$ per Trade</div>
-      <div class="header-stat-value">
-        <input type="number" id="quotaPerTrade" class="quota-input" value="40" min="1" onchange="aggiornaTotali()">
-      </div>
+        <div class="header-stat-label">$ per Trade</div>
+        <div class="header-stat-value">
+            <input type="number" id="quotaPerTrade" class="quota-input" value="40" min="1" oninput="aggiornaCapitale()">
+        </div>
     </div>
+    <div class="header-stat-item">
+        <div class="header-stat-label">Capitale Totale $</div>
+        <div class="header-stat-value" id="capitaleTotale"></div>
+    </div>
+</div>
     <div class="info-box">
       <br><em><strong>Regola di ingresso:</strong></em> si effettuano al massimo <em><strong>2 o 3 trade ogni 24 ore</strong></em>, per un totale massimo di 6 in contemporanea.  
       Ogni trade ha una durata di <em><strong>10 candele da 4 ore</strong></em> (circa 40 ore), alla fine delle quali si valuta un nuovo ingresso solo se il prezzo è in posizione favorevole.  
@@ -545,7 +550,7 @@
       <br><em><strong>Stato attuale:</strong></em> l'intero capitale è attualmente impegnato nei 56 trade, ma <em><strong>i profitti iniziano fin da subito</strong></em>, non da un giorno futuro. Di seguito il Capitale nella situazione attuale. Maggiori Info Mensilità <a href="index.html" target="_blank">clicca qui</a>. <span id="infoTotaleTrade">56</span>
     </div>
   </div>
-</div> 
+ 
 
   <div class="card">
     <div class="card-header">
@@ -1179,6 +1184,24 @@ function salvaStorico() {
     document.getElementById("percentuale50_75").textContent = `${count50_75} giorni`;
     document.getElementById("percentuale75_100").textContent = `${count75_100} giorni`;
   }
+  
+	// Totale del Capitale
+   function aggiornaCapitale() {
+        // Recupera il valore dei "Trade Totali"
+        const tradeTotali = parseInt(document.getElementById('totaleTrade').innerText);
+
+        // Recupera il valore della "Quota per Trade"
+        const quotaPerTrade = parseInt(document.getElementById('quotaPerTrade').value);
+
+        // Calcola il "Capitale Totale"
+        const capitaleTotale = tradeTotali * quotaPerTrade;
+
+        // Aggiorna il testo del div "Capitale Totale"
+        document.getElementById('capitaleTotale').innerText = capitaleTotale;
+    }
+
+    // Chiama la funzione una volta al caricamento della pagina per impostare il valore iniziale
+    document.addEventListener('DOMContentLoaded', aggiornaCapitale);
   
   // Salva i dati in localStorage
   function salvaDatiLocali() {
