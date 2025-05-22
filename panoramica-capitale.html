@@ -780,28 +780,37 @@ function resettaDati() {
     return array.reduce((sum, val) => sum + val, 0) / array.length;
   }
   
-  // Salva lo stato attuale nei dati storici
-  function salvaStorico() {
-    const oggi = new Date();
-    const timestamp = oggi.toISOString();
-    
-    // Controlla se c'è già un record per oggi
-    const oggiString = oggi.toISOString().split('T')[0];
-    const recordOggi = datiCapitale.storicoCapitale.find(record => 
-      record.data.split('T')[0] === oggiString
-    );
-    
-    if (recordOggi) {
-  // Aggiorna il record esistente per oggi
-  recordOggi.coingecko = datiCapitale.coingecko;
-  recordOggi.binance = datiCapitale.binance;
-  recordOggi.totaleIn = datiCapitale.totaleIn;
-  recordOggi.capitale = datiCapitale.capitale;
-}
-    
-    // Ordina lo storico per data
-    datiCapitale.storicoCapitale.sort((a, b) => new Date(a.data) - new Date(b.data));
+ // Salva lo stato attuale nei dati storici
+function salvaStorico() {
+  const oggi = new Date();
+  const timestamp = oggi.toISOString();
+  
+  // Controlla se c'è già un record per oggi
+  const oggiString = oggi.toISOString().split('T')[0];
+  const recordOggi = datiCapitale.storicoCapitale.find(record => 
+    record.data.split('T')[0] === oggiString
+  );
+  
+  if (recordOggi) {
+    // Aggiorna il record esistente per oggi
+    recordOggi.coingecko = datiCapitale.coingecko;
+    recordOggi.binance = datiCapitale.binance;
+    recordOggi.totaleIn = datiCapitale.totaleIn;
+    recordOggi.capitale = datiCapitale.capitale;
+  } else {
+    // Aggiungi un nuovo record per oggi
+    datiCapitale.storicoCapitale.push({
+      data: timestamp,
+      coingecko: datiCapitale.coingecko,
+      binance: datiCapitale.binance,
+      totaleIn: datiCapitale.totaleIn,
+      capitale: datiCapitale.capitale
+    });
   }
+  
+  // Ordina lo storico per data
+  datiCapitale.storicoCapitale.sort((a, b) => new Date(a.data) - new Date(b.data));
+}
   
   // Filtra i dati storici per il periodo visualizzato
   function filtraDatiPerPeriodo(dati, giorni) {
