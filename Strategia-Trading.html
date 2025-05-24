@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategia di Trading 4H - Indicatore</title>
+    <link rel="icon" type="image/png" href="favicon.png"> 
+    <style>
+        /* CSS globale dal tuo esempio */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            flex-grow: 1;
+        }
+
+        /* Stili per i box (adattati dal tuo CSS e dal mio precedente) */
+        .header-box, 
+        .content-box, /* Usiamo 'content-box' per i box con le tabelle */
+        .indicator-info-box { /* Nuovo box per le info indicatore */
+            background-color: white;
+            padding: 20px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Stile specifico per l'header-box */
+        .header-box {
+            background-color: #4a6fa5;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .header-box h1 {
+            color: white;
+            margin: 0;
+        }
+        
+        /* Stili per i titoli all'interno dei box */
+        h2 {
+            color: #4a6fa5;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Stili per le tabelle */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 30px;
+        }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f0f0f0;
+            color: #555;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Classi colore e bold */
+        .green { color: #28a745; font-weight: bold; }
+        .red { color: #dc3545; font-weight: bold; }
+        .white { color: #8e8e8e; font-weight: bold; }
+        .yellow { color: #ffc107; font-weight: bold; }
+        .orange { color: #fd7e14; font-weight: bold; }
+        .gray { color: #6c757d; font-weight: bold; }
+        .bold { font-weight: bold; }
+
+        /* Stile per il nuovo box informazioni indicatore */
+        .indicator-info-box {
+            text-align: center;
+            padding: 30px;
+            margin-top: 20px;
+        }
+        .indicator-info-box p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: #555;
+        }
+        .indicator-info-box a.profile-link {
+            color: #4a6fa5;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            display: block; /* Per far sì che il link vada su una nuova riga */
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+        .indicator-info-box a.profile-link:hover {
+            color: #385d8a;
+        }
+        .indicator-button {
+            display: inline-block;
+            background-color: #28a745; /* Verde per il bottone di download/visualizzazione */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .indicator-button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        /* Stile per il footer, come da tua richiesta */
+        .footer {
+            margin-top: 30px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 16px;
+            color: #F2BB66;
+            font-weight: normal;
+        }
+
+        .footer a {
+            color: #FAEBD7;
+            text-decoration: none;
+            margin: 0 8px;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #FFDB58;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header-box">
+            <h1>Strategia di Trading 4H - Indicatore</h1>
+        </div>
+
+        <div class="content-box">
+            <h2>2. Dashboard Spiegata e Interpretazione dei Segnali</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Indicatore Dashboard</th>
+                        <th>Scala / Valore</th>
+                        <th>Interpretazione del Colore / Stato</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="bold">📈 LinReg</span></td>
+                        <td>Da -1 a +1</td>
+                        <td>
+                            <span class="green">🟢</span> <span class="bold">Verde</span>: Valore &le; -0.8 (zona di acquisto potenziale)<br>
+                            <span class="red">🔴</span> <span class="bold">Rosso</span>: Valore &ge; +0.8 (zona di vendita potenziale)<br>
+                            <span class="white">⚪</span> <span class="bold">Bianco</span>: Valore neutro (-0.8 &lt; x &lt; +0.8)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="bold">📊 BB Pos</span></td>
+                        <td>Da -1 a +1</td>
+                        <td>
+                            <span class="green">🟢</span> <span class="bold">Verde</span>: &le; -0.8 (vicino banda inferiore, oversold)<br>
+                            <span class="red">🔴</span> <span class="bold">Rosso</span>: &ge; +0.8 (vicino banda superiore, overbought)<br>
+                            <span class="yellow">🟡</span> <span class="bold">Giallo</span>: Zona neutra
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="bold">🎯 Pearson R</span></td>
+                        <td>Coefficiente di correlazione</td>
+                        <td>
+                            <span class="green">💪</span> <span class="bold">Verde</span>: |R| &ge; 0.7 (trend forte, segnali affidabili)<br>
+                            <span class="orange">⚠️</span> <span class="bold">Arancione</span>: |R| &lt; 0.7 (trend debole, attenzione!)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="bold">⚡ Strength</span></td>
+                        <td>Punteggio di confluenza</td>
+                        <td>
+                            <span class="green">🚀</span> <span class="bold">Verde</span>: &ge; +1.5 (segnale BUY forte)<br>
+                            <span class="red">📉</span> <span class="bold">Rosso</span>: &le; -1.5 (segnale SELL forte)<br>
+                            <span class="gray">➖</span> <span class="bold">Grigio</span>: Segnale debole
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="bold">🌊 Market Condition</span></td>
+                        <td>Classificazione del trend</td>
+                        <td>
+                            <span class="green">📈</span> <span class="bold">"TRENDING"</span>: Pearson |R| &ge; 0.8 (ideale per trading)<br>
+                            <span class="orange">〰️</span> <span class="bold">"WEAK TREND"</span>: 0.5 &le; |R| &lt; 0.8 (cautela)<br>
+                            <span class="gray">💤</span> <span class="bold">"SIDEWAYS"</span>: |R| &lt; 0.5 (evita il trading)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="background-color: #e0e0e0; text-align: center;"><span class="bold">Interpretazione Segnali</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="bold">✅ SEGNALE BUY VALIDO quando:</span></td>
+                        <td colspan="2">
+                            <span class="bold">Condizioni:</span><br>
+                            - LinReg &le; -0.8 (<span class="green">🟢</span>)<br>
+                            - Signal Strength &ge; +1.5 (<span class="green">🚀</span>)<br>
+                            - Pearson R forte (<span class="green">💪</span>)<br>
+                            - Market = TRENDING (<span class="green">📈</span>)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="bold">❌ SEGNALE SELL VALIDO quando:</span></td>
+                        <td colspan="2">
+                            <span class="bold">Condizioni:</span><br>
+                            - LinReg &ge; +0.8 (<span class="red">🔴</span>)<br>
+                            - Signal Strength &le; -1.5 (<span class="red">📉</span>)<br>
+                            - Pearson R forte (<span class="green">💪</span>)<br>
+                            - Market = TRENDING (<span class="green">📈</span>)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="bold">⚠️ EVITA TRADING quando:</span></td>
+                        <td colspan="2">
+                            <span class="bold">Condizioni:</span><br>
+                            - Market = SIDEWAYS (<span class="gray">💤</span>)<br>
+                            - Pearson R debole (<span class="orange">⚠️</span>)<br>
+                            - Signal Strength tra -1.5 e +1.5 (<span class="gray">➖</span>)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-box">
+            <h2>1. Come Funziona l'Indicatore: Sistema di Scoring e Logica dei Segnali</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Componente Principale</th>
+                        <th>Descrizione / Scala di Punteggio</th>
+                        <th>Punti Chiave</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="bold">Linear Regression Position</span></td>
+                        <td>Da -1 a +1</td>
+                        <td>
+                            <span class="bold">-1</span> = Prezzo molto sotto la linea di regressione (oversold)<br>
+                            <span class="bold">+1</span> = Prezzo molto sopra la linea di regressione (overbought)<br>
+                            <span class="bold">0</span> = Prezzo sulla linea di regressione
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="bold">Bollinger Bands Position</span></td>
+                        <td>Da -1 a +1</td>
+                        <td>
+                            <span class="bold">-1</span> = Prezzo sulla banda inferiore<br>
+                            <span class="bold">+1</span> = Prezzo sulla banda superiore<br>
+                            <span class="bold">0</span> = Prezzo sulla media mobile centrale
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="bold">Signal Strength</span></td>
+                        <td>Somma pesata di tutti i fattori (min. -3.0, max. +3.0)</td>
+                        <td>
+                            Un punteggio aggregato che riflette la forza e la direzione del segnale.
+                            <br><br>
+                            <span class="bold">Logica dei Segnali:</span><br>
+                            <span class="bold">BUY</span>: Signal Strength &ge; +1.5 + LinReg &le; -0.8 + Pearson R forte<br>
+                            <span class="bold">SELL</span>: Signal Strength &le; -1.5 + LinReg &ge; +0.8 + Pearson R forte
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h2>Strategia di Utilizzo</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Consigli Utili</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            1. Controlla sempre il Market Condition prima<br>
+                            2. Aspetta confluenza di almeno 3 indicatori<br>
+                            3. Il tuo Stochastic RSI può essere il 4° filtro di conferma<br>
+                            4. Usa i pivot points come stop loss dinamici
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="indicator-info-box">
+            <h2>Indicatore (Open Source) creato da gerardo_dorrico</h2>
+            <p>Visita il mio profilo su TradingView per scoprire altri strumenti e strategie:</p>
+            <a href="https://it.tradingview.com/u/gerardo_dorrico/" target="_blank" rel="noopener noreferrer" class="profile-link">
+                Profilo TradingView di gerardo_dorrico
+            </a>
+            <p>Per visualizzare e aggiungere l'indicatore completo al tuo grafico su TradingView:</p>
+            <a href="https://it.tradingview.com/script/KmJoB1NP/" target="_blank" rel="noopener noreferrer" class="indicator-button">
+                Vedi l'indicatore su TradingView
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        Trading Spot Manager v1.1 | 
+        <a href="index.html">Operatività</a> | 
+        <a href="panoramica-capitale.html">Capitale</a> | 
+        <a href="blocco-note.html">Note</a> | 
+		<a href="Strategia-Trading.html">Indicatore</a> | 
+        <a href="candlestick.html">Candlestick</a> | 
+        <a href="cheat-sheet.html">Patterns</a>
+         </div>
+
+</body>
+</html>
