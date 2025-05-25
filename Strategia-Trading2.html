@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4H Enhanced Trading Strategy - Indicatore Completo</title>
+    <title>4H Enhanced Trading Strategy - Complete Indicator</title>
     <link rel="icon" type="image/png" href="favicon.png"> 
     <style>
-        /* CSS globale */
+        /* Global CSS */
         * {
             margin: 0;
             padding: 0;
@@ -28,7 +28,7 @@
             flex-grow: 1;
         }
 
-        /* Stili per i box */
+        /* Box Styles */
         .header-box, 
         .content-box,
         .indicator-info-box {
@@ -41,14 +41,14 @@
             box-sizing: border-box;
         }
         
-        /* Stile specifico per l'header-box */
+        /* Specific style for header-box */
         .header-box {
             background-color: #4a6fa5;
             color: white;
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            position: relative; /* Aggiunto per posizionamento assoluto del selettore lingua */
+            position: relative; /* Added for absolute positioning of language selector */
         }
 
         .header-box h1 {
@@ -56,7 +56,7 @@
             margin: 0;
         }
         
-        /* Stili per il selettore lingua */
+        /* Language selector styles */
         .language-selector {
             position: absolute;
             top: 10px;
@@ -78,7 +78,7 @@
             color: #FFDB58;
         }
 
-        /* Stili per i titoli all'interno dei box */
+        /* Styles for titles inside boxes */
         h2 {
             color: #4a6fa5;
             border-bottom: 1px solid #eee;
@@ -87,7 +87,7 @@
             margin-bottom: 20px;
         }
         
-        /* Stili per le tabelle */
+        /* Table styles */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -109,7 +109,7 @@
             background-color: #f9f9f9;
         }
 
-        /* Classi colore e bold */
+        /* Color and bold classes */
         .green { color: #28a745; font-weight: bold; }
         .red { color: #dc3545; font-weight: bold; }
         .white { color: #8e8e8e; font-weight: bold; }
@@ -143,7 +143,7 @@
             color: #721c24;
         }
 
-        /* Stile per il box informazioni indicatore */
+        /* Indicator info box style */
         .indicator-info-box {
             text-align: center;
             padding: 30px;
@@ -182,7 +182,7 @@
             transform: translateY(-2px);
         }
 
-        /* Stile per il footer */
+        /* Footer style */
         .footer {
             margin-top: 30px;
             margin-bottom: 10px;
@@ -202,7 +202,6 @@
         .footer a:hover {
             color: #FFDB58;
         }
-
     </style>
 </head>
 <body>
@@ -210,178 +209,178 @@
     <div class="container">
         <div class="header-box">
             <div class="language-selector">
-                <a href="Strategia-Trading.html" class="bold">ITA</a> | <a href="Strategia-Trading2.html">ENG</a>
+                <a href="Strategia-Trading.html">ITA</a> | <a href="Strategia-Trading2.html" class="bold">ENG</a>
             </div>
-            <h1>4H Enhanced Trading Strategy - Indicatore Completo</h1>
-            <p>Sistema di Trading Avanzato con Dashboard Mobile e Approccio Gerarchico</p>
+            <h1>4H Enhanced Trading Strategy - Complete Indicator</h1>
+            <p>Advanced Trading System with Mobile Dashboard and Hierarchical Approach</p>
         </div>
 
         <div class="content-box">
-            <h2>🎯 Dashboard Mobile Spiegata - Interpretazione dei Segnali</h2>
+            <h2>🎯 Mobile Dashboard Explained - Signal Interpretation</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Indicatore Dashboard</th>
-                        <th>Scala / Valore</th>
-                        <th>Interpretazione del Colore / Stato</th>
+                        <th>Dashboard Indicator</th>
+                        <th>Scale / Value</th>
+                        <th>Color / Status Interpretation</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td><span class="bold">🎯 LinReg (PRIMARY)</span></td>
-                        <td>Da -1 a +1</td>
+                        <td>From -1 to +1</td>
                         <td>
-                            <span class="green">🟢 BUY ZONE</span>: Valore ≤ -0.8 (zona di acquisto primaria)<br>
-                            <span class="red">🔴 SELL ZONE</span>: Valore ≥ +0.8 (zona di vendita primaria)<br>
-                            <span class="white">⚪ NEUTRAL</span>: Valore neutro (-0.8 < x < +0.8)<br>
-                            <span class="bold">NOTA:</span> Questo è il filtro PRIMARIO obbligatorio
+                            <span class="green">🟢 BUY ZONE</span>: Value ≤ -0.8 (primary buy zone)<br>
+                            <span class="red">🔴 SELL ZONE</span>: Value ≥ +0.8 (primary sell zone)<br>
+                            <span class="white">⚪ NEUTRAL</span>: Neutral value (-0.8 < x < +0.8)<br>
+                            <span class="bold">NOTE:</span> This is the MANDATORY PRIMARY filter
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">📊 Bollinger Bands</span></td>
-                        <td>Da -1 a +1</td>
+                        <td>From -1 to +1</td>
                         <td>
-                            <span class="green">🟢 OVERSOLD</span>: ≤ -0.8 (vicino banda inferiore)<br>
-                            <span class="red">🔴 OVERBOUGHT</span>: ≥ +0.8 (vicino banda superiore)<br>
-                            <span class="yellow">🟡 NEUTRAL</span>: Zona neutra
+                            <span class="green">🟢 OVERSOLD</span>: ≤ -0.8 (near lower band)<br>
+                            <span class="red">🔴 OVERBOUGHT</span>: ≥ +0.8 (near upper band)<br>
+                            <span class="yellow">🟡 NEUTRAL</span>: Neutral zone
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">⚡ Stochastic RSI</span></td>
-                        <td>K e D (0-100)</td>
+                        <td>K and D (0-100)</td>
                         <td>
-                            <span class="green">🟢 OVERSOLD</span>: K ≤ 20 (zona di ipervenduto)<br>
-                            <span class="red">🔴 OVERBOUGHT</span>: K ≥ 80 (zona di ipercomprato)<br>
-                            <span class="yellow">🟡 NEUTRAL</span>: Zona neutra<br>
-                            <span class="bold">SPECIALE:</span> Rileva incroci anticipatori K/D
+                            <span class="green">🟢 OVERSOLD</span>: K ≤ 20 (oversold zone)<br>
+                            <span class="red">🔴 OVERBOUGHT</span>: K ≥ 80 (overbought zone)<br>
+                            <span class="yellow">🟡 NEUTRAL</span>: Neutral zone<br>
+                            <span class="bold">SPECIAL:</span> Detects anticipatory K/D crosses
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">🎯 Pearson R</span></td>
-                        <td>Coefficiente di correlazione</td>
+                        <td>Correlation Coefficient</td>
                         <td>
-                            <span class="green">💪 STRONG TREND</span>: |R| ≥ 0.7 (trend forte, segnali affidabili)<br>
-                            <span class="orange">⚠️ WEAK TREND</span>: |R| < 0.7 (trend debole, cautela!)
+                            <span class="green">💪 STRONG TREND</span>: |R| ≥ 0.7 (strong trend, reliable signals)<br>
+                            <span class="orange">⚠️ WEAK TREND</span>: |R| < 0.7 (weak trend, caution!)
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">🔗 Confluence Score</span></td>
-                        <td>Punteggio di confluenza (-3 a +3)</td>
+                        <td>Confluence Score (-3 to +3)</td>
                         <td>
-                            <span class="green">🚀 BULLISH CONF</span>: Score ≥ +1 (confluenza rialzista)<br>
-                            <span class="red">📉 BEARISH CONF</span>: Score ≤ -1 (confluenza ribassista)<br>
-                            <span class="gray">➖ NO CONFLUENCE</span>: Score tra -1 e +1
+                            <span class="green">🚀 BULLISH CONF</span>: Score ≥ +1 (bullish confluence)<br>
+                            <span class="red">📉 BEARISH CONF</span>: Score ≤ -1 (bearish confluence)<br>
+                            <span class="gray">➖ NO CONFLUENCE</span>: Score between -1 and +1
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">🌊 Market Condition</span></td>
-                        <td>Classificazione del trend</td>
+                        <td>Trend Classification</td>
                         <td>
-                            <span class="blue">📈 STRONG TREND</span>: |R| ≥ 0.8 (ideale per trading)<br>
-                            <span class="orange">〰️ WEAK TREND</span>: 0.5 ≤ |R| < 0.8 (cautela)<br>
-                            <span class="gray">💤 SIDEWAYS</span>: |R| < 0.5 (evita il trading)
+                            <span class="blue">📈 STRONG TREND</span>: |R| ≥ 0.8 (ideal for trading)<br>
+                            <span class="orange">〰️ WEAK TREND</span>: 0.5 ≤ |R| < 0.8 (caution)<br>
+                            <span class="gray">💤 SIDEWAYS</span>: |R| < 0.5 (avoid trading)
                         </td>
                     </tr>
                 </tbody>
             </table>
 
             <div class="alert-box alert-success">
-                <h3>✅ SEGNALE BUY ATTIVO quando:</h3>
+                <h3>✅ BUY SIGNAL ACTIVE when:</h3>
                 <ul>
-                    <li><strong>LinReg (PRIMARY) ≤ -0.8</strong> 🟢 (OBBLIGATORIO)</li>
+                    <li><strong>LinReg (PRIMARY) ≤ -0.8</strong> 🟢 (MANDATORY)</li>
                     <li><strong>Confluence Score ≥ +1</strong> 🚀</li>
-                    <li><strong>Pearson R ≥ 0.7</strong> 💪 (trend forte)</li>
-                    <li><strong>Almeno 1 indicatore secondario supporta</strong> (BB, Stoch RSI, Pivot)</li>
+                    <li><strong>Pearson R ≥ 0.7</strong> 💪 (strong trend)</li>
+                    <li><strong>At least 1 secondary indicator supports</strong> (BB, Stoch RSI, Pivot)</li>
                 </ul>
             </div>
 
             <div class="alert-box alert-danger">
-                <h3>❌ SEGNALE SELL ATTIVO quando:</h3>
+                <h3>❌ SELL SIGNAL ACTIVE when:</h3>
                 <ul>
-                    <li><strong>LinReg (PRIMARY) ≥ +0.8</strong> 🔴 (OBBLIGATORIO)</li>
+                    <li><strong>LinReg (PRIMARY) ≥ +0.8</strong> 🔴 (MANDATORY)</li>
                     <li><strong>Confluence Score ≤ -1</strong> 📉</li>
-                    <li><strong>Pearson R ≥ 0.7</strong> 💪 (trend forte)</li>
-                    <li><strong>Almeno 1 indicatore secondario supporta</strong> (BB, Stoch RSI, Pivot)</li>
+                    <li><strong>Pearson R ≥ 0.7</strong> 💪 (strong trend)</li>
+                    <li><strong>At least 1 secondary indicator supports</strong> (BB, Stoch RSI, Pivot)</li>
                 </ul>
             </div>
 
             <div class="alert-box alert-warning">
-                <h3>⚠️ EVITA TRADING quando:</h3>
+                <h3>⚠️ AVOID TRADING when:</h3>
                 <ul>
                     <li><strong>Market Condition = SIDEWAYS</strong> 💤</li>
-                    <li><strong>Pearson R < 0.7</strong> ⚠️ (trend debole)</li>
-                    <li><strong>LinReg in zona neutrale</strong> ⚪</li>
-                    <li><strong>No Confluence (Score tra -1 e +1)</strong> ➖</li>
+                    <li><strong>Pearson R < 0.7</strong> ⚠️ (weak trend)</li>
+                    <li><strong>LinReg in neutral zone</strong> ⚪</li>
+                    <li><strong>No Confluence (Score between -1 and +1)</strong> ➖</li>
                 </ul>
             </div>
         </div>
 
         <div class="content-box">
-            <h2>🔧 Come Funziona l'Indicatore: Approccio Gerarchico</h2>
+            <h2>🔧 How the Indicator Works: Hierarchical Approach</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Livello Gerarchico</th>
-                        <th>Componente</th>
-                        <th>Funzione e Importanza</th>
+                        <th>Hierarchical Level</th>
+                        <th>Component</th>
+                        <th>Function and Importance</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td rowspan="2"><span class="bold red">LIVELLO 1 - PRIMARIO</span></td>
+                        <td rowspan="2"><span class="bold red">LEVEL 1 - PRIMARY</span></td>
                         <td><span class="bold">Linear Regression Position</span></td>
                         <td>
-                            <span class="bold">FILTRO OBBLIGATORIO</span><br>
-                            Calcola la posizione del prezzo rispetto alla linea di regressione lineare.<br>
-                            <span class="bold">-1</span> = Molto sotto la linea (oversold estremo)<br>
-                            <span class="bold">+1</span> = Molto sopra la linea (overbought estremo)<br>
-                            <span class="red">Senza questo segnale, NON ci sono trade validi</span>
+                            <span class="bold">MANDATORY FILTER</span><br>
+                            Calculates the price position relative to the linear regression line.<br>
+                            <span class="bold">-1</span> = Far below the line (extreme oversold)<br>
+                            <span class="bold">+1</span> = Far above the line (extreme overbought)<br>
+                            <span class="red">Without this signal, NO valid trades</span>
                         </td>
                     </tr>
                     <tr>
-                        <td><span class="bold">Pearson R (Qualità Trend)</span></td>
+                        <td><span class="bold">Pearson R (Trend Quality)</span></td>
                         <td>
-                            <span class="bold">VALIDATORE DI QUALITÀ</span><br>
-                            Misura la forza della correlazione lineare del trend.<br>
-                            Solo con |R| ≥ 0.7 i segnali sono considerati affidabili.<br>
-                            <span class="red">Pearson R debole = No Trading</span>
+                            <span class="bold">QUALITY VALIDATOR</span><br>
+                            Measures the strength of the linear correlation of the trend.<br>
+                            Only with |R| ≥ 0.7 are signals considered reliable.<br>
+                            <span class="red">Weak Pearson R = No Trading</span>
                         </td>
                     </tr>
                     <tr>
-                        <td rowspan="3"><span class="bold orange">LIVELLO 2 - SECONDARIO</span></td>
+                        <td rowspan="3"><span class="bold orange">LEVEL 2 - SECONDARY</span></td>
                         <td><span class="bold">Bollinger Bands Position</span></td>
                         <td>
-                            <span class="bold">SUPPORTO ALLA CONFLUENZA</span><br>
-                            Conferma le condizioni di oversold/overbought.<br>
-                            Contribuisce +1/-1 al Confluence Score quando estremo.
+                            <span class="bold">CONFLUENCE SUPPORT</span><br>
+                            Confirms oversold/overbought conditions.<br>
+                            Contributes +1/-1 to the Confluence Score when extreme.
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">Stochastic RSI Enhanced</span></td>
                         <td>
-                            <span class="bold">MOMENTUM E TIMING</span><br>
-                            Versione ottimizzata con K=1 (più reattivo).<br>
-                            Rileva incroci anticipatori e zone estreme.<br>
-                            Parametri: RSI(14), Stoch(14), K(1), D(3)
+                            <span class="bold">MOMENTUM AND TIMING</span><br>
+                            Optimized version with K=1 (more reactive).<br>
+                            Detects anticipatory crosses and extreme zones.<br>
+                            Parameters: RSI(14), Stoch(14), K(1), D(3)
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">Pivot Points Filter</span></td>
                         <td>
-                            <span class="bold">SUPPORTI E RESISTENZE</span><br>
-                            Identifica livelli chiave di inversione.<br>
-                            Contribuisce quando il prezzo è entro 2% dai pivot.
+                            <span class="bold">SUPPORTS AND RESISTANCES</span><br>
+                            Identifies key reversal levels.<br>
+                            Contributes when price is within 2% of pivots.
                         </td>
                     </tr>
                     <tr>
-                        <td><span class="bold purple">SISTEMA DI SCORING</span></td>
+                        <td><span class="bold purple">SCORING SYSTEM</span></td>
                         <td><span class="bold">Confluence Score</span></td>
                         <td>
-                            <span class="bold">AGGREGATORE INTELLIGENTE</span><br>
-                            Somma i contributi degli indicatori secondari.<br>
-                            <span class="green">≥ +1 = Confluenza Rialzista</span><br>
-                            <span class="red">≤ -1 = Confluenza Ribassista</span><br>
-                            Solo con confluenza + LinReg primario = Segnale Valido
+                            <span class="bold">INTELLIGENT AGGREGATOR</span><br>
+                            Sums contributions from secondary indicators.<br>
+                            <span class="green">≥ +1 = Bullish Confluence</span><br>
+                            <span class="red">≤ -1 = Bearish Confluence</span><br>
+                            Only with confluence + primary LinReg = Valid Signal
                         </td>
                     </tr>
                 </tbody>
@@ -389,14 +388,14 @@
         </div>
 
         <div class="content-box">
-            <h2>⚙️ Parametri e Configurazioni Ottimizzate</h2>
+            <h2>⚙️ Optimized Parameters and Configurations</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Gruppo Parametri</th>
-                        <th>Impostazione</th>
-                        <th>Valore Ottimizzato</th>
-                        <th>Perché Questo Valore</th>
+                        <th>Parameter Group</th>
+                        <th>Setting</th>
+                        <th>Optimized Value</th>
+                        <th>Reason for This Value</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -404,148 +403,148 @@
                         <td rowspan="2"><span class="bold">Linear Regression</span></td>
                         <td>Length</td>
                         <td>100</td>
-                        <td>Equilibrio tra reattività e stabilità per timeframe 4H</td>
+                        <td>Balance between reactivity and stability for 4H timeframe</td>
                     </tr>
                     <tr>
                         <td>Sensitivity</td>
                         <td>0.8</td>
-                        <td>Soglie ottimali per filtrare falsi segnali</td>
+                        <td>Optimal thresholds for filtering false signals</td>
                     </tr>
                     <tr>
                         <td rowspan="2"><span class="bold">Bollinger Bands</span></td>
                         <td>Length</td>
                         <td>20</td>
-                        <td>Standard per timeframe 4H, buona rappresentazione volatilità</td>
+                        <td>Standard for 4H timeframe, good volatility representation</td>
                     </tr>
                     <tr>
                         <td>Multiplier</td>
                         <td>2.0</td>
-                        <td>Deviazioni standard classiche per catturare il 95% dei movimenti</td>
+                        <td>Classic standard deviations to capture 95% of movements</td>
                     </tr>
                     <tr>
                         <td rowspan="4"><span class="bold">Stochastic RSI</span></td>
                         <td>RSI Length</td>
                         <td>14</td>
-                        <td>Periodo standard per momentum analysis</td>
+                        <td>Standard period for momentum analysis</td>
                     </tr>
                     <tr>
                         <td>Stoch Length</td>
                         <td>14</td>
-                        <td>Coerenza con RSI per calcoli uniformi</td>
+                        <td>Consistency with RSI for uniform calculations</td>
                     </tr>
                     <tr>
                         <td>%K Smooth</td>
                         <td>1</td>
-                        <td><span class="red">CHIAVE:</span> K=1 rende l'indicatore più reattivo e anticipa i segnali</td>
+                        <td><span class="red">KEY:</span> K=1 makes the indicator more reactive and anticipates signals</td>
                     </tr>
                     <tr>
                         <td>%D Smooth</td>
                         <td>3</td>
-                        <td>Smoothing leggero per ridurre rumore mantenendo reattività</td>
+                        <td>Light smoothing to reduce noise while maintaining reactivity</td>
                     </tr>
                     <tr>
                         <td rowspan="2"><span class="bold">Signal Thresholds</span></td>
                         <td>Oversold/Overbought</td>
                         <td>20/80</td>
-                        <td>Zone estreme ottimali per timeframe 4H</td>
+                        <td>Optimal extreme zones for 4H timeframe</td>
                     </tr>
                     <tr>
                         <td>Minimum Pearson R</td>
                         <td>0.7</td>
-                        <td>Soglia che garantisce trend sufficientemente forte</td>
+                        <td>Threshold that ensures a sufficiently strong trend</td>
                     </tr>
                     <tr>
                         <td><span class="bold">Pivot Points</span></td>
                         <td>Length</td>
                         <td>50</td>
-                        <td>Identifica livelli significativi senza troppo rumore</td>
+                        <td>Identifies significant levels without too much noise</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <div class="content-box">
-            <h2>📱 Dashboard Mobile - Funzionalità Avanzate</h2>
+            <h2>📱 Mobile Dashboard - Advanced Features</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Sezione Dashboard</th>
-                        <th>Informazioni Visualizzate</th>
-                        <th>Codice Colore</th>
+                        <th>Dashboard Section</th>
+                        <th>Information Displayed</th>
+                        <th>Color Code</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><span class="bold">Header Principale</span></td>
+                        <td><span class="bold">Main Header</span></td>
                         <td>📊 4H STRATEGY</td>
-                        <td><span class="blue">Blu</span> - Identificazione rapida</td>
+                        <td><span class="blue">Blue</span> - Quick identification</td>
                     </tr>
                     <tr>
                         <td><span class="bold">LinReg Status</span></td>
-                        <td>🎯 LinReg (PRIMARY)<br>Status + Valore numerico</td>
+                        <td>🎯 LinReg (PRIMARY)<br>Status + Numeric Value</td>
                         <td>
-                            <span class="green">Verde</span> - BUY ZONE<br>
-                            <span class="red">Rosso</span> - SELL ZONE<br>
-                            <span class="gray">Grigio</span> - NEUTRAL
+                            <span class="green">Green</span> - BUY ZONE<br>
+                            <span class="red">Red</span> - SELL ZONE<br>
+                            <span class="gray">Gray</span> - NEUTRAL
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">BB Position</span></td>
-                        <td>📊 Bollinger Bands<br>Status + Valore</td>
+                        <td>📊 Bollinger Bands<br>Status + Value</td>
                         <td>
-                            <span class="green">Verde</span> - OVERSOLD<br>
-                            <span class="red">Rosso</span> - OVERBOUGHT<br>
-                            <span class="yellow">Giallo</span> - NEUTRAL
+                            <span class="green">Green</span> - OVERSOLD<br>
+                            <span class="red">Red</span> - OVERBOUGHT<br>
+                            <span class="yellow">Yellow</span> - NEUTRAL
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">Stoch RSI Enhanced</span></td>
                         <td>⚡ Stochastic RSI<br>Status + K:## D:##</td>
                         <td>
-                            <span class="green">Verde</span> - OVERSOLD<br>
-                            <span class="red">Rosso</span> - OVERBOUGHT<br>
-                            <span class="yellow">Giallo</span> - NEUTRAL
+                            <span class="green">Green</span> - OVERSOLD<br>
+                            <span class="red">Red</span> - OVERBOUGHT<br>
+                            <span class="yellow">Yellow</span> - NEUTRAL
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">Trend Quality</span></td>
-                        <td>🎯 Pearson R<br>Status + Valore R</td>
+                        <td>🎯 Pearson R<br>Status + R Value</td>
                         <td>
-                            <span class="green">Verde</span> - STRONG TREND<br>
-                            <span class="orange">Arancione</span> - WEAK TREND
+                            <span class="green">Green</span> - STRONG TREND<br>
+                            <span class="orange">Orange</span> - WEAK TREND
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">Confluence Meter</span></td>
-                        <td>🔗 Confluence Score<br>Status + Score numerico</td>
+                        <td>🔗 Confluence Score<br>Status + Numeric Score</td>
                         <td>
-                            <span class="green">Verde</span> - BULLISH CONF<br>
-                            <span class="red">Rosso</span> - BEARISH CONF<br>
-                            <span class="gray">Grigio</span> - NO CONFLUENCE
+                            <span class="green">Green</span> - BULLISH CONF<br>
+                            <span class="red">Red</span> - BEARISH CONF<br>
+                            <span class="gray">Gray</span> - NO CONFLUENCE
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">Market Assessment</span></td>
                         <td>🌊 Market Condition<br>STRONG/WEAK/SIDEWAYS</td>
                         <td>
-                            <span class="blue">Blu</span> - STRONG TREND<br>
-                            <span class="orange">Arancione</span> - WEAK TREND<br>
-                            <span class="gray">Grigio</span> - SIDEWAYS
+                            <span class="blue">Blue</span> - STRONG TREND<br>
+                            <span class="orange">Orange</span> - WEAK TREND<br>
+                            <span class="gray">Gray</span> - SIDEWAYS
                         </td>
                     </tr>
                     <tr>
                         <td><span class="bold">Threshold Reference</span></td>
                         <td>⚖️ Signal Thresholds<br>BUY < -0.8, SELL > +0.8</td>
-                        <td><span class="purple">Viola</span> - Riferimento soglie</td>
+                        <td><span class="purple">Purple</span> - Threshold reference</td>
                     </tr>
                     <tr>
-                        <td><span class="bold">Main Signal (Grande)</span></td>
-                        <td>Stato principale del segnale</td>
+                        <td><span class="bold">Main Signal (Large)</span></td>
+                        <td>Main signal status</td>
                         <td>
-                            <span class="green">Verde Acceso</span> - BUY SIGNAL ACTIVE<br>
-                            <span class="red">Rosso Acceso</span> - SELL SIGNAL ACTIVE<br>
-                            <span class="orange">Arancione</span> - WAITING CONFLUENCE<br>
-                            <span class="gray">Grigio</span> - NO SETUP DETECTED
+                            <span class="green">Bright Green</span> - BUY SIGNAL ACTIVE<br>
+                            <span class="red">Bright Red</span> - SELL SIGNAL ACTIVE<br>
+                            <span class="orange">Orange</span> - WAITING CONFLUENCE<br>
+                            <span class="gray">Gray</span> - NO SETUP DETECTED
                         </td>
                     </tr>
                 </tbody>
@@ -553,86 +552,86 @@
         </div>
 
         <div class="content-box">
-            <h2>🎯 Strategia di Utilizzo Pratica</h2>
+            <h2>🎯 Practical Usage Strategy</h2>
             <table>
                 <thead>
                     <tr>
                         <th>Step</th>
-                        <th>Azione</th>
-                        <th>Cosa Controllare</th>
+                        <th>Action</th>
+                        <th>What to Check</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><span class="bold">1. Pre-Analisi</span></td>
-                        <td>Controllo Market Condition</td>
-                        <td>🌊 Se non è "STRONG TREND", evita il trading</td>
+                        <td><span class="bold">1. Pre-Analysis</span></td>
+                        <td>Check Market Condition</td>
+                        <td>🌊 If not "STRONG TREND", avoid trading</td>
                     </tr>
                     <tr>
-                        <td><span class="bold">2. Filtro Primario</span></td>
-                        <td>Verifica LinReg Position</td>
-                        <td>🎯 Deve essere ≤ -0.8 (BUY) o ≥ +0.8 (SELL)</td>
+                        <td><span class="bold">2. Primary Filter</span></td>
+                        <td>Verify LinReg Position</td>
+                        <td>🎯 Must be ≤ -0.8 (BUY) or ≥ +0.8 (SELL)</td>
                     </tr>
                     <tr>
-                        <td><span class="bold">3. Qualità Trend</span></td>
-                        <td>Controlla Pearson R</td>
-                        <td>💪 Deve essere ≥ 0.7 per segnali affidabili</td>
+                        <td><span class="bold">3. Trend Quality</span></td>
+                        <td>Check Pearson R</td>
+                        <td>💪 Must be ≥ 0.7 for reliable signals</td>
                     </tr>
                     <tr>
-                        <td><span class="bold">4. Confluenza</span></td>
-                        <td>Verifica Confluence Score</td>
-                        <td>🔗 Deve essere ≥ +1 (BUY) o ≤ -1 (SELL)</td>
+                        <td><span class="bold">4. Confluence</span></td>
+                        <td>Verify Confluence Score</td>
+                        <td>🔗 Must be ≥ +1 (BUY) or ≤ -1 (SELL)</td>
                     </tr>
                     <tr>
-                        <td><span class="bold">5. Conferma Finale</span></td>
-                        <td>Attendi segnale principale</td>
-                        <td>Dashboard deve mostrare "BUY/SELL SIGNAL ACTIVE"</td>
+                        <td><span class="bold">5. Final Confirmation</span></td>
+                        <td>Wait for main signal</td>
+                        <td>Dashboard must show "BUY/SELL SIGNAL ACTIVE"</td>
                     </tr>
                     <tr>
                         <td><span class="bold">6. Entry</span></td>
-                        <td>Entra solo se TUTTI i criteri sono soddisfatti</td>
-                        <td>Non entrare mai con segnali parziali</td>
+                        <td>Enter only if ALL criteria are met</td>
+                        <td>Never enter with partial signals</td>
                     </tr>
                     <tr>
                         <td><span class="bold">7. Stop Loss</span></td>
-                        <td>Usa i livelli di Pivot Points</td>
-                        <td>Livelli dinamici calcolati automaticamente</td>
+                        <td>Use Pivot Points levels</td>
+                        <td>Automatically calculated dynamic levels</td>
                     </tr>
                 </tbody>
             </table>
 
             <div class="alert-box alert-warning">
-                <h3>⚠️ Regole d'Oro per il Successo:</h3>
+                <h3>⚠️ Golden Rules for Success:</h3>
                 <ul>
-                    <li><strong>MAI tradare in condizioni SIDEWAYS</strong> - Aspetta trend forti</li>
-                    <li><strong>LinReg è OBBLIGATORIO</strong> - Senza questo filtro primario, no trade</li>
-                    <li><strong>Pearson R < 0.7 = STOP</strong> - Trend troppo debole</li>
-                    <li><strong>Attendi confluenza completa</strong> - Non affrettarti</li>
-                    <li><strong>Timeframe 4H = Pazienza</strong> - I segnali sono meno frequenti ma più affidabili</li>
+                    <li><strong>NEVER trade in SIDEWAYS conditions</strong> - Wait for strong trends</li>
+                    <li><strong>LinReg is MANDATORY</strong> - Without this primary filter, no trade</li>
+                    <li><strong>Pearson R < 0.7 = STOP</strong> - Trend is too weak</li>
+                    <li><strong>Wait for full confluence</strong> - Don't rush</li>
+                    <li><strong>4H Timeframe = Patience</strong> - Signals are less frequent but more reliable</li>
                 </ul>
             </div>
         </div>
 
         <div class="indicator-info-box">
-            <h2>Indicatore "4H Enhanced Strategy" (Open Source) creato da gerardo_dorrico</h2>
-            <p>Un sistema di trading avanzato che combina analisi tecnica tradizionale con approccio gerarchico moderno.</p>
-            <p>Visita il mio profilo su TradingView per scoprire altri strumenti e strategie:</p>
+            <h2>"4H Enhanced Strategy" Indicator (Open Source) created by gerardo_dorrico</h2>
+            <p>An advanced trading system combining traditional technical analysis with a modern hierarchical approach.</p>
+            <p>Visit my TradingView profile to discover other tools and strategies:</p>
             <a href="https://it.tradingview.com/u/gerardo_dorrico/" target="_blank" rel="noopener noreferrer" class="profile-link">
-                Profilo TradingView di gerardo_dorrico
+                gerardo_dorrico's TradingView Profile
             </a>
-            <p>Per visualizzare e aggiungere l'indicatore completo al tuo grafico su TradingView:</p>
-            <a href="https://it.tradingview.com/script/j8v4yMRv/" target="_blank" rel="noopener noreferrer" class="indicator-button">
-                Vedi l'indicatore su TradingView
+            <p>To view and add the complete indicator to your chart on TradingView:</p>
+            <a href="https://it.tradingview.com/script/ejAPdxVz/" target="_blank" rel="noopener noreferrer" class="indicator-button">
+                View the indicator on TradingView
             </a>
         </div>
     </div>
 
     <div class="footer">
         Trading Spot Manager v1.1 | 
-        <a href="index.html">Operatività</a> | 
-        <a href="panoramica-capitale.html">Capitale</a> | 
-        <a href="blocco-note.html">Note</a> | 
-        <a href="Strategia-Trading.html">Indicatore</a> | 
+        <a href="index.html">Operations</a> | 
+        <a href="capital-overview.html">Capital</a> | 
+        <a href="notepad.html">Notes</a> | 
+        <a href="strategy-trading-eng.html">Indicator</a> | 
         <a href="candlestick.html">Candlestick</a> | 
         <a href="cheat-sheet.html">Patterns</a>
     </div>
