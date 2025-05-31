@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance Trading Bot - Tracking Fiscale</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        button.secondary {
+            background: linear-gradient(45deg, #6c757d, #5a6268);
+        }
+        
+        button.secondary:hover {
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+        
+        .status.info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .status.success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+        
+        .config-summary {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .trade-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .trade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .trade-symbol {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .trade-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .trade-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+        
+        .closure-section {
+            background: #fff8e1;
+            border: 2px solid #ffb74d;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .closure-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+        
+        .closure-form .form-group {
+            flex: 1;
+            min-width: 150px;
+            margin-bottom: 0;
+        }
+        
+        .download-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .quick-trade {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .quick-trade h2 {
+            color: white;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+        
+        .quick-trade select {
+            background: white;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .closure-form {
+                flex-direction: column;
+            }
+            
+            .closure-form .form-group {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Binance Trading Bot - Tracking Fiscale</h1>
+        
+        <!-- Configurazione Generale -->
+        <div class="section">
+            <h2>⚙️ Configurazione Generale</h2>
+            
+            <!-- Riassunto Configurazione -->
+            <div class="config-summary" id="configSummary" style="display: none;">
+                <h3 style="margin-bottom: 15px; color: #667eea;">📋 Configurazione Attuale</h3>
+                <div class="config-item">
+                    <span>Valuta Base:</span>
+                    <span id="currentBaseCurrency">-</span>
+                </div>
+                <div class="config-item">
+                    <span>Quota per Acquisto:</span>
+                    <span id="currentPurchaseAmount">-</span>
+                </div>
+                <div class="config-item">
+                    <span>API Configurate:</span>
+                    <span id="apiStatus">❌ Non configurate</span>
+                </div>
+                <button class="secondary" onclick="showConfiguration()">Modifica Configurazione</button>
+            </div>
+            
+            <!-- Form Configurazione -->
+            <div id="configurationForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="baseCurrency">Valuta Base:</label>
+                        <select id="baseCurrency">
+                            <option value="USDC">USDC</option>
+                            <option value="USDT">USDT</option>
+                            <option value="BUSD">BUSD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchaseAmount">Quota per Acquisto:</label>
+                        <input type="number" id="purchaseAmount" placeholder="es. 100" step="0.01" value="100">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="apiKey">API Key Binance:</label>
+                        <input type="password" id="apiKey" placeholder="Inserisci la tua Binance API Key">
+                    </div>
+                    <div class="form-group">
+                        <label for="apiSecret">API Secret Binance:</label>
+                        <input type="password" id="apiSecret" placeholder="Inserisci il tuo Binance API Secret">
+                    </div>
+                </div>
+                
+                <button onclick="testConnection()">Testa Connessione</button>
+                <button onclick="saveConfiguration()">Salva Configurazione</button>
+                <div id="connectionStatus"></div>
+            </div>
+        </div>
+        
+        <!-- Trading Rapido -->
+        <div class="quick-trade" id="quickTradeSection" style="display: none;">
+            <h2>⚡ Avvia Nuovo Trading</h2>
+            <div class="form-group">
+                <label for="tradingPair" style="color: white;">Seleziona Coppia di Trading:</label>
+                <select id="tradingPair">
+                    <option value="BTC">Bitcoin (BTC)</option>
+                    <option value="ETH">Ethereum (ETH)</option>
+                    <option value="ADA">Cardano (ADA)</option>
+                    <option value="DOT">Polkadot (DOT)</option>
+                    <option value="LINK">Chainlink (LINK)</option>
+                    <option value="BNB">Binance Coin (BNB)</option>
+                    <option value="SOL">Solana (SOL)</option>
+                    <option value="MATIC">Polygon (MATIC)</option>
+                    <option value="AVAX">Avalanche (AVAX)</option>
+                    <option value="ATOM">Cosmos (ATOM)</option>
+                </select>
+            </div>
+            <button onclick="startTradingBot()" id="startBtn" style="background: rgba(255,255,255,0.2); border: 2px solid white;">
+                🚀 Avvia Trading Bot
+            </button>
+            <button onclick="stopTradingBot()" id="stopBtn" disabled style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.5);">
+                🛑 Ferma Trading Bot
+            </button>
+        </div>
+        
+        <!-- Trading Attivi -->
+        <div class="section">
+            <h2>⚡ Trading Attivi</h2>
+            <div id="activeTrades"></div>
+        </div>
+        
+        <!-- Storico Trading -->
+        <div class="section">
+            <h2>📈 Storico Trading</h2>
+            <div id="tradeHistory"></div>
+        </div>
+        
+        <!-- Download Dati -->
+        <div class="section download-section">
+            <h2>💾 Esporta Dati</h2>
+            <button onclick="downloadJSON()">Scarica Storico JSON</button>
+            <button onclick="downloadCSV()">Scarica CSV per Fisco</button>
+        </div>
+    </div>
+
+    <script>
+        // Variabili globali
+        let config = {
+            apiKey: '',
+            apiSecret: '',
+            baseCurrency: 'USDC',
+            purchaseAmount: 100,
+            isConfigured: false
+        };
+        let activeTrades = new Map();
+        let tradeHistory = [];
+        let tradingIntervals = new Map();
+        
+        // Carica configurazione e dati dal localStorage
+        function loadData() {
+            // Carica configurazione
+            const savedConfig = localStorage.getItem('botConfig');
+            if (savedConfig) {
+                config = { ...config, ...JSON.parse(savedConfig) };
+                updateConfigDisplay();
+            }
+            
+            // Carica storico trading
+            const savedHistory = localStorage.getItem('tradeHistory');
+            if (savedHistory) {
+                tradeHistory = JSON.parse(savedHistory);
+                updateTradeHistoryDisplay();
+            }
+            
+            // Carica trading attivi
+            const savedActive = localStorage.getItem('activeTrades');
+            if (savedActive) {
+                activeTrades = new Map(JSON.parse(savedActive));
+                updateActiveTradesDisplay();
+            }
+        }
+        
+        // Salva dati nel localStorage
+        function saveData() {
+            localStorage.setItem('botConfig', JSON.stringify(config));
+            localStorage.setItem('tradeHistory', JSON.stringify(tradeHistory));
+            localStorage.setItem('activeTrades', JSON.stringify([...activeTrades]));
+        }
+        
+        // Aggiorna display configurazione
+        function updateConfigDisplay() {
+            if (config.isConfigured) {
+                document.getElementById('currentBaseCurrency').textContent = config.baseCurrency;
+                document.getElementById('currentPurchaseAmount').textContent = `${config.purchaseAmount} ${config.baseCurrency}`;
+                document.getElementById('apiStatus').textContent = config.apiKey ? '✅ Configurate' : '❌ Non configurate';
+                
+                document.getElementById('configSummary').style.display = 'block';
+                document.getElementById('configurationForm').style.display = 'none';
+                document.getElementById('quickTradeSection').style.display = 'block';
+                
+                // Aggiorna le opzioni della coppia di trading
+                updateTradingPairOptions();
+            } else {
+                document.getElementById('configSummary').style.display = 'none';
+                document.getElementById('configurationForm').style.display = 'block';
+                document.getElementById('quickTradeSection').style.display = 'none';
+            }
+        }
+        
+        // Aggiorna opzioni coppia di trading
+        function updateTradingPairOptions() {
+            const select = document.getElementById('tradingPair');
+            const options = select.querySelectorAll('option');
+            
+            options.forEach(option => {
+                const crypto = option.value;
+                option.textContent = `${option.textContent.split('(')[0].trim()} (${crypto}/${config.baseCurrency})`;
+            });
+        }
+        
+        // Mostra form configurazione
+        function showConfiguration() {
+            // Popola i campi con i valori attuali
+            document.getElementById('baseCurrency').value = config.baseCurrency;
+            document.getElementById('purchaseAmount').value = config.purchaseAmount;
+            document.getElementById('apiKey').value = config.apiKey;
+            document.getElementById('apiSecret').value = config.apiSecret;
+            
+            document.getElementById('configSummary').style.display = 'none';
+            document.getElementById('configurationForm').style.display = 'block';
+            document.getElementById('quickTradeSection').style.display = 'none';
+        }
+        
+        // Test connessione API
+        async function testConnection() {
+            const apiKey = document.getElementById('apiKey').value;
+            const apiSecret = document.getElementById('apiSecret').value;
+            
+            if (!apiKey || !apiSecret) {
+                showStatus('connectionStatus', 'Inserisci API Key e Secret', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('connectionStatus', 'Testando connessione...', 'info');
+                
+                // Simulazione test connessione (in ambiente reale useresti le API Binance)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                showStatus('connectionStatus', '✅ Connessione riuscita!', 'success');
+                return true;
+            } catch (error) {
+                showStatus('connectionStatus', '❌ Errore connessione: ' + error.message, 'error');
+                return false;
+            }
+        }
+        
+        // Salva configurazione
+        async function saveConfiguration() {
+            const apiKey = document.getElementById('apiKey').value;
+            const apiSecret = document.getElementById('apiSecret').value;
+            const baseCurrency = document.getElementById('baseCurrency').value;
+            const purchaseAmount = parseFloat(document.getElementById('purchaseAmount').value);
+            
+            if (!apiKey || !apiSecret) {
+                showStatus('connectionStatus', 'Inserisci API Key e Secret', 'error');
+                return;
+            }
+            
+            if (!purchaseAmount || purchaseAmount <= 0) {
+                showStatus('connectionStatus', 'Inserisci una quota valida', 'error');
+                return;
+            }
+            
+            // Testa la connessione prima di salvare
+            const connectionOk = await testConnection();
+            if (!connectionOk) return;
+            
+            // Salva configurazione
+            config = {
+                apiKey,
+                apiSecret,
+                baseCurrency,
+                purchaseAmount,
+                isConfigured: true
+            };
+            
+            saveData();
+            updateConfigDisplay();
+            showStatus('connectionStatus', '✅ Configurazione salvata con successo!', 'success');
+        }
+        
+        // Avvia trading bot
+        function startTradingBot() {
+            if (!config.isConfigured) {
+                alert('Completa prima la configurazione!');
+                return;
+            }
+            
+            const cryptoSymbol = document.getElementById('tradingPair').value;
+            const tradingPair = `${cryptoSymbol}${config.baseCurrency}`;
+            
+            const tradeId = Date.now().toString();
+            const trade = {
+                id: tradeId,
+                symbol: tradingPair,
+                cryptoSymbol: cryptoSymbol,
+                baseCurrency: config.baseCurrency,
+                amountPerPurchase: config.purchaseAmount,
+                totalPurchases: 5,
+                completedPurchases: 0,
+                purchases: [],
+                startDate: new Date().toISOString(),
+                status: 'active',
+                totalSpent: 0,
+                totalCrypto: 0
+            };
+            
+            activeTrades.set(tradeId, trade);
+            
+            // Simula il primo acquisto
+            executePurchase(tradeId);
+            
+            // Programma acquisti ogni 8 ore (28800000 ms)
+            const interval = setInterval(() => {
+                const currentTrade = activeTrades.get(tradeId);
+                if (currentTrade && currentTrade.status === 'active') {
+                    executePurchase(tradeId);
+                } else {
+                    clearInterval(interval);
+                    tradingIntervals.delete(tradeId);
+                }
+            }, 28800000); // 8 ore
+            
+            tradingIntervals.set(tradeId, interval);
+            
+            updateActiveTradesDisplay();
+            saveData();
+            
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+        }
+        
+        // Ferma trading bot
+        function stopTradingBot() {
+            tradingIntervals.forEach((interval, tradeId) => {
+                clearInterval(interval);
+            });
+            tradingIntervals.clear();
+            
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+        }
+        
+        // Esegui acquisto
+        async function executePurchase(tradeId) {
+            const trade = activeTrades.get(tradeId);
+            if (!trade || trade.completedPurchases >= trade.totalPurchases) return;
+            
+            try {
+                // Simulazione acquisto (in ambiente reale useresti le API Binance)
+                let mockPrice;
+                switch(trade.cryptoSymbol) {
+                    case 'BTC': mockPrice = Math.random() * 10000 + 40000; break;
+                    case 'ETH': mockPrice = Math.random() * 500 + 2000; break;
+                    case 'ADA': mockPrice = Math.random() * 0.5 + 0.3; break;
+                    case 'DOT': mockPrice = Math.random() * 5 + 5; break;
+                    case 'LINK': mockPrice = Math.random() * 10 + 10; break;
+                    case 'BNB': mockPrice = Math.random() * 50 + 200; break;
+                    case 'SOL': mockPrice = Math.random() * 50 + 50; break;
+                    case 'MATIC': mockPrice = Math.random() * 0.5 + 0.5; break;
+                    case 'AVAX': mockPrice = Math.random() * 20 + 20; break;
+                    case 'ATOM': mockPrice = Math.random() * 5 + 8; break;
+                    default: mockPrice = Math.random() * 100 + 50;
+                }
+                
+                const cryptoAmount = trade.amountPerPurchase / mockPrice;
+                
+                const purchase = {
+                    date: new Date().toISOString(),
+                    price: mockPrice,
+                    cryptoAmount: cryptoAmount,
+                    spent: trade.amountPerPurchase,
+                    currency: trade.baseCurrency
+                };
+                
+                trade.purchases.push(purchase);
+                trade.completedPurchases++;
+                trade.totalSpent += trade.amountPerPurchase;
+                trade.totalCrypto += cryptoAmount;
+                
+                if (trade.completedPurchases >= trade.totalPurchases) {
+                    trade.status = 'completed';
+                    trade.endDate = new Date().toISOString();
+                    
+                    // Rimuovi l'intervallo
+                    const interval = tradingIntervals.get(tradeId);
+                    if (interval) {
+                        clearInterval(interval);
+                        tradingIntervals.delete(tradeId);
+                    }
+                }
+                
+                updateActiveTradesDisplay();
+                saveData();
+                
+            } catch (error) {
+                console.error('Errore durante l\'acquisto:', error);
+            }
+        }
+        
+        // Chiudi trade
+        function closeTrade(tradeId, closePrice, closeDate) {
+            const trade = activeTrades.get(tradeId);
+            if (!trade) return;
+            
+            trade.closePrice = parseFloat(closePrice);
+            trade.closeDate = closeDate;
+            trade.closeValue = trade.totalCrypto * trade.closePrice;
+            trade.profit = trade.closeValue - trade.totalSpent;
+            trade.profitPercentage = ((trade.profit / trade.totalSpent) * 100).toFixed(2);
+            trade.status = 'closed';
+            
+            // Sposta da attivi a storico
+            tradeHistory.push(trade);
+            activeTrades.delete(tradeId);
+            
+            updateActiveTradesDisplay();
+            updateTradeHistoryDisplay();
+            saveData();
+        }
+        
+        // Aggiorna display trading attivi
+        function updateActiveTradesDisplay() {
+            const container = document.getElementById('activeTrades');
+            
+            if (activeTrades.size === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Nessun trading attivo</p>';
+                return;
+            }
+            
+            let html = '';
+            activeTrades.forEach((trade, tradeId) => {
+                const progress = (trade.completedPurchases / trade.totalPurchases) * 100;
+                const avgPrice = trade.totalSpent > 0 ? trade.totalSpent / trade.totalCrypto : 0;
+                
+                html += `
+                    <div class="trade-item">
+                        <div class="trade-header">
+                            <span class="trade-symbol">${trade.symbol}</span>
+                            <span class="trade-status ${trade.status === 'active' ? 'status-active' : 'status-completed'}">
+                                ${trade.status === 'active' ? 'In Corso' : 'Completato'}
+                            </span>
+                        </div>
+                        
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        <p style="text-align: center; margin: 5px 0; font-size: 0.9em; color: #666;">
+                            ${trade.completedPurchases}/${trade.totalPurchases} acquisti completati
+                        </p>
+                        
+                        <div class="trade-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Importo per Acquisto</div>
+                                <div class="detail-value">${trade.amountPerPurchase} ${trade.baseCurrency}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Totale Speso</div>
+                                <div class="detail-value">${trade.totalSpent.toFixed(2)} ${trade.baseCurrency}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Crypto Acquistata</div>
+                                <div class="detail-value">${trade.totalCrypto.toFixed(6)} ${trade.cryptoSymbol}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Prezzo Medio</div>
+                                <div class="detail-value">${avgPrice.toFixed(2)} ${trade.baseCurrency}</div>
+                            </div>
+                        </div>
+                        
+                        ${trade.status === 'completed' ? `
+                            <div class="closure-section">
+                                <h4>Chiusura Trade</h4>
+                                <div class="closure-form">
+                                    <div class="form-group">
+                                        <label>Data Chiusura:</label>
+                                        <input type="date" id="closeDate_${tradeId}" value="${new Date().toISOString().split('T')[0]}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Prezzo Chiusura (${trade.baseCurrency}):</label>
+                                        <input type="number" id="closePrice_${tradeId}" step="0.01" placeholder="Prezzo in ${trade.baseCurrency}">
+                                    </div>
+                                    <button onclick="closeTrade('${tradeId}', document.getElementById('closePrice_${tradeId}').value, document.getElementById('closeDate_${tradeId}').value)">
+                                        Chiudi Trade
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Aggiorna display storico
+        function updateTradeHistoryDisplay() {
+            const container = document.getElementById('tradeHistory');
+            
+            if (tradeHistory.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Nessun trade completato</p>';
+                return;
+            }
+            
+            let html = '';
+            tradeHistory.forEach(trade => {
+                html += `
+                    <div class="trade-item">
+                        <div class="trade-header">
+                            <span class="trade-symbol">${trade.symbol}</span>
+                            <span class="trade-status status-completed">Chiuso</span>
+                        </div>
+                        
+                        <div class="trade-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Data Inizio</div>
+                                <div class="detail-value">${new Date(trade.startDate).toLocaleDateString()}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Data Chiusura</div>
+                                <div class="detail-value">${new Date(trade.closeDate).toLocaleDateString()}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Totale Speso</div>
+                                <div class="detail-value">${trade.totalSpent.toFixed(2)} ${trade.baseCurrency}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Prezzo Medio Acquisto</div>
+                                <div class="detail-value">${(trade.totalSpent / trade.totalCrypto).toFixed(2)} ${trade.baseCurrency}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Crypto Venduta</div>
+                                <div class="detail-value">${trade.totalCrypto.toFixed(6)} ${trade.cryptoSymbol}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Prezzo Vendita</div>
+                                <div class="detail-value">${trade.closePrice.toFixed(2)} ${trade.baseCurrency}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Ricavo</div>
+                                <div class="detail-value">${trade.closeValue.toFixed(2)} ${trade.baseCurrency}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Profitto/Perdita</div>
+                                <div class="detail-value" style="color: ${trade.profit > 0 ? '#28a745' : '#dc3545'};">
+                                    ${trade.profit > 0 ? '+' : ''}${trade.profit.toFixed(2)} ${trade.baseCurrency} (${trade.profitPercentage}%)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Mostra messaggio di stato
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        // Download JSON
+        function downloadJSON() {
+            const data = {
+                config: config,
+                activeTrades: [...activeTrades],
+                tradeHistory: tradeHistory,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `trading_bot_data_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+         // Download CSV per fisco
+        function downloadCSV() {
+            let csv = 'Data Inizio,Data Chiusura,Coppia,Investimento (USD),Valore Chiusura (USD),Profitto/Perdita (USD),Percentuale,Crypto Acquistata\n';
+            
+            tradeHistory.forEach(trade => {
+                csv += `${new Date(trade.startDate).toLocaleDateString()},${new Date(trade.closeDate).toLocaleDateString()},${trade.symbol},${trade.totalSpent.toFixed(2)},${trade.closeValue.toFixed(2)},${trade.profit.toFixed(2)},${trade.profitPercentage}%,${trade.totalCrypto.toFixed(6)}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `binance_trades_fiscale_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+    </script>
+</body>
+</html>

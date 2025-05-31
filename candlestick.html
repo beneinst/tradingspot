@@ -6,283 +6,286 @@
     <title>Pattern Candlestick per il Trading Spot su Criptovalute (H4)</title>
 	<link rel="icon" type="image/png" href="favicon.png">
     <style>
-        :root {
-            --primary-color: #2a71d0;
-            --secondary-color: #f8f9fa;
-            --bullish-color: #26a69a;
-            --bearish-color: #ef5350;
-            --neutral-color: #78909c;
-            --dark-bg: #263238;
-            --light-text: #eceff1;
-            --shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #333;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        header {
-            background: var(--dark-bg);
-            color: var(--light-text);
-            padding: 2rem;
-            text-align: center;
-            box-shadow: var(--shadow);
-        }
-        
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .intro {
-            background-color: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-        }
-        
-        h1 {
-            font-size: 1.7rem;
-            margin-bottom: 1rem;
-            color: var(--light-text);
-        }
-        
-        h2 {
-            font-size: 1.8rem;
-            margin: 1.5rem 0;
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 0.5rem;
-        }
-        
-        h3 {
-            font-size: 1.3rem;
-            margin: 1rem 0;
-            color: #455a64;
-        }
-        
-        p {
-            margin-bottom: 1rem;
-        }
-        
-        .patterns-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-        
-        .pattern-card {
-            background-color: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s ease;
-        }
-        
-        .pattern-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .pattern-header {
-            padding: 1rem;
-            color: white;
-        }
-        
-        .bullish {
-            background-color: var(--bullish-color);
-        }
-        
-        .bearish {
-            background-color: var(--bearish-color);
-        }
-        
-        .neutral {
-            background-color: var(--neutral-color);
-        }
-        
-        .pattern-content {
-            padding: 1.5rem;
-        }
-        
-        .pattern-svg {
-            background-color: var(--secondary-color);
-            height: 150px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 1rem;
-            border-radius: 4px;
-        }
-        
-        .description-list {
-            list-style-type: none;
-        }
-        
-        .description-list li {
-            margin-bottom: 0.5rem;
-            padding-left: 1.2rem;
-            position: relative;
-        }
-        
-        .description-list li::before {
-            content: "•";
-            color: var(--primary-color);
-            font-weight: bold;
-            position: absolute;
-            left: 0;
-        }
-        
-        .tips {
-            background-color: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 2rem 0;
-            box-shadow: var(--shadow);
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .tips ol {
-            padding-left: 1.5rem;
-        }
-        
-        .tips li {
-            margin-bottom: 0.8rem;
-        }
-        
-        .conclusion {
-            background-color: var(--dark-bg);
-            color: var(--light-text);
-            padding: 2rem;
-            border-radius: 8px;
-            margin-top: 2rem;
-            box-shadow: var(--shadow);
-        }
-        
-       .footer {
-      margin-top: 1px;
-	  margin-bottom: 20px;
-      text-align: center;
-      font-size: 16px;
-	  color: #F2BB66;
-      font-weight: normal;
-    }
+    :root {
+    --primary-color: #2a71d0;
+    --secondary-color: #37474f;
+    --bullish-color: #26a69a;
+    --bearish-color: #ef5350;
+    --neutral-color: #78909c;
+    --dark-bg: #263238;
+    --light-text: #eceff1;
+    --shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
 
-    .footer a {
-      color: #FAEBD7;
-      text-decoration: none;
-      margin: 0 8px;
-      transition: color 0.3s ease;
-    }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-    .footer a:hover {
-      color: #FFDB58;
-    }
-        /* Stile per il menu di navigazione */
-        .nav-container {
-            background-color: var(--dark-bg);
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow);
-        }
-        
-        .nav {
-            display: flex;
-            justify-content: center;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-        }
-        
-        .nav a {
-            color: var(--light-text);
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            margin: 0 0.5rem;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-        
-        .nav a:hover {
-            background-color: rgba(255,255,255,0.1);
-        }
-        
-        /* Stile per il pulsante che torna in alto */
-        .back-to-top {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background-color: var(--primary-color);
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            box-shadow: var(--shadow);
-            opacity: 0;
-            transition: all 0.3s ease;
-            pointer-events: none;
-        }
-        
-        .back-to-top.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-        
-        /* Stile per tooltip */
-        .tooltip {
-            position: relative;
-            cursor: help;
-            border-bottom: 1px dotted var(--primary-color);
-        }
-        
-        .tooltip .tooltip-text {
-            visibility: hidden;
-            background-color: var(--dark-bg);
-            color: var(--light-text);
-            text-align: center;
-            border-radius: 6px;
-            padding: 0.5rem;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            width: 200px;
-        }
-        
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
+body {
+    background: linear-gradient(135deg, #1e272e 0%, #2f3640 100%);
+    font-family: 'Poppins', sans-serif;
+    color: var(--light-text);
+    line-height: 1.6;
+}
 
-        /* Animazioni per le candele */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
+header {
+    background: var(--dark-bg);
+    color: var(--light-text);
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
 
-        .svg-candle:hover {
-            animation: pulse 1s infinite;
-        }
+.container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.intro {
+    background-color: var(--secondary-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+}
+
+h1 {
+    font-size: 1.7rem;
+    margin-bottom: 1rem;
+    color: var(--light-text);
+}
+
+h2 {
+    font-size: 1.8rem;
+    margin: 1.5rem 0;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+}
+
+h3 {
+    font-size: 1.3rem;
+    margin: 1rem 0;
+    color: var(--light-text);
+}
+
+p {
+    margin-bottom: 1rem;
+}
+
+.patterns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.pattern-card {
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease;
+}
+
+.pattern-card:hover {
+    transform: translateY(-5px);
+}
+
+.pattern-header {
+    padding: 1rem;
+    color: white;
+}
+
+.bullish {
+    background-color: var(--bullish-color);
+}
+
+.bearish {
+    background-color: var(--bearish-color);
+}
+
+.neutral {
+    background-color: var(--neutral-color);
+}
+
+.pattern-content {
+    padding: 1.5rem;
+}
+
+.pattern-svg {
+    background-color: var(--dark-bg);
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.description-list {
+    list-style-type: none;
+}
+
+.description-list li {
+    margin-bottom: 0.5rem;
+    padding-left: 1.2rem;
+    position: relative;
+}
+
+.description-list li::before {
+    content: "•";
+    color: var(--primary-color);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.tips {
+    background-color: var(--secondary-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary-color);
+}
+
+.tips ol {
+    padding-left: 1.5rem;
+}
+
+.tips li {
+    margin-bottom: 0.8rem;
+}
+
+.conclusion {
+    background-color: var(--dark-bg);
+    color: var(--light-text);
+    padding: 2rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.footer {
+    margin-top: 1px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 16px;
+    color: #F2BB66;
+    font-weight: normal;
+}
+
+.footer a {
+    color: #FAEBD7;
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #FFDB58;
+}
+
+/* Menu di navigazione */
+.nav-container {
+    background-color: var(--dark-bg);
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+}
+
+.nav {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+}
+
+.nav a {
+    color: var(--light-text);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.nav a:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* Pulsante "torna su" */
+.back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background-color: var(--primary-color);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.back-to-top.show {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Tooltip */
+.tooltip {
+    position: relative;
+    cursor: help;
+    border-bottom: 1px dotted var(--primary-color);
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    background-color: var(--dark-bg);
+    color: var(--light-text);
+    text-align: center;
+    border-radius: 6px;
+    padding: 0.5rem;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    width: 200px;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Animazioni per SVG candele */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.svg-candle:hover {
+    animation: pulse 1s infinite;
+}
+
     </style>
 </head>
 <body>
