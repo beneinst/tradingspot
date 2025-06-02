@@ -674,6 +674,9 @@ p {
             </ul>
         </div>
     </div>
+	
+	
+
 
     <div class="indicator-info-box">
         <h2>Strategia "Multi-Confluence Ver. 9" (Advanced System) creata da gerardo_dorrico</h2>
@@ -687,6 +690,48 @@ p {
             Vedi l'indicatore su TradingView
         </a>
     </div>
+
+
+<div class="indicator-info-box">
+  <h2 style="margin-top:0;">Codice sorgente (open source)</h2>
+  <p>
+    Scarica il codice sorgente completo della <strong>Strategia "Multi-Confluence Ver. 9" (Advanced System)</strong> creata da gerardo_dorrico.<br>
+    Il sistema combina 6 categorie di indicatori con regressione lineare per segnali di alta qualità.
+  </p>
+  <a 
+    href="https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/11558428/6f411bb1-da51-449d-9c4c-2fd6c6e8ff72/paste.txt" 
+    download="Multi-Confluence-Ver9.pine"
+    style="display:inline-block; background:#222; color:#fff; padding:12px 28px; border:none; border-radius:6px; text-decoration:none; font-size:16px; font-family:sans-serif; margin-bottom:18px;">
+    ⬇️ Download codice sorgente (.txt)
+  </a>
+  <p style="margin-top:22px; margin-bottom:10px;"><strong>Anteprima codice:</strong></p>
+  <iframe 
+    srcdoc='
+      <pre style="font-family: Fira Mono, Consolas, Menlo, Monaco, monospace; background:#181818; color:#e0e0e0; padding:18px; border-radius:8px; font-size:13px; max-height:420px; overflow:auto; white-space:pre; margin:0;">
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © gerardo_dorrico
+
+//@version=6
+indicator(&apos;4H | Strategia Multi-Confluence Ver. 9&apos;, shorttitle = &apos;4H | Strategia Multi Confluenza&apos;, overlay = true, max_labels_count = 500, max_lines_count = 500, max_bars_back = 500)
+
+// ========== IMPOSTAZIONI ==========
+// Impostazioni Regressione Lineare - PIÙ REATTIVA
+lengthInput = input.int(50, title = &apos;LinReg Lunghezza&apos;, minval = 10, maxval = 200, group = &apos;Regressione Lineare&apos;)
+sourceInput = input.source(close, title = &apos;Sorgente&apos;, group = &apos;Regressione Lineare&apos;)
+linreg_sensitivity = input.float(0.8, title = &apos;Sensibilità Segnale LinReg&apos;, minval = 0.3, maxval = 1.0, step = 0.1, group = &apos;Regressione Lineare&apos;)
+// ... (continua nel file scaricabile)
+      </pre>
+    ' 
+    style="width:100%;height:420px;border:1px solid #bbb;border-radius:8px;box-sizing:border-box;margin-bottom:18px;background:#181818;">
+  </iframe>
+  <div style="margin-top:16px;">
+    <a href="https://it.tradingview.com/script/faddeaSj/" target="_blank" rel="noopener noreferrer" style="display:inline-block; background:#0057b8; color:#fff; padding:10px 22px; border-radius:6px; text-decoration:none; font-weight:600; margin-right:10px;">
+      Vedi l'indicatore su TradingView
+    </a>
+    <a href="https://it.tradingview.com/u/gerardo_dorrico/" target="_blank" rel="noopener noreferrer" style="display:inline-block; background:#222; color:#fff; padding:10px 22px; border-radius:6px; text-decoration:none;">
+      Profilo TradingView di gerardo_dorrico
+    </a>
+  </div>
 </div>
 
 <div class="footer">
