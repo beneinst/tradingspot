@@ -191,19 +191,19 @@ tr:nth-child(even) {
     margin-bottom: 10px;
     text-align: center;
     font-size: 16px;
-    color: #F2BB66;
+    color: #f2bb66;
     font-weight: normal;
 }
 
 .footer a {
-    color: #FAEBD7;
+    color: #ffe;
     text-decoration: none;
     margin: 0 8px;
     transition: color 0.3s ease;
 }
 
 .footer a:hover {
-    color: #FFDB58;
+    color: #ffdb58;
 }
 
 /* Additional styles for content structure */
@@ -243,134 +243,145 @@ p {
 
 <div class="container">
     <div class="header-box">
-        <h1>📊 STRATEGIA AVANZATA 4H CON LINREG ANTICIPATORIA V6</h1>
-        <p class="note">Sistema di Trading Avanzato con Dashboard Mobile e Approccio Gerarchico Multi-Componente</p>
+        <div class="language-selector">
+            <a href="Strategia-Trading.html">ITA</a> | <a href="Strategia-Trading2.html" class="bold">ENG</a>
+        </div>
+        <h1>📊 STRATEGIA MULTI-CONFLUENCE VER. 9</h1>
+        <p class="note">Sistema di Trading Avanzato 4H / 1H con 6 Categorie di Indicatori e Regressione Lineare</p>
     </div>
 
     <div class="content-box">
-        <h2>🚀 NUOVO FUNZIONAMENTO ANTICIPATORIO</h2>
+        <h2>🚀 PANORAMICA SISTEMA MULTI-CONFLUENCE</h2>
         
-        <h3>Sistema Ibrido Multi-Componente</h3>
+        <h3>Sistema Avanzato con Filtro Primario</h3>
         <ul>
-            <li><b>LinReg Principale (100 periodi):</b> Identifica il trend di lungo termine e determina le zone critiche di ipervenduto/ipercomprato. Questo componente fornisce la direzione dominante del mercato e filtra i segnali principali, garantendo che le operazioni seguano il flusso primario del prezzo.</li>
-            <li><b>LinReg Breve (20 periodi):</b> Genera segnali anticipatori rapidi per catturare accelerazioni di breve periodo. Questa componente veloce migliora la reattività del sistema, permettendo di identificare i punti di inversione prima che si manifestino completamente nel trend principale.</li>
-            <li><b>Momentum ROC (5 candele):</b> Misura la forza direzionale recente del movimento di prezzo. Valuta l'intensità della spinta attuale per evitare ingressi controtrend e confermare la validità dei segnali quando il momentum supporta la direzione prevista.</li>
-            <li><b>Price Action:</b> Riconosce pattern di inversione classici come Doji, Hammer e Shooting Star. Questi pattern rappresentano l'indecisione del mercato e i punti di svolta confermati dal comportamento effettivo del prezzo, aggiungendo una dimensione qualitativa all'analisi quantitativa.</li>
-            <li><b>Formula Combinata:</b> Integra intelligentemente tutti i componenti attraverso un sistema di pesi configurabili. Questa metodologia garantisce che ogni elemento contribuisca in modo ottimale alla decisione finale, bilanciando trend, momentum e segnali di prezzo.</li>
+            <li><b>Regressione Lineare (Filtro Primario):</b> Determina la direzione principale del trend con lunghezza 50 e sensibilità 0.8. Fornisce il segnale di base e deve essere sempre attivato per generare operazioni valide.</li>
+            <li><b>Bande di Bollinger:</b> Identifica condizioni di ipercomprato/ipervenduto con periodo 20 e deviazione standard 2.0. Contribuisce alla confluenza quando il prezzo è in zone estreme.</li>
+            <li><b>Stochastic RSI:</b> Misura momentum e identifica punti di inversione con parametri RSI 14, Stoch 14, Smoothing K=3, D=3. Attivo in zone di ipervenduto (≤20) e ipercomprato (≥80).</li>
+            <li><b>Medie Mobili e Trend:</b> Combina EMA 21, SMA 50 e RSI 14 per determinare il trend generale e la forza del momentum.</li>
+            <li><b>Indicatori Momentum (Nuovo):</b> Sistema a 4 componenti che include Momentum, ROC, Williams %R e CCI per valutare la forza complessiva del movimento.</li>
+            <li><b>Price Action Patterns (Nuovo):</b> Riconosce pattern candlestick come Engulfing, Hammer, Shooting Star e Doji, validati tramite ATR per garantire significatività statistica.</li>
         </ul>
         
-        <h3>Modalità Anticipatoria — Distribuzione dei Pesi</h3>
-        <p class="note">Il sistema predice i movimenti futuri combinando diversi orizzonti temporali:</p>
+        <h3>Sistema di Confluence Scoring</h3>
+        <p class="note">Il sistema calcola un punteggio di confluenza da -6 a +6 sommando i contributi di tutti gli indicatori:</p>
         <ul>
-            <li><b>40% LinReg tradizionale:</b> Fornisce la base solida del trend principale</li>
-            <li><b>21% Momentum breve termine:</b> Cattura le accelerazioni immediate (70% del peso momentum totale)</li>
-            <li><b>9% LinReg veloce:</b> Anticipa le inversioni rapide (30% del peso momentum totale)</li>
-            <li><b>40% Segnali Price Action:</b> Conferma i punti di svolta attraverso pattern candlestick</li>
-        </ul>
-        
-        <h3>Early Exit System — Protezione Avanzata</h3>
-        <p class="note">Sistema di protezione automatico che preserva il capitale:</p>
-        <ul>
-            <li><b>Tracciamento automatico:</b> Monitora continuamente tutte le posizioni aperte senza intervento manuale</li>
-            <li><b>Uscita anticipata:</b> Attivata quando la posizione LinReg supera la soglia critica (default 0.5), indicando perdita di forza del segnale originale</li>
-            <li><b>Prevenzione perdite:</b> Chiude automaticamente le posizioni su falsi segnali prima che si trasformino in perdite significative</li>
+            <li><b>Confluence Score = BB + Pivot + Stoch RSI + Medie Mobili + Momentum + Price Action</b></li>
+            <li><b>Range Operativo:</b> Tipicamente da -4 a +4 con segnali validi quando ≥ +1 (buy) o ≤ -1 (sell)</li>
+            <li><b>Validazione Pearson R:</b> Richiede |R| ≥ 0.5 per garantire correlazione statisticamente significativa</li>
         </ul>
     </div>
 
     <div class="content-box">
-        <h2>📋 REGOLE DI TRADING</h2>
+        <h2>📋 REGOLE DI TRADING MULTI-CONFLUENCE</h2>
 
         <h3 class="signal-buy">🟢 SEGNALE DI ACQUISTO (BUY)</h3>
-        <p class="note">Identifica opportunità di acquisto in zone di ipervenduto con confluenza rialzista</p>
+        <p class="note">Identifica opportunità di acquisto con confluenza multipla in zone di ipervenduto</p>
         <ul>
             <li><b>Condizioni Obbligatorie (TUTTE devono essere soddisfatte):</b>
                 <ul>
-                    <li><b>LinReg Anticipatoria ≤ -0.8:</b> Il prezzo si trova in zona di oversold estremo, indicando un potenziale rimbalzo tecnico</li>
-                    <li><b>Confluence Score ≥ +1.0:</b> Almeno due indicatori secondari confermano il bias rialzista</li>
-                    <li><b>Pearson R ≥ 0.7:</b> Il trend ha una correlazione sufficientemente forte per garantire affidabilità del segnale</li>
+                    <li><b>Regressione Lineare ≤ -0.8:</b> Posizione normalizzata in zona di ipervenduto estremo</li>
+                    <li><b>Confluence Score ≥ +1.0:</b> Almeno una confluenza positiva netta da indicatori secondari</li>
+                    <li><b>Pearson R |R| ≥ 0.5:</b> Correlazione statisticamente significativa per validare il trend</li>
                 </ul>
             </li>
-            <li><b>Filtri di Confluenza (+1 punto ciascuno):</b>
+            <li><b>Confluenze Positive (+1 punto ciascuna):</b>
                 <ul>
-                    <li><b>Bollinger Bands ≤ -0.8:</b> Il prezzo tocca o si avvicina alla banda inferiore, suggerendo condizione di ipervenduto</li>
-                    <li><b>Pivot Points:</b> Il prezzo si trova entro 2% da un pivot low recente, indicando supporto tecnico significativo</li>
-                    <li><b>Stochastic RSI:</b> K ≤ 20 (oversold) O crossover K sopra D (segnale di inversione rialzista)</li>
-                    <li><b>Moving Averages Golden Cross:</b> EMA50 > SMA200 + RSI > 50 + Volume > media (trend rialzista confermato)</li>
+                    <li><b>Bollinger Bands ≤ -0.7:</b> Prezzo in zona ipervenduto delle bande</li>
+                    <li><b>Stochastic RSI ≤ 20:</b> Momentum in zona di ipervenduto</li>
+                    <li><b>Pivot Points:</b> Prezzo entro 3% da supporto pivot</li>
+                    <li><b>Momentum Rialzista:</b> Tutti e 4 gli indicatori momentum positivi</li>
+                    <li><b>Price Action Bullish:</b> Pattern rialzisti (Engulfing, Hammer) validati da ATR</li>
+                    <li><b>Trend Rialzista:</b> EMA21 > SMA50 + Close > EMA21 + RSI > 50</li>
                 </ul>
             </li>
         </ul>
 
         <h3 class="signal-sell">🔴 SEGNALE DI VENDITA (SELL)</h3>
-        <p class="note">Identifica opportunità di vendita in zone di ipercomprato con confluenza ribassista</p>
+        <p class="note">Identifica opportunità di vendita con confluenza multipla in zone di ipercomprato</p>
         <ul>
             <li><b>Condizioni Obbligatorie (TUTTE devono essere soddisfatte):</b>
                 <ul>
-                    <li><b>LinReg Anticipatoria ≥ +0.8:</b> Il prezzo si trova in zona di overbought estremo, indicando un potenziale ritracciamento</li>
-                    <li><b>Confluence Score ≤ -1.0:</b> Almeno due indicatori secondari confermano il bias ribassista</li>
-                    <li><b>Pearson R ≥ 0.7:</b> Il trend mantiene una correlazione forte per validare il segnale di vendita</li>
+                    <li><b>Regressione Lineare ≥ +0.8:</b> Posizione normalizzata in zona di ipercomprato estremo</li>
+                    <li><b>Confluence Score ≤ -1.0:</b> Almeno una confluenza negativa netta da indicatori secondari</li>
+                    <li><b>Pearson R |R| ≥ 0.5:</b> Correlazione statisticamente significativa per validare il trend</li>
                 </ul>
             </li>
-            <li><b>Filtri di Confluenza (-1 punto ciascuno):</b>
+            <li><b>Confluenze Negative (-1 punto ciascuna):</b>
                 <ul>
-                    <li><b>Bollinger Bands ≥ +0.8:</b> Il prezzo tocca o supera la banda superiore, indicando condizione di ipercomprato</li>
-                    <li><b>Pivot Points:</b> Il prezzo si trova entro 2% da un pivot high recente, suggerendo resistenza tecnica significativa</li>
-                    <li><b>Stochastic RSI:</b> K ≥ 80 (overbought) O crossunder K sotto D (segnale di inversione ribassista)</li>
-                    <li><b>Moving Averages Death Cross:</b> EMA50 < SMA200 + RSI < 50 + Volume > media (trend ribassista confermato)</li>
+                    <li><b>Bollinger Bands ≥ +0.7:</b> Prezzo in zona ipercomprato delle bande</li>
+                    <li><b>Stochastic RSI ≥ 80:</b> Momentum in zona di ipercomprato</li>
+                    <li><b>Pivot Points:</b> Prezzo entro 3% da resistenza pivot</li>
+                    <li><b>Momentum Ribassista:</b> Tutti e 4 gli indicatori momentum negativi</li>
+                    <li><b>Price Action Bearish:</b> Pattern ribassisti (Engulfing, Shooting Star) validati da ATR</li>
+                    <li><b>Trend Ribassista:</b> EMA21 < SMA50 + Close < EMA21 + RSI < 50</li>
                 </ul>
             </li>
-        </ul>
-
-        <h3>🚪 EARLY EXIT — Sistema di Uscita Anticipata</h3>
-        <p class="note">Protezione automatica che chiude le posizioni quando il segnale principale perde forza</p>
-        <ul>
-            <li><b>Exit BUY:</b> Attivato quando LinReg Anticipatoria ≥ +0.5 (il momentum rialzista si sta esaurendo)</li>
-            <li><b>Exit SELL:</b> Attivato quando LinReg Anticipatoria ≤ -0.5 (il momentum ribassista si sta indebolendo)</li>
         </ul>
     </div>
 
     <div class="content-box">
-        <h2>🧩 COMPONENTI E DESCRIZIONE FUNZIONALE DEI SEGNALI</h2>
+        <h2>🧩 COMPONENTI E DESCRIZIONE FUNZIONALE</h2>
         <table>
             <tr>
-                <th>Segnale</th>
+                <th>Indicatore</th>
                 <th>Funzione Principale</th>
-                <th>Descrizione Operativa</th>
+                <th>Parametri e Calcolo</th>
+                <th>Contributo Confluence</th>
             </tr>
             <tr>
-                <td><b>LinReg Anticipatoria</b></td>
-                <td>Filtro primario per condizioni di eccesso (overbought/oversold)</td>
-                <td>Combina regressione lineare a 100 e 20 periodi per identificare deviazioni significative dal trend. Quando il valore supera ±0.8, indica condizioni estreme che spesso precedono inversioni di prezzo. È il filtro più importante e obbligatorio per ogni trade.</td>
+                <td><b>Regressione Lineare</b></td>
+                <td>Filtro primario per trend e segnali base</td>
+                <td>Lunghezza 50, Sensibilità 0.8, Posizione normalizzata -1 a +1</td>
+                <td>Filtro obbligatorio, non punteggio</td>
             </tr>
             <tr>
-                <td><b>Momentum (ROC)</b></td>
-                <td>Misura la forza e direzione del movimento recente</td>
-                <td>Calcola il tasso di cambio del prezzo su 5 candele per valutare l'accelerazione del movimento. Valori positivi indicano momentum rialzista, negativi ribassista. Previene ingressi controtrend identificando quando il momentum supporta o contrasta il segnale principale.</td>
+                <td><b>Bande di Bollinger</b></td>
+                <td>Identifica volatilità e condizioni estreme</td>
+                <td>Periodo 20, Deviazione 2.0, Posizione normalizzata -1 a +1</td>
+                <td>+1 se ≤-0.7, -1 se ≥+0.7</td>
             </tr>
             <tr>
-                <td><b>Price Action</b></td>
-                <td>Rileva pattern di inversione candlestick</td>
-                <td>Analizza automaticamente pattern come Doji (indecisione), Hammer (inversione rialzista), Shooting Star (inversione ribassista). Questi pattern rappresentano la psicologia del mercato e confermano o rafforzano i segnali degli indicatori quantitativi attraverso il comportamento effettivo del prezzo.</td>
+                <td><b>Stochastic RSI</b></td>
+                <td>Misura momentum e punti di inversione</td>
+                <td>RSI 14, Stoch 14, K=3, D=3, Soglie 20/80</td>
+                <td>+1 se ≤20, -1 se ≥80</td>
             </tr>
             <tr>
-                <td><b>Confluence Score</b></td>
-                <td>Aggrega i punteggi dei filtri secondari</td>
-                <td>Sistema di scoring che assegna punti positivi/negativi a ciascun indicatore secondario. Quando più indicatori si allineano nella stessa direzione, aumenta significativamente la probabilità di successo del trade. Un score ≥ +1 per buy o ≤ -1 per sell è obbligatorio.</td>
+                <td><b>Indicatori Momentum</b></td>
+                <td>Valuta forza del movimento (4 componenti)</td>
+                <td>Momentum(10), ROC(12), Williams%R(14), CCI(20)</td>
+                <td>+1 se tutti positivi, -1 se tutti negativi</td>
             </tr>
             <tr>
-                <td><b>Early Exit System</b></td>
-                <td>Protezione automatica delle posizioni</td>
-                <td>Monitora continuamente la forza del segnale principale (LinReg) e chiude automaticamente le posizioni quando il valore scende sotto la soglia critica di 0.5. Questo sistema previene il deterioramento di trade vincenti e limita le perdite su falsi segnali, preservando il capitale.</td>
+                <td><b>Price Action Patterns</b></td>
+                <td>Riconosce pattern candlestick significativi</td>
+                <td>Engulfing, Hammer, Shooting Star, Doji + ATR(14) validation</td>
+                <td>+1 pattern rialzista, -1 pattern ribassista</td>
+            </tr>
+            <tr>
+                <td><b>Punti Pivot</b></td>
+                <td>Identifica supporti e resistenze dinamici</td>
+                <td>Lookback 25 periodi, Distanza 3%</td>
+                <td>+1 vicino supporto, -1 vicino resistenza</td>
+            </tr>
+            <tr>
+                <td><b>Medie Mobili</b></td>
+                <td>Determina trend generale e momentum</td>
+                <td>EMA 21, SMA 50, RSI 14</td>
+                <td>+0.5 trend rialzista, -0.5 trend ribassista</td>
             </tr>
             <tr>
                 <td><b>Pearson R</b></td>
-                <td>Validazione della qualità del trend</td>
-                <td>Coefficiente di correlazione che misura la forza del trend lineare. Valori ≥ 0.7 indicano un trend sufficientemente definito per operazioni affidabili. Quando R < 0.7, il mercato è in fase laterale o caotica, e il trading dovrebbe essere evitato per ridurre il rischio.</td>
+                <td>Validazione statistica correlazione</td>
+                <td>Correlazione regressione lineare, Soglia ≥0.5</td>
+                <td>Filtro qualità, non punteggio</td>
             </tr>
         </table>
     </div>
 
     <div class="content-box">
-        <h2>📊 DASHBOARD & PARAMETRI</h2>
+        <h2>📊 DASHBOARD & MONITORAGGIO</h2>
         <table>
             <tr>
                 <th>Indicatore Dashboard</th>
@@ -378,7 +389,7 @@ p {
                 <th>Interpretazione del Colore / Stato</th>
             </tr>
             <tr>
-                <td>🎯 LinReg (PRIMARY)</td>
+                <td>🎯 Regressione Lineare (PRIMARY)</td>
                 <td>Da -1 a +1</td>
                 <td>
                     <span class="green">🟢 BUY ZONE: ≤ -0.8</span><br>
@@ -388,11 +399,11 @@ p {
                 </td>
             </tr>
             <tr>
-                <td>📊 Bollinger Bands</td>
+                <td>📊 Bande di Bollinger</td>
                 <td>Da -1 a +1</td>
                 <td>
-                    <span class="green">🟢 OVERSOLD: ≤ -0.8</span><br>
-                    <span class="red">🔴 OVERBOUGHT: ≥ +0.8</span><br>
+                    <span class="green">🟢 OVERSOLD: ≤ -0.7</span><br>
+                    <span class="red">🔴 OVERBOUGHT: ≥ +0.7</span><br>
                     <span class="yellow">🟡 NEUTRAL: Zona neutra</span>
                 </td>
             </tr>
@@ -402,316 +413,292 @@ p {
                 <td>
                     <span class="green">🟢 OVERSOLD: K ≤ 20</span><br>
                     <span class="red">🔴 OVERBOUGHT: K ≥ 80</span><br>
-                    <span class="yellow">🟡 NEUTRAL: Zona neutra</span><br>
-                    <span class="note">Rileva incroci anticipatori K/D</span>
+                    <span class="yellow">🟡 NEUTRAL: 20 &lt; K &lt; 80</span>
                 </td>
             </tr>
             <tr>
-                <td>📈 Medie Mobili</td>
-                <td>Stato Incrocio</td>
+                <td>🚀 Indicatori Momentum</td>
+                <td>Combinazione 4 componenti</td>
                 <td>
-                    <span class="green">🟢 GOLDEN CROSS: EMA 50 &gt; SMA 200</span><br>
-                    <span class="red">🔴 DEATH CROSS: EMA 50 &lt; SMA 200</span><br>
-                    <span class="white">⚪ NEUTRAL: Nessun incrocio chiaro / piatta</span>
+                    <span class="green">🟢 BULLISH: Tutti e 4 positivi</span><br>
+                    <span class="red">🔴 BEARISH: Tutti e 4 negativi</span><br>
+                    <span class="yellow">🟡 MIXED: Segnali contrastanti</span>
                 </td>
             </tr>
             <tr>
-                <td>🔊 Analisi Volume</td>
-                <td>Rapporto vs. Media Volume</td>
+                <td>🕯️ Price Action Patterns</td>
+                <td>Pattern Recognition + ATR</td>
                 <td>
-                    <span class="green">🟢 ALTO VOLUME: &gt;1.5x media</span><br>
-                    <span class="yellow">🟡 MEDIO VOLUME: &gt;1x media</span><br>
-                    <span class="white">⚪ BASSO VOLUME: &lt;1x media</span>
+                    <span class="green">🟢 BULLISH: Engulfing Bull, Hammer</span><br>
+                    <span class="red">🔴 BEARISH: Engulfing Bear, Shooting Star</span><br>
+                    <span class="yellow">🟡 DOJI: Indecisione mercato</span>
                 </td>
             </tr>
             <tr>
                 <td>🎯 Pearson R</td>
                 <td>Coefficiente di correlazione</td>
                 <td>
-                    <span class="green">💪 STRONG TREND: |R| ≥ 0.7</span><br>
-                    <span class="orange">⚠️ WEAK TREND: |R| &lt; 0.7</span>
+                    <span class="green">💪 VALID TREND: |R| ≥ 0.5</span><br>
+                    <span class="orange">⚠️ WEAK TREND: |R| &lt; 0.5</span>
                 </td>
             </tr>
             <tr>
                 <td>🔗 Confluence Score</td>
-                <td>Punteggio di confluenza (-3 a +3)</td>
+                <td>Punteggio totale (-6 a +6)</td>
                 <td>
-                    <span class="green">🚀 BULLISH CONF: Score ≥ +1</span><br>
-                    <span class="red">📉 BEARISH CONF: Score ≤ -1</span><br>
-                    <span class="gray">➖ NO CONFLUENCE: Score tra -1 e +1</span>
+                    <span class="green">🚀 STRONG BUY: Score ≥ +3</span><br>
+                    <span class="green">📈 BUY: Score ≥ +1</span><br>
+                    <span class="red">📉 SELL: Score ≤ -1</span><br>
+                    <span class="red">💥 STRONG SELL: Score ≤ -3</span><br>
+                    <span class="gray">➖ NO SIGNAL: -1 &lt; Score &lt; +1</span>
                 </td>
             </tr>
             <tr>
-                <td>🌊 Market Condition</td>
-                <td>Classificazione del trend</td>
+                <td>💪 Signal Strength</td>
+                <td>Intensità combinata</td>
                 <td>
-                    <span class="green">📈 STRONG TREND: |R| ≥ 0.8</span><br>
-                    <span class="yellow">〰️ WEAK TREND: 0.5 ≤ |R| &lt; 0.8</span><br>
-                    <span class="gray">💤 SIDEWAYS: |R| &lt; 0.5</span>
+                    <span class="green">🔥 MOLTO FORTE: ≥ +3</span><br>
+                    <span class="green">💪 FORTE: +2</span><br>
+                    <span class="yellow">📊 MODERATO: +1</span><br>
+                    <span class="red">📊 MODERATO: -1</span><br>
+                    <span class="red">💪 FORTE: -2</span><br>
+                    <span class="red">🔥 MOLTO FORTE: ≤ -3</span>
                 </td>
             </tr>
         </table>
     </div>
 
     <div class="content-box">
-        <h2>⚙️ PARAMETRI OTTIMIZZATI</h2>
+        <h2>⚙️ PARAMETRI OTTIMIZZATI MULTI-CONFLUENCE</h2>
         <table>
             <tr>
-                <th>Gruppo Parametri</th>
-                <th>Impostazione</th>
-                <th>Valore Ottimizzato</th>
-                <th>Ragione di Questo Valore</th>
+                <th>Gruppo Indicatori</th>
+                <th>Parametro</th>
+                <th>Valore</th>
+                <th>Ragione Ottimizzazione</th>
             </tr>
             <tr>
-                <td>Linear Regression</td>
+                <td>Regressione Lineare</td>
                 <td>Length</td>
-                <td>100</td>
-                <td>Equilibrio tra reattività e stabilità per timeframe 4H.</td>
+                <td>50</td>
+                <td>Equilibrio perfetto tra reattività e stabilità per timeframe 4H</td>
             </tr>
             <tr>
+                <td>Regressione Lineare</td>
                 <td>Sensitivity</td>
-                <td>-</td>
                 <td>0.8</td>
-                <td>Soglie ottimali per filtrare falsi segnali.</td>
+                <td>Soglia ottimale per filtrare falsi segnali mantenendo reattività</td>
             </tr>
             <tr>
-                <td>Bollinger Bands</td>
-                <td>Length</td>
-                <td>20</td>
-                <td>Standard per timeframe 4H, buona rappresentazione volatilità.</td>
-            </tr>
-            <tr>
-                <td>Bollinger Bands</td>
-                <td>Multiplier</td>
-                <td>2.0</td>
-                <td>Deviazioni standard classiche per catturare il 95% dei movimenti.</td>
+                <td>Bande di Bollinger</td>
+                <td>Length / Multiplier</td>
+                <td>20 / 2.0</td>
+                <td>Standard statistico per catturare 95% movimenti in timeframe 4H</td>
             </tr>
             <tr>
                 <td>Stochastic RSI</td>
-                <td>RSI Length</td>
-                <td>14</td>
-                <td>Periodo standard per l'analisi del momentum.</td>
+                <td>RSI/Stoch Length</td>
+                <td>14 / 14</td>
+                <td>Periodo standard momentum, K=3 D=3 per smoothing ottimale</td>
             </tr>
             <tr>
-                <td>Stochastic RSI</td>
-                <td>Stoch Length</td>
-                <td>14</td>
-                <td>Coerenza con RSI per calcoli uniformi.</td>
+                <td>Indicatori Momentum</td>
+                <td>Momentum/ROC/Williams/CCI</td>
+                <td>10/12/14/20</td>
+                <td>Periodi differenziati per catturare multiple velocità momentum</td>
             </tr>
             <tr>
-                <td>Stochastic RSI</td>
-                <td>%K Smooth</td>
-                <td>1</td>
-                <td>K=1 rende l'indicatore più reattivo e anticipa i segnali.</td>
+                <td>Price Action</td>
+                <td>ATR Validation</td>
+                <td>14 (>0.5*ATR)</td>
+                <td>Filtra pattern significativi escludendo rumore di mercato</td>
             </tr>
             <tr>
-                <td>Stochastic RSI</td>
-                <td>%D Smooth</td>
-                <td>3</td>
-                <td>Smoothing leggero per ridurre rumore mantenendo reattività.</td>
+                <td>Punti Pivot</td>
+                <td>Lookback / Distance</td>
+                <td>25 / 3%</td>
+                <td>Identifica livelli significativi senza eccessivo rumore</td>
             </tr>
             <tr>
                 <td>Medie Mobili</td>
-                <td>EMA Length</td>
-                <td>50</td>
-                <td>Media esponenziale a breve termine, reattiva ai recenti cambiamenti di prezzo.</td>
+                <td>EMA / SMA</td>
+                <td>21 / 50</td>
+                <td>Combinazione reattiva (EMA) e stabile (SMA) per trend</td>
             </tr>
             <tr>
-                <td>Medie Mobili</td>
-                <td>SMA Length</td>
-                <td>200</td>
-                <td>Media semplice a lungo termine, robusta per identificare i trend principali.</td>
-            </tr>
-            <tr>
-                <td>Analisi Volume</td>
-                <td>Volume MA Length</td>
-                <td>20</td>
-                <td>Periodo per il calcolo del volume medio.</td>
-            </tr>
-            <tr>
-                <td>Analisi Volume</td>
-                <td>High Volume Multiplier</td>
-                <td>1.5</td>
-                <td>Soglia per classificare i segnali di "Alto Volume".</td>
-            </tr>
-            <tr>
-                <td>Soglie Segnale</td>
-                <td>Oversold/Overbought</td>
-                <td>20/80</td>
-                <td>Zone estreme ottimali per timeframe 4H.</td>
-            </tr>
-            <tr>
-                <td>Minimum Pearson R</td>
-                <td>-</td>
-                <td>0.7</td>
-                <td>Soglia che garantisce un trend sufficientemente forte.</td>
-            </tr>
-            <tr>
-                <td>Pivot Points</td>
-                <td>Length</td>
-                <td>50</td>
-                <td>Identifica livelli significativi senza troppo rumore.</td>
+                <td>Validazione</td>
+                <td>Pearson R Threshold</td>
+                <td>0.5</td>
+                <td>Soglia statistica per garantire correlazione significativa</td>
             </tr>
         </table>
     </div>
 
     <div class="content-box">
-        <h2>📚 PROCEDURA OPERATIVA</h2>
+        <h2>📚 PROCEDURA OPERATIVA MULTI-CONFLUENCE</h2>
         <table>
             <tr>
                 <th>Step</th>
                 <th>Azione</th>
-                <th>Cosa Controllare</th>
+                <th>Controlli Specifici</th>
             </tr>
             <tr>
                 <td>1. Pre-Analisi</td>
-                <td>Controllo Condizione di Mercato</td>
-                <td>🌊 Se non è "STRONG TREND", evita il trading.</td>
+                <td>Verifica Pearson R</td>
+                <td>🎯 |R| deve essere ≥ 0.5 per trading valido</td>
             </tr>
             <tr>
-                <td>2. Filtro Primario (LinReg)</td>
-                <td>Verifica Posizione LinReg</td>
-                <td>🎯 Deve essere ≤ -0.8 (BUY) o ≥ +0.8 (SELL). OBBLIGATORIO.</td>
+                <td>2. Filtro Primario</td>
+                <td>Controllo Regressione Lineare</td>
+                <td>📊 Deve essere ≤ -0.8 (BUY) o ≥ +0.8 (SELL). OBBLIGATORIO.</td>
             </tr>
             <tr>
-                <td>3. Qualità Trend (Pearson R)</td>
-                <td>Controlla Pearson R</td>
-                <td>💪 Deve essere ≥ 0.7 per segnali affidabili.</td>
+                <td>3. Calcolo Confluence</td>
+                <td>Somma Punteggi Indicatori</td>
+                <td>🔗 BB + Pivot + StochRSI + MA + Momentum + PriceAction</td>
             </tr>
             <tr>
-                <td>4. Controllo Confluenza</td>
+                <td>4. Validazione Score</td>
                 <td>Verifica Confluence Score</td>
-                <td>🔗 Deve essere ≥ +1 (BUY) o ≤ -1 (SELL).</td>
+                <td>✅ Deve essere ≥ +1 (BUY) o ≤ -1 (SELL)</td>
             </tr>
             <tr>
-                <td>5. Conferma Volume</td>
-                <td>Conferma con il Volume</td>
-                <td>🔊 Cerca "Alto Volume" o "Medio Volume" per confermare la forza.</td>
+                <td>5. Controllo Intensità</td>
+                <td>Calcola Signal Strength</td>
+                <td>💪 Signal Strength = Confluence Score + LinReg Signal</td>
             </tr>
             <tr>
-                <td>6. Segnale Finale</td>
-                <td>Attendi la visualizzazione del Segnale Principale</td>
-                <td>La Dashboard deve mostrare chiaramente "BUY SIGNAL ACTIVE" o "SELL SIGNAL ACTIVE".</td>
+                <td>6. Analisi Pattern</td>
+                <td>Verifica Price Action</td>
+                <td>🕯️ Conferma con pattern candlestick validati da ATR</td>
             </tr>
             <tr>
-                <td>7. Ingresso</td>
-                <td>Entra solo se TUTTI i criteri sono soddisfatti</td>
-                <td>Non entrare mai in un trade con segnali parziali o contrastanti.</td>
-            </tr>
-           <tr>
-                <td>8. Stop Loss</td>
-                <td>Utilizza le Bande di Regressione Lineare</td>
-                <td>Imposta lo Stop Loss oltre la banda rilevante.</td>
+                <td>7. Momentum Check</td>
+                <td>Controllo 4 Indicatori Momentum</td>
+                <td>🚀 Tutti devono allinearsi nella stessa direzione</td>
             </tr>
             <tr>
-                <td>9. Take Profit</td>
-                <td>Strategia di Uscita Graduale</td>
-                <td>🎯 Primo TP al 50% del target, secondo TP al 100%. Oppure usa Early Exit automatico.</td>
+                <td>8. Segnale Finale</td>
+                <td>Attendi Confluenza Completa</td>
+                <td>🎯 TUTTI i criteri obbligatori devono essere soddisfatti</td>
             </tr>
             <tr>
-                <td>10. Monitoraggio</td>
-                <td>Controllo Continuo Early Exit</td>
-                <td>🚪 Se LinReg scende sotto ±0.5, considera l'uscita anticipata per proteggere il capitale.</td>
+                <td>9. Gestione Rischio</td>
+                <td>Imposta Stop Loss</td>
+                <td>🛡️ Sotto/sopra canale regressione + supporto/resistenza pivot</td>
+            </tr>
+            <tr>
+                <td>10. Take Profit</td>
+                <td>Strategia Uscita Graduale</td>
+                <td>🎯 Livello 1: Banda opposta, Livello 2: Canale opposto, Livello 3: Pivot opposto</td>
             </tr>
         </table>
     </div>
 
     <div class="content-box">
-        <h2>⚠️ AVVERTENZE E GESTIONE DEL RISCHIO</h2>
+        <h2>⚠️ GESTIONE RISCHIO E USCITE</h2>
         
         <div class="alert-box alert-danger">
-            <h3>🚨 REGOLE FONDAMENTALI DI SICUREZZA</h3>
+            <h3>🚨 STOP LOSS SUGGERITI</h3>
             <ul>
-                <li><b>Mai operare senza Stop Loss:</b> Ogni trade deve avere un livello di uscita prestabilito</li>
-                <li><b>Rispetta sempre il money management:</b> Non rischiare più del 2% del capitale per singolo trade</li>
-                <li><b>Non forzare i segnali:</b> Se non tutti i criteri sono soddisfatti, astieniti dal trading</li>
-                <li><b>Mercati laterali = No Trading:</b> Se Pearson R < 0.7, evita completamente il trading</li>
-            </ul>
-        </div>
-
-        <div class="alert-box alert-warning">
-            <h3>⚠️ CONDIZIONI DI MERCATO DA EVITARE</h3>
-            <ul>
-                <li><b>Bassa Correlazione:</b> Pearson R < 0.7 indica mercato caotico o laterale</li>
-                <li><b>Volumi Insufficienti:</b> Operazioni con volume molto basso sono spesso inaffidabili</li>
-                <li><b>Confluenza Debole:</b> Score di confluenza tra -1 e +1 indica segnali contrastanti</li>
-                <li><b>Notizie ad Alto Impatto:</b> Evita il trading durante annunci economici importanti</li>
+                <li><b>Buy Orders:</b> Sotto il canale inferiore di regressione lineare O supporto pivot più vicino</li>
+                <li><b>Sell Orders:</b> Sopra il canale superiore di regressione lineare O resistenza pivot più vicina</li>
+                <li><b>Risk Management:</b> Non rischiare mai più del 1-2% del capitale per trade</li>
             </ul>
         </div>
 
         <div class="alert-box alert-success">
-            <h3>✅ BEST PRACTICES OPERATIVE</h3>
+            <h3>🎯 TAKE PROFIT STRATIFICATI</h3>
             <ul>
-                <li><b>Pazienza:</b> Attendi che tutti i filtri si allineino perfettamente</li>
-                <li><b>Disciplina:</b> Segui rigorosamente le regole senza eccezioni emotive</li>
-                <li><b>Journaling:</b> Tieni traccia di ogni trade per analisi retrospettive</li>
-                <li><b>Backtesting:</b> Testa sempre la strategia sui dati storici prima dell'uso live</li>
+                <li><b>Livello 1 (50% posizione):</b> Banda Bollinger opposta alla direzione trade</li>
+                <li><b>Livello 2 (30% posizione):</b> Canale opposto di regressione lineare</li>
+                <li><b>Livello 3 (20% posizione):</b> Pivot point opposto più vicino</li>
+                <li><b>Trailing Stop:</b> Considera trailing stop dinamico basato su ATR</li>
+            </ul>
+        </div>
+
+        <div class="alert-box alert-warning">
+            <h3>⚠️ USCITE ANTICIPATE</h3>
+            <ul>
+                <li><b>Momentum Reversal:</b> Cambio direzione negli indicatori momentum (da tutti positivi a negativi)</li>
+                <li><b>Confluence Score Reversal:</b> Inversione del punteggio (da positivo a negativo o viceversa)</li>
+                <li><b>Pattern Contrario:</b> Formazione pattern candlestick opposti significativi</li>
+                <li><b>Pearson R Deterioration:</b> Se correlazione scende sotto 0.5 durante il trade</li>
             </ul>
         </div>
     </div>
 
     <div class="content-box">
-        <h2>🎯 ESEMPI PRATICI DI SEGNALI</h2>
+        <h2>🎯 ESEMPI PRATICI MULTI-CONFLUENCE</h2>
         
-        <h3 class="signal-buy">Esempio Segnale BUY Perfetto</h3>
+        <h3 class="signal-buy">Esempio BUY Signal Molto Forte (+4)</h3>
         <div class="alert-box alert-success">
             <ul>
-                <li>🎯 <b>LinReg Anticipatoria:</b> -0.85 (ZONA BUY ✓)</li>
-                <li>💪 <b>Pearson R:</b> 0.75 (TREND FORTE ✓)</li>
-                <li>🔗 <b>Confluence Score:</b> +2 (Bollinger oversold + Stoch RSI oversold)</li>
-                <li>🔊 <b>Volume:</b> Alto (1.8x media)</li>
-                <li>📊 <b>Pattern:</b> Hammer rilevato</li>
-                <li>🚀 <b>Risultato:</b> SEGNALE BUY CONFERMATO</li>
+                <li>🎯 <b>Regressione Lineare:</b> -0.85 (BUY ZONE ✓)</li>
+                <li>💪 <b>Pearson R:</b> 0.75 (TREND VALIDO ✓)</li>
+                <li>📊 <b>Bollinger Bands:</b> -0.8 (OVERSOLD +1)</li>
+                <li>⚡ <b>Stochastic RSI:</b> 15 (OVERSOLD +1)</li>
+                <li>🎯 <b>Pivot Point:</b> 2% da supporto (+1)</li>
+                <li>🚀 <b>Momentum:</b> Tutti e 4 positivi (+1)</li>
+                <li>🕯️ <b>Price Action:</b> Hammer validato ATR (+1)</li>
+                <li>📈 <b>Trend MA:</b> EMA21>SMA50, RSI>50 (+0.5)</li>
+                <li>🔗 <b>Confluence Score:</b> +5.5</li>
+                <li>💪 <b>Signal Strength:</b> +4.5 (MOLTO FORTE)</li>
             </ul>
         </div>
 
-        <h3 class="signal-sell">Esempio Segnale SELL Perfetto</h3>
+        <h3 class="signal-sell">Esempio SELL Signal Molto Forte (-4)</h3>
         <div class="alert-box alert-danger">
             <ul>
-                <li>🎯 <b>LinReg Anticipatoria:</b> +0.90 (ZONA SELL ✓)</li>
-                <li>💪 <b>Pearson R:</b> 0.82 (TREND FORTE ✓)</li>
-                <li>🔗 <b>Confluence Score:</b> -2 (Bollinger overbought + MA Death Cross)</li>
-                <li>🔊 <b>Volume:</b> Alto (2.1x media)</li>
-                <li>📊 <b>Pattern:</b> Shooting Star rilevato</li>
-                <li>📉 <b>Risultato:</b> SEGNALE SELL CONFERMATO</li>
+                <li>🎯 <b>Regressione Lineare:</b> +0.90 (SELL ZONE ✓)</li>
+                <li>💪 <b>Pearson R:</b> 0.82 (TREND VALIDO ✓)</li>
+                <li>📊 <b>Bollinger Bands:</b> +0.85 (OVERBOUGHT -1)</li>
+                <li>⚡ <b>Stochastic RSI:</b> 85 (OVERBOUGHT -1)</li>
+                <li>🎯 <b>Pivot Point:</b> 1.5% da resistenza (-1)</li>
+                <li>🚀 <b>Momentum:</b> Tutti e 4 negativi (-1)</li>
+                <li>🕯️ <b>Price Action:</b> Shooting Star validato ATR (-1)</li>
+                <li>📉 <b>Trend MA:</b> EMA21<SMA50, RSI<50 (-0.5)</li>
+                <li>🔗 <b>Confluence Score:</b> -5.5</li>
+                <li>💪 <b>Signal Strength:</b> -4.5 (MOLTO FORTE)</li>
             </ul>
         </div>
 
-        <h3>❌ Esempio Segnale da EVITARE</h3>
+        <h3>❌ Esempio Segnale RIFIUTATO</h3>
         <div class="alert-box alert-warning">
             <ul>
-                <li>🎯 <b>LinReg Anticipatoria:</b> -0.85 (sembrerebbe BUY)</li>
-                <li>💪 <b>Pearson R:</b> 0.45 (TREND DEBOLE ❌)</li>
-                <li>🔗 <b>Confluence Score:</b> 0 (nessuna confluenza)</li>
-                <li>🔊 <b>Volume:</b> Basso (0.7x media)</li>
-                <li>⚠️ <b>Risultato:</b> SEGNALE RIFIUTATO - condizioni inadeguate</li>
+                <li>🎯 <b>Regressione Lineare:</b> -0.85 (sembrerebbe BUY)</li>
+                <li>💪 <b>Pearson R:</b> 0.35 (CORRELAZIONE DEBOLE ❌)</li>
+                <li>🔗 <b>Confluence Score:</b> +0.5 (SOTTO SOGLIA ❌)</li>
+                <li>⚠️ <b>Risultato:</b> SEGNALE RIFIUTATO - condizioni non sufficienti</li>
+                <li>📝 <b>Azione:</b> Attendere miglioramento confluenza o correlazione</li>
             </ul>
         </div>
     </div>
 
-
-<div class="indicator-info-box">
-            <h2>Indicatore "4H Enhanced Strategy" (Open Source) creato da gerardo_dorrico</h2>
-            <p>Un sistema di trading avanzato che combina analisi tecnica tradizionale con un approccio gerarchico moderno.</p>
-            <p>Visita il mio profilo su TradingView per scoprire altri strumenti e strategie:</p>
-            <a href="https://it.tradingview.com/u/gerardo_dorrico/" target="_blank" rel="noopener noreferrer" class="profile-link">
-                Profilo TradingView di gerardo_dorrico
-            </a>
-            <p>Per visualizzare e aggiungere l'indicatore completo al tuo grafico su TradingView:</p>
-            <a href="https://it.tradingview.com/script/YfieUd0A/" target="_blank" rel="noopener noreferrer" class="indicator-button">
-                Vedi l'indicatore su TradingView
-            </a>
-        </div></div>
+    <div class="indicator-info-box">
+        <h2>Strategia "Multi-Confluence Ver. 9" (Advanced System) creata da gerardo_dorrico</h2>
+        <p>Sistema avanzato che combina 6 categorie di indicatori con regressione lineare per segnali di alta qualità.</p>
+        <p>Visita il mio profilo su TradingView per scoprire altri strumenti e strategie:</p>
+        <a href="https://it.tradingview.com/u/gerardo_dorrico/" target="_blank" rel="noopener noreferrer" class="profile-link">
+            Profilo TradingView di gerardo_dorrico
+        </a>
+        <p>Per visualizzare e aggiungere l'indicatore completo al tuo grafico su TradingView:</p>
+        <a href="https://it.tradingview.com/script/YfieUd0A/" target="_blank" rel="noopener noreferrer" class="indicator-button">
+            Vedi l'indicatore su TradingView
+        </a>
+    </div>
+</div>
 
 <div class="footer">
-        Trading Spot Manager v1.1 | 
-        <a href="index.html">Operatività</a> | 
-        <a href="panoramica-capitale.html">Capitale</a> | 
-        <a href="blocco-note.html">Note</a> | 
-		<a href="Strategia-Trading.html">Indicatore</a> | 
-        <a href="candlestick.html">Candlestick</a> | 
-        <a href="cheat-sheet.html">Patterns</a>
-         </div>
+    Trading Spot Manager v1.1 | 
+    <a href="index.html">Operatività</a> | 
+    <a href="panoramica-capitale.html">Capitale</a> | 
+    <a href="blocco-note.html">Note</a> | 
+    <a href="Strategia-Trading.html">Indicatore</a> | 
+    <a href="candlestick.html">Candlestick</a> | 
+    <a href="cheat-sheet.html">Patterns</a>
+</div>
+
 </body>
 </html>
 				

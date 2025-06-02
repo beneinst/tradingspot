@@ -1,0 +1,486 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © gerardo_dorrico
+
+//@version=6
+indicator('Strategia Avanzata 4 Ore con Dashboard V5', shorttitle = '4H Strategia Avanzata V5', overlay = true, max_labels_count = 500, max_lines_count = 500, max_bars_back = 500)
+
+// ========== IMPOSTAZIONI ==========
+// Impostazioni Regressione Lineare
+lengthInput = input.int(100, title = 'LinReg Lunghezza', minval = 1, maxval = 5000, group = 'Regressione Lineare')
+sourceInput = input.source(close, title = 'Sorgente', group = 'Regressione Lineare')
+linreg_sensitivity = input.float(0.8, title = 'Sensibilità Segnale LinReg', minval = 0.1, maxval = 1.0, step = 0.1, group = 'Regressione Lineare')
+
+// Impostazioni Canale
+group1 = 'Impostazioni Canale'
+useUpperDevInput = input.bool(true, title = 'Deviazione Superiore', inline = 'Upper Deviation', group = group1)
+upperMultInput = input.float(2.0, title = '', inline = 'Upper Deviation', group = group1)
+useLowerDevInput = input.bool(true, title = '', inline = 'Lower Deviation', group = group1)
+lowerMultInput = input.float(2.0, title = '', inline = 'Lower Deviation', group = group1)
+
+// Impostazioni Visualizzazione
+group2 = 'Impostazioni Visualizzazione'
+showPearsonInput = input.bool(true, 'Mostra Pearson\'s R', group = group2)
+showSignals = input.bool(true, 'Mostra Segnali di Trading', group = group2)
+extendLeftInput = input.bool(false, 'Estendi Linee a Sinistra', group = group2)
+extendRightInput = input.bool(true, 'Estendi Linee a Destra', group = group2)
+
+// Impostazioni Segnale
+group_signals = 'Impostazioni Segnale'
+use_bb_filter = input.bool(true, 'Usa Filtro BB', group = group_signals)
+use_pivot_filter = input.bool(true, 'Usa Filtro Pivot', group = group_signals)
+use_stoch_rsi_filter = input.bool(true, 'Usa Filtro Stochastic RSI', group = group_signals)
+use_ma_cross_filter = input.bool(true, 'Usa Filtro Incrocio Medie', group = group_signals)
+min_pearson = input.float(0.7, 'Pearson R Minimo per Segnali', minval = 0.1, maxval = 1.0, step = 0.1, group = group_signals)
+
+// Impostazioni Stochastic RSI - PARAMETRI OTTIMIZZATI
+group_stoch = 'Impostazioni Stochastic RSI'
+stoch_rsi_length = input.int(14, 'Lunghezza Stoch RSI', minval = 1, group = group_stoch)
+stoch_rsi_rsi_length = input.int(14, 'Lunghezza RSI', minval = 1, group = group_stoch)
+stoch_rsi_k = input.int(1, '%K Stoch Smoothing (1=veloce)', minval = 1, maxval = 5, group = group_stoch)
+stoch_rsi_d = input.int(3, '%D Stoch Smoothing', minval = 1, group = group_stoch)
+stoch_oversold = input.float(20, 'Livello Ipervenduto', minval = 0, maxval = 50, group = group_stoch)
+stoch_overbought = input.float(80, 'Livello Ipercomprato', minval = 50, maxval = 100, group = group_stoch)
+
+// Impostazioni Filtro Medie Mobili - NUOVO
+group_ma = 'Impostazioni Medie Mobili'
+ema_length = input.int(50, 'Lunghezza EMA', minval = 1, group = group_ma)
+sma_length = input.int(200, 'Lunghezza SMA', minval = 1, group = group_ma)
+rsi_momentum_length = input.int(14, 'Lunghezza RSI Momentum', minval = 1, group = group_ma)
+volume_avg_length = input.int(20, 'Lunghezza Media Volume', minval = 1, group = group_ma)
+
+// ========== INIZIALIZZA VARIABILI ==========
+var float confluence_score = 0.0
+
+// ========== STOCHASTIC RSI - VERSIONE MIGLIORATA ==========
+rsi_source = ta.rsi(close, stoch_rsi_rsi_length)
+stoch_rsi = ta.stoch(rsi_source, rsi_source, rsi_source, stoch_rsi_length)
+stoch_k = ta.sma(stoch_rsi, stoch_rsi_k)
+stoch_d = ta.sma(stoch_k, stoch_rsi_d)
+
+// Detect StochRSI crossovers - NUOVO SEGNALE ANTICIPATORIO
+stoch_cross_up = ta.crossover(stoch_k, stoch_d) and stoch_k <= stoch_oversold + 10
+stoch_cross_down = ta.crossunder(stoch_k, stoch_d) and stoch_k >= stoch_overbought - 10
+
+// ========== FILTRO MEDIE MOBILI - NUOVO ==========
+ema50 = ta.ema(close, ema_length)
+sma200 = ta.sma(close, sma_length)
+rsi_momentum = ta.rsi(close, rsi_momentum_length)
+vol_avg = ta.sma(volume, volume_avg_length)
+
+// Condizioni Golden Cross e Death Cross con conferme aggiuntive
+golden_cross = ema50 > sma200 and rsi_momentum > 50 and volume > vol_avg
+death_cross = ema50 < sma200 and rsi_momentum < 50 and volume > vol_avg
+
+// Stato generale del trend
+trend_bullish = ema50 > sma200
+trend_bearish = ema50 < sma200
+
+// Plot delle medie mobili (opzionale - puoi commentare se non vuoi visualizzarle)
+plot(ema50, title = 'EMA 50', color = color.new(color.orange, 60), linewidth = 1)
+plot(sma200, title = 'SMA 200', color = color.new(color.purple, 60), linewidth = 2)
+
+// ========== CALCOLO REGRESSIONE LINEARE ==========
+calcSlope(source, length) =>
+    max_bars_back(source, 5000)
+    if not barstate.islast or length <= 1
+        [float(na), float(na), float(na)]
+    else
+        sumX = 0.0
+        sumY = 0.0
+        sumXSqr = 0.0
+        sumXY = 0.0
+        for i = 0 to length - 1 by 1
+            val = source[i]
+            per = i + 1.0
+            sumX := sumX + per
+            sumY := sumY + val
+            sumXSqr := sumXSqr + per * per
+            sumXY := sumXY + val * per
+        slope = (length * sumXY - sumX * sumY) / (length * sumXSqr - sumX * sumX)
+        average = sumY / length
+        intercept = average - slope * sumX / length + slope
+        [slope, average, intercept]
+
+[s, a, i] = calcSlope(sourceInput, lengthInput)
+startPrice = i + s * (lengthInput - 1)
+endPrice = i
+
+// Define extend style and colors (these were missing)
+extendStyle = extendRightInput ? extend.right : extendLeftInput ? extend.left : extend.none
+colorUpper = color.new(color.blue, 80)
+colorLower = color.new(color.red, 80)
+
+var line baseLine = na
+if na(baseLine) and not na(startPrice)
+    baseLine := line.new(bar_index - lengthInput + 1, startPrice, bar_index, endPrice, width = 1, extend = extendStyle, color = color.new(colorLower, 0))
+else
+    line.set_xy1(baseLine, bar_index - lengthInput + 1, startPrice)
+    line.set_xy2(baseLine, bar_index, endPrice)
+
+calcDev(source, length, slope, average, intercept) =>
+    upDev = 0.0
+    dnDev = 0.0
+    stdDevAcc = 0.0
+    dsxx = 0.0
+    dsyy = 0.0
+    dsxy = 0.0
+    periods = length - 1
+    daY = intercept + slope * periods / 2
+    val = intercept
+    for j = 0 to periods by 1
+        price = high[j] - val
+        if price > upDev
+            upDev := price
+        price := val - low[j]
+        if price > dnDev
+            dnDev := price
+        price := source[j]
+        dxt = price - average
+        dyt = val - daY
+        price := price - val
+        stdDevAcc := stdDevAcc + price * price
+        dsxx := dsxx + dxt * dxt
+        dsyy := dsyy + dyt * dyt
+        dsxy := dsxy + dxt * dyt
+        val := val + slope
+    stdDev = math.sqrt(stdDevAcc / (periods == 0 ? 1 : periods))
+    pearsonR = dsxx == 0 or dsyy == 0 ? 0 : dsxy / math.sqrt(dsxx * dsyy)
+    [stdDev, pearsonR, upDev, dnDev]
+
+[stdDev, pearsonR, upDev, dnDev] = calcDev(sourceInput, lengthInput, s, a, i)
+
+// Calculate LinReg position (-1 to +1)
+linreg_position = not na(stdDev) and stdDev > 0 ? math.max(-1, math.min(1, (close - endPrice) / (stdDev * 2))) : 0
+
+upperStartPrice = startPrice + (useUpperDevInput ? upperMultInput * stdDev : upDev)
+upperEndPrice = endPrice + (useUpperDevInput ? upperMultInput * stdDev : upDev)
+var line upper = na
+lowerStartPrice = startPrice + (useLowerDevInput ? -lowerMultInput * stdDev : -dnDev)
+lowerEndPrice = endPrice + (useLowerDevInput ? -lowerMultInput * stdDev : -dnDev)
+var line lower = na
+
+if na(upper) and not na(upperStartPrice)
+    upper := line.new(bar_index - lengthInput + 1, upperStartPrice, bar_index, upperEndPrice, width = 1, extend = extendStyle, color = color.new(colorUpper, 0))
+else
+    line.set_xy1(upper, bar_index - lengthInput + 1, upperStartPrice)
+    line.set_xy2(upper, bar_index, upperEndPrice)
+
+if na(lower) and not na(lowerStartPrice)
+    lower := line.new(bar_index - lengthInput + 1, lowerStartPrice, bar_index, lowerEndPrice, width = 1, extend = extendStyle, color = color.new(colorUpper, 0))
+else
+    line.set_xy1(lower, bar_index - lengthInput + 1, lowerStartPrice)
+    line.set_xy2(lower, bar_index, lowerEndPrice)
+
+linefill.new(upper, baseLine, color = colorUpper)
+linefill.new(baseLine, lower, color = colorLower)
+
+// ========== BANDE DI BOLLINGER ==========
+bb_length = input.int(20, minval = 1, title = 'Lunghezza BB', group = 'Bande di Bollinger')
+bb_maType = input.string('SMA', 'Tipo Media Mobile', options = ['SMA', 'EMA', 'SMMA (RMA)', 'WMA', 'VWMA'], group = 'Bande di Bollinger')
+bb_src = input(close, title = 'Sorgente BB', group = 'Bande di Bollinger')
+bb_mult = input.float(2.0, minval = 0.001, maxval = 50, title = 'Deviazione Std BB', group = 'Bande di Bollinger')
+
+ma(source, length, _type) =>
+    switch _type
+        'SMA' => ta.sma(source, length)
+        'EMA' => ta.ema(source, length)
+        'SMMA (RMA)' => ta.rma(source, length)
+        'WMA' => ta.wma(source, length)
+        'VWMA' => ta.vwma(source, length)
+
+bb_basis = ma(bb_src, bb_length, bb_maType)
+bb_dev = bb_mult * ta.stdev(bb_src, bb_length)
+bb_upper = bb_basis + bb_dev
+bb_lower = bb_basis - bb_dev
+bb_offset = input.int(0, 'Spostamento BB', minval = -500, maxval = 500, display = display.data_window, group = 'Bande di Bollinger')
+
+// BB Position calculation
+bb_position = (close - bb_lower) / (bb_upper - bb_lower) * 2 - 1 // -1 to +1 scale
+
+plot(bb_basis, 'Base BB', color = #f0e0e0, offset = bb_offset)
+bb_p1 = plot(bb_upper, 'Superiore BB', color = #cd5c5c, offset = bb_offset)
+bb_p2 = plot(bb_lower, 'Inferiore BB', color = #7dcc5d, offset = bb_offset)
+
+// ========== PUNTI PIVOT ==========
+length = input(50, 'Lunghezza Pivot', group = 'Punti Pivot')
+show_reg = input.bool(true, 'Pivot Regolari', inline = 'inline1', group = 'Punti Pivot')
+reg_ph_css = input.color(#ef5350, 'Massimo', inline = 'inline1', group = 'Punti Pivot')
+reg_pl_css = input.color(#26a69a, 'Minimo', inline = 'inline1', group = 'Punti Pivot')
+
+ph = ta.pivothigh(length, length)
+pl = ta.pivotlow(length, length)
+
+// Track recent pivot levels
+var float recent_ph = na
+var float recent_pl = na
+var int recent_ph_bar = na
+var int recent_pl_bar = na
+
+if bool(ph)
+    recent_ph := ph
+    recent_ph_bar := bar_index - length
+if bool(pl)
+    recent_pl := pl
+    recent_pl_bar := bar_index - length
+
+// ========== LOGICA SEGNALE AVANZATA CON APPROCCIO GERARCHICO ==========
+// Passo 1: LinReg come filtro primario (OBBLIGATORIO)
+linreg_buy_primary = linreg_position <= -linreg_sensitivity  // LinReg in zona ipervenduto
+linreg_sell_primary = linreg_position >= linreg_sensitivity  // LinReg in zona ipercomprato
+
+// Passo 2: Confluenza degli altri indicatori (solo SE LinReg è valido)
+confluence_score := 0.0
+
+// Contributo BB (supporto secondario)
+if use_bb_filter
+    if bb_position <= -0.8 // Vicino banda inferiore BB (supporta BUY)
+        confluence_score := confluence_score + 1
+    else if bb_position >= 0.8 // Vicino banda superiore BB (supporta SELL)
+        confluence_score := confluence_score - 1
+
+// Contributo Pivot (supporto secondario)
+if use_pivot_filter and not na(recent_ph) and not na(recent_pl)
+    distance_to_ph = math.abs(close - recent_ph) / recent_ph * 100
+    distance_to_pl = math.abs(close - recent_pl) / recent_pl * 100
+
+    if distance_to_pl < 2 // Entro 2% dal minimo pivot recente (supporta BUY)
+        confluence_score := confluence_score + 1
+    else if distance_to_ph < 2 // Entro 2% dal massimo pivot recente (supporta SELL)
+        confluence_score := confluence_score - 1
+
+// Contributo Stochastic RSI (supporto secondario - MIGLIORATO)
+if use_stoch_rsi_filter
+    // Condizioni più precise con incroci
+    stoch_bullish = (stoch_k <= stoch_oversold and stoch_d <= stoch_oversold) or stoch_cross_up
+    stoch_bearish = (stoch_k >= stoch_overbought and stoch_d >= stoch_overbought) or stoch_cross_down
+    
+    if stoch_bullish // Ipervenduto o incrocio rialzista (supporta BUY)
+        confluence_score := confluence_score + 1
+    else if stoch_bearish // Ipercomprato o incrocio ribassista (supporta SELL)
+        confluence_score := confluence_score - 1
+
+// Contributo Filtro Medie Mobili (supporto secondario - NUOVO)
+if use_ma_cross_filter
+    if golden_cross // Golden Cross con conferme (supporta BUY)
+        confluence_score := confluence_score + 0.5  // Peso minore perché è trend following
+    else if death_cross // Death Cross con conferme (supporta SELL)
+        confluence_score := confluence_score - 0.5
+
+// Filtro Pearson R (qualità del trend)
+pearson_ok = math.abs(pearsonR) >= min_pearson
+
+// Passo 3: Segnali finali (LinReg DEVE essere valido + confluenza + Pearson OK)
+buy_signal = linreg_buy_primary and confluence_score >= 1 and pearson_ok
+sell_signal = linreg_sell_primary and confluence_score <= -1 and pearson_ok
+
+// Calcolo Intensità Segnale per visualizzazione
+signal_strength = (linreg_buy_primary ? 1 : linreg_sell_primary ? -1 : 0) + confluence_score
+
+// Plot segnali
+if showSignals
+    if buy_signal
+        label.new(bar_index, low, 'BUY\n' + str.tostring(signal_strength, '#.##'), color = color.green, style = label.style_label_up, size = size.normal, tooltip = 'LinReg: ' + str.tostring(linreg_position, '#.##') + '\nBB: ' + str.tostring(bb_position, '#.##') + '\nStoch K: ' + str.tostring(stoch_k, '#.##') + '\nMA Trend: ' + (trend_bullish ? 'Rialzista' : 'Ribassista') + '\nPearson R: ' + str.tostring(pearsonR, '#.##'))
+
+    if sell_signal
+        label.new(bar_index, high, 'SELL\n' + str.tostring(signal_strength, '#.##'), color = color.red, style = label.style_label_down, size = size.normal, tooltip = 'LinReg: ' + str.tostring(linreg_position, '#.##') + '\nBB: ' + str.tostring(bb_position, '#.##') + '\nStoch K: ' + str.tostring(stoch_k, '#.##') + '\nMA Trend: ' + (trend_bullish ? 'Rialzista' : 'Ribassista') + '\nPearson R: ' + str.tostring(pearsonR, '#.##'))
+
+// Visualizzazione Pearson's R
+var label r = na
+label.delete(r[1])
+if showPearsonInput and not na(pearsonR)
+    r_color = pearson_ok ? color.green : color.orange
+    r := label.new(bar_index - lengthInput + 1, lowerStartPrice, 'R: ' + str.tostring(pearsonR, '#.####'), color = color.new(color.white, 100), textcolor = r_color, size = size.normal, style = label.style_label_up)
+
+// ========== DASHBOARD REATTIVA PER MOBILE - AGGIORNATA CON MA CROSS ==========
+if barstate.islast and showSignals
+    // Detecta la larghezza dello schermo e adatta le dimensiones
+    var table info_table = table.new(position.bottom_right, 3, 11, bgcolor = color.new(color.black, 95), border_width = 1, border_color = color.new(color.gray, 60))
+
+    // Header compatto
+    table.cell(info_table, 0, 0, '📊 STRATEGIA 4H AVANZATA', text_color = color.white, bgcolor = color.new(color.blue, 85), text_size = size.small)
+    table.merge_cells(info_table, 0, 0, 2, 0) // Merge su 3 colonne
+
+    // --- ICONE UNICODE ---
+    // Queste icone sono state selezionate per essere visivamente chiare e rappresentative.
+    // Puoi trovare altri simboli qui: https://www.compart.com/en/unicode/category/Sm
+    icon_up = '⬆️' // Freccia in su
+    icon_down = '⬇️' // Freccia in giù
+    icon_neutral = '↔️' // Freccia orizzontale
+    icon_strong = '💪' // Bicipite (trend forte)
+    icon_weak = '⚠️' // Avviso (trend debole)
+    icon_bullish_chart = '📈' // Grafico in su (trend rialzista)
+    icon_bearish_chart = '📉' // Grafico in giù (trend ribassista)
+    icon_rocket = '🚀' // Razzo (golden cross/confluenza rialzista)
+    icon_skull = '💀' // Teschio (death cross/confluenza ribassista)
+    icon_fire = '🔥' // Fuoco (volume alto)
+    icon_avg_vol = '📊' // Grafico a barre (volume medio/basso)
+    icon_buy_zone = '🟢' // Cerchio verde (zona buy/ipervenduto)
+    icon_sell_zone = '🔴' // Cerchio rosso (zona sell/ipercomprato)
+    icon_neutral_zone = '⚪' // Cerchio bianco (neutrale/lateralizzazione)
+    icon_threshold = '⚖️' // Bilancia (soglie)
+    icon_alert = '🚨' // Allarme (segnale principale)
+    icon_link = '🔗' // Catena (confluenza)
+    icon_wave = '🌊' // Onda (condizione mercato)
+
+
+    // Posizione LinReg (PRIMARIO)
+    linreg_icon = linreg_buy_primary ? icon_buy_zone : linreg_sell_primary ? icon_sell_zone : icon_neutral_zone
+    linreg_icon_color = linreg_buy_primary ? color.new(color.lime, 60) : linreg_sell_primary ? color.new(color.red, 60) : color.new(color.gray, 80)
+    // Testo accorciato: 'BUY', 'SELL', 'NEU'
+    linreg_status_text = linreg_buy_primary ? 'BUY' : linreg_sell_primary ? 'SELL' : 'NEU'
+
+    table.cell(info_table, 0, 1, '🎯 LinReg', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 1, linreg_icon, text_color = color.white, bgcolor = linreg_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 1, linreg_status_text + '\n' + str.tostring(linreg_position, '#.##'), text_color = color.white, bgcolor = linreg_icon_color, text_size = size.small)
+
+    // Posizione BB
+    bb_icon = bb_position <= -0.8 ? icon_buy_zone : bb_position >= 0.8 ? icon_sell_zone : icon_neutral_zone
+    bb_icon_color = bb_position <= -0.8 ? color.new(color.lime, 75) : bb_position >= 0.8 ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    // Testo accorciato: 'SOLD', 'BOUT', 'NEU'
+    bb_status_text = bb_position <= -0.8 ? 'SOLD' : bb_position >= 0.8 ? 'BOUT' : 'NEU'
+
+    table.cell(info_table, 0, 2, '📊 Bollinger', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 2, bb_icon, text_color = color.white, bgcolor = bb_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 2, bb_status_text + '\n' + str.tostring(bb_position, '#.##'), text_color = color.white, bgcolor = bb_icon_color, text_size = size.small)
+
+    // Stochastic RSI (MIGLIORATO)
+    stoch_icon = stoch_k <= stoch_oversold ? icon_buy_zone : stoch_k >= stoch_overbought ? icon_sell_zone : icon_neutral_zone
+    stoch_icon_color = stoch_k <= stoch_oversold ? color.new(color.lime, 75) : stoch_k >= stoch_overbought ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    // Testo accorciato: 'SOLD', 'BOUT', 'NEU'
+    stoch_status_text = stoch_k <= stoch_oversold ? 'SOLD' : stoch_k >= stoch_overbought ? 'BOUT' : 'NEU'
+
+    table.cell(info_table, 0, 3, '⚡ Stoch RSI', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 3, stoch_icon, text_color = color.white, bgcolor = stoch_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 3, stoch_status_text + '\nK:' + str.tostring(stoch_k, '#.#') + ' D:' + str.tostring(stoch_d, '#.#'), text_color = color.white, bgcolor = stoch_icon_color, text_size = size.small)
+
+    // Filtro Medie Mobili - NUOVO
+    ma_icon = golden_cross ? icon_rocket : death_cross ? icon_skull : trend_bullish ? icon_bullish_chart : trend_bearish ? icon_bearish_chart : icon_neutral
+    ma_icon_color = golden_cross ? color.new(color.lime, 70) : death_cross ? color.new(color.red, 70) : trend_bullish ? color.new(color.green, 80) : trend_bearish ? color.new(color.orange, 80) : color.new(color.gray, 80)
+    // Testo accorciato: 'GOLD', 'DEATH', 'UP', 'DOWN', 'NEU'
+    ma_status_text = golden_cross ? 'GOLD' : death_cross ? 'DEATH' : trend_bullish ? 'UP' : trend_bearish ? 'DOWN' : 'NEU'
+
+    table.cell(info_table, 0, 4, '📈 Medie Mobili', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 4, ma_icon, text_color = color.white, bgcolor = ma_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 4, ma_status_text + '\nEMA>' + (ema50 > sma200 ? 'SMA' : 'SMA') + ' RSI:' + str.tostring(rsi_momentum, '#'), text_color = color.white, bgcolor = ma_icon_color, text_size = size.small)
+
+    // Pearson R
+    pearson_icon = pearson_ok ? icon_strong : icon_weak
+    pearson_icon_color = pearson_ok ? color.new(color.lime, 75) : color.new(color.orange, 80)
+    // Testo accorciato: 'FORT', 'WEAK'
+    pearson_status_text = pearson_ok ? 'FORT' : 'WEAK'
+
+    table.cell(info_table, 0, 5, '🎯 Pearson R', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 5, pearson_icon, text_color = color.white, bgcolor = pearson_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 5, pearson_status_text + '\n' + str.tostring(pearsonR, '#.##'), text_color = color.white, bgcolor = pearson_icon_color, text_size = size.small)
+
+    // Score di Confluenza
+    conf_icon = confluence_score >= 1 ? icon_rocket : confluence_score <= -1 ? icon_skull : icon_neutral_zone
+    conf_icon_color = confluence_score >= 1 ? color.new(color.lime, 70) : confluence_score <= -1 ? color.new(color.red, 70) : color.new(color.gray, 80)
+    // Testo accorciato: 'BULL', 'BEAR', 'NEU'
+    conf_status_text = confluence_score >= 1 ? 'BULL' : confluence_score <= -1 ? 'BEAR' : 'NEU'
+
+    table.cell(info_table, 0, 6, '🔗 Confluenza', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 6, conf_icon, text_color = color.white, bgcolor = conf_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 6, conf_status_text + '\nScore: ' + str.tostring(confluence_score, '#.#'), text_color = color.white, bgcolor = conf_icon_color, text_size = size.small)
+
+    // Volume Analysis - NUOVO
+    vol_icon = volume > vol_avg * 1.5 ? icon_fire : volume > vol_avg ? icon_avg_vol : icon_avg_vol
+    vol_icon_color = volume > vol_avg * 1.5 ? color.new(color.lime, 70) : volume > vol_avg ? color.new(color.yellow, 80) : color.new(color.gray, 80)
+    // Testo accorciato: 'ALTO', 'MEDIO', 'BASSO'
+    vol_status_text = volume > vol_avg * 1.5 ? 'ALTO' : volume > vol_avg ? 'MEDIO' : 'BASSO'
+    vol_ratio_text = str.tostring(volume / vol_avg, '#.#') + 'x'
+
+    table.cell(info_table, 0, 7, '📊 Volume', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 7, vol_icon, text_color = color.white, bgcolor = vol_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 7, vol_status_text + '\nRatio: ' + vol_ratio_text, text_color = color.white, bgcolor = vol_icon_color, text_size = size.small)
+
+    // Condizione di Mercato
+    market_icon = math.abs(pearsonR) >= 0.8 ? icon_strong : math.abs(pearsonR) >= 0.5 ? icon_weak : icon_neutral_zone
+    market_color = math.abs(pearsonR) >= 0.8 ? color.new(color.blue, 75) : math.abs(pearsonR) >= 0.5 ? color.new(color.orange, 80) : color.new(color.gray, 80)
+    // Testo accorciato: 'FORTE', 'DEBOLE', 'LAT.'
+    market_condition_text = math.abs(pearsonR) >= 0.8 ? 'FORTE' : math.abs(pearsonR) >= 0.5 ? 'DEBOLE' : 'LAT.' 
+
+    table.cell(info_table, 0, 8, '🌊 Mercato', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 8, market_icon, text_color = color.white, bgcolor = market_color, text_size = size.large)
+    table.cell(info_table, 2, 8, market_condition_text, text_color = color.white, bgcolor = market_color, text_size = size.small)
+
+    // Riferimento Soglie
+    table.cell(info_table, 0, 9, '⚖️ Soglie', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 9, icon_threshold, text_color = color.white, bgcolor = color.new(color.purple, 80), text_size = size.large)
+    table.cell(info_table, 2, 9, 'BUY < ' + str.tostring(-linreg_sensitivity, '#.#') + '\nSELL > ' + str.tostring(linreg_sensitivity, '#.#'), text_color = color.white, bgcolor = color.new(color.purple, 80), text_size = size.small)
+
+    // SEGNALE PRINCIPALE - Grande e prominente
+    main_icon = buy_signal ? icon_alert : sell_signal ? icon_alert : (linreg_buy_primary or linreg_sell_primary) ? icon_alert : icon_neutral_zone
+    main_status_text = buy_signal ? 'BUY ATTIVO' : sell_signal ? 'SELL ATTIVO' : (linreg_buy_primary or linreg_sell_primary) ? 'ATTESA CONFL.' : 'NO SETUP'
+    
+    main_color = buy_signal ? color.new(color.lime, 40) : sell_signal ? color.new(color.red, 40) : (linreg_buy_primary or linreg_sell_primary) ? color.new(color.orange, 60) : color.new(color.gray, 80)
+
+    table.cell(info_table, 0, 10, '🚨 SEGNALE', text_color = color.white, bgcolor = color.new(color.black, 70), text_size = size.small)
+    table.cell(info_table, 1, 10, main_icon, text_color = color.white, bgcolor = main_color, text_size = size.large)
+    table.cell(info_table, 2, 10, main_status_text, text_color = color.white, bgcolor = main_color, text_size = size.small)
+
+
+// ========== ALERT CONDITIONS - CONDIZIONI DI AVVISO ==========
+// Alert per segnali di trading
+alertcondition(buy_signal, title = 'SEGNALE BUY 4H', message = 'STRATEGIA 4H: Segnale BUY attivato! LinReg: {{plot("linreg_position")}} | BB: {{plot("bb_position")}} | Stoch: {{plot("stoch_k")}} | Confluenza: {{plot("confluence_score")}} | Pearson R: {{plot("pearsonR")}}')
+
+alertcondition(sell_signal, title = 'SEGNALE SELL 4H', message = 'STRATEGIA 4H: Segnale SELL attivato! LinReg: {{plot("linreg_position")}} | BB: {{plot("bb_position")}} | Stoch: {{plot("stoch_k")}} | Confluenza: {{plot("confluence_score")}} | Pearson R: {{plot("pearsonR")}}')
+
+// Alert per Golden Cross e Death Cross
+alertcondition(golden_cross, title = 'GOLDEN CROSS RILEVATO', message = 'STRATEGIA 4H: Golden Cross rilevato! EMA50 sopra SMA200 con RSI > 50 e volume elevato')
+
+alertcondition(death_cross, title = 'DEATH CROSS RILEVATO', message = 'STRATEGIA 4H: Death Cross rilevato! EMA50 sotto SMA200 con RSI < 50 e volume elevato')
+
+// Alert per setup di confluenza (preparazione segnale)
+setup_bullish = linreg_buy_primary and confluence_score >= 0.5 and not buy_signal
+setup_bearish = linreg_sell_primary and confluence_score <= -0.5 and not sell_signal
+
+alertcondition(setup_bullish, title = 'SETUP RIALZISTA IN FORMAZIONE', message = 'STRATEGIA 4H: Setup rialzista in formazione - monitorare per possibile segnale BUY')
+
+alertcondition(setup_bearish, title = 'SETUP RIBASSISTA IN FORMAZIONE', message = 'STRATEGIA 4H: Setup ribassista in formazione - monitorare per possibile segnale SELL')
+
+// ========== PLOT AGGIUNTIVI PER ANALISI ==========
+// Plot invisibili per utilizzo negli alert
+plot(linreg_position, title = 'LinReg Position', display = display.none)
+plot(bb_position, title = 'BB Position', display = display.none)
+plot(stoch_k, title = 'Stoch K', display = display.none)
+plot(confluence_score, title = 'Confluence Score', display = display.none)
+plot(pearsonR, title = 'Pearson R', display = display.none)
+
+// Plot per identificare le zone di trading
+bgcolor(linreg_buy_primary ? color.new(color.green, 95) : linreg_sell_primary ? color.new(color.red, 95) : na, title = 'Zone di Trading LinReg')
+
+// Plot per evidenziare i segnali confermati
+bgcolor(buy_signal ? color.new(color.lime, 85) : sell_signal ? color.new(color.red, 85) : na, title = 'Segnali Confermati')
+
+// ========== STATISTICHE E METRICHE FINALI ==========
+// Calcolo efficienza segnali (opzionale - per debugging)
+var int total_buy_signals = 0
+var int total_sell_signals = 0
+
+if buy_signal
+    total_buy_signals := total_buy_signals + 1
+if sell_signal
+    total_sell_signals := total_sell_signals + 1
+
+// Note finali per l'utente
+// Questo indicatore combina:
+// 1. Regressione Lineare (filtro primario obbligatorio)
+// 2. Bande di Bollinger (supporto secondario)
+// 3. Punti Pivot (supporto secondario)
+// 4. Stochastic RSI migliorato (supporto secondario)
+// 5. Filtro Medie Mobili con Golden/Death Cross (supporto secondario - NUOVO)
+// 6. Analisi del Volume (supporto terziario - NUOVO)
+// 7. Pearson R per validazione trend (filtro qualità)
+//
+// La strategia genera segnali solo quando:
+// - LinReg è in zona estrema (BUY < -0.8 o SELL > 0.8)
+// - Almeno 1 punto di confluenza è raggiunto
+// - Pearson R indica un trend di qualità (>= 0.7)
+//
+// Il nuovo filtro MA Cross aggiunge:
+// - Golden Cross: EMA50 > SMA200 + RSI > 50 + Volume > Media
+// - Death Cross: EMA50 < SMA200 + RSI < 50 + Volume > Media
+// - Contributo di 0.5 punti al confluence_score
+//
+// Utilizzare preferibilmente su timeframe 4H per migliori risultati.

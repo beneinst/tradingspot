@@ -1,0 +1,537 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © gerardo_dorrico
+
+//@version=6
+indicator('Strategia Avanzata 4 Ore con LinReg Anticipatoria V6', shorttitle = '4H | Strategia Avanzata V8', overlay = true, max_labels_count = 500, max_lines_count = 500, max_bars_back = 500)
+
+// ========== IMPOSTAZIONI ==========
+// Impostazioni Regressione Lineare - MIGLIORATE
+lengthInput = input.int(100, title = 'LinReg Lunghezza', minval = 1, maxval = 5000, group = 'Regressione Lineare')
+sourceInput = input.source(close, title = 'Sorgente', group = 'Regressione Lineare')
+linreg_sensitivity = input.float(0.8, title = 'Sensibilità Segnale LinReg', minval = 0.1, maxval = 1.0, step = 0.1, group = 'Regressione Lineare')
+
+// NUOVE IMPOSTAZIONI ANTICIPATORIE
+use_anticipatory_mode = input.bool(true, 'Modalità Anticipatoria', group = 'Regressione Lineare')
+short_length = input.int(20, 'Lunghezza LinReg Breve (Anticipatoria)', minval = 5, maxval = 100, group = 'Regressione Lineare')
+momentum_weight = input.float(0.3, 'Peso Momentum Anticipatorio', minval = 0.1, maxval = 0.5, step = 0.1, group = 'Regressione Lineare')
+price_action_weight = input.float(0.4, 'Peso Price Action', minval = 0.1, maxval = 0.6, step = 0.1, group = 'Regressione Lineare')
+
+// Impostazioni Canale
+group1 = 'Impostazioni Canale'
+useUpperDevInput = input.bool(true, title = 'Deviazione Superiore', inline = 'Upper Deviation', group = group1)
+upperMultInput = input.float(2.0, title = '', inline = 'Upper Deviation', group = group1)
+useLowerDevInput = input.bool(true, title = '', inline = 'Lower Deviation', group = group1)
+lowerMultInput = input.float(2.0, title = '', inline = 'Lower Deviation', group = group1)
+
+// Impostazioni Visualizzazione
+group2 = 'Impostazioni Visualizzazione'
+showPearsonInput = input.bool(true, 'Mostra Pearson\'s R', group = group2)
+showSignals = input.bool(true, 'Mostra Segnali di Trading', group = group2)
+extendLeftInput = input.bool(false, 'Estendi Linee a Sinistra', group = group2)
+extendRightInput = input.bool(true, 'Estendi Linee a Destra', group = group2)
+
+// Impostazioni Segnale
+group_signals = 'Impostazioni Segnale'
+use_bb_filter = input.bool(true, 'Usa Filtro BB', group = group_signals)
+use_pivot_filter = input.bool(true, 'Usa Filtro Pivot', group = group_signals)
+use_stoch_rsi_filter = input.bool(true, 'Usa Filtro Stochastic RSI', group = group_signals)
+use_ma_cross_filter = input.bool(true, 'Usa Filtro Incrocio Medie', group = group_signals)
+min_pearson = input.float(0.7, 'Pearson R Minimo per Segnali', minval = 0.1, maxval = 1.0, step = 0.1, group = group_signals)
+
+// NUOVE IMPOSTAZIONI PER EARLY EXIT
+use_early_exit = input.bool(true, 'Usa Early Exit', group = group_signals)
+early_exit_threshold = input.float(0.5, 'Soglia Early Exit', minval = 0.1, maxval = 0.9, step = 0.1, group = group_signals)
+
+// Impostazioni Stochastic RSI
+group_stoch = 'Impostazioni Stochastic RSI'
+stoch_rsi_length = input.int(14, 'Lunghezza Stoch RSI', minval = 1, group = group_stoch)
+stoch_rsi_rsi_length = input.int(14, 'Lunghezza RSI', minval = 1, group = group_stoch)
+stoch_rsi_k = input.int(1, '%K Stoch Smoothing (1=veloce)', minval = 1, maxval = 5, group = group_stoch)
+stoch_rsi_d = input.int(3, '%D Stoch Smoothing', minval = 1, group = group_stoch)
+stoch_oversold = input.float(20, 'Livello Ipervenduto', minval = 0, maxval = 50, group = group_stoch)
+stoch_overbought = input.float(80, 'Livello Ipercomprato', minval = 50, maxval = 100, group = group_stoch)
+
+// Impostazioni Filtro Medie Mobili
+group_ma = 'Impostazioni Medie Mobili'
+ema_length = input.int(50, 'Lunghezza EMA', minval = 1, group = group_ma)
+sma_length = input.int(200, 'Lunghezza SMA', minval = 1, group = group_ma)
+rsi_momentum_length = input.int(14, 'Lunghezza RSI Momentum', minval = 1, group = group_ma)
+volume_avg_length = input.int(20, 'Lunghezza Media Volume', minval = 1, group = group_ma)
+
+// ========== INIZIALIZZA VARIABILI ==========
+var float confluence_score = 0.0
+
+// ========== STOCHASTIC RSI ==========
+rsi_source = ta.rsi(close, stoch_rsi_rsi_length)
+stoch_rsi = ta.stoch(rsi_source, rsi_source, rsi_source, stoch_rsi_length)
+stoch_k = ta.sma(stoch_rsi, stoch_rsi_k)
+stoch_d = ta.sma(stoch_k, stoch_rsi_d)
+
+stoch_cross_up = ta.crossover(stoch_k, stoch_d) and stoch_k <= stoch_oversold + 10
+stoch_cross_down = ta.crossunder(stoch_k, stoch_d) and stoch_k >= stoch_overbought - 10
+
+// ========== FILTRO MEDIE MOBILI ==========
+ema50 = ta.ema(close, ema_length)
+sma200 = ta.sma(close, sma_length)
+rsi_momentum = ta.rsi(close, rsi_momentum_length)
+vol_avg = ta.sma(volume, volume_avg_length)
+
+golden_cross = ema50 > sma200 and rsi_momentum > 50 and volume > vol_avg
+death_cross = ema50 < sma200 and rsi_momentum < 50 and volume > vol_avg
+
+trend_bullish = ema50 > sma200
+trend_bearish = ema50 < sma200
+
+plot(ema50, title = 'EMA 50', color = color.new(color.orange, 60), linewidth = 1)
+plot(sma200, title = 'SMA 200', color = color.new(color.purple, 60), linewidth = 2)
+
+// ========== REGRESSIONE LINEARE MIGLIORATA ==========
+calcSlope(source, length) =>
+    max_bars_back(source, 5000)
+    if not barstate.islast or length <= 1
+        [float(na), float(na), float(na)]
+    else
+        sumX = 0.0
+        sumY = 0.0
+        sumXSqr = 0.0
+        sumXY = 0.0
+        for i = 0 to length - 1 by 1
+            val = source[i]
+            per = i + 1.0
+            sumX := sumX + per
+            sumY := sumY + val
+            sumXSqr := sumXSqr + per * per
+            sumXY := sumXY + val * per
+        slope = (length * sumXY - sumX * sumY) / (length * sumXSqr - sumX * sumX)
+        average = sumY / length
+        intercept = average - slope * sumX / length + slope
+        [slope, average, intercept]
+
+// Calcolo LinReg normale (lunga)
+[s, a, i] = calcSlope(sourceInput, lengthInput)
+startPrice = i + s * (lengthInput - 1)
+endPrice = i
+
+// NUOVO: Calcolo LinReg breve (anticipatoria)
+[s_short, a_short, i_short] = calcSlope(sourceInput, short_length)
+startPrice_short = i_short + s_short * (short_length - 1)
+endPrice_short = i_short
+
+// NUOVO: Calcolo componenti anticipatorie
+// 1. Momentum recente (ROC delle ultime 5 candele)
+recent_momentum = (close - close[5]) / close[5] * 100
+
+// 2. Price Action (pattern di inversione)
+higher_high = high > high[1] and high[1] > high[2]
+lower_low = low < low[1] and low[1] < low[2]
+doji = math.abs(close - open) < (high - low) * 0.1
+shooting_star = (high - math.max(open, close)) > (math.abs(close - open) * 2) and (math.min(open, close) - low) < (math.abs(close - open) * 0.5)
+hammer = (math.min(open, close) - low) > (math.abs(close - open) * 2) and (high - math.max(open, close)) < (math.abs(close - open) * 0.5)
+
+// Segnali di inversione price action
+reversal_bearish = higher_high and (doji or shooting_star)
+reversal_bullish = lower_low and (doji or hammer)
+
+// 3. NUOVO: Calcolo posizione LinReg anticipatoria
+calcDev(source, length, slope, average, intercept) =>
+    upDev = 0.0
+    dnDev = 0.0
+    stdDevAcc = 0.0
+    dsxx = 0.0
+    dsyy = 0.0
+    dsxy = 0.0
+    periods = length - 1
+    daY = intercept + slope * periods / 2
+    val = intercept
+    for j = 0 to periods by 1
+        price = high[j] - val
+        if price > upDev
+            upDev := price
+        price := val - low[j]
+        if price > dnDev
+            dnDev := price
+        price := source[j]
+        dxt = price - average
+        dyt = val - daY
+        price := price - val
+        stdDevAcc := stdDevAcc + price * price
+        dsxx := dsxx + dxt * dxt
+        dsyy := dsyy + dyt * dyt
+        dsxy := dsxy + dxt * dyt
+        val := val + slope
+    stdDev = math.sqrt(stdDevAcc / (periods == 0 ? 1 : periods))
+    pearsonR = dsxx == 0 or dsyy == 0 ? 0 : dsxy / math.sqrt(dsxx * dsyy)
+    [stdDev, pearsonR, upDev, dnDev]
+
+[stdDev, pearsonR, upDev, dnDev] = calcDev(sourceInput, lengthInput, s, a, i)
+[stdDev_short, pearsonR_short, upDev_short, dnDev_short] = calcDev(sourceInput, short_length, s_short, a_short, i_short)
+
+// Posizione LinReg normale
+linreg_position = not na(stdDev) and stdDev > 0 ? math.max(-1, math.min(1, (close - endPrice) / (stdDev * 2))) : 0
+
+// NUOVO: Posizione LinReg anticipatoria combinata
+linreg_position_short = not na(stdDev_short) and stdDev_short > 0 ? math.max(-1, math.min(1, (close - endPrice_short) / (stdDev_short * 2))) : 0
+
+// Normalizzazione momentum (-1 a +1)
+momentum_normalized = math.max(-1, math.min(1, recent_momentum / 10))
+
+// Segnale price action (-1 a +1)
+price_action_signal = reversal_bearish ? -1 : reversal_bullish ? 1 : 0
+
+// Calcolo pesi
+base_weight = 1 - momentum_weight - price_action_weight
+
+// FORMULA ANTICIPATORIA COMBINATA
+anticipatory_position = use_anticipatory_mode ? base_weight * linreg_position + (momentum_weight * 0.7) * momentum_normalized + (momentum_weight * 0.3) * linreg_position_short + price_action_weight * price_action_signal : linreg_position
+
+
+
+// Usa la posizione anticipatoria per i segnali
+final_linreg_position = anticipatory_position
+
+// Visualizzazione linee LinReg (manteniamo quella originale per riferimento)
+extendStyle = extendRightInput ? extend.right : extendLeftInput ? extend.left : extend.none
+colorUpper = color.new(color.blue, 80)
+colorLower = color.new(color.red, 80)
+
+var line baseLine = na
+if na(baseLine) and not na(startPrice)
+    baseLine := line.new(bar_index - lengthInput + 1, startPrice, bar_index, endPrice, width = 1, extend = extendStyle, color = color.new(colorLower, 0))
+else
+    line.set_xy1(baseLine, bar_index - lengthInput + 1, startPrice)
+    line.set_xy2(baseLine, bar_index, endPrice)
+
+upperStartPrice = startPrice + (useUpperDevInput ? upperMultInput * stdDev : upDev)
+upperEndPrice = endPrice + (useUpperDevInput ? upperMultInput * stdDev : upDev)
+var line upper = na
+lowerStartPrice = startPrice + (useLowerDevInput ? -lowerMultInput * stdDev : -dnDev)
+lowerEndPrice = endPrice + (useLowerDevInput ? -lowerMultInput * stdDev : -dnDev)
+var line lower = na
+
+if na(upper) and not na(upperStartPrice)
+    upper := line.new(bar_index - lengthInput + 1, upperStartPrice, bar_index, upperEndPrice, width = 1, extend = extendStyle, color = color.new(colorUpper, 0))
+else
+    line.set_xy1(upper, bar_index - lengthInput + 1, upperStartPrice)
+    line.set_xy2(upper, bar_index, upperEndPrice)
+
+if na(lower) and not na(lowerStartPrice)
+    lower := line.new(bar_index - lengthInput + 1, lowerStartPrice, bar_index, lowerEndPrice, width = 1, extend = extendStyle, color = color.new(colorUpper, 0))
+else
+    line.set_xy1(lower, bar_index - lengthInput + 1, lowerStartPrice)
+    line.set_xy2(lower, bar_index, lowerEndPrice)
+
+linefill.new(upper, baseLine, color = colorUpper)
+linefill.new(baseLine, lower, color = colorLower)
+
+// NUOVO: Linea LinReg breve (anticipatoria) - opzionale
+var line baseLine_short = na
+if use_anticipatory_mode and na(baseLine_short) and not na(startPrice_short)
+    baseLine_short := line.new(bar_index - short_length + 1, startPrice_short, bar_index, endPrice_short, width = 2, extend = extend.right, color = color.new(color.yellow, 30))
+else if use_anticipatory_mode
+    line.set_xy1(baseLine_short, bar_index - short_length + 1, startPrice_short)
+    line.set_xy2(baseLine_short, bar_index, endPrice_short)
+
+// ========== BANDE DI BOLLINGER ==========
+bb_length = input.int(20, minval = 1, title = 'Lunghezza BB', group = 'Bande di Bollinger')
+bb_maType = input.string('SMA', 'Tipo Media Mobile', options = ['SMA', 'EMA', 'SMMA (RMA)', 'WMA', 'VWMA'], group = 'Bande di Bollinger')
+bb_src = input(close, title = 'Sorgente BB', group = 'Bande di Bollinger')
+bb_mult = input.float(2.0, minval = 0.001, maxval = 50, title = 'Deviazione Std BB', group = 'Bande di Bollinger')
+
+ma(source, length, _type) =>
+    switch _type
+        'SMA' => ta.sma(source, length)
+        'EMA' => ta.ema(source, length)
+        'SMMA (RMA)' => ta.rma(source, length)
+        'WMA' => ta.wma(source, length)
+        'VWMA' => ta.vwma(source, length)
+
+bb_basis = ma(bb_src, bb_length, bb_maType)
+bb_dev = bb_mult * ta.stdev(bb_src, bb_length)
+bb_upper = bb_basis + bb_dev
+bb_lower = bb_basis - bb_dev
+bb_offset = input.int(0, 'Spostamento BB', minval = -500, maxval = 500, display = display.data_window, group = 'Bande di Bollinger')
+
+bb_position = (close - bb_lower) / (bb_upper - bb_lower) * 2 - 1
+
+plot(bb_basis, 'Base BB', color = #f0e0e0, offset = bb_offset)
+bb_p1 = plot(bb_upper, 'Superiore BB', color = #cd5c5c, offset = bb_offset)
+bb_p2 = plot(bb_lower, 'Inferiore BB', color = #7dcc5d, offset = bb_offset)
+
+// ========== PUNTI PIVOT ==========
+length = input(50, 'Lunghezza Pivot', group = 'Punti Pivot')
+show_reg = input.bool(true, 'Pivot Regolari', inline = 'inline1', group = 'Punti Pivot')
+reg_ph_css = input.color(#ef5350, 'Massimo', inline = 'inline1', group = 'Punti Pivot')
+reg_pl_css = input.color(#26a69a, 'Minimo', inline = 'inline1', group = 'Punti Pivot')
+
+ph = ta.pivothigh(length, length)
+pl = ta.pivotlow(length, length)
+
+var float recent_ph = na
+var float recent_pl = na
+var int recent_ph_bar = na
+var int recent_pl_bar = na
+
+if bool(ph)
+    recent_ph := ph
+    recent_ph_bar := bar_index - length
+if bool(pl)
+    recent_pl := pl
+    recent_pl_bar := bar_index - length
+
+// ========== LOGICA SEGNALE MIGLIORATA ==========
+// Usa la posizione anticipatoria invece di quella normale
+linreg_buy_primary = final_linreg_position <= -linreg_sensitivity
+linreg_sell_primary = final_linreg_position >= linreg_sensitivity
+
+// NUOVO: Early Exit Logic
+var bool in_buy_position = false
+var bool in_sell_position = false
+
+// Tracking delle posizioni
+if linreg_buy_primary and not in_buy_position
+    in_buy_position := true
+    in_sell_position := false
+else if linreg_sell_primary and not in_sell_position
+    in_sell_position := true
+    in_buy_position := false
+
+// Early Exit Conditions
+early_exit_buy = use_early_exit and in_buy_position and final_linreg_position >= early_exit_threshold
+early_exit_sell = use_early_exit and in_sell_position and final_linreg_position <= -early_exit_threshold
+
+if early_exit_buy
+    in_buy_position := false
+if early_exit_sell
+    in_sell_position := false
+
+// Confluenza (resto del codice rimane uguale)
+confluence_score := 0.0
+
+if use_bb_filter
+    if bb_position <= -0.8
+        confluence_score := confluence_score + 1
+    else if bb_position >= 0.8
+        confluence_score := confluence_score - 1
+
+if use_pivot_filter and not na(recent_ph) and not na(recent_pl)
+    distance_to_ph = math.abs(close - recent_ph) / recent_ph * 100
+    distance_to_pl = math.abs(close - recent_pl) / recent_pl * 100
+
+    if distance_to_pl < 2
+        confluence_score := confluence_score + 1
+    else if distance_to_ph < 2
+        confluence_score := confluence_score - 1
+
+if use_stoch_rsi_filter
+    stoch_bullish = (stoch_k <= stoch_oversold and stoch_d <= stoch_oversold) or stoch_cross_up
+    stoch_bearish = (stoch_k >= stoch_overbought and stoch_d >= stoch_overbought) or stoch_cross_down
+    
+    if stoch_bullish
+        confluence_score := confluence_score + 1
+    else if stoch_bearish
+        confluence_score := confluence_score - 1
+
+if use_ma_cross_filter
+    if golden_cross
+        confluence_score := confluence_score + 0.5
+    else if death_cross
+        confluence_score := confluence_score - 0.5
+
+pearson_ok = math.abs(pearsonR) >= min_pearson
+
+// Segnali finali con sistema anticipatorio
+buy_signal = linreg_buy_primary and confluence_score >= 1 and pearson_ok
+sell_signal = linreg_sell_primary and confluence_score <= -1 and pearson_ok
+
+signal_strength = (linreg_buy_primary ? 1 : linreg_sell_primary ? -1 : 0) + confluence_score
+
+// Plot segnali con informazioni anticipatorie
+if showSignals
+    if buy_signal
+        label.new(bar_index, low, 'BUY' + (use_anticipatory_mode ? ' ANT' : '') + '\n' + str.tostring(signal_strength, '#.##'), color = color.green, style = label.style_label_up, size = size.normal, tooltip = 'LinReg Anticipatorio: ' + str.tostring(final_linreg_position, '#.##') + '\nLinReg Normale: ' + str.tostring(linreg_position, '#.##') + '\nMomentum: ' + str.tostring(momentum_normalized, '#.##') + '\nPrice Action: ' + str.tostring(price_action_signal, '#.##') + '\nBB: ' + str.tostring(bb_position, '#.##') + '\nStoch K: ' + str.tostring(stoch_k, '#.##') + '\nPearson R: ' + str.tostring(pearsonR, '#.##'))
+
+    if sell_signal
+        label.new(bar_index, high, 'SELL' + (use_anticipatory_mode ? ' ANT' : '') + '\n' + str.tostring(signal_strength, '#.##'), color = color.red, style = label.style_label_down, size = size.normal, tooltip = 'LinReg Anticipatorio: ' + str.tostring(final_linreg_position, '#.##') + '\nLinReg Normale: ' + str.tostring(linreg_position, '#.##') + '\nMomentum: ' + str.tostring(momentum_normalized, '#.##') + '\nPrice Action: ' + str.tostring(price_action_signal, '#.##') + '\nBB: ' + str.tostring(bb_position, '#.##') + '\nStoch K: ' + str.tostring(stoch_k, '#.##') + '\nPearson R: ' + str.tostring(pearsonR, '#.##'))
+
+    // NUOVO: Early Exit Signals
+    if early_exit_buy
+        label.new(bar_index, high, 'EXIT\nBUY', color = color.orange, style = label.style_label_down, size = size.small)
+    if early_exit_sell
+        label.new(bar_index, low, 'EXIT\nSELL', color = color.orange, style = label.style_label_up, size = size.small)
+
+// Visualizzazione Pearson's R
+var label r = na
+label.delete(r[1])
+if showPearsonInput and not na(pearsonR)
+    r_color = pearson_ok ? color.green : color.orange
+    r := label.new(bar_index - lengthInput + 1, lowerStartPrice, 'R: ' + str.tostring(pearsonR, '#.####'), color = color.new(color.white, 100), textcolor = r_color, size = size.normal, style = label.style_label_up)
+
+// ========== DASHBOARD AGGIORNATA ==========
+if barstate.islast and showSignals
+    var table info_table = table.new(position.bottom_right, 3, 12, bgcolor = color.new(color.black, 95), border_width = 1, border_color = color.new(color.gray, 60))
+
+    // Header
+    table.cell(info_table, 0, 0, '📊 STRATEGIA 4H ANTICIPATORIA', text_color = color.white, bgcolor = color.new(color.blue, 85), text_size = size.small)
+    table.merge_cells(info_table, 0, 0, 2, 0)
+
+    // NUOVA RIGA: Modalità Anticipatoria
+    mode_icon = use_anticipatory_mode ? '🚀' : '📈'
+    mode_color = use_anticipatory_mode ? color.new(color.lime, 70) : color.new(color.blue, 70)
+    mode_text = use_anticipatory_mode ? 'ANTICIP' : 'NORMALE'
+
+    table.cell(info_table, 0, 1, '🎯 Modalità', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 1, mode_icon, text_color = color.white, bgcolor = mode_color, text_size = size.large)
+    table.cell(info_table, 2, 1, mode_text + '\nPos: ' + str.tostring(final_linreg_position, '#.##'), text_color = color.white, bgcolor = mode_color, text_size = size.small)
+
+    // LinReg Comparison
+    linreg_icon = linreg_buy_primary ? '🟢' : linreg_sell_primary ? '🔴' : '⚪'
+    linreg_icon_color = linreg_buy_primary ? color.new(color.lime, 60) : linreg_sell_primary ? color.new(color.red, 60) : color.new(color.gray, 80)
+    linreg_status_text = linreg_buy_primary ? 'BUY' : linreg_sell_primary ? 'SELL' : 'NEU'
+
+    table.cell(info_table, 0, 2, '📊 LinReg', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 2, linreg_icon, text_color = color.white, bgcolor = linreg_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 2, linreg_status_text + '\nNorm: ' + str.tostring(linreg_position, '#.##'), text_color = color.white, bgcolor = linreg_icon_color, text_size = size.small)
+
+    // NUOVO: Momentum & Price Action
+    momentum_icon = recent_momentum > 2 ? '⬆️' : recent_momentum < -2 ? '⬇️' : '↔️'
+    momentum_color = recent_momentum > 2 ? color.new(color.lime, 75) : recent_momentum < -2 ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    momentum_text = recent_momentum > 2 ? 'BULL' : recent_momentum < -2 ? 'BEAR' : 'NEU'
+
+    table.cell(info_table, 0, 3, '⚡ Momentum', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 3, momentum_icon, text_color = color.white, bgcolor = momentum_color, text_size = size.large)
+    table.cell(info_table, 2, 3, momentum_text + '\n' + str.tostring(recent_momentum, '#.#') + '%', text_color = color.white, bgcolor = momentum_color, text_size = size.small)
+
+   // Price Action (continuazione dalla riga interrotta)
+    pa_icon = reversal_bearish ? '🔻' : reversal_bullish ? '🔺' : '⚬'
+    pa_color = reversal_bearish ? color.new(color.red, 75) : reversal_bullish ? color.new(color.lime, 75) : color.new(color.gray, 80)
+    pa_text = reversal_bearish ? 'BEAR' : reversal_bullish ? 'BULL' : 'NEU'
+
+    table.cell(info_table, 0, 4, '🎯 Price Action', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 4, pa_icon, text_color = color.white, bgcolor = pa_color, text_size = size.large)
+    table.cell(info_table, 2, 4, pa_text + '\nSig: ' + str.tostring(price_action_signal, '#.#'), text_color = color.white, bgcolor = pa_color, text_size = size.small)
+
+    // Bande di Bollinger
+    bb_icon = bb_position <= -0.8 ? '🟢' : bb_position >= 0.8 ? '🔴' : '🟡'
+    bb_icon_color = bb_position <= -0.8 ? color.new(color.lime, 60) : bb_position >= 0.8 ? color.new(color.red, 60) : color.new(color.yellow, 80)
+    bb_status_text = bb_position <= -0.8 ? 'BUY' : bb_position >= 0.8 ? 'SELL' : 'NEU'
+
+    table.cell(info_table, 0, 5, '📊 Bollinger', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 5, bb_icon, text_color = color.white, bgcolor = bb_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 5, bb_status_text + '\nPos: ' + str.tostring(bb_position, '#.##'), text_color = color.white, bgcolor = bb_icon_color, text_size = size.small)
+
+    // Stochastic RSI
+    stoch_icon = stoch_cross_up ? '🟢' : stoch_cross_down ? '🔴' : stoch_k <= stoch_oversold ? '🟡' : stoch_k >= stoch_overbought ? '🟠' : '⚪'
+    stoch_icon_color = stoch_cross_up ? color.new(color.lime, 60) : stoch_cross_down ? color.new(color.red, 60) : stoch_k <= stoch_oversold ? color.new(color.yellow, 80) : stoch_k >= stoch_overbought ? color.new(color.orange, 80) : color.new(color.gray, 80)
+    stoch_status_text = stoch_cross_up ? 'X-UP' : stoch_cross_down ? 'X-DN' : stoch_k <= stoch_oversold ? 'O-SLD' : stoch_k >= stoch_overbought ? 'O-BUY' : 'NEU'
+
+    table.cell(info_table, 0, 6, '📈 Stoch RSI', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 6, stoch_icon, text_color = color.white, bgcolor = stoch_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 6, stoch_status_text + '\nK: ' + str.tostring(stoch_k, '#.#'), text_color = color.white, bgcolor = stoch_icon_color, text_size = size.small)
+
+    // Trend delle Medie Mobili
+    trend_icon = golden_cross ? '🟢' : death_cross ? '🔴' : trend_bullish ? '🟡' : trend_bearish ? '🟠' : '⚪'
+    trend_icon_color = golden_cross ? color.new(color.lime, 60) : death_cross ? color.new(color.red, 60) : trend_bullish ? color.new(color.yellow, 80) : trend_bearish ? color.new(color.orange, 80) : color.new(color.gray, 80)
+    trend_status_text = golden_cross ? 'G-X' : death_cross ? 'D-X' : trend_bullish ? 'BULL' : trend_bearish ? 'BEAR' : 'NEU'
+
+    table.cell(info_table, 0, 7, '📊 Trend MA', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 7, trend_icon, text_color = color.white, bgcolor = trend_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 7, trend_status_text + '\nRSI: ' + str.tostring(rsi_momentum, '#.#'), text_color = color.white, bgcolor = trend_icon_color, text_size = size.small)
+
+    // Pearson R (Forza della Correlazione)
+    pearson_icon = math.abs(pearsonR) >= 0.8 ? '🟢' : math.abs(pearsonR) >= 0.6 ? '🟡' : '🔴'
+    pearson_icon_color = math.abs(pearsonR) >= 0.8 ? color.new(color.lime, 60) : math.abs(pearsonR) >= 0.6 ? color.new(color.yellow, 80) : color.new(color.red, 60)
+    pearson_status_text = math.abs(pearsonR) >= 0.8 ? 'FORTE' : math.abs(pearsonR) >= 0.6 ? 'MEDIO' : 'DEBOLE'
+
+    table.cell(info_table, 0, 8, '🔗 Correlazione', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 8, pearson_icon, text_color = color.white, bgcolor = pearson_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 8, pearson_status_text + '\nR: ' + str.tostring(pearsonR, '#.###'), text_color = color.white, bgcolor = pearson_icon_color, text_size = size.small)
+
+    // Confluenza Totale
+    confluence_icon = confluence_score >= 2 ? '🟢' : confluence_score >= 1 ? '🟡' : confluence_score <= -2 ? '🔴' : confluence_score <= -1 ? '🟠' : '⚪'
+    confluence_icon_color = confluence_score >= 2 ? color.new(color.lime, 60) : confluence_score >= 1 ? color.new(color.yellow, 80) : confluence_score <= -2 ? color.new(color.red, 60) : confluence_score <= -1 ? color.new(color.orange, 80) : color.new(color.gray, 80)
+    confluence_status_text = confluence_score >= 2 ? 'MOLTO BULL' : confluence_score >= 1 ? 'BULL' : confluence_score <= -2 ? 'MOLTO BEAR' : confluence_score <= -1 ? 'BEAR' : 'NEUTRO'
+
+    table.cell(info_table, 0, 9, '⚖️ Confluenza', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 9, confluence_icon, text_color = color.white, bgcolor = confluence_icon_color, text_size = size.large)
+    table.cell(info_table, 2, 9, confluence_status_text + '\nScore: ' + str.tostring(confluence_score, '#.##'), text_color = color.white, bgcolor = confluence_icon_color, text_size = size.small)
+
+    // Segnale Finale
+    final_signal_icon = buy_signal ? '🚀' : sell_signal ? '🔥' : '⏸️'
+    final_signal_color = buy_signal ? color.new(color.lime, 40) : sell_signal ? color.new(color.red, 40) : color.new(color.gray, 80)
+    final_signal_text = buy_signal ? 'COMPRARE' : sell_signal ? 'VENDERE' : 'ASPETTARE'
+
+    table.cell(info_table, 0, 10, '🎯 SEGNALE', text_color = color.white, bgcolor = color.new(color.blue, 85), text_size = size.small)
+    table.cell(info_table, 1, 10, final_signal_icon, text_color = color.white, bgcolor = final_signal_color, text_size = size.huge)
+    table.cell(info_table, 2, 10, final_signal_text + '\nForza: ' + str.tostring(signal_strength, '#.##'), text_color = color.white, bgcolor = final_signal_color, text_size = size.small)
+
+    // Early Exit Status (se abilitato)
+    if use_early_exit
+        exit_icon = in_buy_position ? '📈' : in_sell_position ? '📉' : '⏹️'
+        exit_color = in_buy_position ? color.new(color.lime, 70) : in_sell_position ? color.new(color.red, 70) : color.new(color.gray, 80)
+        exit_text = in_buy_position ? 'IN BUY' : in_sell_position ? 'IN SELL' : 'NO POS'
+
+        table.cell(info_table, 0, 11, '🚪 Exit Status', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+        table.cell(info_table, 1, 11, exit_icon, text_color = color.white, bgcolor = exit_color, text_size = size.large)
+        table.cell(info_table, 2, 11, exit_text + '\nThr: ' + str.tostring(early_exit_threshold, '#.#'), text_color = color.white, bgcolor = exit_color, text_size = size.small)
+
+// ========== ALERTS ==========
+// Alert per cambio trend anticipatorio
+momentum_change_bull = ta.change(recent_momentum) > 5 and recent_momentum > 0
+momentum_change_bear = ta.change(recent_momentum) < -5 and recent_momentum < 0
+
+alertcondition(buy_signal, title = 'Segnale BUY Anticipatorio', message = 'SEGNALE BUY ANTICIPATORIO')
+alertcondition(sell_signal, title = 'Segnale SELL Anticipatorio', message = 'SEGNALE SELL ANTICIPATORIO')
+alertcondition(early_exit_buy, title = 'Early Exit BUY', message = 'EARLY EXIT BUY')
+alertcondition(early_exit_sell, title = 'Early Exit SELL', message = 'EARLY EXIT SELL')
+alertcondition(momentum_change_bull, title = 'Momentum Bullish Forte', message = 'CAMBIO MOMENTUM BULLISH')
+alertcondition(momentum_change_bear, title = 'Momentum Bearish Forte', message = 'CAMBIO MOMENTUM BEARISH')
+
+// ========== PLOT PER STUDY ==========
+// Plot delle variabili principali per l'accesso esterno
+plot(final_linreg_position, title = 'Posizione LinReg Anticipatoria', display = display.data_window)
+plot(linreg_position, title = 'Posizione LinReg Normale', display = display.data_window)
+plot(confluence_score, title = 'Score Confluenza', display = display.data_window)
+plot(pearsonR, title = 'Pearson R', display = display.data_window)
+plot(recent_momentum, title = 'Momentum Recente', display = display.data_window)
+plot(bb_position, title = 'Posizione BB', display = display.data_window)
+plot(stoch_k, title = 'Stochastic K', display = display.data_window)
+plot(signal_strength, title = 'Forza Segnale', display = display.data_window)
+
+// Plot dei segnali per backtesting
+plotshape(buy_signal, title = 'Segnale BUY', location = location.belowbar, color = color.lime, style = shape.triangleup, size = size.small)
+plotshape(sell_signal, title = 'Segnale SELL', location = location.abovebar, color = color.red, style = shape.triangledown, size = size.small)
+plotshape(early_exit_buy, title = 'Exit BUY', location = location.abovebar, color = color.orange, style = shape.xcross, size = size.tiny)
+plotshape(early_exit_sell, title = 'Exit SELL', location = location.belowbar, color = color.orange, style = shape.xcross, size = size.tiny)
+
+// ========== DEBUGGING INFO (opzionale) ==========
+debug_mode = input.bool(false, 'Modalità Debug', group = 'Debug')
+
+if debug_mode and barstate.islast
+    var table debug_table = table.new(position.top_right, 2, 8, bgcolor = color.new(color.black, 90), border_width = 1)
+    
+    table.cell(debug_table, 0, 0, 'DEBUG INFO', text_color = color.white, bgcolor = color.new(color.red, 70), text_size = size.small)
+    table.merge_cells(debug_table, 0, 0, 1, 0)
+    
+    table.cell(debug_table, 0, 1, 'LinReg Normale:', text_color = color.white, text_size = size.tiny)
+    table.cell(debug_table, 1, 1, str.tostring(linreg_position, '#.####'), text_color = color.yellow, text_size = size.tiny)
+    
+    table.cell(debug_table, 0, 2, 'LinReg Breve:', text_color = color.white, text_size = size.tiny)
+    table.cell(debug_table, 1, 2, str.tostring(linreg_position_short, '#.####'), text_color = color.yellow, text_size = size.tiny)
+    
+    table.cell(debug_table, 0, 3, 'Momentum Norm:', text_color = color.white, text_size = size.tiny)
+    table.cell(debug_table, 1, 3, str.tostring(momentum_normalized, '#.####'), text_color = color.yellow, text_size = size.tiny)
+    
+    table.cell(debug_table, 0, 4, 'Price Action:', text_color = color.white, text_size = size.tiny)
+    table.cell(debug_table, 1, 4, str.tostring(price_action_signal, '#.####'), text_color = color.yellow, text_size = size.tiny)
+    
+    table.cell(debug_table, 0, 5, 'Anticipatorio:', text_color = color.white, text_size = size.tiny)
+    table.cell(debug_table, 1, 5, str.tostring(final_linreg_position, '#.####'), text_color = color.lime, text_size = size.tiny)
+    
+    table.cell(debug_table, 0, 6, 'Pearson R:', text_color = color.white, text_size = size.tiny)
+    table.cell(debug_table, 1, 6, str.tostring(pearsonR, '#.####'), text_color = color.aqua, text_size = size.tiny)
+    
+    table.cell(debug_table, 0, 7, 'In Position:', text_color = color.white, text_size = size.tiny)
+    position_status = in_buy_position ? 'BUY' : in_sell_position ? 'SELL' : 'NONE'
+    table.cell(debug_table, 1, 7, position_status, text_color = in_buy_position ? color.lime : in_sell_position ? color.red : color.gray, text_size = size.tiny)
+
+// ========== FINE CODICE ==========
