@@ -186,11 +186,12 @@ textarea {
 }
 
 input[type="file"] {
-    max-width: 200px;
+    max-width: 50%;
     background-color: var(--color-surface);
     color: var(--color-text);
     border: 1px solid var(--color-border);
 }
+
 
 .empty-state {
     text-align: center;
@@ -271,7 +272,7 @@ input[type="file"] {
             
             <div class="backup-container">
                 <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
-                <input type="file" id="fileInput" accept=".json">
+                <input type="file" id="fileInput" accept=".json" style="width: 100%;">
                 <button onclick="caricaDati()" class="btn-primary">Carica Dati</button>
             </div>
 			
