@@ -269,7 +269,7 @@
  .storico-chart-container {
     height: 800px;
     margin-top: 20px;
-    background-color: #4b4b4b;
+    background-color: #333;
     position: relative;
     padding: 20px 0;
     display: flex;
@@ -802,7 +802,7 @@ function scaricaGrafico() {
   const tempCtx = tempCanvas.getContext('2d');
   
   // Imposta dimensioni HD con rapporto 16:9 (più ampio orizzontalmente)
-  tempCanvas.width = 4460;
+  tempCanvas.width = 4260;
   tempCanvas.height = 2160;
   
   // Riempie lo sfondo di BIANCO (non #262626)
@@ -1026,9 +1026,9 @@ function salvaStorico() {
         legend: {
           position: 'bottom',
           labels: {
-            color: '#222', // grigio molto scuro
+            color: '#EBF4FA', // grigio molto scuro
             font: {
-              size: 14,
+              size: 15,
               family: 'Poppins'
             },
             padding: 15
@@ -1150,12 +1150,12 @@ function salvaStorico() {
             display: true,
             text: 'Numero di Trade',
             font: {
-              size: 16 // Font size per HD
+              size: 20 // Font size per HD
             }
           },
           ticks: {
             font: {
-              size: 14
+              size: 18
             }
           }
         },
@@ -1164,12 +1164,12 @@ function salvaStorico() {
             display: true,
             text: 'Data',
             font: {
-              size: 16
+              size: 20
             }
           },
           ticks: {
             font: {
-              size: 14
+              size: 18
             }
           }
         }
