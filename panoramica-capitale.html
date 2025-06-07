@@ -267,19 +267,28 @@
   }
 
  .storico-chart-container {
-    height: 800px;
+    height: 720px;
+    width: 100%;
     margin-top: 20px;
     background-color: #333;
     position: relative;
-    padding: 20px 0;
+    padding: 20px;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 #storicoCapitaleChart {
-    max-width: 100%;
-    max-height: 100%;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+}
+
+/* Assicurati che il container padre sia responsive */
+.storico-chart-container canvas {
+    background-color: transparent;
 }
 
   .time-range-selector {
@@ -797,65 +806,48 @@ function resettaDati() {
 function scaricaGrafico() {
   const canvas = document.getElementById('storicoCapitaleChart');
   
-  // Crea un canvas temporaneo con proporzioni più ampie (16:9 invece di 16:10)
-  const tempCanvas = document.createElement('canvas');
-  const tempCtx = tempCanvas.getContext('2d');
+  // Attiva modalità export e ricrea il grafico
+  modalitaExport = true;
+  creaGraficoStoricoCapitale();
   
-  // Imposta dimensioni HD con rapporto 16:9 (più ampio orizzontalmente)
-  tempCanvas.width = 4260;
-  tempCanvas.height = 2160;
-  
-  // Riempie lo sfondo di BIANCO (non #262626)
-  tempCtx.fillStyle = '#FFFFFF';
-  tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-  
-  // Copia il grafico originale sul canvas temporaneo
-  tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
-  
-  // Crea il link per il download
-  const link = document.createElement('a');
-  const oggi = new Date();
-  const dataFormattata = oggi.toISOString().split('T')[0];
-  
-  link.download = `grafico-capitale-HD-${dataFormattata}.png`;
-  link.href = tempCanvas.toDataURL('image/png', 1.0); // Qualità massima
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  // Aspetta che il grafico sia completamente renderizzato
+  setTimeout(() => {
+    // Crea un canvas temporaneo con proporzioni più ampie (16:9)
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // Imposta dimensioni HD con rapporto 16:9
+    tempCanvas.width = 4260;
+    tempCanvas.height = 2160;
+    
+    // Riempie lo sfondo di BIANCO
+    tempCtx.fillStyle = '#FFFFFF';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // Copia il grafico originale sul canvas temporaneo
+    tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // Aggiungi il watermark
+    aggiungiWatermark(tempCtx, tempCanvas.width, tempCanvas.height);
+    
+    // Crea il link per il download
+    const link = document.createElement('a');
+    const oggi = new Date();
+    const dataFormattata = oggi.toISOString().split('T')[0];
+    
+    link.download = `grafico-capitale-HD-${dataFormattata}.png`;
+    link.href = tempCanvas.toDataURL('image/png', 1.0);
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Disattiva modalità export e ricrea il grafico per la visualizzazione web
+    modalitaExport = false;
+    creaGraficoStoricoCapitale();
+  }, 100); // Piccolo delay per assicurarsi che il rendering sia completo
 }
 
-// ALTERNATIVA: Se vuoi mantenere le proporzioni originali ma solo correggere il colore
-function scaricaGraficoAlternativa() {
-  const canvas = document.getElementById('storicoCapitaleChart');
-  
-  // Crea un canvas temporaneo con le stesse dimensioni dell'originale
-  const tempCanvas = document.createElement('canvas');
-  const tempCtx = tempCanvas.getContext('2d');
-  
-  // Mantieni le dimensioni originali
-  tempCanvas.width = canvas.width;
-  tempCanvas.height = canvas.height;
-  
-  // Riempie lo sfondo di BIANCO
-  tempCtx.fillStyle = '#FFFFFF';
-  tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-  
-  // Copia il grafico originale
-  tempCtx.drawImage(canvas, 0, 0);
-  
-  // Download
-  const link = document.createElement('a');
-  const oggi = new Date();
-  const dataFormattata = oggi.toISOString().split('T')[0];
-  
-  link.download = `grafico-capitale-HD-${dataFormattata}.png`;
-  link.href = tempCanvas.toDataURL('image/png', 1.0);
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
 
   
   // Aggiorna i dati dei trade
@@ -1063,34 +1055,34 @@ function salvaStorico() {
 
   
   // Crea il grafico storico della distribuzione del capitale
-  function creaGraficoStoricoCapitale() {
+  // Configurazione colori per web e export
+const coloriConfig = {
+  web: {
+    testo: '#fff',
+    griglia: 'rgba(68, 68, 68, 0.8)',
+    sfondo: 'transparent'
+  },
+  export: {
+    testo: '#000',
+    griglia: 'rgba(200, 200, 200, 0.8)',
+    sfondo: '#ffffff'
+  }
+};
+
+let modalitaExport = false; // Flag per sapere se stiamo esportando
+
+function creaGraficoStoricoCapitale() {
   const canvas = document.getElementById('storicoCapitaleChart');
   const ctx = canvas.getContext('2d');
-  
-  // CONFIGURAZIONE HD DEL CANVAS
-  canvas.width = 1920;
-  canvas.height = 1080;
-  
-  // Adatta le dimensioni CSS al container
-  const container = canvas.parentElement;
-  const containerWidth = container.clientWidth - 40; // Sottrae padding
-  const containerHeight = 900;
-  
-  const scaleToContainer = Math.min(
-    containerWidth / 1920,
-    containerHeight / 1080
-  );
-  
-  canvas.style.width = (1920 * scaleToContainer) + 'px';
-  canvas.style.height = (1080 * scaleToContainer) + 'px';
-  canvas.style.display = 'block';
-  canvas.style.margin = '0 auto';
 
   const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
 
   if (storicoCapitaleChart) {
     storicoCapitaleChart.destroy();
   }
+
+  // Scegli i colori in base alla modalità
+  const colori = modalitaExport ? coloriConfig.export : coloriConfig.web;
 
   storicoCapitaleChart = new Chart(ctx, {
     type: 'line',
@@ -1105,9 +1097,10 @@ function salvaStorico() {
           data: datiPeriodo.map(item => item.coingecko),
           backgroundColor: 'rgba(161, 201, 53, 0.2)',
           borderColor: '#A1C935',
-          borderWidth: 3, // Aumentato per HD
+          borderWidth: 3,
           tension: 0.4,
-          pointRadius: 4 // Aumentato per HD
+          pointRadius: 6,
+          pointHoverRadius: 8
         },
         {
           label: 'Binance',
@@ -1116,7 +1109,8 @@ function salvaStorico() {
           borderColor: '#FBB917',
           borderWidth: 3,
           tension: 0.4,
-          pointRadius: 4
+          pointRadius: 6,
+          pointHoverRadius: 8
         },
         {
           label: 'Totale in Trading',
@@ -1125,7 +1119,8 @@ function salvaStorico() {
           borderColor: '#F62817',
           borderWidth: 3,
           tension: 0.4,
-          pointRadius: 4
+          pointRadius: 6,
+          pointHoverRadius: 8
         },
         {
           label: 'A Capitale',
@@ -1134,14 +1129,70 @@ function salvaStorico() {
           borderColor: '#008080',
           borderWidth: 3,
           tension: 0.4,
-          pointRadius: 4
+          pointRadius: 6,
+          pointHoverRadius: 8
         }
       ]
     },
     options: {
-      responsive: false, // IMPORTANTE: disabilita responsive
+      responsive: true,
       maintainAspectRatio: false,
-      devicePixelRatio: 1, // Controllo completo della risoluzione
+      
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      hover: {
+        mode: 'index',
+        intersect: false,
+        animationDuration: 200
+      },
+      animation: {
+        duration: modalitaExport ? 0 : 800, // No animazione durante export
+        easing: 'easeOutQuart'
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            color: colori.testo,
+            font: {
+              size: 16,
+              family: 'Poppins, Arial, sans-serif'
+            },
+            padding: 15,
+            boxWidth: 25,
+            boxHeight: 12,
+            usePointStyle: false
+          }
+        },
+        tooltip: {
+          enabled: !modalitaExport, // Disabilita tooltip durante export
+          backgroundColor: 'rgba(51, 51, 51, 0.95)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: '#666',
+          borderWidth: 1,
+          cornerRadius: 8,
+          displayColors: true,
+          callbacks: {
+            label: function(context) {
+              const label = context.dataset.label || '';
+              const value = context.parsed.y || 0;
+              return `${label}: ${value.toFixed(2)}`;
+            }
+          }
+        }
+      },
+      layout: {
+        padding: {
+          top: modalitaExport ? 2 : 5, // Più spazio in alto per il watermark
+          right: modalitaExport ? 5 : 10,
+          bottom: modalitaExport ? 2 : 5,
+          left: modalitaExport ? 5 : 5
+        }
+      },
       scales: {
         y: {
           beginAtZero: true,
@@ -1149,59 +1200,73 @@ function salvaStorico() {
           title: {
             display: true,
             text: 'Numero di Trade',
+            color: colori.testo,
             font: {
-              size: 20 // Font size per HD
+              size: modalitaExport ? 20 : 14
             }
           },
           ticks: {
+            color: colori.testo,
             font: {
-              size: 18
+              size: modalitaExport ? 16 : 12
             }
+          },
+          grid: {
+            color: colori.griglia
           }
         },
         x: {
           title: {
             display: true,
             text: 'Data',
+            color: colori.testo,
             font: {
-              size: 20
+              size: modalitaExport ? 20 : 14
             }
           },
           ticks: {
+            color: colori.testo,
             font: {
-              size: 18
-            }
-          }
-        }
-      },
-      plugins: {
-        legend: {
-          labels: {
-            font: {
-              size: 16
-            }
-          }
-        },
-        tooltip: {
-          titleFont: {
-            size: 16
+              size: modalitaExport ? 16 : 12
+            },
+            maxRotation: 45,
+            minRotation: 0
           },
-          bodyFont: {
-            size: 14
-          },
-          callbacks: {
-            label: function(context) {
-              const label = context.dataset.label || '';
-              const value = context.raw || 0;
-              const dollari = value * datiCapitale.quotaPerTrade;
-              return `${label}: ${value} trade = $${dollari}`;
-            }
+          grid: {
+            color: colori.griglia
           }
         }
       }
     }
   });
 }
+
+// Funzione per aggiungere watermark al canvas
+function aggiungiWatermark(ctx, width, height) {
+  const oggi = new Date();
+  const dataFormattata = oggi.toLocaleDateString('it-IT');
+  
+  // Salva il contesto corrente
+  ctx.save();
+  
+  // Configura il testo del watermark
+  ctx.font = '34px "Courier New", monospace';
+  ctx.fillStyle = '#666666';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'bottom';
+  
+  // Testo del watermark
+  const watermarkText = `📈 gerardo_dorrico data: ${dataFormattata}`;
+  
+  // Posiziona il watermark in basso a destra
+  const padding = 30;
+  ctx.fillText(watermarkText, width - padding, height - padding);
+  
+  // Ripristina il contesto
+  ctx.restore();
+}
+
+
 
   
   // Aggiorna il grafico storico
