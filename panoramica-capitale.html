@@ -506,7 +506,61 @@
       <canvas id="capitaleChart"></canvas>
     </div>
   </div>
+  <div class="card">
+    <div class="card-header">
+      <h2>Gestione Trade</h2>
+    </div>
+    
+    <div class="input-group">
+      <div class="form-group">
+        <label for="inputCoinGecko">CoinGecko</label>
+        <input type="number" id="inputCoinGecko" value="22" min="0">
+      </div>
+      <div class="form-group">
+        <label for="inputBinance">Binance</label>
+        <input type="number" id="inputBinance" value="4" min="0">
+		
+      </div>
+    </div>
+    
+    <button onclick="aggiornaTrade()" style="height: 60px; margin-top: 18px;">🚀 Aggiorna Trade</button>
+
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h2>Capitale Totale</h2>
+    </div>
+    
+   <div class="header-stats">
+    <div class="header-stat-item">
+        <div class="header-stat-label">Trade Totali</div>
+        <div class="header-stat-value" id="totaleTrade">56</div>
+    </div>
+    <div class="header-stat-item">
+        <div class="header-stat-label">$ per Trade</div>
+        <div class="header-stat-value">
+            <input type="number" id="quotaPerTrade" class="quota-input" value="40" min="1" oninput="aggiornaCapitale()">
+        </div>
+    </div>
+    <div class="header-stat-item">
+        <div class="header-stat-label">Capitale Totale</div>
+        <div class="header-stat-value" id="capitaleTotale"></div></div>
+<div class="header-stat-item">
+    <div class="header-stat-label">Capitale Restante</div>
+    <div class="header-stat-value" id="capitaleInDollari"></div>
+</div>
+<div class="header-stat-item">
+    <div class="header-stat-label">Totale In Cripto</div>
+    <div class="header-stat-value" id="totaleInDollari"></div>
+</div>  
+
+    <button onclick="aggiornaTrade()" style="height: 50px; margin-top: 15px;">🎯 Aggiorna Capitale</button>
+    
+  </div>
   
+  
+  
+  </div>
   <!-- Nuova card per il grafico storico -->
   <div class="card">
     <div class="card-header">
@@ -547,6 +601,8 @@
             </div>
           </div>
           
+		  
+		  
           <div class="storico-chart-container">
             <canvas id="storicoCapitaleChart"></canvas>
           </div>
@@ -584,62 +640,9 @@
     </div>
   </div>
     
-  <div class="card">
-    <div class="card-header">
-      <h2>Gestione Trade</h2>
-    </div>
-    
-    <div class="input-group">
-      <div class="form-group">
-        <label for="inputCoinGecko">CoinGecko</label>
-        <input type="number" id="inputCoinGecko" value="22" min="0">
-      </div>
-      <div class="form-group">
-        <label for="inputBinance">Binance</label>
-        <input type="number" id="inputBinance" value="4" min="0">
-		
-      </div>
-    </div>
-    
-    <button onclick="aggiornaTrade()" style="height: 60px; margin-top: 18px;">🚀 Aggiorna Trade</button>
-
-  </div>
-  
-  <div class="card">
-    <div class="card-header">
-      <h2>Capitale Totale</h2>
-    </div>
-    
-   <div class="header-stats">
-    <div class="header-stat-item">
-        <div class="header-stat-label">Trade Totali</div>
-        <div class="header-stat-value" id="totaleTrade">56</div>
-    </div>
-    <div class="header-stat-item">
-        <div class="header-stat-label">$ per Trade</div>
-        <div class="header-stat-value">
-            <input type="number" id="quotaPerTrade" class="quota-input" value="40" min="1" oninput="aggiornaCapitale()">
-        </div>
-    </div>
-    <div class="header-stat-item">
-        <div class="header-stat-label">Capitale Totale</div>
-        <div class="header-stat-value" id="capitaleTotale"></div></div>
-<div class="header-stat-item">
-    <div class="header-stat-label">Capitale Restante</div>
-    <div class="header-stat-value" id="capitaleInDollari"></div>
-</div>
-<div class="header-stat-item">
-    <div class="header-stat-label">Totale In Cripto</div>
-    <div class="header-stat-value" id="totaleInDollari"></div>
-</div>  
-
-    <button onclick="aggiornaTrade()" style="height: 50px; margin-top: 15px;">🎯 Aggiorna Capitale</button>
-    
-  </div>
   
   
   
-  </div>
   
   
   <div class="card">
