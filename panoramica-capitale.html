@@ -220,7 +220,7 @@
 
   .input-group {
     display: flex;
-	color: #739bf2;
+	color: #e5e4e7;
     gap: -10px;
   }
 
@@ -479,6 +479,27 @@
   <div class="head2" style="color: white !important;">
     <p class="titolo-bianco"><strong>Panoramica del Capitale in Trading</strong></p>
   </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <h2>Gestione Trade</h2>
+    </div>
+    
+    <div class="input-group">
+      <div class="form-group">
+        <label for="inputCoinGecko" style="font-size: 18px;">CoinGecko</label>
+        <input type="number" style="color: #18171c; font-size: 32px;" id="inputCoinGecko" value="22" min="0">
+      </div>
+      <div class="form-group">
+        <label for="inputBinance" style="font-size: 18px;">Binance</label>
+        <input type="number" style="color: #18171c; font-size: 32px;" id="inputBinance" value="4" min="0">
+		
+      </div>
+    </div>
+    
+    <button onclick="aggiornaTrade()" style="height: 50px; margin-top: 18px;">🚀 Aggiorna Trade</button>
+
+  </div>
 
   <div class="card">
     <div class="card-header">
@@ -487,20 +508,20 @@
     
     <div class="stats-grid">
       <div class="stat-item">
-        <div class="stat-label">CoinGecko</div>
-        <div class="stat-value coingecko" id="coingecko">21</div>
+        <div class="stat-label">Su CoinGecko</div>
+        <div class="stat-value coingecko" style="color: #f75e25; font-size: 39px;" id="coingecko">21</div>
       </div>
       <div class="stat-item">
-        <div class="stat-label">Binance</div>
-        <div class="stat-value binance" id="binance">2</div>
+        <div class="stat-label">Su Binance</div>
+        <div class="stat-value binance" style="color: #ffd700; font-size: 39px;" id="binance">2</div>
       </div>
       <div class="stat-item">
-        <div class="stat-label">Totale In</div>
-        <div class="stat-value totale" id="totaleIn">23</div>
+        <div class="stat-label">Totale in Cripto</div>
+        <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn">23</div>
       </div>
       <div class="stat-item">
-        <div class="stat-label">A Capitale</div>
-        <div class="stat-value capitale" id="capitale">43</div>
+        <div class="stat-label">Restanti in Dollari</div>
+        <div class="stat-value capitale" style="color: #008080; font-size: 39px;" id="capitale">43</div>
       </div>
     </div>
     
@@ -508,26 +529,7 @@
       <canvas id="capitaleChart"></canvas>
     </div>
   </div>
-  <div class="card">
-    <div class="card-header">
-      <h2>Gestione Trade</h2>
-    </div>
-    
-    <div class="input-group">
-      <div class="form-group">
-        <label for="inputCoinGecko">CoinGecko</label>
-        <input type="number" id="inputCoinGecko" value="22" min="0">
-      </div>
-      <div class="form-group">
-        <label for="inputBinance">Binance</label>
-        <input type="number" id="inputBinance" value="4" min="0">
-		
-      </div>
-    </div>
-    
-    <button onclick="aggiornaTrade()" style="height: 50px; margin-top: 18px;">🚀 Aggiorna Trade</button>
-
-  </div>
+  
   <div class="card">
     <div class="card-header">
       <h2>Capitale Totale</h2>
@@ -536,24 +538,24 @@
    <div class="header-stats">
     <div class="header-stat-item">
         <div class="header-stat-label">Trade Totali</div>
-        <div class="header-stat-value" id="totaleTrade">56</div>
+        <div class="header-stat-value" style="color: #987654; font-size: 34px;" id="totaleTrade">56</div>
     </div>
     <div class="header-stat-item">
         <div class="header-stat-label">$ per Trade</div>
         <div class="header-stat-value">
-            <input type="number" id="quotaPerTrade" class="quota-input" value="40" min="1" oninput="aggiornaCapitale()">
+            <input type="number"  font-size: 24px;" id="quotaPerTrade" class="quota-input" value="40" min="1" oninput="aggiornaCapitale()">
         </div>
     </div>
     <div class="header-stat-item">
         <div class="header-stat-label">Capitale Totale</div>
-        <div class="header-stat-value" id="capitaleTotale"></div></div>
+        <div class="header-stat-value" style="color: #f5f5f5; font-size: 34px;" id="capitaleTotale"></div></div>
 <div class="header-stat-item">
     <div class="header-stat-label">Capitale Restante</div>
-    <div class="header-stat-value" id="capitaleInDollari"></div>
+    <div class="header-stat-value" style="color: #008080; font-size: 34px;" id="capitaleInDollari"></div>
 </div>
 <div class="header-stat-item">
     <div class="header-stat-label">Totale In Cripto</div>
-    <div class="header-stat-value" id="totaleInDollari"></div>
+    <div class="header-stat-value" style="color: #f62817; font-size: 34px;" id="totaleInDollari"></div>
 </div>  
 
     <button onclick="aggiornaTrade()" style="height: 50px; margin-top: 15px;">🎯 Aggiorna Capitale</button>
@@ -1031,9 +1033,9 @@ function salvaStorico() {
           datiCapitale.capitale
         ],
         backgroundColor: [
-          '#32CD32',
+          '#f75e25',
           '#FFD700',
-          '#4682B4'
+          '#008080'
         ],
         borderColor: '#111', // bordo molto scuro
         borderWidth: 2,
