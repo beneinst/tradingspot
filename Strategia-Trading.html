@@ -693,7 +693,7 @@ p {
 
 
 <div class="indicator-info-box">
-  <h2 style="margin-top:0;">Codice sorgente (Open Source)</h2>
+  <h2 style="margin-top:0;">Codice sorgente 12.06.2025</h2>
   
   <p style="margin-top:18px; margin-bottom:10px;"><strong></strong></p>
   <div class="indicator-info-box" style="
@@ -714,7 +714,7 @@ p {
 // © gerardo_dorrico
 
 //@version=6
-indicator('4H | Strategia Multi-Confluence Ver. 9', shorttitle = '4H StratMC', overlay = true, max_labels_count = 500, max_lines_count = 500, max_bars_back = 500)
+indicator('4H | Strategia Multi-Confluence', shorttitle = '4H StratMC', overlay = true, max_labels_count = 500, max_lines_count = 500, max_bars_back = 500)
 
 // ========== IMPOSTAZIONI ==========
 // Impostazioni Regressione Lineare - PIÙ REATTIVA
@@ -777,6 +777,9 @@ doji_threshold = input.float(0.1, 'Soglia Doji (%)', minval = 0.01, maxval = 1.0
 
 // ========== INIZIALIZZA VARIABILI ==========
 var float confluence_score = 0.0
+
+
+
 
 // ========== STOCHASTIC RSI ==========
 rsi_source = ta.rsi(close, stoch_rsi_rsi_length)
@@ -1000,6 +1003,52 @@ var int signal_timer = 0
 var bool last_signal_was_buy = false
 var bool last_signal_was_sell = false
 var bool signal_confirmed = false
+var float stored_linreg_position = na
+var float stored_pearson = na
+var float stored_confluence = na
+
+// ========== FUNZIONE PER VERIFICARE CONDIZIONI BASE ==========
+checkBaseConditions(is_buy_direction) =>
+    // Condizione 1: LinReg in zona critica
+    linreg_in_zone = is_buy_direction ? linreg_position <= -0.7 : linreg_position >= 0.7
+    
+    // Condizione 2: Pearson R valido
+    pearson_valid = math.abs(pearsonR) >= min_pearson
+    
+    // Condizione 3: Almeno un indicatore secondario favorevole
+    secondary_indicators_ok = false
+    
+    if is_buy_direction
+        // Per segnali di acquisto
+        bb_favorable = bb_position <= -0.5
+        stoch_favorable = stoch_k <= 30
+        trend_favorable = trend_bullish or (not trend_bearish and rsi_momentum > 45)
+        momentum_favorable = momentum_bullish or (momentum_normalized > -0.5 and roc > -2)
+        pa_favorable = price_action_bullish or (not price_action_bearish and not is_doji)
+        pivot_favorable = not na(recent_pl) and math.abs(close - recent_pl) / recent_pl * 100 < 5
+        
+        // Almeno 2 indicatori secondari devono essere favorevoli
+        favorable_count = (bb_favorable ? 1 : 0) + (stoch_favorable ? 1 : 0) + 
+                         (trend_favorable ? 1 : 0) + (momentum_favorable ? 1 : 0) + 
+                         (pa_favorable ? 1 : 0) + (pivot_favorable ? 1 : 0)
+        secondary_indicators_ok := favorable_count >= 2
+    else
+        // Per segnali di vendita
+        bb_favorable = bb_position >= 0.5
+        stoch_favorable = stoch_k >= 70
+        trend_favorable = trend_bearish or (not trend_bullish and rsi_momentum < 55)
+        momentum_favorable = momentum_bearish or (momentum_normalized < 0.5 and roc < 2)
+        pa_favorable = price_action_bearish or (not price_action_bullish and not is_doji)
+        pivot_favorable = not na(recent_ph) and math.abs(close - recent_ph) / recent_ph * 100 < 5
+        
+        // Almeno 2 indicatori secondari devono essere favorevoli
+        favorable_count = (bb_favorable ? 1 : 0) + (stoch_favorable ? 1 : 0) + 
+                         (trend_favorable ? 1 : 0) + (momentum_favorable ? 1 : 0) + 
+                         (pa_favorable ? 1 : 0) + (pivot_favorable ? 1 : 0)
+        secondary_indicators_ok := favorable_count >= 2
+    
+    // Tutte e 3 le condizioni devono essere soddisfatte
+    linreg_in_zone and pearson_valid and secondary_indicators_ok
 
 // ========== LOGICA SEGNALE AVANZATA ==========
 // Passo 1: LinReg come filtro primario (più sensibile)
@@ -1065,29 +1114,63 @@ sell_signal = linreg_sell_primary and confluence_score <= -1 and pearson_ok
 signal_strength = confluence_score + (linreg_buy_primary ? 1 : linreg_sell_primary ? -1 : 0)
 
 // NUOVO: Verifica segnale SOLO alla chiusura della candela
+// Verifica condizioni base per BUY e SELL
+base_conditions_buy = checkBaseConditions(true)
+base_conditions_sell = checkBaseConditions(false)
+
+// Segnali CONFERMATI alla chiusura candela (mantieni la logica originale)
 signal_at_close_buy = buy_signal and barstate.isconfirmed
 signal_at_close_sell = sell_signal and barstate.isconfirmed
 
-// Reset e aggiornamento del timer - SOLO su candela chiusa
-if signal_at_close_buy or signal_at_close_sell
-    signal_timer := 1
-    last_signal_was_buy := signal_at_close_buy
-    last_signal_was_sell := signal_at_close_sell
-    signal_confirmed := true
-else if signal_timer > 0 and signal_timer < 14
-    signal_timer += 1
-else if signal_timer >= 14
-    signal_timer := 0
-    last_signal_was_buy := false
-    last_signal_was_sell := false
-    signal_confirmed := false
+// Gestione del timer - SOLO alla chiusura della candela
+if barstate.isconfirmed
+    if signal_at_close_buy or signal_at_close_sell
+        // Nuovo segnale confermato - inizia timer
+        signal_timer := 1
+        last_signal_was_buy := signal_at_close_buy
+        last_signal_was_sell := signal_at_close_sell
+        signal_confirmed := true
+        // Memorizza le condizioni attuali
+        stored_linreg_position := linreg_position
+        stored_pearson := pearsonR
+        stored_confluence := confluence_score
+    else if signal_timer > 0 and signal_timer < 12
+        // Timer attivo - verifica se le condizioni base sono ancora valide
+        conditions_still_valid = false
+        
+        if last_signal_was_buy
+            conditions_still_valid := base_conditions_buy
+        else if last_signal_was_sell
+            conditions_still_valid := base_conditions_sell
+        
+        if conditions_still_valid
+            signal_timer += 1  // Continua il timer
+        else
+            // Condizioni non più valide - resetta timer
+            signal_timer := 0
+            last_signal_was_buy := false
+            last_signal_was_sell := false
+            signal_confirmed := false
+            stored_linreg_position := na
+            stored_pearson := na
+            stored_confluence := na
+    else if signal_timer >= 12
+        // Timer scaduto - resetta
+        signal_timer := 0
+        last_signal_was_buy := false
+        last_signal_was_sell := false
+        signal_confirmed := false
+        stored_linreg_position := na
+        stored_pearson := na
+        stored_confluence := na
 
-// Determina se mostrare il segnale del timing (indipendente dalle condizioni attuali)
+// Determina se mostrare il segnale del timing
 show_timing_signal = signal_timer > 0 and signal_confirmed
 
-// Testo del timing
-timing_text = show_timing_signal ? ' (' + str.tostring(signal_timer) + '/6)' : ''
-
+// Testo del timing aggiornato
+timing_text = show_timing_signal ? ' (' + str.tostring(signal_timer) + '/12)' + (signal_timer > 6 ? ' ⚠️' : '') : ''
+	
+	
 // Plot segnali
 if showSignals
     // Segnale LIVE (durante formazione candela)
@@ -1131,8 +1214,10 @@ if showPearsonInput and not na(pearsonR)
                   color = color.new(color.white, 100), textcolor = r_color, size = size.normal, style = label.style_label_up)
 
 // ========== DASHBOARD AVANZATA ==========
+
+var table info_table = table.new(position.bottom_right, 3, 13, bgcolor = color.new(color.black, 95), border_width = 1, border_color = color.new(color.gray, 60))
 if barstate.islast and showSignals
-    var table info_table = table.new(position.bottom_right, 3, 13, bgcolor = color.new(color.black, 95), border_width = 1, border_color = color.new(color.gray, 60))
+    
 
     // Header
     table.cell(info_table, 0, 0, '📊 4H | Strategia Multi Conf', text_color = color.white, bgcolor = color.new(color.blue, 85), text_size = size.small)
@@ -1233,49 +1318,52 @@ if barstate.islast and showSignals
     table.cell(info_table, 1, 10, signal_icon, text_color = color.white, bgcolor = signal_color, text_size = size.large)
     table.cell(info_table, 2, 10, signal_text + '\n' + str.tostring(signal_strength, '#.#'), text_color = color.white, bgcolor = signal_color, text_size = size.small)
 
-    // Timer Status
-    timer_icon = show_timing_signal ? (last_signal_was_buy ? '⏰🟢' : last_signal_was_sell ? '⏰🔴' : '⏰') : '💤'
-    timer_color = show_timing_signal ? (last_signal_was_buy ? color.new(color.lime, 60) : color.new(color.red, 60)) : color.new(color.gray, 80)
-    timer_text = show_timing_signal ? (last_signal_was_buy ? 'OK COMPRA' : 'OK VENDI') + timing_text : 'ASPETTA'
+  // Timer Status
+timer_icon = show_timing_signal ? (last_signal_was_buy ? (signal_timer <= 6 ? '⏰🟢' : '⏰🟡') : (signal_timer <= 6 ? '⏰🔴' : '⏰🟡')) : (base_conditions_buy ? '🟢⏳' : base_conditions_sell ? '🔴⏳' : '💤')
 
-    table.cell(info_table, 0, 11, '⏰ Stato OK', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 11, timer_icon, text_color = color.white, bgcolor = timer_color, text_size = size.large)
-    table.cell(info_table, 2, 11, timer_text, text_color = color.white, bgcolor = timer_color, text_size = size.small)
+timer_color = show_timing_signal ? (last_signal_was_buy ? (signal_timer <= 6 ? color.new(color.lime, 60) : color.new(color.yellow, 60)) : (signal_timer <= 6 ? color.new(color.red, 60) : color.new(color.yellow, 60))) : (base_conditions_buy ? color.new(color.lime, 80) : base_conditions_sell ? color.new(color.red, 80) : color.new(color.gray, 80))
 
-    // Market State
-    market_state = trend_bullish and confluence_score > 0 ? 'TREND RIALZISTA' : 
-                   trend_bearish and confluence_score < 0 ? 'TREND RIBASSISTA' : 
-                   'TREND LATERALE'
-    market_icon = trend_bullish and confluence_score > 0 ? '🐂' : 
-                  trend_bearish and confluence_score < 0 ? '🐻' : '🦀'
-    market_color = trend_bullish and confluence_score > 0 ? color.new(color.lime, 60) : 
-                   trend_bearish and confluence_score < 0 ? color.new(color.red, 60) : color.new(color.yellow, 70)
+timer_text = show_timing_signal ? (last_signal_was_buy ? 'BUY ATTIVO' : 'SELL ATTIVO') + timing_text : (base_conditions_buy ? 'PRONTO BUY' : base_conditions_sell ? 'PRONTO SELL' : 'ASPETTA')
 
-    table.cell(info_table, 0, 12, '🌍 Mercato', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 12, market_icon, text_color = color.white, bgcolor = market_color, text_size = size.large)
-    table.cell(info_table, 2, 12, market_state, text_color = color.white, bgcolor = market_color, text_size = size.small)
+table.cell(info_table, 0, 11, '⏰ Stato OK', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+table.cell(info_table, 1, 11, timer_icon, text_color = color.white, bgcolor = timer_color, text_size = size.large)
+table.cell(info_table, 2, 11, timer_text, text_color = color.white, bgcolor = timer_color, text_size = size.small)
+
+   // Market State
+market_state = trend_bullish and confluence_score > 0 ? 'TREND RIALZISTA' : 
+               trend_bearish and confluence_score < 0 ? 'TREND RIBASSISTA' : 
+               'TREND LATERALE'
+market_icon = trend_bullish and confluence_score > 0 ? '🐂' : 
+              trend_bearish and confluence_score < 0 ? '🐻' : '🦀'
+market_color = trend_bullish and confluence_score > 0 ? color.new(color.lime, 60) : 
+               trend_bearish and confluence_score < 0 ? color.new(color.red, 60) : color.new(color.yellow, 70)
+
+table.cell(info_table, 0, 12, '🌍 Mercato', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+table.cell(info_table, 1, 12, market_icon, text_color = color.white, bgcolor = market_color, text_size = size.large)
+table.cell(info_table, 2, 12, market_state, text_color = color.white, bgcolor = market_color, text_size = size.small)
 
 // ========== ALERT CONDITIONS ==========
 // Alert per segnali confermati
-alertcondition(signal_at_close_buy, title = 'Segnale COMPRA Confermato', message = 'SEGNALE COMPRA CONFERMATO - Punteggio Confluenza: {{plot("confluence_score")}} - Forza Segnale: {{plot("signal_strength")}}')
-alertcondition(signal_at_close_sell, title = 'Segnale VENDI Confermato', message = 'SEGNALE VENDI CONFERMATO - Punteggio Confluenza: {{plot("confluence_score")}} - Forza Segnale: {{plot("signal_strength")}}')
+alertcondition(show_timing_signal and signal_timer > 6 and last_signal_was_buy and base_conditions_buy, title = 'Opportunità BUY Durante Timer', message = '🔄 OPPORTUNITÀ BUY - Timer attivo da {{plot("signal_timer")}} candele - Condizioni ancora valide')
 
-// Alert per strong signals
-alertcondition(signal_at_close_buy and signal_strength >= 2, title = 'Segnale COMPRA FORTE', message = '🔥 SEGNALE COMPRA FORTE - Forza Segnale: {{plot("signal_strength")}}')
-alertcondition(signal_at_close_sell and signal_strength <= -2, title = 'Segnale VENDI FORTE', message = '🔥 SEGNALE VENDI FORTE - Forza Segnale: {{plot("signal_strength")}}')
+alertcondition(show_timing_signal and signal_timer > 6 and last_signal_was_sell and base_conditions_sell, title = 'Opportunità SELL Durante Timer', message = '🔄 OPPORTUNITÀ SELL - Timer attivo da {{plot("signal_timer")}} candele - Condizioni ancora valide')
 
-// ========== PLOT PER DEBUGGING ==========
-plot(confluence_score, title = 'Punteggio Confluenza', display = display.data_window, color = color.new(color.blue, 100))
-plot(signal_strength, title = 'Forza Segnale', display = display.data_window, color = color.new(color.purple, 100))
-plot(linreg_position, title = 'Posizione LinReg', display = display.data_window, color = color.new(color.orange, 100))
-plot(bb_position, title = 'Posizione BB', display = display.data_window, color = color.new(color.yellow, 100))
+// Alert per condizioni base raggiunte (senza segnale completo)
+alertcondition(base_conditions_buy and not (signal_timer > 0), title = 'Condizioni Base BUY', message = '⏳ CONDIZIONI BASE BUY - LinReg: {{plot("linreg_position")}} - Pearson: {{plot("pearsonR")}}')
+
+alertcondition(base_conditions_sell and not (signal_timer > 0), title = 'Condizioni Base SELL', message = '⏳ CONDIZIONI BASE SELL - LinReg: {{plot("linreg_position")}} - Pearson: {{plot("pearsonR")}}')
+
+// ========== PLOT AGGIUNTIVI PER DEBUGGING ==========
+plot(signal_timer, title = 'Timer Stato', display = display.data_window, color = color.new(color.gray, 100))
+plot(base_conditions_buy ? 1 : 0, title = 'Condizioni Base BUY', display = display.data_window, color = color.new(color.green, 100))
+plot(base_conditions_sell ? 1 : 0, title = 'Condizioni Base SELL', display = display.data_window, color = color.new(color.red, 100))
 
 
 // ========== VISUALIZZAZIONE PATTERN CANDLESTICK ==========
 if showSignals
     // Doji
-    if is_doji
-        label.new(bar_index, high + atr * 0.5, 'DOJI', color = color.new(color.yellow, 75), style = label.style_label_down, size = size.tiny)
+  // ==================   if is_doji
+  // ==========      label.new(bar_index, high + atr * 0.5, 'DOJI', color = color.new(color.yellow, 75), style = label.style_label_down, size = size.tiny)
 
     // Engulfing patterns
 // ==========     if bullish_engulfing
@@ -1292,7 +1380,35 @@ if showSignals
  // ==========        label.new(bar_index, high + atr * 0.3, 'STELLA CAD', color = color.new(color.orange, 80), style = label.style_label_down, size = size.tiny)
 
 // ========== PLOT PIVOT POINTS ==========
-if show_reg
+// ========if show_reg
+    if not na(ph)
+        label.new(bar_index - length, ph, 'MA', color = color.new(#0ebe69, 80), style = label.style_label_down, size = size.small)
+    if not na(pl)
+        label.new(bar_index - length, pl, 'MI', color  = color.new(#942c03, 80), style = label.style_label_up, size = size.small)
+
+
+// ========== VISUALIZZAZIONE PATTERN CANDLESTICK ==========
+if showSignals
+    // Doji
+  // ==================   if is_doji
+  // ==========      label.new(bar_index, high + atr * 0.5, 'DOJI', color = color.new(color.yellow, 75), style = label.style_label_down, size = size.tiny)
+
+    // Engulfing patterns
+// ==========     if bullish_engulfing
+// ==========         label.new(bar_index, low - atr * 0.5, 'ENG RIALZ', color = color.new(color.green, 80), style = label.style_label_up, size = size.tiny)
+
+// ==========     if bearish_engulfing
+ // ==========        label.new(bar_index, high + atr * 0.5, 'ENG RIBAS', color = color.new(color.red, 80), style = label.style_label_down, size = size.tiny)
+
+    // Hammer e Shooting Star
+ // ==========    if hammer
+ // ==========        label.new(bar_index, low - atr * 0.3, 'MARTELLO', color = color.new(color.lime, 80), style = label.style_label_up, size = size.tiny)
+
+ // ==========    if shooting_star
+ // ==========        label.new(bar_index, high + atr * 0.3, 'STELLA CAD', color = color.new(color.orange, 80), style = label.style_label_down, size = size.tiny)
+
+// ========== PLOT PIVOT POINTS ==========
+// ========if show_reg
     if not na(ph)
         label.new(bar_index - length, ph, 'MA', color = color.new(#0ebe69, 80), style = label.style_label_down, size = size.small)
     if not na(pl)
