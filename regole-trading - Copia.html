@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regole di Trading</title>
+  <link rel="icon" type="image/png" href="favicon.png"> 
+  <style>
+ :root {
+  --primary-color: #4caf50;       /* Verde bottone principale */
+  --secondary-color: #2196f3;     /* Blu bottone secondario */
+  --accent-color: #f44336;        /* Rosso bottone chiusura mese */
+  --binance-color: #f2bb66;       /* Giallo personalizzato del footer */
+  --background-color: #1e1e1e;    /* Sfondo principale */
+  --card-color: #2c2c2c;          /* Sfondo card */
+  --border-color: #000000;           /* Bordo elementi/tabella */
+  --text-color: #4c4c4c;          /* Colore principale del testo */
+  --text-light: #aaa;             /* Testo secondario o descrittivo */
+  --highlight-light: #ffe58f;     /* Testo evidenziato - corrente */
+  --highlight-green: #c7ffc7;     /* Evidenziato verde - media */
+  --highlight-red: #ffc7c7;       /* Evidenziato rosso - totale */
+  --header-bg: #333a56;           /* Sfondo header */
+  --hover-link: #ffdb58;          /* Hover link footer */
+}
+
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+ body {
+  background: linear-gradient(135deg, var(--background-color) 0%, #2a2a2a 100%);
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-color);
+  line-height: 1.6;
+  padding: 20px;
+}
+
+
+  .container {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .header,
+  .head2 {
+     background-color: #222831;
+    padding: 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  h1 {
+    color: var(--primary-color);
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .header-stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .header-stat-item {
+    
+    padding: 10px 20px;
+    
+    text-align: center;
+    min-width: 140px;
+	background-color: #222831;
+    
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    margin-bottom: 20px;
+    
+    box-sizing: border-box;
+  }
+
+  .header-stat-label {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 2px;
+  }
+
+  .header-stat-value {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .quota-input {
+    width: 70px;
+    padding: 5px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .info-box {
+    background-color: rgba(52, 152, 219, 0.2);
+    border-left: 4px solid var(--primary-color);
+    padding: 15px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+	text-align: justify;
+	color: #CFECEC;
+    font-size: 15px;
+  }
+
+  .card {
+    background-color: var(--card-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+	
+  }
+
+  .card-header {
+   background-color: #222831;
+    padding: 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    }
+
+
+  .titolo-bianco {
+    color: #ffffff;
+    font-size: 28px;
+    margin: 0;
+    line-height: 28px;
+  }
+
+  .card h2 {
+    color: var(--primary-color);
+    font-size: 18px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .stat-item {
+    background-color: #222831;
+    padding: 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .stat-label {
+    font-size: 16px;
+    color: var(--text-light);
+    margin-bottom: 5px;
+  }
+
+  .stat-value {
+    font-size: 34px;
+    font-weight: bold;
+  }
+
+  .coingecko {
+    color: #C85A17;
+  }
+
+  .binance {
+    color: #FBB917;
+  }
+
+  .totale {
+    color: #F62817;
+  }
+
+  .capitale {
+    color: #008080;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  input {
+    width: 80%;
+    padding: 10px;
+    border: 1px dashed var(--border-color);
+    border-radius: 12px;
+    font-size: 21px;
+	font-weight: bold;
+	color: #000000;
+	background-color: #E3E4FA;
+  }
+
+  .input-group {
+    display: flex;
+	color: #e5e4e7;
+    gap: -10px;
+  }
+
+  .input-group input {
+    flex: 1;
+	
+  }
+
+  button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+  }
+
+  button:hover {
+    background-color: #2980b9;
+  }
+
+  .btn-secondary {
+    background-color: var(--secondary-color);
+  }
+
+  .btn-secondary:hover {
+    background-color: #27ae60;
+  }
+
+  .btn-danger {
+    background-color: var(--accent-color);
+  }
+
+  .btn-danger:hover {
+    background-color: #c0392b;
+  }
+
+  .chart-container {
+    height: 600px;
+    margin-top: 20px;
+	color: #ffffff;
+    position: relative;
+    padding: 20px 0;
+  }
+
+ .storico-chart-container {
+    height: 720px;
+    width: 100%;
+    margin-top: 20px;
+    background-color: #333;
+    position: relative;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+  .btn-custom {
+    height: 60px;
+    margin-top: 18px;
+    background-color: blue;       /* colore base blu */
+    color: white;                 /* testo bianco per contrasto */
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-custom:hover {
+    background-color: green;      /* colore verde al passaggio del mouse */
+  }
+
+
+#storicoCapitaleChart {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+}
+
+/* Assicurati che il container padre sia responsive */
+.storico-chart-container canvas {
+    background-color: transparent;
+}
+
+  .time-range-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+
+  .time-range-btn {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+	color: #000000;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .time-range-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+
+  .distribution-stats {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin: 15px 0;
+  }
+
+  .distribution-item {
+    background-color: rgba(0, 0, 0, 0.03);
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    min-width: 120px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin: 5px;
+  }
+
+  .distribution-label {
+    font-size: 12px;
+    color: var(--text-light);
+  }
+
+  .distribution-value {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .backup-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    align-items: center;
+	}
+
+  #fileInput {
+    flex: 1;
+	font-size: 14px;
+    padding: 8px;
+  }
+
+ .footer {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 16px;
+    color: #f2bb66;
+    font-weight: normal;
+}
+
+.footer a {
+    color: #ffe;
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #ffdb58;
+}
+
+
+  .tab-container {
+    margin-bottom: 15px;
+  }
+
+  .tab-buttons {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .tab-button {
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-light);
+  }
+
+  .tab-button.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+  }
+
+  .tab-content {
+    padding-top: 15px;
+  }
+
+  .tab-panel {
+    display: none;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .input-group {
+      flex-direction: column;
+    }
+
+    .header-stats {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-stat-item {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .time-range-selector {
+      flex-wrap: wrap;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  h2 {
+    color: #739bf2 !important;
+    font-weight: bold !important;
+    
+    letter-spacing: -0.1px !important;
+}
+
+</style>
+
+</head>
+<body>
+<div class="container">
+  <div class="head2" style="color: white !important;">
+    <p class="titolo-bianco"><strong>Regole di Trading</strong></p>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <h2>Gestione Trade</h2>
+    </div>
+    
+    <div class="input-group">
+      <div class="form-group">
+        <label for="inputCoinGecko" style="font-size: 18px;">CoinGecko</label>
+        <input type="number" style="color: #18171c; font-size: 32px;" id="inputCoinGecko" value="22" min="0">
+      </div>
+      <div class="form-group">
+        <label for="inputBinance" style="font-size: 18px;">Binance</label>
+        <input type="number" style="color: #18171c; font-size: 32px;" id="inputBinance" value="4" min="0">
+		
+      </div>
+    </div>
+    
+    <button onclick="aggiornaTrade()" style="height: 50px; margin-top: 18px;">🚀 Aggiorna Trade</button>
+
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Distribuzione Capitale</h2>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-label">Su CoinGecko</div>
+        <div class="stat-value coingecko" style="color: #f75e25; font-size: 39px;" id="coingecko">21</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Su Binance</div>
+        <div class="stat-value binance" style="color: #ffd700; font-size: 39px;" id="binance">2</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Totale in Cripto</div>
+        <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn">23</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Restanti in Dollari</div>
+        <div class="stat-value capitale" style="color: #008080; font-size: 39px;" id="capitale">43</div>
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <canvas id="capitaleChart"></canvas>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <h2>Capitale Totale</h2>
+    </div>
+    
+   <div class="header-stats">
+    <div class="header-stat-item">
+        <div class="header-stat-label">Trade Totali</div>
+        <div class="header-stat-value" style="color: #987654; font-size: 34px;" id="totaleTrade">56</div>
+    </div>
+    <div class="header-stat-item">
+        <div class="header-stat-label">$ per Trade</div>
+        <div class="header-stat-value">
+            <input type="number"  font-size: 24px;" id="quotaPerTrade" class="quota-input" value="40" min="1" oninput="aggiornaCapitale()">
+        </div>
+    </div>
+    <div class="header-stat-item">
+        <div class="header-stat-label">Capitale Totale</div>
+        <div class="header-stat-value" style="color: #f5f5f5; font-size: 34px;" id="capitaleTotale"></div></div>
+<div class="header-stat-item">
+    <div class="header-stat-label">Capitale Restante</div>
+    <div class="header-stat-value" style="color: #008080; font-size: 34px;" id="capitaleInDollari"></div>
+</div>
+<div class="header-stat-item">
+    <div class="header-stat-label">Totale In Cripto</div>
+    <div class="header-stat-value" style="color: #f62817; font-size: 34px;" id="totaleInDollari"></div>
+</div>  
+
+    <button onclick="aggiornaTrade()" style="height: 50px; margin-top: 15px;">🎯 Aggiorna Capitale</button>
+    
+  </div>
+  
+  
+  
+  </div>
+  <!-- Nuova card per il grafico storico -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Storico Distribuzione Capitale</h2>
+    </div>
+    
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-button active" onclick="cambiaTab(event, 'tab-distribuzione')">Distribuzione nel Tempo</button>
+        <button class="tab-button" onclick="cambiaTab(event, 'tab-percentuale')">Analisi Percentuale</button>
+      </div>
+      
+      <div class="tab-content">
+        <div id="tab-distribuzione" class="tab-panel active">
+          <div class="time-range-selector">
+            <button class="time-range-btn active" data-days="30" onclick="cambiaRangeTempo(this)">30 Giorni</button>
+            <button class="time-range-btn" data-days="90" onclick="cambiaRangeTempo(this)">90 Giorni</button>
+            <button class="time-range-btn" data-days="180" onclick="cambiaRangeTempo(this)">6 Mesi</button>
+            <button class="time-range-btn" data-days="365" onclick="cambiaRangeTempo(this)">1 Anno</button>
+            <button class="time-range-btn" data-days="all" onclick="cambiaRangeTempo(this)">Tutto</button>
+			<!-- NUOVO PULSANTE -->
+  <button class="time-range-btn" onclick="scaricaGrafico()" style="margin-left: 15px;">📷 Scarica Grafico</button>
+
+          </div>
+          
+          <div class="header-stats">
+            <div class="header-stat-item">
+              <div class="header-stat-label">Media Trade CoinGecko</div>
+              <div class="header-stat-value" id="mediaTradeCoingecko">0</div>
+            </div>
+            <div class="header-stat-item">
+              <div class="header-stat-label">Media Trade Binance</div>
+              <div class="header-stat-value" id="mediaTradeBinance">0</div>
+            </div>
+            <div class="header-stat-item">
+              <div class="header-stat-label">Media $ in Trading</div>
+              <div class="header-stat-value" id="mediaDollariTrading">$0</div>
+            </div>
+          </div>
+          
+		  
+		  
+          <div class="storico-chart-container">
+            <canvas id="storicoCapitaleChart"></canvas>
+          </div>
+        </div>
+        
+        <div id="tab-percentuale" class="tab-panel">
+          <div class="info-box">
+            Analisi del tempo in cui il capitale è stato allocato nelle seguenti percentuali in dollari.
+          </div>
+          
+          <div class="distribution-stats">
+            <div class="distribution-item">
+              <div class="distribution-label">0-25% in Dollari</div>
+              <div class="distribution-value" id="percentuale0_25">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">25-50% in Dollari</div>
+              <div class="distribution-value" id="percentuale25_50">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">50-75% in Dollari</div>
+              <div class="distribution-value" id="percentuale50_75">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">75-100% in Dollari</div>
+              <div class="distribution-value" id="percentuale75_100">0 giorni</div>
+            </div>
+          </div>
+          
+          <div class="storico-chart-container">
+            <canvas id="percentualeCapitaleChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    
+  
+  
+  
+  
+  
+  <div class="card">
+  <div class="card-header">
+    <h2>Regole</h2>
+  </div>
+ 
+<div class="info-box">
+  <br><em><strong>1. Regola Operativa:</strong></em> siamo passati dal time frame a <em><strong>4H</strong></em> a quello a <em><strong>1H</strong></em>. L’indicatore risulta meno preciso, ma consente un’operatività più veloce. Il punto debole è che serve un controllo frequente, almeno ogni 12 ore oppure allo scadere delle candele da 4 ore. È consigliato impostare sveglie a orari regolari: <em><strong>6:00, 10:00, 14:00, 18:00, 22:00</strong></em>. Si potranno poi regolare altri eventi per adeguare il tutto alla propria routine.  
+
+  L'utilizzo del time frame a 1H favorisce un trading più attivo e permette di comprendere meglio anche un’unica operazione su 4H. È vero che si tratta di una sola operazione, ma richiede studio e concentrazione. Il trading non porta mai certezze assolute, ma solo probabilità statistiche basate su matematica e finanza.  
+
+  Una volta acquisita maggiore familiarità con i grafici, si può tornare al 4H: le operazioni saranno più lunghe e impegnative anche dal punto di vista psicologico (ansia, attesa). Per evitare l'over trading, è meglio chiudere i trade in modo rapido.  
+  <br><em><strong>2. Frequenza:</strong></em> si effettuano <em><strong>1 o 2 trade al giorno</strong></em>, con un massimo di <em><strong>4 in contemporanea</strong></em>.  
+  Ogni trade ha una durata di <em><strong>5 candele da 8 ore</strong></em> (circa 40 ore). Alla fine di ciascun ciclo, si valuta un nuovo ingresso solo se il prezzo è in posizione favorevole.  
+
+  <br><em><strong>3. Capitale di partenza:</strong></em> ogni trade parte da una base di <em><strong>40 $</strong></em>, distribuiti in un totale di <em><strong>56 operazioni complessive</strong></em>. È uno dei pochi ambiti in cui siamo davvero autori del nostro lavoro.  
+
+  <br><em><strong>4. Obiettivo:</strong></em> proteggere il capitale e garantire una rendita costante nel tempo, mantenendo il controllo emotivo e operativo.  
+    <br><em><strong>5. Occorrenze:</strong></em> Quando il guadagno supera l'8% si chiude in qualsiasi posizione! Invece se non supera l'1,5% si lascia il trade in cripto.  
+
+
+  <br><em><strong>Stato attuale:</strong></em> l'intero capitale è attualmente impegnato nei <em><strong>56 trade</strong></em>. I profitti iniziano <em><strong>fin da subito</strong></em>, senza aspettare un giorno futuro. Considerando anche la tassazione statale, e il fatto che i fondi sono depositati in <em><strong>dollari, euro o cripto</strong></em>, questa strategia rappresenta anche un modo efficace per conservare il denaro, dato che non può essere speso se non a un valore pari o superiore a quello di acquisto.   
+gestione mensile: <a href="index.html" target="_blank">clicca qui</a>. <span id="infoTotaleTrade">56</span>
+  
+</div></div>
+
+ 
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Backup &amp; Ripristino</h2>
+    </div>
+    
+    <p style="color: #ADD8E6;">Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
+
+    
+    <div class="backup-container">
+      <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
+      <input type="file" id="fileInput" accept=".json">
+      <button onclick="caricaDati()">Carica Dati</button>
+
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+        Trading Spot Manager v1.1 | 
+        <a href="index.html">Operatività</a> | 
+        <a href="panoramica-capitale.html">Capitale</a> | 
+        <a href="blocco-note.html">Note</a> | 
+		<a href="Strategia-Trading.html">Indicatore</a> | 
+        <a href="regole-trading.html">Regole</a> |
+		<a href="candlestick.html">Candlestick</a> | 
+        <a href="cheat-sheet.html">Patterns</a>
+         </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+
+<script>
+  // Dati principali dell'applicazione
+  const datiCapitale = {
+    coingecko: 0,
+    binance: 0,
+    totaleIn: 0,
+    capitale: 40,
+    totaleTrade: 56,
+    quotaPerTrade: 40,
+    storicoCapitale: [],
+    ultimoAggiornamento: new Date().toISOString()
+  };
+  
+  // Variabili per i grafici
+  let capitaleChart = null;
+  let storicoCapitaleChart = null;
+  let percentualeCapitaleChart = null;
+  let periodoVisualizzato = 30; // default: 30 giorni
+  
+  // Funzione di inizializzazione
+  function inizializza() {
+    // Carica dati salvati se disponibili
+    caricaDatiLocali();
+    
+    // Se non ci sono dati storici, crea un punto iniziale
+    if (datiCapitale.storicoCapitale.length === 0) {
+      creaStoricoIniziale();
+    }
+    
+    // Aggiorna l'interfaccia con i dati attuali
+    aggiornaInterfaccia();
+    
+    // Crea il grafico iniziale
+    creaGraficoCapitale();
+    
+    // Crea il grafico storico
+    creaGraficoStoricoCapitale();
+    
+    // Crea il grafico percentuale
+    creaGraficoPercentualeCapitale();
+    
+    // Calcola e mostra le statistiche sulla percentuale di tempo
+    calcolaStatistichePercentuali();
+  }
+  
+  // Crea uno storico iniziale con valori di default retroattivi
+  function creaStoricoIniziale() {
+    const oggi = new Date();
+    const inizioStorico = new Date(oggi);
+    inizioStorico.setDate(oggi.getDate() - 120); // Crea uno storico di 4 mesi
+    
+    // Valori di default per lo storico iniziale
+    const valoriDefault = {
+      coingecko: 0,
+      binance: 0,
+      totaleIn: 0,
+      capitale: datiCapitale.totaleTrade
+    };
+    
+    // Crea un punto dati ogni 3 giorni per gli ultimi 4 mesi
+    for (let d = new Date(inizioStorico); d <= oggi; d.setDate(d.getDate() + 3)) {
+      datiCapitale.storicoCapitale.push({
+        data: new Date(d).toISOString(),
+        coingecko: valoriDefault.coingecko,
+        binance: valoriDefault.binance,
+        totaleIn: valoriDefault.totaleIn,
+        capitale: valoriDefault.capitale
+      });
+    }
+    
+    // Aggiungi i valori attuali come ultimo punto
+    datiCapitale.storicoCapitale.push({
+      data: new Date().toISOString(),
+      coingecko: datiCapitale.coingecko,
+      binance: datiCapitale.binance,
+      totaleIn: datiCapitale.totaleIn,
+      capitale: datiCapitale.capitale
+    });
+  }
+  
+  // Aggiorna i totali
+  function aggiornaTotali() {
+    datiCapitale.quotaPerTrade = parseFloat(document.getElementById("quotaPerTrade").value) || datiCapitale.quotaPerTrade;
+    
+    // Aggiorna l'interfaccia
+    aggiornaInterfaccia();
+    
+    // Salva lo stato nei dati storici
+    salvaStorico();
+    
+    // Salva i dati in localStorage
+    salvaDatiLocali();
+    
+    // Aggiorna i grafici
+    aggiornaGrafico();
+    aggiornaGraficoStorico();
+    aggiornaGraficoPercentuale();
+    
+    // Ricalcola le statistiche percentuali
+    calcolaStatistichePercentuali();
+  }
+  
+  // Funzione per resettare tutti i dati
+function resettaDati() {
+  // Resetta i dati principali
+  datiCapitale.coingecko = 0;
+  datiCapitale.binance = 0;
+  datiCapitale.totaleIn = 0;
+  datiCapitale.capitale = datiCapitale.totaleTrade;
+  datiCapitale.storicoCapitale = [];
+  datiCapitale.ultimoAggiornamento = new Date().toISOString();
+  
+  // Crea un nuovo storico iniziale
+  creaStoricoIniziale();
+  
+  // Aggiorna l'interfaccia e i grafici
+  aggiornaInterfaccia();
+  aggiornaGrafico();
+  aggiornaGraficoStorico();
+  aggiornaGraficoPercentuale();
+  calcolaStatistichePercentuali();
+  
+  // Salva i dati in localStorage
+  salvaDatiLocali();
+  
+  alert('Dati resettati con successo!');
+}
+
+// Salva immagine del grafico
+function scaricaGrafico() {
+  const canvas = document.getElementById('storicoCapitaleChart');
+  
+  // Attiva modalità export e ricrea il grafico
+  modalitaExport = true;
+  creaGraficoStoricoCapitale();
+  
+  // Aspetta che il grafico sia completamente renderizzato
+  setTimeout(() => {
+    // Crea un canvas temporaneo con proporzioni più ampie (16:9)
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // Imposta dimensioni HD con rapporto 16:9
+    tempCanvas.width = 4260;
+    tempCanvas.height = 2160;
+    
+    // Riempie lo sfondo di BIANCO
+    tempCtx.fillStyle = '#FFFFFF';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // Copia il grafico originale sul canvas temporaneo
+    tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // Aggiungi il watermark
+    aggiungiWatermark(tempCtx, tempCanvas.width, tempCanvas.height);
+    
+    // Crea il link per il download
+    const link = document.createElement('a');
+    const oggi = new Date();
+    const dataFormattata = oggi.toISOString().split('T')[0];
+    
+    link.download = `grafico-capitale-HD-${dataFormattata}.png`;
+    link.href = tempCanvas.toDataURL('image/png', 1.0);
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Disattiva modalità export e ricrea il grafico per la visualizzazione web
+    modalitaExport = false;
+    creaGraficoStoricoCapitale();
+  }, 100); // Piccolo delay per assicurarsi che il rendering sia completo
+}
+
+
+  
+  // Aggiorna i dati dei trade
+  function aggiornaTrade() {
+    const nuovoCoinGecko = parseInt(document.getElementById("inputCoinGecko").value);
+    const nuovoBinance = parseInt(document.getElementById("inputBinance").value);
+    
+    if (!isNaN(nuovoCoinGecko)) {
+      datiCapitale.coingecko = nuovoCoinGecko;
+    }
+    
+    if (!isNaN(nuovoBinance)) {
+      datiCapitale.binance = nuovoBinance;
+    }
+    
+    // Calcola il totale in
+    datiCapitale.totaleIn = datiCapitale.coingecko + datiCapitale.binance;
+    
+    // Aggiorna il capitale disponibile
+    calcolaCapitale();
+    
+    // Aggiorna l'ultimo aggiornamento
+    datiCapitale.ultimoAggiornamento = new Date().toISOString();
+    
+    // Aggiorna l'interfaccia
+    aggiornaInterfaccia();
+    
+    // Salva lo stato nei dati storici
+    salvaStorico();
+    
+    // Salva i dati in localStorage
+    salvaDatiLocali();
+    
+    // Aggiorna i grafici
+    aggiornaGrafico();
+    aggiornaGraficoStorico();
+    aggiornaGraficoPercentuale();
+    
+    // Ricalcola le statistiche percentuali
+    calcolaStatistichePercentuali();
+	setTimeout(() => {
+  salvaDatiLocali();
+  aggiornaGraficoStorico();
+}, 100);
+  }
+  
+  // Calcola il capitale disponibile
+  function calcolaCapitale() {
+    datiCapitale.capitale = datiCapitale.totaleTrade - datiCapitale.totaleIn;
+  }
+  
+  function verificaDatiStorico() {
+  console.log('Dati storico attuali:', datiCapitale.storicoCapitale);
+  console.log('Ultimo aggiornamento:', datiCapitale.ultimoAggiornamento);
+  console.log('LocalStorage:', JSON.parse(localStorage.getItem('datiCapitale')));
+}
+
+  // Aggiorna tutti gli elementi dell'interfaccia
+  function aggiornaInterfaccia() {
+    document.getElementById("coingecko").textContent = datiCapitale.coingecko;
+    document.getElementById("binance").textContent = datiCapitale.binance;
+    document.getElementById("totaleIn").textContent = datiCapitale.totaleIn;
+    document.getElementById("capitale").textContent = datiCapitale.capitale;
+    document.getElementById("totaleTrade").textContent = datiCapitale.totaleTrade;
+    document.getElementById("infoTotaleTrade").textContent = datiCapitale.totaleTrade;
+    document.getElementById("quotaPerTrade").value = datiCapitale.quotaPerTrade;
+    
+    // Aggiorna anche i valori degli input
+    document.getElementById("inputCoinGecko").value = datiCapitale.coingecko;
+    document.getElementById("inputBinance").value = datiCapitale.binance;
+    
+    // Calcola e aggiorna le medie
+    const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+    
+    if (datiPeriodo.length > 0) {
+      const mediaCoingecko = calcolaMedia(datiPeriodo.map(item => item.coingecko));
+      const mediaBinance = calcolaMedia(datiPeriodo.map(item => item.binance));
+      const mediaDollari = (mediaCoingecko + mediaBinance) * datiCapitale.quotaPerTrade;
+      
+      document.getElementById("mediaTradeCoingecko").textContent = mediaCoingecko.toFixed(1);
+      document.getElementById("mediaTradeBinance").textContent = mediaBinance.toFixed(1);
+      document.getElementById("mediaDollariTrading").textContent = `$${mediaDollari.toFixed(2)}`;
+    }
+  }
+  
+  // Calcola la media di un array di numeri
+  function calcolaMedia(array) {
+    if (array.length === 0) return 0;
+    return array.reduce((sum, val) => sum + val, 0) / array.length;
+  }
+  
+ // Salva lo stato attuale nei dati storici
+function salvaStorico() {
+  const oggi = new Date();
+  const timestamp = oggi.toISOString();
+  
+  // Controlla se c'è già un record per oggi
+  const oggiString = oggi.toISOString().split('T')[0];
+  const recordOggi = datiCapitale.storicoCapitale.find(record => 
+    record.data.split('T')[0] === oggiString
+  );
+  
+  if (recordOggi) {
+    // Aggiorna il record esistente per oggi
+    recordOggi.coingecko = datiCapitale.coingecko;
+    recordOggi.binance = datiCapitale.binance;
+    recordOggi.totaleIn = datiCapitale.totaleIn;
+    recordOggi.capitale = datiCapitale.capitale;
+  } else {
+    // Aggiungi un nuovo record per oggi
+    datiCapitale.storicoCapitale.push({
+      data: timestamp,
+      coingecko: datiCapitale.coingecko,
+      binance: datiCapitale.binance,
+      totaleIn: datiCapitale.totaleIn,
+      capitale: datiCapitale.capitale
+    });
+  }
+  
+  // Ordina lo storico per data
+  datiCapitale.storicoCapitale.sort((a, b) => new Date(a.data) - new Date(b.data));
+}
+  
+  // Filtra i dati storici per il periodo visualizzato
+  function filtraDatiPerPeriodo(dati, giorni) {
+    if (!dati || dati.length === 0) return [];
+    
+    if (giorni === 'all') return dati;
+    
+    const oggi = new Date();
+    const dataLimite = new Date(oggi);
+    dataLimite.setDate(oggi.getDate() - giorni);
+    
+    return dati.filter(item => new Date(item.data) >= dataLimite);
+  }
+  
+ function creaGraficoCapitale() {
+  const ctx = document.getElementById('capitaleChart').getContext('2d');
+
+  if (capitaleChart) {
+    capitaleChart.destroy();
+  }
+
+  capitaleChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['CoinGecko (Crypto)', 'Binance (Crypto)', 'A Capitale (USD)'],
+      datasets: [{
+        data: [
+          datiCapitale.coingecko,
+          datiCapitale.binance,
+          datiCapitale.capitale
+        ],
+        backgroundColor: [
+          '#f75e25',
+          '#FFD700',
+          '#008080'
+        ],
+        borderColor: '#111', // bordo molto scuro
+        borderWidth: 2,
+        hoverOffset: 15
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            color: '#EBF4FA', // grigio molto scuro
+            font: {
+              size: 15,
+              family: 'Poppins'
+            },
+            padding: 15
+          }
+        },
+        tooltip: {
+          backgroundColor: '#111', // sfondo tooltip molto scuro
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: '#333',
+          borderWidth: 1,
+          callbacks: {
+            label: function (context) {
+              const label = context.label || '';
+              const value = context.raw || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = ((value / total) * 100).toFixed(1);
+              const dollari = (value * datiCapitale.quotaPerTrade).toFixed(2);
+              return `${label}: ${value} trade (${percentage}%) = $${dollari}`;
+            }
+          }
+        }
+      },
+      cutout: '55%',
+      layout: {
+        padding: 10
+      }
+    }
+  });
+}
+
+
+  
+  // Crea il grafico storico della distribuzione del capitale
+  // Configurazione colori per web e export
+const coloriConfig = {
+  web: {
+    testo: '#fff',
+    griglia: 'rgba(68, 68, 68, 0.8)',
+    sfondo: 'transparent'
+  },
+  export: {
+    testo: '#000',
+    griglia: 'rgba(200, 200, 200, 0.8)',
+    sfondo: '#ffffff'
+  }
+};
+
+let modalitaExport = false; // Flag per sapere se stiamo esportando
+
+function creaGraficoStoricoCapitale() {
+  const canvas = document.getElementById('storicoCapitaleChart');
+  const ctx = canvas.getContext('2d');
+
+  const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+
+  if (storicoCapitaleChart) {
+    storicoCapitaleChart.destroy();
+  }
+
+  // Scegli i colori in base alla modalità
+  const colori = modalitaExport ? coloriConfig.export : coloriConfig.web;
+
+  storicoCapitaleChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: datiPeriodo.map(item => {
+        const data = new Date(item.data);
+        return `${data.getDate()}/${data.getMonth() + 1}`;
+      }),
+      datasets: [
+        {
+          label: 'CoinGecko',
+          data: datiPeriodo.map(item => item.coingecko),
+          backgroundColor: 'rgba(161, 201, 53, 0.2)',
+          borderColor: '#A1C935',
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 6,
+          pointHoverRadius: 8
+        },
+        {
+          label: 'Binance',
+          data: datiPeriodo.map(item => item.binance),
+          backgroundColor: 'rgba(251, 185, 23, 0.2)',
+          borderColor: '#FBB917',
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 6,
+          pointHoverRadius: 8
+        },
+        {
+          label: 'Totale in Trading',
+          data: datiPeriodo.map(item => item.totaleIn),
+          backgroundColor: 'rgba(246, 40, 23, 0.2)',
+          borderColor: '#F62817',
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 6,
+          pointHoverRadius: 8
+        },
+        {
+          label: 'A Capitale',
+          data: datiPeriodo.map(item => item.capitale),
+          backgroundColor: 'rgba(0, 128, 128, 0.2)',
+          borderColor: '#008080',
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 6,
+          pointHoverRadius: 8
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      hover: {
+        mode: 'index',
+        intersect: false,
+        animationDuration: 200
+      },
+      animation: {
+        duration: modalitaExport ? 0 : 800, // No animazione durante export
+        easing: 'easeOutQuart'
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            color: colori.testo,
+            font: {
+              size: 16,
+              family: 'Poppins, Arial, sans-serif'
+            },
+            padding: 15,
+            boxWidth: 25,
+            boxHeight: 12,
+            usePointStyle: false
+          }
+        },
+        tooltip: {
+          enabled: !modalitaExport, // Disabilita tooltip durante export
+          backgroundColor: 'rgba(51, 51, 51, 0.95)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: '#666',
+          borderWidth: 1,
+          cornerRadius: 8,
+          displayColors: true,
+          callbacks: {
+            label: function(context) {
+              const label = context.dataset.label || '';
+              const value = context.parsed.y || 0;
+              return `${label}: ${value.toFixed(2)}`;
+            }
+          }
+        }
+      },
+      layout: {
+        padding: {
+          top: modalitaExport ? 2 : 5, // Più spazio in alto per il watermark
+          right: modalitaExport ? 5 : 10,
+          bottom: modalitaExport ? 2 : 5,
+          left: modalitaExport ? 5 : 5
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 56,
+          title: {
+            display: true,
+            text: 'Numero di Trade',
+            color: colori.testo,
+            font: {
+              size: modalitaExport ? 14.5 : 12
+            }
+          },
+          ticks: {
+            color: colori.testo,
+            font: {
+              size: modalitaExport ? 14.5 : 12
+            }
+          },
+          grid: {
+            color: colori.griglia
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Data',
+            color: colori.testo,
+            font: {
+              size: modalitaExport ? 14.5 : 12
+            }
+          },
+          ticks: {
+            color: colori.testo,
+            font: {
+              size: modalitaExport ? 14.5 : 12
+            },
+            maxRotation: 45,
+            minRotation: 0
+          },
+          grid: {
+            color: colori.griglia
+          }
+        }
+      }
+    }
+  });
+}
+
+// Funzione per aggiungere watermark al canvas
+function aggiungiWatermark(ctx, width, height) {
+  const oggi = new Date();
+  const dataFormattata = oggi.toLocaleDateString('it-IT');
+  
+  // Salva il contesto corrente
+  ctx.save();
+  
+  // Configura il testo del watermark
+  ctx.font = '34px "Courier New", monospace';
+  ctx.fillStyle = '#666666';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'bottom';
+  
+  // Testo del watermark
+  const watermarkText = `📈 gerardo_dorrico data: ${dataFormattata}`;
+  
+  // Posiziona il watermark in basso a destra
+  const padding = 30;
+  ctx.fillText(watermarkText, width - padding, height - padding);
+  
+  // Ripristina il contesto
+  ctx.restore();
+}
+
+
+
+  
+  // Aggiorna il grafico storico
+  function aggiornaGraficoStorico() {
+    if (storicoCapitaleChart) {
+      const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+      
+      storicoCapitaleChart.data.labels = datiPeriodo.map(item => {
+        const data = new Date(item.data);
+        return `${data.getDate()}/${data.getMonth() + 1}`;
+      });
+      
+      storicoCapitaleChart.data.datasets[0].data = datiPeriodo.map(item => item.coingecko);
+      storicoCapitaleChart.data.datasets[1].data = datiPeriodo.map(item => item.binance);
+      storicoCapitaleChart.data.datasets[2].data = datiPeriodo.map(item => item.totaleIn);
+      storicoCapitaleChart.data.datasets[3].data = datiPeriodo.map(item => item.capitale);
+      
+      storicoCapitaleChart.update();
+    }
+  }
+  
+  // Cambia il range di tempo visualizzato
+  function cambiaRangeTempo(elemento) {
+    // Rimuovi la classe active da tutti i bottoni
+    document.querySelectorAll('.time-range-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    // Aggiungi la classe active all'elemento cliccato
+    elemento.classList.add('active');
+    
+    // Aggiorna il periodo visualizzato
+    periodoVisualizzato = elemento.dataset.days;
+    
+    // Aggiorna i grafici
+    aggiornaGraficoStorico();
+    aggiornaGraficoPercentuale();
+    
+    // Aggiorna le statistiche
+    aggiornaInterfaccia();
+    
+    // Ricalcola le statistiche percentuali
+    calcolaStatistichePercentuali();
+  }
+  
+  // Cambia tab attivo
+  function cambiaTab(event, tabId) {
+    // Nascondi tutti i pannelli
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+      panel.classList.remove('active');
+    });
+    
+    // Rimuovi active da tutti i bottoni
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    // Mostra il pannello selezionato
+    document.getElementById(tabId).classList.add('active');
+    
+    // Attiva il bottone cliccato
+    event.currentTarget.classList.add('active');
+    
+    // Aggiorna i grafici se necessario
+    if (tabId === 'tab-distribuzione') {
+      aggiornaGraficoStorico();
+    } else if (tabId === 'tab-percentuale') {
+      aggiornaGraficoPercentuale();
+      calcolaStatistichePercentuali();
+    }
+  }
+  
+  // Crea il grafico percentuale
+  function creaGraficoPercentualeCapitale() {
+    const ctx = document.getElementById('percentualeCapitaleChart').getContext('2d');
+    const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+    
+    // Calcola le percentuali del capitale in dollari
+    const percentuali = datiPeriodo.map(item => {
+      const totaleInDollari = item.totaleIn * datiCapitale.quotaPerTrade;
+      const totaleComplessivo = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
+      return (totaleInDollari / totaleComplessivo) * 100;
+    });
+    
+    percentualeCapitaleChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: datiPeriodo.map(item => {
+          const data = new Date(item.data);
+          return `${data.getDate()}/${data.getMonth() + 1}`;
+        }),
+        datasets: [{
+          label: '% Capitale in Trading',
+          data: percentuali,
+          backgroundColor: 'rgba(52, 152, 219, 0.2)',
+          borderColor: '#3498db',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Percentuale in Trading (%)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Data'
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const value = context.raw || 0;
+                return `Capitale in Trading: ${value.toFixed(1)}%`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // Aggiorna il grafico percentuale
+  function aggiornaGraficoPercentuale() {
+    if (percentualeCapitaleChart) {
+      const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+      
+      // Aggiorna le etichette
+      percentualeCapitaleChart.data.labels = datiPeriodo.map(item => {
+        const data = new Date(item.data);
+        return `${data.getDate()}/${data.getMonth() + 1}`;
+      });
+      
+      // Calcola le nuove percentuali
+      const percentuali = datiPeriodo.map(item => {
+        const totaleInDollari = item.totaleIn * datiCapitale.quotaPerTrade;
+        const totaleComplessivo = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
+        return (totaleInDollari / totaleComplessivo) * 100;
+      });
+      
+      percentualeCapitaleChart.data.datasets[0].data = percentuali;
+      percentualeCapitaleChart.update();
+    }
+  }
+  
+  // Calcola le statistiche per le percentuali di tempo
+  function calcolaStatistichePercentuali() {
+    const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+    
+    if (datiPeriodo.length === 0) {
+      return;
+    }
+    
+    // Contatori per ciascuna fascia percentuale
+    let count0_25 = 0;
+    let count25_50 = 0;
+    let count50_75 = 0;
+    let count75_100 = 0;
+    
+    // Calcola le percentuali per ogni giorno e incrementa i contatori
+    datiPeriodo.forEach(item => {
+      const totaleInDollari = item.totaleIn * datiCapitale.quotaPerTrade;
+      const totaleComplessivo = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
+      const percentuale = (totaleInDollari / totaleComplessivo) * 100;
+      
+      if (percentuale <= 25) {
+        count0_25++;
+      } else if (percentuale <= 50) {
+        count25_50++;
+      } else if (percentuale <= 75) {
+        count50_75++;
+      } else {
+        count75_100++;
+      }
+    });
+    
+    // Aggiorna i contatori nell'interfaccia
+    document.getElementById("percentuale0_25").textContent = `${count0_25} giorni`;
+    document.getElementById("percentuale25_50").textContent = `${count25_50} giorni`;
+    document.getElementById("percentuale50_75").textContent = `${count50_75} giorni`;
+    document.getElementById("percentuale75_100").textContent = `${count75_100} giorni`;
+  }
+  
+	// Totale del Capitale
+   function aggiornaCapitale() {
+    // Recupera il valore dei "Trade Totali"
+    const tradeTotali = parseInt(document.getElementById('totaleTrade').innerText);
+
+    // Recupera il valore della "Quota per Trade"
+    const quotaPerTrade = parseInt(document.getElementById('quotaPerTrade').value);
+
+    // Salva il valore quotaPerTrade nei dati principali
+    datiCapitale.quotaPerTrade = quotaPerTrade;
+
+    // Calcola il "Capitale Totale"
+    const capitaleTotale = tradeTotali * quotaPerTrade;
+
+    // Calcola "A Capitale" in dollari
+    const capitaleInDollari = datiCapitale.capitale * quotaPerTrade;
+
+    // Calcola "Totale In" in dollari
+    const totaleInDollari = datiCapitale.totaleIn * quotaPerTrade;
+
+    // Aggiorna tutti i valori nell'interfaccia
+    document.getElementById('capitaleTotale').innerText = capitaleTotale;
+    document.getElementById('capitaleInDollari').innerText = `$${capitaleInDollari}`;
+    document.getElementById('totaleInDollari').innerText = `$${totaleInDollari}`;
+
+    // Salva i dati aggiornati
+    salvaDatiLocali();
+}
+
+// Modifica la funzione aggiornaInterfaccia() per includere i nuovi campi
+function aggiornaInterfaccia() {
+    document.getElementById("coingecko").textContent = datiCapitale.coingecko;
+    document.getElementById("binance").textContent = datiCapitale.binance;
+    document.getElementById("totaleIn").textContent = datiCapitale.totaleIn;
+    document.getElementById("capitale").textContent = datiCapitale.capitale;
+    document.getElementById("totaleTrade").textContent = datiCapitale.totaleTrade;
+    document.getElementById("infoTotaleTrade").textContent = datiCapitale.totaleTrade;
+    document.getElementById("quotaPerTrade").value = datiCapitale.quotaPerTrade;
+    
+    // Aggiorna anche i valori degli input
+    document.getElementById("inputCoinGecko").value = datiCapitale.coingecko;
+    document.getElementById("inputBinance").value = datiCapitale.binance;
+    
+    // Calcola e aggiorna i nuovi valori in dollari
+    const capitaleTotale = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
+    const capitaleInDollari = datiCapitale.capitale * datiCapitale.quotaPerTrade;
+    const totaleInDollari = datiCapitale.totaleIn * datiCapitale.quotaPerTrade;
+    
+    // Aggiorna i nuovi elementi dell'interfaccia
+    document.getElementById('capitaleTotale').innerText = capitaleTotale;
+    document.getElementById('capitaleInDollari').innerText = `$${capitaleInDollari}`;
+    document.getElementById('totaleInDollari').innerText = `$${totaleInDollari}`;
+    
+    // Calcola e aggiorna le medie (codice esistente)
+    const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+    
+    if (datiPeriodo.length > 0) {
+      const mediaCoingecko = calcolaMedia(datiPeriodo.map(item => item.coingecko));
+      const mediaBinance = calcolaMedia(datiPeriodo.map(item => item.binance));
+      const mediaDollari = (mediaCoingecko + mediaBinance) * datiCapitale.quotaPerTrade;
+      
+      document.getElementById("mediaTradeCoingecko").textContent = mediaCoingecko.toFixed(1);
+      document.getElementById("mediaTradeBinance").textContent = mediaBinance.toFixed(1);
+      document.getElementById("mediaDollariTrading").textContent = `$${mediaDollari.toFixed(2)}`;
+    }
+}
+
+// Modifica la funzione aggiornaTotali() per salvare quotaPerTrade
+function aggiornaTotali() {
+    datiCapitale.quotaPerTrade = parseFloat(document.getElementById("quotaPerTrade").value) || datiCapitale.quotaPerTrade;
+    
+    // Aggiorna l'interfaccia
+    aggiornaInterfaccia();
+    
+    // Salva lo stato nei dati storici
+    salvaStorico();
+    
+    // Salva i dati in localStorage
+    salvaDatiLocali();
+    
+    // Aggiorna i grafici
+    aggiornaGrafico();
+    aggiornaGraficoStorico();
+    aggiornaGraficoPercentuale();
+    
+    // Ricalcola le statistiche percentuali
+    calcolaStatistichePercentuali();
+}
+
+
+  // Salva i dati in localStorage
+  function salvaDatiLocali() {
+    localStorage.setItem('datiCapitale', JSON.stringify(datiCapitale));
+  }
+  
+  // Carica i dati da localStorage
+  function caricaDatiLocali() {
+    const datiSalvati = localStorage.getItem('datiCapitale');
+    if (datiSalvati) {
+      const datiParsati = JSON.parse(datiSalvati);
+      
+      // Aggiorna i dati dell'applicazione
+      Object.assign(datiCapitale, datiParsati);
+    }
+  }
+  
+  // Scarica i dati come file JSON
+  function scaricaDati() {
+    const dataStr = JSON.stringify(datiCapitale, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+	
+    a.download = `capitale-trading-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  
+  // Carica i dati da un file JSON
+  function caricaDati() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+      alert('Seleziona un file JSON prima di procedere.');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const datiCaricati = JSON.parse(e.target.result);
+        
+        // Verifica che i dati caricati abbiano la struttura corretta
+        if (!datiCaricati.hasOwnProperty('coingecko') || 
+            !datiCaricati.hasOwnProperty('binance') || 
+            !datiCaricati.hasOwnProperty('totaleIn') || 
+            !datiCaricati.hasOwnProperty('capitale')) {
+          alert('Il file non contiene dati validi.');
+          return;
+        }
+        
+        // Aggiorna i dati dell'applicazione
+        Object.assign(datiCapitale, datiCaricati);
+        
+        // Aggiorna l'interfaccia
+        aggiornaInterfaccia();
+        
+        // Aggiorna i grafici
+        aggiornaGrafico();
+        aggiornaGraficoStorico();
+        aggiornaGraficoPercentuale();
+        
+        // Ricalcola le statistiche percentuali
+        calcolaStatistichePercentuali();
+        
+        // Salva i dati in localStorage
+        salvaDatiLocali();
+     
+        alert('Dati caricati con successo!');
+      } catch (error) {
+        alert('Errore durante il caricamento dei dati: ' + error.message);
+      }
+    };
+    
+    reader.readAsText(file);
+  }
+  
+  // Funzione per aggiungere un indicatore del tempo del capitale
+  function aggiungiIndicatoreTempo() {
+    // Ottieni i dati più recenti
+    const datiRecenti = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, 30); // ultimi 30 giorni
+    
+    if (datiRecenti.length < 2) return; // Servono almeno 2 punti dati per calcolare una tendenza
+    
+    // Calcola il trend del capitale in trading
+    const primoValore = datiRecenti[0].totaleIn;
+    const ultimoValore = datiRecenti[datiRecenti.length - 1].totaleIn;
+    const differenza = ultimoValore - primoValore;
+    
+    // Calcola la velocità media di variazione (trade al giorno)
+    const giorniPassati = (new Date(datiRecenti[datiRecenti.length - 1].data) - new Date(datiRecenti[0].data)) / (1000 * 60 * 60 * 24);
+    const velocitaMediaGiornaliera = giorniPassati > 0 ? differenza / giorniPassati : 0;
+    
+    // Calcola il tempo stimato per raggiungere il 100% o tornare allo 0% del capitale in trading
+    let tempoStimato = 0;
+    let messaggio = "";
+    
+    if (velocitaMediaGiornaliera > 0) {
+      // Stiamo aumentando il capitale in trading, calcoliamo quanto tempo per arrivare al 100%
+      const tradeRimanenti = datiCapitale.totaleTrade - ultimoValore;
+      tempoStimato = velocitaMediaGiornaliera > 0 ? Math.ceil(tradeRimanenti / velocitaMediaGiornaliera) : Infinity;
+      messaggio = `Al ritmo attuale, il 100% del capitale sarà in trading tra circa ${tempoStimato} giorni`;
+    } else if (velocitaMediaGiornaliera < 0) {
+      // Stiamo diminuendo il capitale in trading, calcoliamo quanto tempo per tornare allo 0%
+      tempoStimato = velocitaMediaGiornaliera < 0 ? Math.ceil(ultimoValore / Math.abs(velocitaMediaGiornaliera)) : Infinity;
+      messaggio = `Al ritmo attuale, il capitale in trading sarà esaurito tra circa ${tempoStimato} giorni`;
+    } else {
+      messaggio = "Il capitale in trading è stabile, nessuna variazione rilevata nell'ultimo periodo";
+    }
+    
+    // Crea o aggiorna l'elemento HTML per l'indicatore del tempo
+    let indicatoreElement = document.getElementById("indicatoreTempo");
+    if (!indicatoreElement) {
+      indicatoreElement = document.createElement("div");
+      indicatoreElement.id = "indicatoreTempo";
+      indicatoreElement.className = "info-box";
+      
+      // Inseriscilo prima del grafico percentuale
+      const container = document.getElementById("tab-percentuale");
+      const graficoContainer = container.querySelector(".storico-chart-container");
+      container.insertBefore(indicatoreElement, graficoContainer);
+    }
+    
+    // Aggiorna il contenuto dell'indicatore
+    indicatoreElement.innerHTML = `
+      <strong>Indicatore di Tendenza:</strong> ${messaggio}<br>
+      <span class="distribution-label">Variazione media: ${velocitaMediaGiornaliera.toFixed(2)} trade al giorno</span>
+    `;
+    
+    // Aggiungi un colore in base alla tendenza
+    if (velocitaMediaGiornaliera > 0) {
+      indicatoreElement.style.borderLeft = "4px solid var(--accent-color)";
+    } else if (velocitaMediaGiornaliera < 0) {
+      indicatoreElement.style.borderLeft = "4px solid var(--secondary-color)";
+    } else {
+      indicatoreElement.style.borderLeft = "4px solid var(--primary-color)";
+    }
+  }
+  
+  // Inizializza l'applicazione quando il documento è pronto
+  document.addEventListener('DOMContentLoaded', function() {
+    inizializza();
+	window.addEventListener('resize', gestisciRidimensionamento);
+    
+    // Aggiungi l'indicatore del tempo dopo l'inizializzazione
+    aggiungiIndicatoreTempo();
+    
+    // Aggiorna l'indicatore quando cambia il range di tempo
+    document.querySelectorAll('.time-range-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        aggiungiIndicatoreTempo();
+      });
+    });
+  });
+    </script>
+
+</body>
+</html>
