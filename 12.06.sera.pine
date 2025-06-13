@@ -1,0 +1,693 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © gerardo_dorrico
+
+//@version=6
+indicator('4H | Strategia Multi-Confluence', shorttitle = '4H StratMC', overlay = true, max_labels_count = 500, max_lines_count = 500, max_bars_back = 500)
+
+// ========== IMPOSTAZIONI ==========
+// Impostazioni Regressione Lineare - PIÙ REATTIVA
+lengthInput = input.int(100, title = 'LinReg Lunghezza', minval = 10, maxval = 200, group = 'Regressione Lineare')
+sourceInput = input.source(close, title = 'Sorgente', group = 'Regressione Lineare')
+linreg_sensitivity = input.float(0.8, title = 'Sensibilità Segnale LinReg', minval = 0.3, maxval = 1.0, step = 0.1, group = 'Regressione Lineare')
+
+// Impostazioni Canale
+group1 = 'Impostazioni Canale'
+useUpperDevInput = input.bool(true, title = 'Deviazione Superiore', inline = 'Upper Deviation', group = group1)
+upperMultInput = input.float(1.0, title = '', inline = 'Upper Deviation', group = group1)
+useLowerDevInput = input.bool(true, title = '', inline = 'Lower Deviation', group = group1)
+lowerMultInput = input.float(1.0, title = '', inline = 'Lower Deviation', group = group1)
+
+// Impostazioni Visualizzazione
+group2 = 'Impostazioni Visualizzazione'
+showPearsonInput = input.bool(true, 'Mostra Pearson\'s R', group = group2)
+showSignals = input.bool(true, 'Mostra Segnali di Trading', group = group2)
+extendLeftInput = input.bool(false, 'Estendi Linee a Sinistra', group = group2)
+extendRightInput = input.bool(true, 'Estendi Linee a Destra', group = group2)
+
+// Impostazioni Segnale
+group_signals = 'Impostazioni Segnale'
+use_bb_filter = input.bool(true, 'Usa Filtro BB', group = group_signals)
+use_pivot_filter = input.bool(true, 'Usa Filtro Pivot', group = group_signals)
+use_stoch_rsi_filter = input.bool(true, 'Usa Filtro Stochastic RSI', group = group_signals)
+use_ma_cross_filter = input.bool(true, 'Usa Filtro Incrocio Medie', group = group_signals)
+use_momentum_filter = input.bool(true, 'Usa Filtro Momentum', group = group_signals)
+use_price_action_filter = input.bool(true, 'Usa Filtro Price Action', group = group_signals)
+min_pearson = input.float(0.5, 'Pearson R Minimo per Segnali', minval = 0.1, maxval = 1.0, step = 0.1, group = group_signals)
+
+// Impostazioni Stochastic RSI
+group_stoch = 'Impostazioni Stochastic RSI'
+stoch_rsi_length = input.int(14, 'Lunghezza Stoch RSI', minval = 1, group = group_stoch)
+stoch_rsi_rsi_length = input.int(14, 'Lunghezza RSI', minval = 1, group = group_stoch)
+stoch_rsi_k = input.int(1, '%K Stoch Smoothing', minval = 1, maxval = 5, group = group_stoch)
+stoch_rsi_d = input.int(2, '%D Stoch Smoothing', minval = 1, group = group_stoch)
+stoch_oversold = input.float(20, 'Livello Ipervenduto', minval = 0, maxval = 50, group = group_stoch)
+stoch_overbought = input.float(80, 'Livello Ipercomprato', minval = 50, maxval = 100, group = group_stoch)
+
+// Impostazioni Medie Mobili
+group_ma = 'Impostazioni Medie Mobili'
+ema_length = input.int(21, 'Lunghezza EMA', minval = 1, group = group_ma)
+sma_length = input.int(50, 'Lunghezza SMA', minval = 1, group = group_ma)
+rsi_momentum_length = input.int(14, 'Lunghezza RSI Momentum', minval = 1, group = group_ma)
+volume_avg_length = input.int(20, 'Lunghezza Media Volume', minval = 1, group = group_ma)
+
+// Impostazioni Momentum - NUOVO
+group_momentum = 'Impostazioni Momentum'
+momentum_length = input.int(10, 'Lunghezza Momentum', minval = 1, group = group_momentum)
+roc_length = input.int(12, 'Lunghezza Rate of Change', minval = 1, group = group_momentum)
+williams_r_length = input.int(14, 'Lunghezza Williams %R', minval = 1, group = group_momentum)
+cci_length = input.int(20, 'Lunghezza CCI', minval = 1, group = group_momentum)
+
+// Impostazioni Price Action - NUOVO
+group_pa = 'Impostazioni Price Action'
+atr_length = input.int(14, 'Lunghezza ATR', minval = 1, group = group_pa)
+engulfing_lookback = input.int(2, 'Lookback Pattern Engulfing', minval = 1, maxval = 5, group = group_pa)
+doji_threshold = input.float(0.1, 'Soglia Doji (%)', minval = 0.01, maxval = 1.0, step = 0.01, group = group_pa)
+
+// ========== INIZIALIZZA VARIABILI ==========
+var float confluence_score = 0.0
+
+
+
+
+// ========== STOCHASTIC RSI ==========
+rsi_source = ta.rsi(close, stoch_rsi_rsi_length)
+stoch_rsi = ta.stoch(rsi_source, rsi_source, rsi_source, stoch_rsi_length)
+stoch_k = ta.sma(stoch_rsi, stoch_rsi_k)
+stoch_d = ta.sma(stoch_k, stoch_rsi_d)
+
+// ========== MEDIE MOBILI ==========
+ema21 = ta.ema(close, ema_length)
+sma50 = ta.sma(close, sma_length)
+rsi_momentum = ta.rsi(close, rsi_momentum_length)
+vol_avg = ta.sma(volume, volume_avg_length)
+
+// Trend generale
+trend_bullish = ema21 > sma50 and close > ema21
+trend_bearish = ema21 < sma50 and close < ema21
+
+// Plot delle medie mobili
+plot(ema21, title = 'EMA 21', color = color.new(color.orange, 50), linewidth = 1)
+plot(sma50, title = 'SMA 50', color = color.new(color.purple, 50), linewidth = 2)
+
+// ========== INDICATORI MOMENTUM - NUOVO ==========
+// Momentum
+momentum = ta.mom(close, momentum_length)
+momentum_normalized = momentum / close * 100
+
+// Rate of Change
+roc = ta.roc(close, roc_length)
+
+// Williams %R
+williams_r_highest = ta.highest(high, williams_r_length)
+williams_r_lowest = ta.lowest(low, williams_r_length)
+williams_r = williams_r_highest != williams_r_lowest ? -100 * (williams_r_highest - close) / (williams_r_highest - williams_r_lowest) : 0
+
+// Commodity Channel Index
+cci = ta.cci(hl2, cci_length)
+
+// Momentum Score combinato
+momentum_bullish = momentum_normalized > 0 and roc > 0 and williams_r > -50 and cci > 0
+momentum_bearish = momentum_normalized < 0 and roc < 0 and williams_r < -50 and cci < 0
+
+// ========== PRICE ACTION PATTERNS - NUOVO ==========
+// ATR per volatilità
+atr = ta.atr(atr_length)
+
+// Body delle candele
+body = math.abs(close - open)
+body_pct = body / (high - low) * 100
+
+// Doji Pattern
+is_doji = body_pct <= doji_threshold
+
+// Engulfing Patterns
+bullish_engulfing = close > open and close[1] < open[1] and 
+                   open <= close[1] and close >= open[1] and 
+                   body > body[1] * 1.2
+
+bearish_engulfing = close < open and close[1] > open[1] and 
+                   open >= close[1] and close <= open[1] and 
+                   body > body[1] * 1.2
+
+// Hammer e Shooting Star
+lower_shadow = open < close ? open - low : close - low
+upper_shadow = open < close ? high - close : high - open
+total_range = high - low
+
+hammer = lower_shadow > body * 2 and upper_shadow < body * 0.5 and total_range > atr * 0.5
+shooting_star = upper_shadow > body * 2 and lower_shadow < body * 0.5 and total_range > atr * 0.5
+
+// Price Action Score
+price_action_bullish = bullish_engulfing or (hammer and close > open)
+price_action_bearish = bearish_engulfing or (shooting_star and close < open)
+
+// ========== CALCOLO REGRESSIONE LINEARE - PIÙ REATTIVA ==========
+calcSlope(source, length) =>
+    max_bars_back(source, 5000)
+    if not barstate.islast or length <= 1
+        [float(na), float(na), float(na)]
+    else
+        sumX = 0.0
+        sumY = 0.0
+        sumXSqr = 0.0
+        sumXY = 0.0
+        for i = 0 to length - 1 by 1
+            val = source[i]
+            per = i + 1.0
+            sumX := sumX + per
+            sumY := sumY + val
+            sumXSqr := sumXSqr + per * per
+            sumXY := sumXY + val * per
+        slope = (length * sumXY - sumX * sumY) / (length * sumXSqr - sumX * sumX)
+        average = sumY / length
+        intercept = average - slope * sumX / length + slope
+        [slope, average, intercept]
+
+[s, a, i] = calcSlope(sourceInput, lengthInput)
+startPrice = i + s * (lengthInput - 1)
+endPrice = i
+
+// Define extend style and colors
+extendStyle = extendRightInput ? extend.right : extendLeftInput ? extend.left : extend.none
+colorUpper = color.new(color.blue, 80)
+colorLower = color.new(color.red, 80)
+
+var line baseLine = na
+if na(baseLine) and not na(startPrice)
+    baseLine := line.new(bar_index - lengthInput + 1, startPrice, bar_index, endPrice, width = 1, extend = extendStyle, color = color.new(colorLower, 0))
+else
+    line.set_xy1(baseLine, bar_index - lengthInput + 1, startPrice)
+    line.set_xy2(baseLine, bar_index, endPrice)
+
+calcDev(source, length, slope, average, intercept) =>
+    upDev = 0.0
+    dnDev = 0.0
+    stdDevAcc = 0.0
+    dsxx = 0.0
+    dsyy = 0.0
+    dsxy = 0.0
+    periods = length - 1
+    daY = intercept + slope * periods / 2
+    val = intercept
+    for j = 0 to periods by 1
+        price = high[j] - val
+        if price > upDev
+            upDev := price
+        price := val - low[j]
+        if price > dnDev
+            dnDev := price
+        price := source[j]
+        dxt = price - average
+        dyt = val - daY
+        price := price - val
+        stdDevAcc := stdDevAcc + price * price
+        dsxx := dsxx + dxt * dxt
+        dsyy := dsyy + dyt * dyt
+        dsxy := dsxy + dxt * dyt
+        val := val + slope
+    stdDev = math.sqrt(stdDevAcc / (periods == 0 ? 1 : periods))
+    pearsonR = dsxx == 0 or dsyy == 0 ? 0 : dsxy / math.sqrt(dsxx * dsyy)
+    [stdDev, pearsonR, upDev, dnDev]
+
+[stdDev, pearsonR, upDev, dnDev] = calcDev(sourceInput, lengthInput, s, a, i)
+
+// Calculate LinReg position (-1 to +1) - PIÙ SENSIBILE
+linreg_position = not na(stdDev) and stdDev > 0 ? math.max(-1, math.min(1, (close - endPrice) / (stdDev * 1.5))) : 0
+
+upperStartPrice = startPrice + (useUpperDevInput ? upperMultInput * stdDev : upDev)
+upperEndPrice = endPrice + (useUpperDevInput ? upperMultInput * stdDev : upDev)
+var line upper = na
+lowerStartPrice = startPrice + (useLowerDevInput ? -lowerMultInput * stdDev : -dnDev)
+lowerEndPrice = endPrice + (useLowerDevInput ? -lowerMultInput * stdDev : -dnDev)
+var line lower = na
+
+if na(upper) and not na(upperStartPrice)
+    upper := line.new(bar_index - lengthInput + 1, upperStartPrice, bar_index, upperEndPrice, width = 1, extend = extendStyle, color = color.new(colorUpper, 0))
+else
+    line.set_xy1(upper, bar_index - lengthInput + 1, upperStartPrice)
+    line.set_xy2(upper, bar_index, upperEndPrice)
+
+if na(lower) and not na(lowerStartPrice)
+    lower := line.new(bar_index - lengthInput + 1, lowerStartPrice, bar_index, lowerEndPrice, width = 1, extend = extendStyle, color = color.new(colorUpper, 0))
+else
+    line.set_xy1(lower, bar_index - lengthInput + 1, lowerStartPrice)
+    line.set_xy2(lower, bar_index, lowerEndPrice)
+
+linefill.new(upper, baseLine, color = colorUpper)
+linefill.new(baseLine, lower, color = colorLower)
+
+// ========== BANDE DI BOLLINGER ==========
+bb_length = input.int(20, minval = 1, title = 'Lunghezza BB', group = 'Bande di Bollinger')
+bb_maType = input.string('SMA', 'Tipo Media Mobile', options = ['SMA', 'EMA', 'SMMA (RMA)', 'WMA', 'VWMA'], group = 'Bande di Bollinger')
+bb_src = input(close, title = 'Sorgente BB', group = 'Bande di Bollinger')
+bb_mult = input.float(2.0, minval = 0.001, maxval = 50, title = 'Deviazione Std BB', group = 'Bande di Bollinger')
+
+ma(source, length, _type) =>
+    switch _type
+        'SMA' => ta.sma(source, length)
+        'EMA' => ta.ema(source, length)
+        'SMMA (RMA)' => ta.rma(source, length)
+        'WMA' => ta.wma(source, length)
+        'VWMA' => ta.vwma(source, length)
+
+bb_basis = ma(bb_src, bb_length, bb_maType)
+bb_dev = bb_mult * ta.stdev(bb_src, bb_length)
+bb_upper = bb_basis + bb_dev
+bb_lower = bb_basis - bb_dev
+bb_offset = input.int(0, 'Spostamento BB', minval = -500, maxval = 500, display = display.data_window, group = 'Bande di Bollinger')
+
+// BB Position calculation
+bb_position = (close - bb_lower) / (bb_upper - bb_lower) * 2 - 1 // -1 to +1 scale
+
+plot(bb_basis, 'Base BB', color = #f0e0e0, offset = bb_offset)
+bb_p1 = plot(bb_upper, 'Superiore BB', color = #cd5c5c, offset = bb_offset)
+bb_p2 = plot(bb_lower, 'Inferiore BB', color = #7dcc5d, offset = bb_offset)
+
+// ========== PUNTI PIVOT ==========
+length = input(25, 'Lunghezza Pivot', group = 'Punti Pivot')
+show_reg = input.bool(true, 'Pivot Regolari', inline = 'inline1', group = 'Punti Pivot')
+reg_ph_css = input.color(#ef5350, 'Massimo', inline = 'inline1', group = 'Punti Pivot')
+reg_pl_css = input.color(#26a69a, 'Minimo', inline = 'inline1', group = 'Punti Pivot')
+
+ph = ta.pivothigh(length, length)
+pl = ta.pivotlow(length, length)
+
+// Track recent pivot levels
+var float recent_ph = na
+var float recent_pl = na
+var int recent_ph_bar = na
+var int recent_pl_bar = na
+
+if bool(ph)
+    recent_ph := ph
+    recent_ph_bar := bar_index - length
+if bool(pl)
+    recent_pl := pl
+    recent_pl_bar := bar_index - length
+
+// ========== TIMING SEGNALI FISSO - MODIFICATO ==========
+// Variabili per tracciare il timing dei segnali
+var int signal_timer = 0
+var bool last_signal_was_buy = false
+var bool last_signal_was_sell = false
+var bool signal_confirmed = false
+var float stored_linreg_position = na
+var float stored_pearson = na
+var float stored_confluence = na
+
+// ========== FUNZIONE PER VERIFICARE CONDIZIONI BASE ==========
+checkBaseConditions(is_buy_direction) =>
+    // Condizione 1: LinReg in zona critica
+    linreg_in_zone = is_buy_direction ? linreg_position <= -0.7 : linreg_position >= 0.7
+    
+    // Condizione 2: Pearson R valido
+    pearson_valid = math.abs(pearsonR) >= min_pearson
+    
+    // Condizione 3: Almeno un indicatore secondario favorevole
+    secondary_indicators_ok = false
+    
+    if is_buy_direction
+        // Per segnali di acquisto
+        bb_favorable = bb_position <= -0.5
+        stoch_favorable = stoch_k <= 30
+        trend_favorable = trend_bullish or (not trend_bearish and rsi_momentum > 45)
+        momentum_favorable = momentum_bullish or (momentum_normalized > -0.5 and roc > -2)
+        pa_favorable = price_action_bullish or (not price_action_bearish and not is_doji)
+        pivot_favorable = not na(recent_pl) and math.abs(close - recent_pl) / recent_pl * 100 < 5
+        
+        // Almeno 2 indicatori secondari devono essere favorevoli
+        favorable_count = (bb_favorable ? 1 : 0) + (stoch_favorable ? 1 : 0) + 
+                         (trend_favorable ? 1 : 0) + (momentum_favorable ? 1 : 0) + 
+                         (pa_favorable ? 1 : 0) + (pivot_favorable ? 1 : 0)
+        secondary_indicators_ok := favorable_count >= 2
+    else
+        // Per segnali di vendita
+        bb_favorable = bb_position >= 0.5
+        stoch_favorable = stoch_k >= 70
+        trend_favorable = trend_bearish or (not trend_bullish and rsi_momentum < 55)
+        momentum_favorable = momentum_bearish or (momentum_normalized < 0.5 and roc < 2)
+        pa_favorable = price_action_bearish or (not price_action_bullish and not is_doji)
+        pivot_favorable = not na(recent_ph) and math.abs(close - recent_ph) / recent_ph * 100 < 5
+        
+        // Almeno 2 indicatori secondari devono essere favorevoli
+        favorable_count = (bb_favorable ? 1 : 0) + (stoch_favorable ? 1 : 0) + 
+                         (trend_favorable ? 1 : 0) + (momentum_favorable ? 1 : 0) + 
+                         (pa_favorable ? 1 : 0) + (pivot_favorable ? 1 : 0)
+        secondary_indicators_ok := favorable_count >= 2
+    
+    // Tutte e 3 le condizioni devono essere soddisfatte
+    linreg_in_zone and pearson_valid and secondary_indicators_ok
+
+// ========== LOGICA SEGNALE AVANZATA ==========
+// Passo 1: LinReg come filtro primario (più sensibile)
+linreg_buy_primary = linreg_position <= -linreg_sensitivity
+linreg_sell_primary = linreg_position >= linreg_sensitivity
+
+// Passo 2: Calcolo confluence score
+confluence_score := 0.0
+
+// Contributo BB
+if use_bb_filter
+    if bb_position <= -0.7
+        confluence_score := confluence_score + 1
+    else if bb_position >= 0.7
+        confluence_score := confluence_score - 1
+
+// Contributo Pivot
+if use_pivot_filter and not na(recent_ph) and not na(recent_pl)
+    distance_to_ph = math.abs(close - recent_ph) / recent_ph * 100
+    distance_to_pl = math.abs(close - recent_pl) / recent_pl * 100
+
+    if distance_to_pl < 3
+        confluence_score := confluence_score + 1
+    else if distance_to_ph < 3
+        confluence_score := confluence_score - 1
+
+// Contributo Stochastic RSI
+if use_stoch_rsi_filter
+    if stoch_k <= stoch_oversold and stoch_d <= stoch_oversold
+        confluence_score := confluence_score + 1
+    else if stoch_k >= stoch_overbought and stoch_d >= stoch_overbought
+        confluence_score := confluence_score - 1
+
+// Contributo Medie Mobili
+if use_ma_cross_filter
+    if trend_bullish and rsi_momentum > 50
+        confluence_score := confluence_score + 0.5
+    else if trend_bearish and rsi_momentum < 50
+        confluence_score := confluence_score - 0.5
+
+// Contributo Momentum - NUOVO
+if use_momentum_filter
+    if momentum_bullish
+        confluence_score := confluence_score + 1
+    else if momentum_bearish
+        confluence_score := confluence_score - 1
+
+// Contributo Price Action - NUOVO
+if use_price_action_filter
+    if price_action_bullish
+        confluence_score := confluence_score + 1
+    else if price_action_bearish
+        confluence_score := confluence_score - 1
+
+// Filtro Pearson R
+pearson_ok = math.abs(pearsonR) >= min_pearson
+
+// Segnali finali
+buy_signal = linreg_buy_primary and confluence_score >= 1 and pearson_ok
+sell_signal = linreg_sell_primary and confluence_score <= -1 and pearson_ok
+
+// Calcolo Intensità Segnale
+signal_strength = confluence_score + (linreg_buy_primary ? 1 : linreg_sell_primary ? -1 : 0)
+
+// NUOVO: Verifica segnale SOLO alla chiusura della candela
+// Verifica condizioni base per BUY e SELL
+base_conditions_buy = checkBaseConditions(true)
+base_conditions_sell = checkBaseConditions(false)
+
+// Segnali CONFERMATI alla chiusura candela (mantieni la logica originale)
+signal_at_close_buy = buy_signal and barstate.isconfirmed
+signal_at_close_sell = sell_signal and barstate.isconfirmed
+
+// Gestione del timer - SOLO alla chiusura della candela
+if barstate.isconfirmed
+    if signal_at_close_buy or signal_at_close_sell
+        // Nuovo segnale confermato - azzera e riparte da 1
+        signal_timer := 1
+        last_signal_was_buy := signal_at_close_buy
+        last_signal_was_sell := signal_at_close_sell
+        signal_confirmed := true
+    else if signal_timer > 0 and signal_timer < 6
+        // Continua il conteggio senza verificare nulla
+        signal_timer += 1
+    else if signal_timer >= 6
+        // Timer finito - resetta tutto
+        signal_timer := 0
+        last_signal_was_buy := false
+        last_signal_was_sell := false
+        signal_confirmed := false
+
+// Determina se mostrare il segnale del timing
+show_timing_signal = signal_timer > 0 and signal_confirmed
+
+// Testo del timing aggiornato
+if show_timing_signal and showSignals
+    timer_label_text = (last_signal_was_buy ? 'BUY ' : 'SELL ') + str.tostring(signal_timer) + '/6'
+    timer_color = last_signal_was_buy ? color.new(color.green, 20) : color.new(color.red, 20)
+    
+    label.new(bar_index, high + atr * 0.3, 
+              timer_label_text, 
+              color = timer_color, 
+              style = label.style_label_down, 
+              size = size.normal,
+              tooltip = 'Segnale ' + (last_signal_was_buy ? 'BUY' : 'SELL') + ' - Candela ' + str.tostring(signal_timer) + ' di 6')
+
+	
+// Plot segnali
+if showSignals
+    // Segnale LIVE (durante formazione candela)
+    if buy_signal and not barstate.isconfirmed
+        label.new(bar_index, low, 'COMPRA LIVE\n' + str.tostring(signal_strength, '#.#'), 
+                 color = color.new(color.green, 20), style = label.style_label_up, size = size.small, 
+                 tooltip = 'Segnale in formazione - NON confermato')
+
+    if sell_signal and not barstate.isconfirmed
+        label.new(bar_index, high, 'VENDI LIVE\n' + str.tostring(signal_strength, '#.#'), 
+                 color = color.new(color.red, 20), style = label.style_label_down, size = size.small, 
+                 tooltip = 'Segnale in formazione - NON confermato')
+
+    // Segnale CONFERMATO (candela chiusa)
+    if signal_at_close_buy
+        label.new(bar_index, low, 'COMPRA ✓\n' + str.tostring(signal_strength, '#.#'), 
+                 color = color.green, style = label.style_label_up, size = size.normal, 
+                 tooltip = 'SEGNALE CONFERMATO\nLinReg: ' + str.tostring(linreg_position, '#.##') + 
+                          '\nBB: ' + str.tostring(bb_position, '#.##') + 
+                          '\nStoch K: ' + str.tostring(stoch_k, '#.##') + 
+                          '\nMomentum: ' + (momentum_bullish ? 'Rialzista' : 'Ribassista') + 
+                          '\nPrice Action: ' + (price_action_bullish ? 'Rialzista' : 'Neutrale') + 
+                          '\nPearson R: ' + str.tostring(pearsonR, '#.##'))
+
+    if signal_at_close_sell
+        label.new(bar_index, high, 'VENDI ✓\n' + str.tostring(signal_strength, '#.#'), 
+                 color = color.red, style = label.style_label_down, size = size.normal, 
+                 tooltip = 'SEGNALE CONFERMATO\nLinReg: ' + str.tostring(linreg_position, '#.##') + 
+                          '\nBB: ' + str.tostring(bb_position, '#.##') + 
+                          '\nStoch K: ' + str.tostring(stoch_k, '#.##') + 
+                          '\nMomentum: ' + (momentum_bearish ? 'Ribassista' : 'Rialzista') + 
+                          '\nPrice Action: ' + (price_action_bearish ? 'Ribassista' : 'Neutrale') + 
+                          '\nPearson R: ' + str.tostring(pearsonR, '#.##'))
+
+// Visualizzazione Pearson's R
+var label r = na
+label.delete(r[1])
+if showPearsonInput and not na(pearsonR)
+    r_color = pearson_ok ? color.green : color.orange
+    r := label.new(bar_index - lengthInput + 1, lowerStartPrice, 'R: ' + str.tostring(pearsonR, '#.####'), 
+                  color = color.new(color.white, 100), textcolor = r_color, size = size.normal, style = label.style_label_up)
+
+
+// ========== DASHBOARD AVANZATA ==========
+var table info_table = table.new(position.bottom_right, 3, 13, bgcolor = color.new(color.black, 95), border_width = 1, border_color = color.new(color.gray, 60))
+if barstate.islast and showSignals
+    
+
+    // Header
+    table.cell(info_table, 0, 0, '📊 4H | Strategia Multi Conf', text_color = color.white, bgcolor = color.new(color.blue, 85), text_size = size.small)
+    table.merge_cells(info_table, 0, 0, 2, 0)
+
+    // LinReg Position
+    linreg_icon = linreg_buy_primary ? '🟢' : linreg_sell_primary ? '🔴' : '⚪'
+    linreg_color = linreg_buy_primary ? color.new(color.lime, 60) : linreg_sell_primary ? color.new(color.red, 60) : color.new(color.gray, 80)
+    linreg_text = linreg_buy_primary ? 'COMPRA' : linreg_sell_primary ? 'VENDI' : 'NEUTRO'
+
+    table.cell(info_table, 0, 1, '🎯 LinReg', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 1, linreg_icon, text_color = color.white, bgcolor = linreg_color, text_size = size.large)
+    table.cell(info_table, 2, 1, linreg_text + '\n' + str.tostring(linreg_position, '#.##'), text_color = color.white, bgcolor = linreg_color, text_size = size.small)
+
+    // BB Position
+    bb_icon = bb_position <= -0.7 ? '🟢' : bb_position >= 0.7 ? '🔴' : '⚪'
+    bb_color = bb_position <= -0.7 ? color.new(color.lime, 75) : bb_position >= 0.7 ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    bb_text = bb_position <= -0.7 ? 'COMPRA' : bb_position >= 0.7 ? 'VENDI' : 'NEUTRO'
+
+    table.cell(info_table, 0, 2, '📊 Bollinger', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 2, bb_icon, text_color = color.white, bgcolor = bb_color, text_size = size.large)
+    table.cell(info_table, 2, 2, bb_text + '\n' + str.tostring(bb_position, '#.##'), text_color = color.white, bgcolor = bb_color, text_size = size.small)
+
+    // Stochastic RSI
+    stoch_icon = stoch_k <= stoch_oversold ? '🟢' : stoch_k >= stoch_overbought ? '🔴' : '⚪'
+    stoch_color = stoch_k <= stoch_oversold ? color.new(color.lime, 75) : stoch_k >= stoch_overbought ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    stoch_text = stoch_k <= stoch_oversold ? 'COMPRA' : stoch_k >= stoch_overbought ? 'VENDI' : 'NEUTRO'
+
+    table.cell(info_table, 0, 3, '⚡ Stoch RSI', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 3, stoch_icon, text_color = color.white, bgcolor = stoch_color, text_size = size.large)
+    table.cell(info_table, 2, 3, stoch_text + '\nK:' + str.tostring(stoch_k, '#') + ' D:' + str.tostring(stoch_d, '#'), text_color = color.white, bgcolor = stoch_color, text_size = size.small)
+
+   // Medie Mobili
+    ma_icon = trend_bullish ? '📈' : trend_bearish ? '📉' : '↔️'
+    ma_color = trend_bullish ? color.new(color.lime, 75) : trend_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    ma_text = trend_bullish ? 'RIALZISTA' : trend_bearish ? 'RIBASSISTA' : 'NEUTRO'
+
+    table.cell(info_table, 0, 4, '📈 Trend MA', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 4, ma_icon, text_color = color.white, bgcolor = ma_color, text_size = size.large)
+    table.cell(info_table, 2, 4, ma_text + '\nRSI:' + str.tostring(rsi_momentum, '#'), text_color = color.white, bgcolor = ma_color, text_size = size.small)
+
+    // Momentum
+    momentum_icon = momentum_bullish ? '🚀' : momentum_bearish ? '📉' : '⚪'
+    momentum_color = momentum_bullish ? color.new(color.lime, 75) : momentum_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    momentum_text = momentum_bullish ? 'RIALZISTA' : momentum_bearish ? 'RIBASSISTA' : 'NEUTRO'
+
+    table.cell(info_table, 0, 5, '🚀 Momentum', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 5, momentum_icon, text_color = color.white, bgcolor = momentum_color, text_size = size.large)
+    table.cell(info_table, 2, 5, momentum_text + '\nROC:' + str.tostring(roc, '#.#'), text_color = color.white, bgcolor = momentum_color, text_size = size.small)
+
+    // Price Action
+    pa_icon = price_action_bullish ? '🟢' : price_action_bearish ? '🔴' : '⚪'
+    pa_color = price_action_bullish ? color.new(color.lime, 75) : price_action_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    pa_text = price_action_bullish ? 'RIALZISTA' : price_action_bearish ? 'RIBASSISTA' : 'NEUTRO'
+
+    table.cell(info_table, 0, 6, '🕯️ Price Action', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 6, pa_icon, text_color = color.white, bgcolor = pa_color, text_size = size.large)
+    table.cell(info_table, 2, 6, pa_text + '\nATR:' + str.tostring(atr, '#.####'), text_color = color.white, bgcolor = pa_color, text_size = size.small)
+
+    // Pivot Points
+    pivot_distance_ph = not na(recent_ph) ? math.abs(close - recent_ph) / recent_ph * 100 : na
+    pivot_distance_pl = not na(recent_pl) ? math.abs(close - recent_pl) / recent_pl * 100 : na
+    
+    pivot_icon = '📍'
+    pivot_color = color.new(color.orange, 75)
+    pivot_text = not na(pivot_distance_pl) and pivot_distance_pl < 3 ? 'SUPPORTO' : not na(pivot_distance_ph) and pivot_distance_ph < 3 ? 'RESISTENZA' : 'NEUTRO'
+
+    table.cell(info_table, 0, 7, '📍 Pivot', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 7, pivot_icon, text_color = color.white, bgcolor = pivot_color, text_size = size.large)
+    table.cell(info_table, 2, 7, pivot_text + '\nA:' + str.tostring(pivot_distance_ph, '#.#') + ' B:' + str.tostring(pivot_distance_pl, '#.#'), text_color = color.white, bgcolor = pivot_color, text_size = size.small)
+
+    // Pearson R
+    pearson_icon = pearson_ok ? '✅' : '❌'
+    pearson_color = pearson_ok ? color.new(color.lime, 75) : color.new(color.red, 75)
+    pearson_text = pearson_ok ? 'VALIDO' : 'DEBOLE'
+
+    table.cell(info_table, 0, 8, '📊 Pearson R', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 8, pearson_icon, text_color = color.white, bgcolor = pearson_color, text_size = size.large)
+    table.cell(info_table, 2, 8, pearson_text + '\n' + str.tostring(pearsonR, '#.###'), text_color = color.white, bgcolor = pearson_color, text_size = size.small)
+
+    // Confluence Score
+    conf_icon = confluence_score >= 1 ? '🟢' : confluence_score <= -1 ? '🔴' : '⚪'
+    conf_color = confluence_score >= 1 ? color.new(color.lime, 60) : confluence_score <= -1 ? color.new(color.red, 60) : color.new(color.yellow, 80)
+    conf_text = confluence_score >= 1 ? 'COMPRA' : confluence_score <= -1 ? 'VENDI' : 'NEUTRO'
+
+    table.cell(info_table, 0, 9, '🎯 Confluenza', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 9, conf_icon, text_color = color.white, bgcolor = conf_color, text_size = size.large)
+    table.cell(info_table, 2, 9, conf_text + '\n' + str.tostring(confluence_score, '#.#'), text_color = color.white, bgcolor = conf_color, text_size = size.small)
+
+    // Signal Strength
+    signal_icon = signal_strength >= 2 ? '🔥' : signal_strength <= -2 ? '❄️' : signal_strength > 0 ? '📈' : signal_strength < 0 ? '📉' : '⚪'
+    signal_color = signal_strength >= 2 ? color.new(color.green, 50) : signal_strength <= -2 ? color.new(color.red, 50) : 
+                   signal_strength > 0 ? color.new(color.lime, 75) : signal_strength < 0 ? color.new(color.orange, 75) : color.new(color.gray, 80)
+    signal_text = signal_strength >= 2 ? 'COMPRA FORTE' : signal_strength <= -2 ? 'VENDI FORTE' : 
+                  signal_strength > 0 ? 'COMPRA DEBOLE' : signal_strength < 0 ? 'VENDI DEBOLE' : 'NEUTRALE'
+
+    table.cell(info_table, 0, 10, '💪 Forza OK', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 10, signal_icon, text_color = color.white, bgcolor = signal_color, text_size = size.large)
+    table.cell(info_table, 2, 10, signal_text + '\n' + str.tostring(signal_strength, '#.#'), text_color = color.white, bgcolor = signal_color, text_size = size.small)
+
+  // Timer Status
+timer_icon = show_timing_signal ? 
+             (last_signal_was_buy ? '⏰🟢' : '⏰🔴') : '💤'
+
+timer_color = show_timing_signal ? 
+              (last_signal_was_buy ? color.new(color.lime, 60) : color.new(color.red, 60)) : 
+              color.new(color.gray, 80)
+
+timer_text = show_timing_signal ? 
+             (last_signal_was_buy ? 'BUY' : 'SELL') + ' (' + str.tostring(signal_timer) + '/6)' : 
+             'NESSUN SEGNALE'
+
+table.cell(info_table, 0, 11, '⏰ Stato OK', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+table.cell(info_table, 1, 11, timer_icon, text_color = color.white, bgcolor = timer_color, text_size = size.large)
+table.cell(info_table, 2, 11, timer_text, text_color = color.white, bgcolor = timer_color, text_size = size.small)
+
+   // Market State
+market_state = trend_bullish and confluence_score > 0 ? 'TREND RIALZISTA' : 
+               trend_bearish and confluence_score < 0 ? 'TREND RIBASSISTA' : 
+               'TREND LATERALE'
+market_icon = trend_bullish and confluence_score > 0 ? '🐂' : 
+              trend_bearish and confluence_score < 0 ? '🐻' : '🦀'
+market_color = trend_bullish and confluence_score > 0 ? color.new(color.lime, 60) : 
+               trend_bearish and confluence_score < 0 ? color.new(color.red, 60) : color.new(color.yellow, 70)
+
+table.cell(info_table, 0, 12, '🌍 Mercato', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+table.cell(info_table, 1, 12, market_icon, text_color = color.white, bgcolor = market_color, text_size = size.large)
+table.cell(info_table, 2, 12, market_state, text_color = color.white, bgcolor = market_color, text_size = size.small)
+
+// ========== ALERT CONDITIONS ==========
+// Alert per segnali confermati
+alertcondition(show_timing_signal and signal_timer > 6 and last_signal_was_buy and base_conditions_buy, title = 'Opportunità BUY Durante Timer', message = '🔄 OPPORTUNITÀ BUY - Timer attivo da {{plot("signal_timer")}} candele - Condizioni ancora valide')
+
+alertcondition(show_timing_signal and signal_timer > 6 and last_signal_was_sell and base_conditions_sell, title = 'Opportunità SELL Durante Timer', message = '🔄 OPPORTUNITÀ SELL - Timer attivo da {{plot("signal_timer")}} candele - Condizioni ancora valide')
+
+// Alert per condizioni base raggiunte (senza segnale completo)
+alertcondition(base_conditions_buy and not (signal_timer > 0), title = 'Condizioni Base BUY', message = '⏳ CONDIZIONI BASE BUY - LinReg: {{plot("linreg_position")}} - Pearson: {{plot("pearsonR")}}')
+
+alertcondition(base_conditions_sell and not (signal_timer > 0), title = 'Condizioni Base SELL', message = '⏳ CONDIZIONI BASE SELL - LinReg: {{plot("linreg_position")}} - Pearson: {{plot("pearsonR")}}')
+
+// ========== PLOT AGGIUNTIVI PER DEBUGGING ==========
+plot(signal_timer, title = 'Timer Stato', display = display.data_window, color = color.new(color.gray, 100))
+plot(base_conditions_buy ? 1 : 0, title = 'Condizioni Base BUY', display = display.data_window, color = color.new(color.green, 100))
+plot(base_conditions_sell ? 1 : 0, title = 'Condizioni Base SELL', display = display.data_window, color = color.new(color.red, 100))
+
+
+// ========== VISUALIZZAZIONE PATTERN CANDLESTICK ==========
+if showSignals
+    // Doji
+  // ==================   if is_doji
+  // ==========      label.new(bar_index, high + atr * 0.5, 'DOJI', color = color.new(color.yellow, 75), style = label.style_label_down, size = size.tiny)
+
+    // Engulfing patterns
+// ==========     if bullish_engulfing
+// ==========         label.new(bar_index, low - atr * 0.5, 'ENG RIALZ', color = color.new(color.green, 80), style = label.style_label_up, size = size.tiny)
+
+// ==========     if bearish_engulfing
+ // ==========        label.new(bar_index, high + atr * 0.5, 'ENG RIBAS', color = color.new(color.red, 80), style = label.style_label_down, size = size.tiny)
+
+    // Hammer e Shooting Star
+ // ==========    if hammer
+ // ==========        label.new(bar_index, low - atr * 0.3, 'MARTELLO', color = color.new(color.lime, 80), style = label.style_label_up, size = size.tiny)
+
+ // ==========    if shooting_star
+ // ==========        label.new(bar_index, high + atr * 0.3, 'STELLA CAD', color = color.new(color.orange, 80), style = label.style_label_down, size = size.tiny)
+
+// ========== PLOT PIVOT POINTS ==========
+// ========if show_reg
+    if not na(ph)
+        label.new(bar_index - length, ph, 'MA', color = color.new(#0ebe69, 80), style = label.style_label_down, size = size.small)
+    if not na(pl)
+        label.new(bar_index - length, pl, 'MI', color  = color.new(#942c03, 80), style = label.style_label_up, size = size.small)
+
+
+// ========== VISUALIZZAZIONE PATTERN CANDLESTICK ==========
+if showSignals
+    // Doji
+  // ==================   if is_doji
+  // ==========      label.new(bar_index, high + atr * 0.5, 'DOJI', color = color.new(color.yellow, 75), style = label.style_label_down, size = size.tiny)
+
+    // Engulfing patterns
+// ==========     if bullish_engulfing
+// ==========         label.new(bar_index, low - atr * 0.5, 'ENG RIALZ', color = color.new(color.green, 80), style = label.style_label_up, size = size.tiny)
+
+// ==========     if bearish_engulfing
+ // ==========        label.new(bar_index, high + atr * 0.5, 'ENG RIBAS', color = color.new(color.red, 80), style = label.style_label_down, size = size.tiny)
+
+    // Hammer e Shooting Star
+ // ==========    if hammer
+ // ==========        label.new(bar_index, low - atr * 0.3, 'MARTELLO', color = color.new(color.lime, 80), style = label.style_label_up, size = size.tiny)
+
+ // ==========    if shooting_star
+ // ==========        label.new(bar_index, high + atr * 0.3, 'STELLA CAD', color = color.new(color.orange, 80), style = label.style_label_down, size = size.tiny)
+
+// ========== PLOT PIVOT POINTS ==========
+// ========if show_reg
+    if not na(ph)
+        label.new(bar_index - length, ph, 'MA', color = color.new(#0ebe69, 80), style = label.style_label_down, size = size.small)
+    if not na(pl)
+        label.new(bar_index - length, pl, 'MI', color  = color.new(#942c03, 80), style = label.style_label_up, size = size.small)

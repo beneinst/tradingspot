@@ -1,0 +1,54 @@
+// ========== VISUALIZZAZIONE PATTERN CANDLESTICK ==========
+if showSignals
+    // Doji
+  // ==================   if is_doji
+  // ==========      label.new(bar_index, high + atr * 0.5, 'DOJI', color = color.new(color.yellow, 75), style = label.style_label_down, size = size.tiny)
+
+    // Engulfing patterns
+// ==========     if bullish_engulfing
+// ==========         label.new(bar_index, low - atr * 0.5, 'ENG RIALZ', color = color.new(color.green, 80), style = label.style_label_up, size = size.tiny)
+
+// ==========     if bearish_engulfing
+ // ==========        label.new(bar_index, high + atr * 0.5, 'ENG RIBAS', color = color.new(color.red, 80), style = label.style_label_down, size = size.tiny)
+
+    // Hammer e Shooting Star
+ // ==========    if hammer
+ // ==========        label.new(bar_index, low - atr * 0.3, 'MARTELLO', color = color.new(color.lime, 80), style = label.style_label_up, size = size.tiny)
+
+ // ==========    if shooting_star
+ // ==========        label.new(bar_index, high + atr * 0.3, 'STELLA CAD', color = color.new(color.orange, 80), style = label.style_label_down, size = size.tiny)
+
+// ========== PLOT PIVOT POINTS ==========
+// ========if show_reg
+    if not na(ph)
+        label.new(bar_index - length, ph, 'MA', color = color.new(#0ebe69, 80), style = label.style_label_down, size = size.small)
+    if not na(pl)
+        label.new(bar_index - length, pl, 'MI', color  = color.new(#942c03, 80), style = label.style_label_up, size = size.small)
+
+
+// ========== VISUALIZZAZIONE PATTERN CANDLESTICK ==========
+if showSignals
+    // Doji
+  // ==================   if is_doji
+  // ==========      label.new(bar_index, high + atr * 0.5, 'DOJI', color = color.new(color.yellow, 75), style = label.style_label_down, size = size.tiny)
+
+    // Engulfing patterns
+// ==========     if bullish_engulfing
+// ==========         label.new(bar_index, low - atr * 0.5, 'ENG RIALZ', color = color.new(color.green, 80), style = label.style_label_up, size = size.tiny)
+
+// ==========     if bearish_engulfing
+ // ==========        label.new(bar_index, high + atr * 0.5, 'ENG RIBAS', color = color.new(color.red, 80), style = label.style_label_down, size = size.tiny)
+
+    // Hammer e Shooting Star
+ // ==========    if hammer
+ // ==========        label.new(bar_index, low - atr * 0.3, 'MARTELLO', color = color.new(color.lime, 80), style = label.style_label_up, size = size.tiny)
+
+ // ==========    if shooting_star
+ // ==========        label.new(bar_index, high + atr * 0.3, 'STELLA CAD', color = color.new(color.orange, 80), style = label.style_label_down, size = size.tiny)
+
+// ========== PLOT PIVOT POINTS ==========
+// ========if show_reg
+    if not na(ph)
+        label.new(bar_index - length, ph, 'MA', color = color.new(#0ebe69, 80), style = label.style_label_down, size = size.small)
+    if not na(pl)
+        label.new(bar_index - length, pl, 'MI', color  = color.new(#942c03, 80), style = label.style_label_up, size = size.small)
