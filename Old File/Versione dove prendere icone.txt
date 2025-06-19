@@ -7,12 +7,23 @@ indicator('4H | Strategia Multi-Confluenza', shorttitle = '4H StratMC', overlay 
 // ========== INIZIALIZZA VARIABILI ==========
 var float confluence_score = 0.0
 var float conflu = na
-extendLeftInput = false   // Fisso: non estendere a sinistra
-extendRightInput = true   // Fisso: estendere a destra
+// Per compatibilità con il resto del codice
+CANDELE_STORICHE = 48
+max_bars_labels = CANDELE_STORICHE
+// CORREZIONE: Usa barstate.isconfirmed per contare le barre confermate
+var int confirmed_bars_count = 0
+if barstate.isconfirmed
+    confirmed_bars_count += 1
 
+// Funzione per creare label con controllo del numero di barre
+create_label(cond, x, y, txt, clr, sty, sz) =>
+    // CORREZIONE: Controlla se siamo nelle ultime N barre confermate
+    is_within_limit = confirmed_bars_count <= max_bars_labels or not barstate.isconfirmed
+    if cond and is_within_limit
+        label.new(x, y, txt, color=clr, style=sty, size=sz)
+        
 
 // ========== IMPOSTAZIONI E VALORI ==========
-
 // Impostazioni Regressione Lineare 
 lengthInput = input.int(100, title = 'LinReg Lunghezza', minval = 10, maxval = 200, group = 'Regressione Lineare')
 sourceInput = input.source(close, title = 'Sorgente', group = 'Regressione Lineare')
@@ -25,7 +36,15 @@ upperMultInput = input.float(1.0, title = '', inline = 'Upper Deviation', group 
 useLowerDevInput = input.bool(true, title = '', inline = 'Lower Deviation', group = group1)
 lowerMultInput = input.float(1.0, title = '', inline = 'Lower Deviation', group = group1)
 
+// Impostazioni Visualizzazione
+group2 = 'Impostazioni Visualizzazione'
+showDashboard = input.bool(true, 'Mostra Dashboard', group = group2)
+showCandlestickPatterns = input.bool(true, "Mostra Pattern Candlestick", group = group2)
+show_reg1 = input.bool(true, 'Pivot Regolari', group = group2)
 
+// Estensione linee FISSA (non più input)
+extendLeftInput = false  // FISSO
+extendRightInput = true  // FISSO
 
 // Impostazioni Segnale
 group_signals = 'Impostazioni Segnale'
@@ -92,8 +111,8 @@ trend_bullish = ema21 > sma50 and close > ema21
 trend_bearish = ema21 < sma50 and close < ema21
 
 // Plot delle medie mobili
-plot(ema21, title = 'EMA 21', color = color.new(#f8ea6f, 10), linewidth = 2)
-plot(sma50, title = 'SMA 50', color = color.new(#F52887, 10), linewidth = 2)
+plot(ema21, title = 'EMA 21', color = color.new(color.orange, 50), linewidth = 1)
+plot(sma50, title = 'SMA 50', color = color.new(color.purple, 50), linewidth = 2)
 
 // Calcolo Momentum 
 momentum = ta.mom(close, momentum_length)
@@ -181,8 +200,8 @@ endPrice = i
 
 // Define extend style and colors
 extendStyle = extendRightInput ? extend.right : extendLeftInput ? extend.left : extend.none
-colorUpper = color.rgb(166, 63, 3, 75)      // Background LinReg zona Rossa
-colorLower = color.rgb(108, 86, 140, 75)      // Background LinReg zona Verde
+colorUpper = color.rgb(166, 63, 3, 75)      // rosso scuro con stessa trasparenza
+colorLower = color.rgb(108, 86, 140, 75)      // verde scuro con stessa trasparenza
 
 var line baseLine = na
 if na(baseLine) and not na(startPrice)
@@ -281,9 +300,9 @@ bb_offset = input.int(0, 'Spostamento BB', minval = -500, maxval = 500, display 
 // BB Position calculation
 bb_position = (close - bb_lower) / (bb_upper - bb_lower) * 2 - 1 // -1 to +1 scale
 
-plot(bb_basis, title='Base BB', color=color.new(#f0e0e0, 100), offset=bb_offset)
-plot(bb_upper, title='Superiore BB', color=color.new(#C11B17, 40), offset=bb_offset)
-plot(bb_lower, title='Inferiore BB', color=color.new(#6CBB3C, 40), offset=bb_offset)
+plot(bb_basis, 'Base BB', color = #f0e0e0, offset = bb_offset)
+bb_p1 = plot(bb_upper, 'Superiore BB', color = #cd5c5c, offset = bb_offset)
+bb_p2 = plot(bb_lower, 'Inferiore BB', color = #7dcc5d, offset = bb_offset)
 
 // Calcolo PUNTI PIVOT
 length = input(9, 'Lunghezza Pivot', group = 'Punti Pivot')
@@ -437,16 +456,15 @@ base_conditions_sell = checkBaseConditions(false)
 signal_at_close_buy = buy_signal and barstate.isconfirmed
 signal_at_close_sell = sell_signal and barstate.isconfirmed
 
-// ============= Calcolo Timer OK (FISSO)
-
-// Variabili Timer Ok
+// Calcolo Timer OK (FISSO)
+// VARIABILI TIMER =================
 var int signal_timer = 0
 var bool last_signal_was_buy = false
 var bool last_signal_was_sell = false
 var bool signal_confirmed = false
 var bool timer_active = false
 
-// Logica del TIMER OK FISSO
+// ================= LOGICA DEL TIMER FISSO =================
 if barstate.isconfirmed
     if signal_at_close_buy or signal_at_close_sell
         // Nuovo segnale confermato - azzera e riparte da 1
@@ -476,102 +494,67 @@ if barstate.isconfirmed
         signal_confirmed := false
         timer_active := false
 
-// Display TIMER STATUS Ok 
+// ================= DISPLAY TIMER STATUS =================
 timer_status = timer_active ? str.tostring(signal_timer) + "/6 " + (last_signal_was_buy ? "BUY" : "SELL") : "No Timer"
 show_timing_signal = timer_active and signal_timer > 0  // CORRETTO: rimossa la "e"
 
 
 
-// ========== Impostazioni Visualizzazione Segnali sul grafico Principale ==========
+// ========== PLOT SEGNALI RIDEFINITO ==========
 
-// Gruppi e impostazioni fisse
-group2 = 'Impostazioni Visualizzazione'
-group4 = 'Impostazioni Visualizzazione'
-groupSignals = 'Visualizzazione Segnali'
-
-showSignals = true  // Fisso
-showCandlestickPatterns = true  // Fisso, non più input
-show_reg1 = true  // Fisso, non più input
+// Controllo semplice: mostra segnali solo nelle ultime 48 candele + segnali LIVE
+should_show_signal = barstate.islast or (bar_index > (last_bar_index - CANDELE_STORICHE))
 
 
-showSignals1 = input.bool(true, 'Mostra Segnali di Trading', group = groupSignals)
+// Funzione generica per creare label
+createLabel(_text, _color, _style, _position) =>
+    if should_show_signal
+        label.new(bar_index, _position, _text, color=_color, style=_style, size=size.normal, textcolor=color.white)
 
-// ========== Logica Segnali ==========
+// Label per segnali di acquisto e vendita
+if signal_at_close_buy
+    createLabel("BUY\n" + str.tostring(confluence_score, "#.#"), color.new(color.green, 20), label.style_label_up, low * 0.999)
 
-// Limite di visualizzazione a 48 barre o variabile
-lookback = 72
+if signal_at_close_sell  
+    createLabel("SELL\n" + str.tostring(confluence_score, "#.#"), color.new(color.red, 20), label.style_label_down, high * 1.001)
 
-// Condizione per mostrare segnali solo nelle ultime 48 candele o in tempo reale
-should_show_signal = barstate.islast or (bar_index > (last_bar_index - lookback))
+// Plot segnali con frecce
+plotshape(signal_at_close_buy, title="Segnale BUY", location=location.belowbar, color=color.new(color.green, 0), style=shape.triangleup, size=size.small)
+plotshape(signal_at_close_sell, title="Segnale SELL", location=location.abovebar, color=color.new(color.red, 0), style=shape.triangledown, size=size.small)
 
-// Funzione per creare label generiche
-create_label(cond, x, y, txt, clr, sty, sz) =>
-    if cond
-        label.new(x, y, txt, color=clr, style=sty, size=sz, yloc=yloc.abovebar)
+// ========== CANDLESTICK PATTERNS DISPLAY ==========
+if showCandlestickPatterns
+    // Doji
+    if is_doji
+        createLabel("DOJI", color.new(color.yellow, 50), label.style_circle, high)
+    
+    // Engulfing patterns
+    if bullish_engulfing
+        createLabel("BULL\nENG", color.new(color.green, 30), label.style_label_up, low * 0.998)
+    
+    if bearish_engulfing
+        createLabel("BEAR\nENG", color.new(color.red, 30), label.style_label_down, high * 1.002)
+    
+    // Hammer e Shooting Star
+    if hammer and close > open
+        createLabel("HAMMER", color.new(color.blue, 30), label.style_label_up, low * 0.997)
+    
+    if shooting_star and close < open
+        createLabel("SHOOT\nSTAR", color.new(color.orange, 30), label.style_label_down, high * 1.003)
 
-// Funzione per creare label dei segnali solo se entro il lookback
-createSignalLabel(cond, x, y, txt, clr, sty, sz, yloc_param) =>
-    if cond and should_show_signal
-        label.new(x, y, txt, color=clr, style=sty, size=sz, yloc=yloc_param, tooltip=str.format("Segnale: {0}\nBarra: {1}", txt, bar_index))
-
-// Array per gestione etichette e lookback
-var label[] label_arr = array.new_label()
-
-// Rimuovi le label più vecchie se superano il limite
-if array.size(label_arr) > lookback
-    lbl_to_delete = array.shift(label_arr)
-    label.delete(lbl_to_delete)
-
-// Visualizzazione pattern candele e segnali
-if showSignals and showCandlestickPatterns
-    min_bar_index = last_bar_index - lookback + 1
-
-  // Pattern rialzisti (sotto la candela)
-    if bullish_engulfing and bar_index >= min_bar_index
-        label.new(bar_index, low - atr * 0.5, 'ENG RIALZ', color=color.new(color.green, 20), style=label.style_label_up, size=size.tiny, yloc=yloc.price)
-    if hammer and bar_index >= min_bar_index
-        label.new(bar_index, low - atr * 0.3, 'MARTELLO', color=color.new(color.lime, 20), style=label.style_label_up, size=size.tiny, yloc=yloc.price)
-
-    // Pattern ribassisti (sopra la candela)
-    if is_doji and bar_index >= min_bar_index
-        label.new(bar_index, high + atr * 0.5, 'DOJI', color=color.new(color.yellow, 20), style=label.style_label_down, size=size.tiny, yloc=yloc.abovebar)
-    if bearish_engulfing and bar_index >= min_bar_index
-        label.new(bar_index, high + atr * 0.5, 'ENG RIBAS', color=color.new(color.red, 20), style=label.style_label_down, size=size.tiny, yloc=yloc.abovebar)
-    if shooting_star and bar_index >= min_bar_index
-        label.new(bar_index, high + atr * 0.3, 'STELLA CAD', color=color.new(color.orange, 20), style=label.style_label_down, size=size.tiny, yloc=yloc.abovebar)
-
-// ========== Visualizzazione Pivot Points ==========
-
+// ========== PIVOT POINTS DISPLAY ==========
 if show_reg1
-    min_bar_index = last_bar_index - lookback + 1
-    if not na(ph) and bar_index >= min_bar_index
-        label.new(bar_index - length, ph, 'MA', color=color.new(#0ebe69, 20), style=label.style_label_down, size=size.tiny, yloc=yloc.abovebar)
-    if not na(pl) and bar_index >= min_bar_index
-        label.new(bar_index - length, pl, 'MI', color=color.new(#942c03, 20), style=label.style_label_up, size=size.tiny, yloc=yloc.price)
+    if bool(ph) and show_reg
+        create_label(true, bar_index - length, ph, 'H', reg_ph_css, label.style_label_down, size.small)
+    if bool(pl) and show_reg
+        create_label(true, bar_index - length, pl, 'L', reg_pl_css, label.style_label_up, size.small)
 
-// Creazione etichette segnali se attivato
-if showSignals
-    // Segnali di acquisto (sotto la candela)
-    if buy_signal and not barstate.isconfirmed
-        createSignalLabel(true, bar_index, low - atr * 0.5, 'COMPRA LIVE\n' + str.tostring(signal_strength, '#.#'), color.new(color.green, 2), label.style_label_up, size.small, yloc.price)
-        // Nota: usa label.style_label_up se label.style_label100.up non esiste
-    if signal_at_close_buy
-        createSignalLabel(true, bar_index, low - atr * 0.5, 'COMPRA ✓\n' + str.tostring(signal_strength, '#.#'), color.green, label.style_label_up, size.small, yloc.price)
-        // Nota: usa label.style_label_up se label.style_label100.up non esiste
-
-    // Segnali di vendita (sopra la candela)
-    if sell_signal and not barstate.isconfirmed
-        createSignalLabel(true, bar_index, high + atr * 0.5, 'VENDI LIVE\n' + str.tostring(signal_strength, '#.#'), color.new(color.red, 2), label.style_label_down, size.small, yloc.price)
-        // Nota: per logica sopra/sotto, qui puoi usare yloc.price e offset positivo
-    if signal_at_close_sell
-        createSignalLabel(true, bar_index, high + atr * 0.5, 'VENDI ✓\n' + str.tostring(signal_strength, '#.#'), color.red, label.style_label_down, size.small, yloc.price)
+// ========== PARAMETRI DASHBOARD ==========
+showSignals = input.bool(true, "Mostra Dashboard", group="🎯 DASHBOARD")
 
 // ========== DASHBOARD AVANZATA ==========
-
 var table info_table = table.new(position.bottom_right, 3, 14, bgcolor = color.new(color.black, 95), border_width = 1, border_color = color.new(color.gray, 60))
 if barstate.islast and showSignals
-    
-
     // Header
     table.cell(info_table, 0, 0, '📊 4H | Strategia Multi Conf', text_color = color.white, bgcolor = color.new(color.blue, 85), text_size = size.small)
     table.merge_cells(info_table, 0, 0, 2, 0)
@@ -603,7 +586,7 @@ if barstate.islast and showSignals
     table.cell(info_table, 1, 3, stoch_icon, text_color = color.white, bgcolor = stoch_color, text_size = size.large)
     table.cell(info_table, 2, 3, stoch_text + '\nK:' + str.tostring(stoch_k, '#') + ' D:' + str.tostring(stoch_d, '#'), text_color = color.white, bgcolor = stoch_color, text_size = size.small)
 
-   // Medie Mobili
+    // Medie Mobili
     ma_icon = trend_bullish ? '📈' : trend_bearish ? '📉' : '↔️'
     ma_color = trend_bullish ? color.new(color.lime, 75) : trend_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
     ma_text = trend_bullish ? 'RIALZISTA' : trend_bearish ? 'RIBASSISTA' : 'NEUTRO'
@@ -629,8 +612,8 @@ if barstate.islast and showSignals
     table.cell(info_table, 0, 6, '🕯️ Price Action', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
     table.cell(info_table, 1, 6, pa_icon, text_color = color.white, bgcolor = pa_color, text_size = size.large)
     table.cell(info_table, 2, 6, pa_text + '\nATR:' + str.tostring(atr, '#.####'), text_color = color.white, bgcolor = pa_color, text_size = size.small)
-	
-	// MACD
+    
+    // MACD
     macd_icon = macd_bullish ? '📈' : macd_bearish ? '📉' : '⚪'
     macd_color = macd_bullish ? color.new(color.lime, 75) : macd_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
     macd_text = macd_bullish ? 'RIALZISTA' : macd_bearish ? 'RIBASSISTA' : 'NEUTRO'
@@ -676,41 +659,40 @@ if barstate.islast and showSignals
     signal_text = signal_strength >= 2 ? 'COMPRA FORTE' : signal_strength <= -2 ? 'VENDI FORTE' : 
                   signal_strength > 0 ? 'COMPRA DEBOLE' : signal_strength < 0 ? 'VENDI DEBOLE' : 'NEUTRALE'
 
-    table.cell(info_table, 0, 11, '💪 Forza OK', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 0, 11, '💪 Forza Segnale', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
     table.cell(info_table, 1, 11, signal_icon, text_color = color.white, bgcolor = signal_color, text_size = size.large)
     table.cell(info_table, 2, 11, signal_text + '\n' + str.tostring(signal_strength, '#.#'), text_color = color.white, bgcolor = signal_color, text_size = size.small)
 
-// Icone e colori per la dashboard
-timer_icon = show_timing_signal ? 
-             (last_signal_was_buy ? '⏰🟢' : '⏰🔴') : '💤'
+    // Icone e colori per la dashboard timer
+    timer_icon = show_timing_signal ? 
+                 (last_signal_was_buy ? '⏰🟢' : '⏰🔴') : '💤'
 
-timer_color = show_timing_signal ? 
-              (last_signal_was_buy ? color.new(color.lime, 60) : color.new(color.red, 60)) : 
-              color.new(color.gray, 80)
+    timer_color = show_timing_signal ? 
+                  (last_signal_was_buy ? color.new(color.lime, 60) : color.new(color.red, 60)) : 
+                  color.new(color.gray, 80)
 
-// Testo dello stato con timer
-timer_text = show_timing_signal ? 
-             'Ok (' + str.tostring(signal_timer) + '/6)' : 
-             'ASPETTA'
+    // Testo dello stato con timer
+    timer_text = show_timing_signal ? 
+                 'ATTIVO (' + str.tostring(signal_timer) + '/6)' : 
+                 'ASPETTA'
 
-// Celle della dashboard
-table.cell(info_table, 0, 12, '⏰ Stato OK', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-table.cell(info_table, 1, 12, timer_icon, text_color = color.white, bgcolor = timer_color, text_size = size.large)
-table.cell(info_table, 2, 12, timer_text, text_color = color.white, bgcolor = timer_color, text_size = size.small)
+    // Celle della dashboard timer
+    table.cell(info_table, 0, 12, '⏰ Timer Segnale', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 12, timer_icon, text_color = color.white, bgcolor = timer_color, text_size = size.large)
+    table.cell(info_table, 2, 12, timer_text, text_color = color.white, bgcolor = timer_color, text_size = size.small)
 
-   // Market State
-market_state = trend_bullish and confluence_score > 0 ? 'RIALZISTA' : 
-               trend_bearish and confluence_score < 0 ? 'RIBASSISTA' : 
-               'LATERALE'
-market_icon = trend_bullish and confluence_score > 0 ? '🐂' : 
-              trend_bearish and confluence_score < 0 ? '🐻' : '🦀'
-market_color = trend_bullish and confluence_score > 0 ? color.new(color.lime, 60) : 
-               trend_bearish and confluence_score < 0 ? color.new(color.red, 60) : color.new(color.yellow, 70)
+    // Market State
+    market_state = trend_bullish and confluence_score > 0 ? 'RIALZISTA' : 
+                   trend_bearish and confluence_score < 0 ? 'RIBASSISTA' : 
+                   'LATERALE'
+    market_icon = trend_bullish and confluence_score > 0 ? '🐂' : 
+                  trend_bearish and confluence_score < 0 ? '🐻' : '🦀'
+    market_color = trend_bullish and confluence_score > 0 ? color.new(color.lime, 60) : 
+                   trend_bearish and confluence_score < 0 ? color.new(color.red, 60) : color.new(color.yellow, 70)
 
-table.cell(info_table, 0, 13, '🌍 Trend', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-table.cell(info_table, 1, 13, market_icon, text_color = color.white, bgcolor = market_color, text_size = size.large)
-table.cell(info_table, 2, 13, market_state, text_color = color.white, bgcolor = market_color, text_size = size.small)
-
+    table.cell(info_table, 0, 13, '🌍 Mercato', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 13, market_icon, text_color = color.white, bgcolor = market_color, text_size = size.large)
+    table.cell(info_table, 2, 13, market_state, text_color = color.white, bgcolor = market_color, text_size = size.small)
 
 // ========== ALERT CONDITIONS ==========
 
@@ -740,10 +722,10 @@ alertcondition(ta.crossover(signal_strength, 1.5) or ta.crossunder(signal_streng
                message = '🔄 Cambio Trend Forte per {{ticker}} - Nuova Forza: {{plot("Forza Segnale")}} - Confluenza: {{plot("Confluenza Score")}}')
 
 // ========== PLOT PER DATA WINDOW ==========
-plot(signal_timer, title = 'Timer Stato', display = display.data_window, color = color.new(color.gray, 100), editable=false)
-plot(base_conditions_buy ? 1 : 0, title = 'Condizioni Base BUY', display = display.data_window, color = color.new(color.green, 100), editable=false)
-plot(base_conditions_sell ? 1 : 0, title = 'Condizioni Base SELL', display = display.data_window, color = color.new(color.red, 100), editable=false)
-plot(confluence_score, title = 'Confluenza Score', display = display.data_window, color = color.new(color.blue, 100), editable=false)
-plot(signal_strength, title = 'Forza Segnale', display = display.data_window, color = color.new(color.purple, 100), editable=false)
-plot(linreg_position, title = 'LinReg Position', display = display.data_window, color = color.new(color.orange, 100), editable=false)
-plot(pearsonR, title = 'Pearson R', display = display.data_window, color = color.new(color.yellow, 100), editable=false)
+plot(signal_timer, title = 'Timer Stato', display = display.data_window, color = color.new(color.gray, 100))
+plot(base_conditions_buy ? 1 : 0, title = 'Condizioni Base BUY', display = display.data_window, color = color.new(color.green, 100))
+plot(base_conditions_sell ? 1 : 0, title = 'Condizioni Base SELL', display = display.data_window, color = color.new(color.red, 100))
+plot(confluence_score, title = 'Confluenza Score', display = display.data_window, color = color.new(color.blue, 100))
+plot(signal_strength, title = 'Forza Segnale', display = display.data_window, color = color.new(color.purple, 100))
+plot(linreg_position, title = 'LinReg Position', display = display.data_window, color = color.new(color.orange, 100))
+plot(pearsonR, title = 'Pearson R', display = display.data_window, color = color.new(color.yellow, 100))
