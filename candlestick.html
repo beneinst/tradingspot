@@ -5,288 +5,390 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pattern Candlestick per il Trading Spot su Criptovalute (H4)</title>
 	<link rel="icon" type="image/png" href="favicon.png">
-    <style>
+	
+	<style>
     :root {
-    --primary-color: #2a71d0;
-    --secondary-color: #37474f;
-    --bullish-color: #26a69a;
-    --bearish-color: #ef5350;
-    --neutral-color: #78909c;
-    --dark-bg: #263238;
-    --light-text: #eceff1;
-    --shadow: 0 4px 8px rgba(0,0,0,0.5);
+  --primary-color: #2a71d0;
+  --secondary-color: #37474f;
+  --bullish-color: #26a69a;
+  --bearish-color: #ef5350;
+  --neutral-color: #78909c;
+  --dark-bg: #23242e;
+  --darker-bg: #181924;
+  --light-text: #eceff1;
+  --shadow: 0 4px 24px rgba(0,0,0,0.45), 0 1.5px 4px rgba(42,113,208,0.08);
+  --card-bg: rgba(35, 36, 46, 0.98);
+  --box-glow: 0 0 0.5px 1px hsla(0,0%,100%,0.07), 0 0 0 1px hsla(0,0%,0%,0.06), 0 0.3px 0.4px hsla(0,0%,0%,0.04), 0 0.9px 1.5px hsla(0,0%,0%,0.09), 0 3.5px 6px hsla(0,0%,0%,0.13);
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    background: linear-gradient(135deg, #1e272e 0%, #2f3640 100%);
-    font-family: 'Poppins', sans-serif;
-    color: var(--light-text);
-    line-height: 1.6;
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #181924 100%);
+  color: var(--light-text);
+  line-height: 1.7;
+  padding: 24px;
+  min-height: 100vh;
+  transition: background 0.4s;
 }
 
 header {
-    background: var(--dark-bg);
-    color: var(--light-text);
-    padding: 2rem;
-    text-align: center;
-    box-shadow: var(--shadow);
+  background: var(--dark-bg);
+  color: var(--light-text);
+  padding: 2rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border-radius: 18px;
+  margin-bottom: 2rem;
 }
 
 .container {
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
-.intro {
-    background-color: var(--secondary-color);
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    box-shadow: var(--shadow);
+#pivot-candlestick {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
 
 h1 {
-    font-size: 1.7rem;
-    margin-bottom: 1rem;
-    color: var(--light-text);
+  font-size: 2.2rem;
+  margin-bottom: 1.2rem;
+  color: var(--primary-color);
 }
 
 h2 {
-    font-size: 1.8rem;
-    margin: 1.5rem 0;
-    color: var(--primary-color);
-    border-bottom: 2px solid var(--primary-color);
-    padding-bottom: 0.5rem;
+  text-align: center;
+  font-size: 2.3rem;
+  margin-bottom: 28px;
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 0.5rem;
 }
 
 h3 {
-    font-size: 1.3rem;
-    margin: 1rem 0;
-    color: var(--light-text);
+  font-size: 1.3rem;
+  margin: 1rem 0;
+  color: var(--light-text);
 }
 
-p {
-    margin-bottom: 1rem;
+.intro-text, .intro {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+  opacity: 0.92;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  background: var(--secondary-color);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
 }
 
 .patterns-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+  gap: 32px;
+  margin-bottom: 40px;
 }
 
 .pattern-card {
-    background-color: var(--secondary-color);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: transform 0.3s ease;
+  background: var(--card-bg);
+  backdrop-filter: blur(5px);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--box-glow), var(--shadow);
+  border: 1.5px solid rgba(42, 113, 208, 0.13);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
 }
 
 .pattern-card:hover {
-    transform: translateY(-5px);
+  transform: translateY(-8px) scale(1.025);
+  box-shadow: 0 16px 48px rgba(42,113,208,0.16), var(--box-glow);
+  border-color: #FFD700;
 }
 
 .pattern-header {
-    padding: 1rem;
-    color: white;
+  padding: 20px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.3rem;
+  color: #fff;
+  letter-spacing: 0.5px;
 }
 
-.bullish {
-    background-color: var(--bullish-color);
+.pattern-header.bullish {
+  background: linear-gradient(135deg, var(--bullish-color), #00695c);
 }
 
-.bearish {
-    background-color: var(--bearish-color);
+.pattern-header.bearish {
+  background: linear-gradient(135deg, var(--bearish-color), #c62828);
 }
 
-.neutral {
-    background-color: var(--neutral-color);
+.pattern-header.neutral {
+  background: linear-gradient(135deg, var(--neutral-color), #455a64);
 }
 
 .pattern-content {
-    padding: 1.5rem;
+  padding: 28px 24px 24px 24px;
 }
 
 .pattern-svg {
-    background-color: var(--dark-bg);
-    height: 150px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 1rem;
-    border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 18px;
+  background: var(--dark-bg);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 2px 8px rgba(42,113,208,0.09);
+  min-height: 120px;
+}
+
+.pattern-content p {
+  font-size: 1.08rem;
+  margin-bottom: 15px;
+  text-align: center;
 }
 
 .description-list {
-    list-style-type: none;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem 0;
 }
 
 .description-list li {
-    margin-bottom: 0.5rem;
-    padding-left: 1.2rem;
-    position: relative;
+  padding: 8px 0 8px 28px;
+  position: relative;
+  font-size: 0.98rem;
+  opacity: 0.92;
+  line-height: 1.7;
 }
 
-.description-list li::before {
-    content: "•";
-    color: var(--primary-color);
-    font-weight: bold;
-    position: absolute;
-    left: 0;
+.description-list li:before {
+  content: "▶";
+  position: absolute;
+  left: 0;
+  color: #FFD700;
+  font-size: 1rem;
 }
 
 .tips {
-    background-color: var(--secondary-color);
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin: 2rem 0;
-    box-shadow: var(--shadow);
-    border-left: 4px solid var(--primary-color);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.10), rgba(255, 165, 0, 0.10));
+  border-radius: 18px;
+  padding: 30px 28px;
+  border: 1.5px solid rgba(255, 215, 0, 0.22);
+  margin-top: 40px;
+  box-shadow: var(--shadow);
 }
 
-.tips ol {
-    padding-left: 1.5rem;
+.tips h3 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #FFD700;
+}
+
+.tips ul {
+  list-style: none;
+  padding: 0;
 }
 
 .tips li {
-    margin-bottom: 0.8rem;
+  padding: 12px 0 12px 32px;
+  position: relative;
+  font-size: 1rem;
+}
+
+.tips li:before {
+  content: "💡";
+  position: absolute;
+  left: 0;
+}
+
+.signal-strength {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.87rem;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.strength-high {
+  background: rgba(76, 175, 80, 0.25);
+  color: #4CAF50;
+  border: 1px solid #4CAF50;
+}
+
+.strength-medium {
+  background: rgba(255, 193, 7, 0.22);
+  color: #FFC107;
+  border: 1px solid #FFC107;
+}
+
+.strength-low {
+  background: rgba(255, 87, 34, 0.22);
+  color: #FF5722;
+  border: 1px solid #FF5722;
 }
 
 .conclusion {
-    background-color: var(--dark-bg);
-    color: var(--light-text);
-    padding: 2rem;
-    border-radius: 8px;
-    margin-top: 2rem;
-    box-shadow: var(--shadow);
+  background-color: var(--dark-bg);
+  color: var(--light-text);
+  padding: 2rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+  box-shadow: var(--shadow);
 }
 
 .footer {
-    margin-top: 1px;
-    margin-bottom: 20px;
-    text-align: center;
-    font-size: 16px;
-    color: #F2BB66;
-    font-weight: normal;
+  margin-top: 1px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 16px;
+  color: #F2BB66;
+  font-weight: normal;
 }
 
 .footer a {
-    color: #FAEBD7;
-    text-decoration: none;
-    margin: 0 8px;
-    transition: color 0.3s ease;
+  color: #FAEBD7;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s;
 }
 
 .footer a:hover {
-    color: #FFDB58;
+  color: #FFDB58;
 }
 
 /* Menu di navigazione */
 .nav-container {
-    background-color: var(--dark-bg);
-    padding: 1rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: var(--shadow);
+  background-color: var(--dark-bg);
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
 }
 
 .nav {
-    display: flex;
-    justify-content: center;
-    overflow-x: auto;
-    scroll-behavior: smooth;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  scroll-behavior: smooth;
 }
 
 .nav a {
-    color: var(--light-text);
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    margin: 0 0.5rem;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    white-space: nowrap;
+  color: var(--light-text);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+  border-radius: 4px;
+  transition: all 0.3s;
+  white-space: nowrap;
 }
 
 .nav a:hover {
-    background-color: rgba(255,255,255,0.1);
+  background-color: rgba(255,255,255,0.08);
 }
 
-/* Pulsante "torna su" */
 .back-to-top {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    background-color: var(--primary-color);
-    color: white;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: none;
-    box-shadow: var(--shadow);
-    opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: var(--primary-color);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
 }
 
 .back-to-top.show {
-    opacity: 1;
-    pointer-events: all;
+  opacity: 1;
+  pointer-events: all;
 }
 
 /* Tooltip */
 .tooltip {
-    position: relative;
-    cursor: help;
-    border-bottom: 1px dotted var(--primary-color);
+  position: relative;
+  cursor: help;
+  border-bottom: 1px dotted var(--primary-color);
 }
 
 .tooltip .tooltip-text {
-    visibility: hidden;
-    background-color: var(--dark-bg);
-    color: var(--light-text);
-    text-align: center;
-    border-radius: 6px;
-    padding: 0.5rem;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -100px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    width: 200px;
+  visibility: hidden;
+  background-color: var(--dark-bg);
+  color: var(--light-text);
+  text-align: center;
+  border-radius: 6px;
+  padding: 0.5rem;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  width: 200px;
 }
 
 .tooltip:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
 }
 
 /* Animazioni per SVG candele */
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 .svg-candle:hover {
-    animation: pulse 1s infinite;
+  animation: pulse 1s infinite;
 }
 
-    </style>
+/* Responsive */
+@media (max-width: 900px) {
+  .patterns-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .container, #pivot-candlestick {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .pattern-content {
+    padding: 18px 8px 16px 8px;
+  }
+  .tips {
+    padding: 18px 8px;
+  }
+}
+</STYLE>
 </head>
 <body>
     <header>
@@ -296,6 +398,7 @@ p {
     <div class="nav-container">
         <nav class="nav">
             <a href="#intro">Introduzione</a>
+			<a href="#pivot-candlestick">pivot-candlestick</a>
             <a href="#inversioni">Inversioni di Tendenza</a>
             <a href="#continuazione">Pattern di Continuazione</a>
             <a href="#suggerimenti">Suggerimenti Operativi</a>
@@ -307,6 +410,362 @@ p {
         <section id="intro" class="intro">
             <p>L'analisi candlestick è uno strumento essenziale per il trader che vuole comprendere il comportamento del mercato attraverso la lettura delle candele giapponesi. Nel trading spot su criptovalute, in particolare sul timeframe a 4 ore (H4), i pattern candlestick possono fornire segnali preziosi per anticipare inversioni di tendenza o conferme di movimenti già in atto. Questo approccio è particolarmente adatto a chi non è costretto a operare in tempi rapidi (come nel day trading), ma preferisce osservare il mercato con più respiro.</p>
         </section>
+		
+ <section id="pivot-candlestick">
+        <h2>📊 Pattern Candlestick e Pivot Point</h2>
+        <p class="intro-text">
+            Questa sezione illustra i principali pattern candlestick riconosciuti dal tuo indicatore e i Pivot Point. 
+            I pattern candlestick rivelano la psicologia del mercato attraverso la formazione dei prezzi, mentre i Pivot Point 
+            identificano livelli chiave per possibili inversioni o accelerazioni di trend. La combinazione di questi elementi 
+            fornisce segnali di trading più affidabili e precisi.
+        </p>
+        
+        <div class="patterns-grid">
+            <!-- ENG RIALZ (Bullish Engulfing) -->
+            <div class="pattern-card">
+                <div class="pattern-header bullish">
+                    <h3>🔹 ENG RIALZ (Bullish Engulfing)</h3>
+                </div>
+                <div class="pattern-content">
+                    <div class="pattern-svg">
+                        <svg width="250" height="180" viewBox="0 0 250 180">
+                            <!-- Candela ribassista piccola -->
+                            <rect x="80" y="70" width="20" height="40" fill="#ef5350" stroke="#000" stroke-width="1"/>
+                            <line x1="90" y1="60" x2="90" y2="70" stroke="#000" stroke-width="2"/>
+                            <line x1="90" y1="110" x2="90" y2="120" stroke="#000" stroke-width="2"/>
+                            
+                            <!-- Candela rialzista grande che ingloba -->
+                            <rect x="140" y="45" width="30" height="90" fill="#26a69a" stroke="#000" stroke-width="1"/>
+                            <line x1="155" y1="40" x2="155" y2="45" stroke="#000" stroke-width="2"/>
+                            <line x1="155" y1="135" x2="155" y2="140" stroke="#000" stroke-width="2"/>
+                            
+                            <!-- Label e freccia -->
+                            <text x="125" y="25" font-size="14" fill="#26a69a" font-weight="bold" text-anchor="middle">ENGULFING</text>
+                            <path d="M 105 90 Q 120 75 135 90" fill="none" stroke="#FFD700" stroke-width="2"/>
+                            <polygon points="132,88 140,90 132,92" fill="#FFD700"/>
+                        </svg>
+                    </div>
+                    <p><strong>Segnale:</strong> Forte inversione rialzista dopo una discesa</p>
+                    <div class="signal-strength strength-high">Affidabilità: Alta</div>
+                    <ul class="description-list">
+                        <li>Candela verde che ingloba completamente una candela rossa precedente</li>
+                        <li>Il corpo della candela rialzista deve superare sia il massimo che il minimo della precedente</li>
+                        <li>Più efficace dopo un trend ribassista prolungato</li>
+                        <li>Conferma con volumi elevati sulla candela engulfing</li>
+                        <li>Stop loss sotto il minimo del pattern</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ENG RIBAS (Bearish Engulfing) -->
+            <div class="pattern-card">
+                <div class="pattern-header bearish">
+                    <h3>🔻 ENG RIBAS (Bearish Engulfing)</h3>
+                </div>
+                <div class="pattern-content">
+                    <div class="pattern-svg">
+                        <svg width="250" height="180" viewBox="0 0 250 180">
+                            <!-- Candela rialzista piccola -->
+                            <rect x="80" y="70" width="20" height="40" fill="#26a69a" stroke="#000" stroke-width="1"/>
+                            <line x1="90" y1="60" x2="90" y2="70" stroke="#000" stroke-width="2"/>
+                            <line x1="90" y1="110" x2="90" y2="120" stroke="#000" stroke-width="2"/>
+                            
+                            <!-- Candela ribassista grande che ingloba -->
+                            <rect x="140" y="45" width="30" height="90" fill="#ef5350" stroke="#000" stroke-width="1"/>
+                            <line x1="155" y1="40" x2="155" y2="45" stroke="#000" stroke-width="2"/>
+                            <line x1="155" y1="135" x2="155" y2="140" stroke="#000" stroke-width="2"/>
+                            
+                            <!-- Label e freccia -->
+                            <text x="125" y="25" font-size="14" fill="#ef5350" font-weight="bold" text-anchor="middle">ENGULFING</text>
+                            <path d="M 105 90 Q 120 75 135 90" fill="none" stroke="#FFD700" stroke-width="2"/>
+                            <polygon points="132,88 140,90 132,92" fill="#FFD700"/>
+                        </svg>
+                    </div>
+                    <p><strong>Segnale:</strong> Forte inversione ribassista dopo una salita</p>
+                    <div class="signal-strength strength-high">Affidabilità: Alta</div>
+                    <ul class="description-list">
+                        <li>Candela rossa che ingloba completamente una candela verde precedente</li>
+                        <li>Il corpo ribassista deve superare sia il massimo che il minimo della precedente</li>
+                        <li>Più efficace dopo un trend rialzista sostenuto</li>
+                        <li>Conferma con volumi elevati sulla candela engulfing</li>
+                        <li>Stop loss sopra il massimo del pattern</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- MARTELLO (Hammer) -->
+            <div class="pattern-card">
+                <div class="pattern-header bullish">
+                    <h3>🔨 MARTELLO (Hammer)</h3>
+                </div>
+                <div class="pattern-content">
+                    <div class="pattern-svg">
+                        <svg width="250" height="180" viewBox="0 0 250 180">
+                            <!-- Corpo piccolo -->
+                            <rect x="115" y="65" width="20" height="15" fill="#26a69a" stroke="#000" stroke-width="1"/>
+                            <!-- Ombra superiore corta -->
+                            <line x1="125" y1="60" x2="125" y2="65" stroke="#000" stroke-width="2"/>
+                            <!-- Ombra inferiore lunga -->
+                            <line x1="125" y1="80" x2="125" y2="130" stroke="#000" stroke-width="3"/>
+                            
+                            <!-- Indicazioni -->
+                            <text x="50" y="75" font-size="12" fill="#FFD700">Corpo piccolo</text>
+                            <line x1="70" y1="73" x2="110" y2="73" stroke="#FFD700" stroke-width="1"/>
+                            
+                            <text x="160" y="105" font-size="12" fill="#FFD700">Ombra lunga</text>
+                            <line x1="135" y1="105" x2="150" y2="105" stroke="#FFD700" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <p><strong>Segnale:</strong> Inversione rialzista dopo test dei supporti</p>
+                    <div class="signal-strength strength-medium">Affidabilità: Media-Alta</div>
+                    <ul class="description-list">
+                        <li>Corpo piccolo nella parte superiore della candela</li>
+                        <li>Ombra inferiore almeno doppia del corpo</li>
+                        <li>Ombra superiore assente o molto piccola</li>
+                        <li>Indica rifiuto dei prezzi bassi da parte del mercato</li>
+                        <li>Conferma con candela verde successiva</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- DOJI -->
+            <div class="pattern-card">
+                <div class="pattern-header neutral">
+                    <h3>⚪ DOJI (Indecisione)</h3>
+                </div>
+                <div class="pattern-content">
+                    <div class="pattern-svg">
+                        <svg width="250" height="180" viewBox="0 0 250 180">
+                            <!-- Corpo piccolissimo (doji) -->
+                            <rect x="122" y="89" width="6" height="2" fill="#78909c" stroke="#000" stroke-width="1"/>
+                            <!-- Ombra superiore -->
+                            <line x1="125" y1="60" x2="125" y2="89" stroke="#000" stroke-width="2"/>
+                            <!-- Ombra inferiore -->
+                            <line x1="125" y1="91" x2="125" y2="120" stroke="#000" stroke-width="2"/>
+                            
+                            <!-- Indicazioni -->
+                            <text x="40" y="65" font-size="12" fill="#FFD700">Ombra superiore</text>
+                            <line x1="85" y1="68" x2="120" y2="75" stroke="#FFD700" stroke-width="1"/>
+                            
+                            <text x="140" y="95" font-size="12" fill="#FFD700">Corpo = 0</text>
+                            <line x1="135" y1="90" x2="145" y2="90" stroke="#FFD700" stroke-width="1"/>
+                            
+                            <text x="40" y="125" font-size="12" fill="#FFD700">Ombra inferiore</text>
+                            <line x1="85" y1="115" x2="120" y2="108" stroke="#FFD700" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <p><strong>Segnale:</strong> Indecisione del mercato, possibile inversione</p>
+                    <div class="signal-strength strength-medium">Affidabilità: Media</div>
+                    <ul class="description-list">
+                        <li>Apertura e chiusura quasi identiche (corpo quasi inesistente)</li>
+                        <li>Ombre superiore e inferiore presenti</li>
+                        <li>Indica equilibrio tra compratori e venditori</li>
+                        <li>Più significativo vicino a supporti/resistenze importanti</li>
+                        <li>Necessita conferma dalla candela successiva</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- STELLA CADENTE (Shooting Star) -->
+            <div class="pattern-card">
+                <div class="pattern-header bearish">
+                    <h3>⭐ STELLA CAD (Shooting Star)</h3>
+                </div>
+                <div class="pattern-content">
+                    <div class="pattern-svg">
+                        <svg width="250" height="180" viewBox="0 0 250 180">
+                            <!-- Corpo piccolo -->
+                            <rect x="115" y="100" width="20" height="15" fill="#ef5350" stroke="#000" stroke-width="1"/>
+                            <!-- Ombra superiore lunga -->
+                            <line x1="125" y1="50" x2="125" y2="100" stroke="#000" stroke-width="3"/>
+                            <!-- Ombra inferiore corta o assente -->
+                            <line x1="125" y1="115" x2="125" y2="120" stroke="#000" stroke-width="2"/>
+                            
+                            <!-- Indicazioni -->
+                            <text x="160" y="75" font-size="12" fill="#FFD700">Ombra lunga</text>
+                            <line x1="135" y1="75" x2="150" y2="75" stroke="#FFD700" stroke-width="1"/>
+                            
+                            <text x="50" y="110" font-size="12" fill="#FFD700">Corpo piccolo</text>
+                            <line x1="70" y1="108" x2="110" y2="108" stroke="#FFD700" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <p><strong>Segnale:</strong> Inversione ribassista dopo test delle resistenze</p>
+                    <div class="signal-strength strength-medium">Affidabilità: Media-Alta</div>
+                    <ul class="description-list">
+                        <li>Corpo piccolo nella parte inferiore della candela</li>
+                        <li>Ombra superiore almeno doppia del corpo</li>
+                        <li>Ombra inferiore assente o molto piccola</li>
+                        <li>Indica rifiuto dei prezzi alti da parte del mercato</li>
+                        <li>Più efficace dopo un trend rialzista</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PIVOT MA (Massimo Assoluto) -->
+            <div class="pattern-card">
+                <div class="pattern-header neutral">
+                    <h3>📈 PIVOT MA (Massimo Assoluto)</h3>
+                </div>
+                <div class="pattern-content">
+                    <div class="pattern-svg">
+                        <svg width="250" height="180" viewBox="0 0 250 180">
+                            <!-- Linea del prezzo -->
+                            <polyline points="20,140 60,120 100,90 140,60 180,40 220,80" 
+                                     fill="none" stroke="#26a69a" stroke-width="4"/>
+                            
+                            <!-- Punto pivot massimo -->
+                            <circle cx="180" cy="40" r="12" fill="#0ebe69" stroke="#fff" stroke-width="3"/>
+                            <text x="185" y="30" font-size="16" fill="#0ebe69" font-weight="bold">MA</text>
+                            
+                            <!-- Linea di resistenza -->
+                            <line x1="140" y1="40" x2="220" y2="40" stroke="#0ebe69" stroke-width="2" stroke-dasharray="5,5"/>
+                            <text x="230" y="45" font-size="12" fill="#0ebe69">Resistenza</text>
+                            
+                            <!-- Frecce indicative -->
+                            <path d="M 160 55 Q 170 45 180 55" fill="none" stroke="#FFD700" stroke-width="2"/>
+                            <polygon points="177,53 185,55 177,57" fill="#FFD700"/>
+                        </svg>
+                    </div>
+                    <p><strong>Significato:</strong> Massimo relativo recente, resistenza dinamica</p>
+                    <div class="signal-strength strength-high">Importanza: Alta</div>
+                    <ul class="description-list">
+                        <li>Punto più alto raggiunto dal prezzo in un periodo definito</li>
+                        <li>Agisce come resistenza psicologica importante</li>
+                        <li>Rottura al rialzo può indicare inizio nuovo trend ascendente</li>
+                        <li>Spesso coincide con zone di presa di profitto</li>
+                        <li>Utilizzare per posizionamento stop loss e take profit</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PIVOT MI (Minimo Assoluto) -->
+            <div class="pattern-card">
+                <div class="pattern-header neutral">
+                    <h3>📉 PIVOT MI (Minimo Assoluto)</h3>
+                </div>
+                <div class="pattern-content">
+                    <div class="pattern-svg">
+                        <svg width="250" height="180" viewBox="0 0 250 180">
+                            <!-- Linea del prezzo -->
+                            <polyline points="20,80 60,100 100,130 140,160 180,140 220,120" 
+                                     fill="none" stroke="#ef5350" stroke-width="4"/>
+                            
+                            <!-- Punto pivot minimo -->
+                            <circle cx="140" cy="160" r="12" fill="#942c03" stroke="#fff" stroke-width="3"/>
+                            <text x="145" y="175" font-size="16" fill="#942c03" font-weight="bold">MI</text>
+                            
+                            <!-- Linea di supporto -->
+                            <line x1="100" y1="160" x2="220" y2="160" stroke="#942c03" stroke-width="2" stroke-dasharray="5,5"/>
+                            <text x="230" y="165" font-size="12" fill="#942c03">Supporto</text>
+                            
+                            <!-- Frecce indicative -->
+                            <path d="M 120 145 Q 130 155 140 145" fill="none" stroke="#FFD700" stroke-width="2"/>
+                            <polygon points="137,147 145,145 137,143" fill="#FFD700"/>
+                        </svg>
+                    </div>
+                    <p><strong>Significato:</strong> Minimo relativo recente, supporto dinamico</p>
+                    <div class="signal-strength strength-high">Importanza: Alta</div>
+                    <ul class="description-list">
+                        <li>Punto più basso raggiunto dal prezzo in un periodo definito</li>
+                        <li>Agisce come supporto psicologico importante</li>
+                        <li>Rottura al ribasso può indicare inizio nuovo trend discendente</li>
+                        <li>Spesso coincide con zone di accumulo e rimbalzo</li>
+                        <li>Utilizzare per identificare opportunità di acquisto</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- MORNING STAR (Pattern aggiuntivo) -->
+            <div class="pattern-card">
+                <div class="pattern-header bullish">
+                    <h3>🌅 MORNING STAR</h3>
+                </div>
+                <div class="pattern-content">
+                    <div class="pattern-svg">
+                        <svg width="250" height="180" viewBox="0 0 250 180">
+                            <!-- Prima candela ribassista -->
+                            <rect x="50" y="60" width="20" height="60" fill="#ef5350" stroke="#000" stroke-width="1"/>
+                            <line x1="60" y1="55" x2="60" y2="60" stroke="#000" stroke-width="2"/>
+                            <line x1="60" y1="120" x2="60" y2="125" stroke="#000" stroke-width="2"/>
+                            
+                            <!-- Candela centrale piccola (doji/spinning top) -->
+                            <rect x="112" y="95" width="12" height="10" fill="#78909c" stroke="#000" stroke-width="1"/>
+                            <line x1="118" y1="85" x2="118" y2="95" stroke="#000" stroke-width="2"/>
+                            <line x1="118" y1="105" x2="118" y2="115" stroke="#000" stroke-width="2"/>
+                            
+                            <!-- Terza candela rialzista -->
+                            <rect x="170" y="65" width="20" height="55" fill="#26a69a" stroke="#000" stroke-width="1"/>
+                            <line x1="180" y1="60" x2="180" y2="65" stroke="#000" stroke-width="2"/>
+                            <line x1="180" y1="120" x2="180" y2="125" stroke="#000" stroke-width="2"/>
+                            
+                            <text x="125" y="35" font-size="14" fill="#26a69a" font-weight="bold" text-anchor="middle">MORNING STAR</text>
+                        </svg>
+                    </div>
+                    <p><strong>Segnale:</strong> Potente inversione rialzista a tre candele</p>
+                    <div class="signal-strength strength-high">Affidabilità: Molto Alta</div>
+                    <ul class="description-list">
+                        <li>Pattern di tre candele: ribassista, piccola, rialzista</li>
+                        <li>La candela centrale può essere doji o spinning top</li>
+                        <li>Gap tra le candele aumenta l'affidabilità</li>
+                        <li>Conferma necessaria con volumi elevati</li>
+                        <li>Stop loss sotto il minimo del pattern</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- EVENING STAR (Pattern aggiuntivo) -->
+            <div class="pattern-card">
+                <div class="pattern-header bearish">
+                    <h3>🌆 EVENING STAR</h3>
+                </div>
+                <div class="pattern-content">
+                    <div class="pattern-svg">
+                        <svg width="250" height="180" viewBox="0 0 250 180">
+                            <!-- Prima candela rialzista -->
+                            <rect x="50" y="60" width="20" height="60" fill="#26a69a" stroke="#000" stroke-width="1"/>
+                            <line x1="60" y1="55" x2="60" y2="60" stroke="#000" stroke-width="2"/>
+                            <line x1="60" y1="120" x2="60" y2="125" stroke="#000" stroke-width="2"/>
+                            
+                            <!-- Candela centrale piccola (doji/spinning top) -->
+                            <rect x="112" y="75" width="12" height="10" fill="#78909c" stroke="#000" stroke-width="1"/>
+                            <line x1="118" y1="65" x2="118" y2="75" stroke="#000" stroke-width="2"/>
+                            <line x1="118" y1="85" x2="118" y2="95" stroke="#000" stroke-width="2"/>
+                            
+                            <!-- Terza candela ribassista -->
+                            <rect x="170" y="85" width="20" height="55" fill="#ef5350" stroke="#000" stroke-width="1"/>
+                            <line x1="180" y1="80" x2="180" y2="85" stroke="#000" stroke-width="2"/>
+                            <line x1="180" y1="140" x2="180" y2="145" stroke="#000" stroke-width="2"/>
+                            
+                            <text x="125" y="35" font-size="14" fill="#ef5350" font-weight="bold" text-anchor="middle">EVENING STAR</text>
+                        </svg>
+                    </div>
+                    <p><strong>Segnale:</strong> Potente inversione ribassista a tre candele</p>
+                    <div class="signal-strength strength-high">Affidabilità: Molto Alta</div>
+                    <ul class="description-list">
+                        <li>Pattern di tre candele: rialzista, piccola, ribassista</li>
+                        <li>La candela centrale può essere doji o spinning top</li>
+                        <li>Gap tra le candele aumenta l'affidabilità</li>
+                        <li>Conferma necessaria con volumi elevati</li>
+                        <li>Stop loss sopra il massimo del pattern</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tips">
+            <h3>💡 Strategie Operative Avanzate</h3>
+            <ul>
+                <li><strong>Confluenza dei segnali:</strong> I pattern candlestick vicino ai Pivot Point (MA/MI) hanno probabilità di successo significativamente più elevate</li>
+                <li><strong>Conferma multi-timeframe:</strong> Verifica i pattern su timeframe superiori (H4, Daily) per aumentare l'affidabilità dei segnali</li>
+                <li><strong>Volume di conferma:</strong> Pattern accompagnati da volumi elevati hanno maggiore forza predittiva</li>
+                <li><strong>Gestione del rischio:</strong> Posiziona sempre stop loss oltre i livelli chiave: sotto i minimi per long, sopra i massimi per short</li>
+                <li><strong>Target dinamici:</strong> Usa i Pivot Point come livelli per prese di profitto parziali e trailing stop</li>
+                <li><strong>Falsi segnali:</strong> Evita pattern in mercati laterali e con volumi scarsi - privilegia sempre contesti di trend definiti</li>
+            <li><strong>Contesto:</strong> I segnali sono più affidabili su timeframe H4 o daily e se confermati da altri indicatori tecnici.</li>
+        </ul>
+    </div>
+</section>
+
         
         <section id="inversioni">
             <h2>🔄 Inversioni di Tendenza</h2>
