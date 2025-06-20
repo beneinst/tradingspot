@@ -587,6 +587,73 @@ label {
   display: none;
 }
 
+.full-box.backup-container {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #232526 0%, #393e46 100%);
+  border-radius: 18px;
+  box-shadow: 0 6px 32px rgba(0,0,0,0.18);
+  border: 2px solid #2c2c2c;
+  margin: 24px 0 0 0;
+}
+
+.full-box.backup-container button,
+.full-box.backup-container .stat-item {
+  flex: 0 0 160px;  /* larghezza fissa per i bottoni */
+  height: 48px;     /* altezza uniforme */
+  border-radius: 10px;
+  border: 2px solid #393e46;
+  background: #222831;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.full-box.backup-container button:hover {
+  background: var(--primary-color, #0099ff);
+  border-color: var(--primary-color, #0099ff);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0,153,255,0.15);
+  cursor: pointer;
+}
+
+/* Input file personalizzato */
+.full-box.backup-container input[type="file"] {
+  flex: 1 1 320px;         /* più lungo rispetto ai bottoni */
+  min-width: 220px;
+  height: 48px;            /* stessa altezza dei bottoni */
+  background: #232526;
+  color: #bfc9d1;
+  border: 2px dashed #393e46;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.10);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Facoltativo: migliora la visibilità al focus */
+.full-box.backup-container input[type="file"]:focus {
+  border-color: var(--primary-color, #0099ff);
+  background: #262d36;
+  outline: none;
+}
+
+
 </style>
 
 </head>
@@ -775,20 +842,17 @@ label {
  
 
   <div class="card">
-    <div class="card-header">
-      <h2>Backup &amp; Ripristino</h2>
-    </div>
-    
-    <p style="color: #ADD8E6;">Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
-
-    
-    <div class="backup-container">
-      <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
-      <input type="file" id="fileInput" accept=".json">
-      <button onclick="caricaDati()">Carica Dati</button>
-
-    </div>
+  <div class="card-header">
+    <h2>Backup &amp; Ripristino</h2>
   </div>
+  <p style="color: #ADD8E6;">Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
+  <div class="backup-container full-box">
+    <button onclick="scaricaDati()" class="stat-item">Scarica Dati (JSON)</button>
+    <input type="file" id="fileInput" class="stat-item" accept=".json">
+    <button onclick="caricaDati()" class="stat-item">Carica Dati</button>
+  </div>
+</div>
+
 </div>
 
 <div class="footer">
@@ -1151,28 +1215,35 @@ function salvaStorico() {
             color: '#ebaa68', // grigio molto scuro
             font: {
               size: 15,
-              family: 'Poppins'
-            },
-            padding: 15
-          }
+              family: 'Trebuchet MS'
+    },
+    padding: 8,                 // Riduci la distanza verticale tra le voci
+    boxWidth: 16,               // Dimensione del punto
+    boxHeight: 16,              // Dimensione del punto
+    usePointStyle: true,        // Usa punti invece di rettangoli
+    pointStyle: 'circle'        // Imposta la forma a cerchio
+  }
         },
         tooltip: {
-          backgroundColor: '#181c23',
-          titleColor: '#fff',
-          bodyColor: '#fff',
-          borderColor: '#ff899a',
-          borderWidth: 3,
-          cornerRadius: 10,
-          padding: 18,
-          displayColors: true,
-          callbacks: {
-            label: function (context) {
-              const label = context.label || '';
-              const value = context.raw || 0;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percentage = ((value / total) * 100).toFixed(1);
-              const dollari = (value * datiCapitale.quotaPerTrade).toFixed(2);
-              return `${label}: ${value} trade (${percentage}%) = $${dollari}`;
+  backgroundColor: '#181c23',
+  titleColor: '#7FFFD4',
+  bodyColor: '#F0F8FF',
+  borderColor: '#1F45FC',
+  borderWidth: 3,
+  cornerRadius: 10,
+  padding: 18,
+  displayColors: true,
+  bodyFont: {
+    size: 18 // Imposta l'altezza del testo delle etichette a 18px
+  },
+  callbacks: {
+    label: function (context) {
+      const label = context.label || '';
+      const value = context.raw || 0;
+      const total = context.dataset.data.reduce((a, b) => a + b, 0);
+      const percentage = ((value / total) * 100).toFixed(1);
+      const dollari = (value * datiCapitale.quotaPerTrade).toFixed(2);
+      return `${label}: ${value} trade (${percentage}%) = $${dollari}`;
             }
           }
         }
