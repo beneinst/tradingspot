@@ -15,13 +15,18 @@
   <script src="drawing-tools.js"></script>
   <style>
     html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background: #181a20;
-      font-family: 'Trebuchet MS', sans-serif;
-	  font-size: 14px;
-    }
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  /* background: #181a20;  <-- Questo non serve più, viene sovrascritto dal gradiente */
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 14px;
+  
+  /* Gradiente dal chiaro (#131722) sopra/sinistra al scuro (#000000) sotto/destra */
+  background: linear-gradient(to bottom right, #131722, #000000); 
+  /* Puoi anche usare 'to bottom' per un gradiente verticale */
+  /* background: linear-gradient(to bottom, #131722, #000000); */
+}
 
     #page-title {
       color: #fff;
