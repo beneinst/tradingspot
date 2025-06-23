@@ -14,152 +14,217 @@
   <!-- File JavaScript per gli strumenti di disegno -->
   <script src="drawing-tools.js"></script>
   <style>
+  /* Stili Globali per tutti i dispositivi (desktop first approach, o base) */
   html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: 'Trebuchet MS', sans-serif;
-  font-size: 14px;
-  
-  /* Gradiente verticale: 
-     - #131722 rimane in alto (o inizia il gradiente)
-     - Sfumatura verso il nero che si intensifica progressivamente
-     - Il nero puro (#000000) è molto presente nella parte finale
-  */
-  background: linear-gradient(to bottom, #000000 0%, #050505 50%, #131722 100%);  
-}
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Trebuchet MS', sans-serif;
+    font-size: 14px;
+    background: linear-gradient(to bottom, #000000 0%, #050505 50%, #131722 100%);
+    overflow-x: hidden; /* Previene lo scroll orizzontale */
+  }
 
+  #page-title {
+    color: #fff;
+    margin: 0;
+    padding: 16px 24px 0 24px;
+    font-size: 1.2em;
+    letter-spacing: 1px;
+  }
+
+  #topbar {
+    width: 100%;
+    background: #23272f;
+    padding: 12px 18px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1.5px solid #222;
+    box-sizing: border-box;
+    z-index: 10;
+    flex-wrap: wrap; /* Permette agli elementi di andare a capo su schermi piccoli */
+  }
+
+  #app-title {
+    color: #fff;
+    margin: 0;
+    font-size: 1.1em;
+    letter-spacing: 1px;
+    white-space: nowrap; /* Mantiene il titolo su una riga se possibile */
+  }
+
+  #toolbar-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  #toolbar-buttons button {
+    padding: 8px 12px;
+    font-size: 1.2em;
+    border-radius: 4px;
+    border: 1px solid #444;
+    background: #20232a;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #toolbar-buttons button:hover {
+    border-color: #26a69a;
+    background: #26a69a;
+    transform: translateY(-1px);
+  }
+
+  #toolbar-buttons button:active {
+    transform: translateY(0);
+  }
+
+  .left-section {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex: 1; /* Permette alla sezione di espandersi */
+    min-width: 0; /* Importante per i flex items per non traboccare */
+  }
+
+  .center-section {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .right-section {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  #symbol-select {
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #444;
+    background: #20232a;
+    color: #fff;
+    cursor: pointer;
+    min-width: 150px; /* Larghezza minima per desktop */
+    flex-grow: 1; /* Permette di espandersi nel flex container */
+  }
+
+  #symbol-select:hover {
+    border-color: #666;
+  }
+
+  #symbol-select:focus {
+    outline: none;
+    border-color: #26a69a;
+  }
+
+  #current-price {
+    color: #26a69a;
+    font-weight: bold;
+    font-size: 1.1em;
+    white-space: nowrap; /* Evita che il prezzo si rompa su più righe */
+  }
+
+  #chart {
+    /* Larghezza al 100% del suo contenitore, non della viewport */
+    /* L'altezza deve tenere conto della topbar, che ora potrebbe avvolgersi su più righe */
+    width: 100%; 
+    height: calc(100vh - var(--topbar-height, 64px)); /* Placeholder per l'altezza della topbar */
+    /* Verrà regolata in JS in base all'altezza dinamica della topbar */
+  }
+
+  .loading {
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .price-change {
+    font-size: 0.9em;
+    margin-left: 10px;
+    white-space: nowrap; /* Evita che la variazione di prezzo si rompa */
+  }
+
+  .price-up {
+    color: #26a69a;
+  }
+
+  .price-down {
+    color: #ef5350;
+  }
+
+  /* MEDIA QUERY per dispositivi con larghezza massima di 480px */
+  @media (max-width: 480px) {
     #page-title {
-      color: #fff;
-      margin: 0;
-      padding: 16px 24px 0 24px;
-      font-size: 1.2em;
-      letter-spacing: 1px;
+      font-size: 1em; /* Riduci la dimensione del font per il titolo principale */
+      padding: 12px 16px 0 16px; /* Riduci il padding */
     }
 
     #topbar {
-      width: 100%;
-      background: #23272f;
-      padding: 12px 18px;
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1.5px solid #222;
-      box-sizing: border-box;
-      z-index: 10;
-      flex-wrap: wrap;
+      flex-direction: column; /* Impila gli elementi verticalmente */
+      align-items: flex-start; /* Allinea a sinistra quando impilati */
+      padding: 10px 15px; /* Riduci il padding della topbar */
+      gap: 10px; /* Riduci lo spazio tra gli elementi */
     }
 
     #app-title {
-      color: #fff;
-      margin: 0;
-      font-size: 1.1em;
-      letter-spacing: 1px;
-      white-space: nowrap;
+      font-size: 1em; /* Riduci la dimensione del font del titolo app */
+      width: 100%; /* Occupa tutta la larghezza disponibile */
+      text-align: center; /* Centra il titolo */
     }
 
+    .left-section,
+    .center-section,
+    .right-section {
+      flex-direction: column; /* Impila le sezioni interne verticalmente */
+      width: 100%; /* Le sezioni interne occupano tutta la larghezza */
+      align-items: center; /* Centra gli elementi all'interno delle sezioni */
+      gap: 5px; /* Riduci lo spazio tra gli elementi */
+    }
+    
     #toolbar-buttons {
-      display: flex;
-      gap: 8px;
-      align-items: center;
+      width: 100%;
+      justify-content: space-around; /* Distribuisci i bottoni orizzontalmente */
+      gap: 5px; /* Riduci il gap */
     }
 
     #toolbar-buttons button {
-      padding: 8px 12px;
-      font-size: 1.2em;
-      border-radius: 4px;
-      border: 1px solid #444;
-      background: #20232a;
-      color: #fff;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      min-width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #toolbar-buttons button:hover {
-      border-color: #26a69a;
-      background: #26a69a;
-      transform: translateY(-1px);
-    }
-
-    #toolbar-buttons button:active {
-      transform: translateY(0);
-    }
-
-    .left-section {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      flex: 1;
-    }
-
-    .center-section {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
-
-    .right-section {
-      display: flex;
-      gap: 10px;
-      align-items: center;
+      min-width: unset; /* Rimuovi la larghezza minima fissa */
+      flex-grow: 1; /* Permetti ai bottoni di espandersi */
+      font-size: 1em; /* Riduci dimensione font bottoni */
+      padding: 6px 8px; /* Riduci padding bottoni */
+      height: 36px; /* Riduci l'altezza dei bottoni */
     }
 
     #symbol-select {
-      padding: 8px 12px;
-      font-size: 1rem;
-      border-radius: 4px;
-      border: 1px solid #444;
-      background: #20232a;
-      color: #fff;
-      cursor: pointer;
-      min-width: 150px;
+      min-width: 100%; /* Occupa tutta la larghezza disponibile */
+      font-size: 0.9em; /* Riduci la dimensione del font del selettore */
     }
 
-    #symbol-select:hover {
-      border-color: #666;
-    }
-
-    #symbol-select:focus {
-      outline: none;
-      border-color: #26a69a;
-    }
-
-    #current-price {
-      color: #26a69a;
-      font-weight: bold;
-      font-size: 1.1em;
+    #current-price,
+    .price-change {
+      font-size: 1em; /* Adatta la dimensione del font per i prezzi */
+      margin-left: 0; /* Rimuovi il margine a sinistra */
     }
 
     #chart {
-      width: 100vw;
-      height: calc(100vh - 80px);
+      /* Su mobile, l'altezza della topbar potrebbe variare di più */
+      /* È consigliabile calcolare dinamicamente l'altezza della topbar in JavaScript */
+      /* per un'esperienza più robusta. Per ora, un'altezza fissa o vw */
+      height: calc(100vh - 120px); /* Regola questa altezza in base a quanto occupa la topbar su mobile */
     }
-
-    .loading {
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-    }
-
-    .price-change {
-      font-size: 0.9em;
-      margin-left: 10px;
-    }
-
-    .price-up {
-      color: #26a69a;
-    }
-
-    .price-down {
-      color: #ef5350;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
   <!-- Barra superiore -->
@@ -201,7 +266,7 @@
   'AVAXUSDC',
   'MANAUSDC',
   'SUIUSDC',
-  'ALGOSUSDT', 
+  'ALGOUSDT', 
   'NEARUSDC',
   'LINKUSDC',
   'UNIUSDC',
