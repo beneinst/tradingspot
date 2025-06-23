@@ -14,18 +14,19 @@
   <!-- File JavaScript per gli strumenti di disegno -->
   <script src="drawing-tools.js"></script>
   <style>
-    html, body {
+  html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  /* background: #181a20;  <-- Questo non serve più, viene sovrascritto dal gradiente */
   font-family: 'Trebuchet MS', sans-serif;
   font-size: 14px;
   
-  /* Gradiente dal chiaro (#131722) sopra/sinistra al scuro (#000000) sotto/destra */
-  background: linear-gradient(to bottom right, #131722, #000000); 
-  /* Puoi anche usare 'to bottom' per un gradiente verticale */
-  /* background: linear-gradient(to bottom, #131722, #000000); */
+  /* Gradiente verticale: 
+     - #131722 rimane in alto (o inizia il gradiente)
+     - Sfumatura verso il nero che si intensifica progressivamente
+     - Il nero puro (#000000) è molto presente nella parte finale
+  */
+  background: linear-gradient(to bottom, #000000 0%, #050505 50%, #131722 100%);  
 }
 
     #page-title {
