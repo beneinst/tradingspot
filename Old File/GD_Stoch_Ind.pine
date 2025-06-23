@@ -1,0 +1,40 @@
+//@version=5
+indicator("Gerardo Dorrico Stocastico Indicatore", shorttitle="GD_Stoch_Ind", overlay=false)
+
+// Parametri input
+len = input.int(14, minval=1, title="Lunghezza Stocastico")
+smoothK = input.int(1, minval=1, title="SmoothK")
+smoothD = input.int(2, minval=1, title="SmoothD")
+upperLine = input.float(78, minval=50, maxval=100, title="Linea Superiore")
+lowerLine = input.float(22, minval=0, maxval=50, title="Linea Inferiore")
+
+// Calcolo Stocastico
+k = ta.sma(ta.stoch(close, high, low, len), smoothK)
+d = ta.sma(k, smoothD)
+
+// Condizioni per i segnali
+longCondition = ta.crossover(k, d) and k < lowerLine
+shortCondition = ta.crossunder(k, d) and k > upperLine
+
+// Plotta lo Stocastico
+plot(k, color=color.green, title="Stoch K")
+plot(d, color=color.red, title="Stoch D")
+
+// Plotta le linee orizzontali
+h1 = hline(upperLine, color=color.red, linestyle=hline.style_dashed, title="Linea Superiore")
+h2 = hline(lowerLine, color=color.green, linestyle=hline.style_dashed, title="Linea Inferiore")
+fill(h1, h2, color=color.new(color.gray, 90), title="Area tra le linee")
+
+// Plotta i segnali
+plotshape(longCondition, title="Segnale Long", location=location.bottom, color=color.green, style=shape.triangleup, size=size.small)
+plotshape(shortCondition, title="Segnale Short", location=location.top, color=color.red, style=shape.triangledown, size=size.small)
+
+// Alerts
+alertcondition(longCondition, title="Segnale Long", message="Segnale di acquisto rilevato!")
+alertcondition(shortCondition, title="Segnale Short", message="Segnale di vendita rilevato!")
+
+// Aggiungi il nome del creatore
+var label creatorLabel = na
+if (barstate.islast)
+    creatorLabel := label.new(bar_index, 100, text="Creato da Gerardo Dorrico", style=label.style_label_down, color=color.new(color.blue, 50), textcolor=color.white, size=size.small)
+    label.delete(creatorLabel[1])

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lightweight Charts Trading App</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- Libreria Lightweight Charts da CDN -->
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- File JavaScript per gli indicatori tecnici -->
+  <script src="indicators.js"></script>
+  <!-- File JavaScript per gli strumenti di disegno -->
+  <script src="drawing-tools.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #181a20;
+      font-family: 'Trebuchet MS', sans-serif;
+	  font-size: 14px;
+    }
+
+    #page-title {
+      color: #fff;
+      margin: 0;
+      padding: 16px 24px 0 24px;
+      font-size: 1.2em;
+      letter-spacing: 1px;
+    }
+
+    #topbar {
+      width: 100%;
+      background: #23272f;
+      padding: 12px 18px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1.5px solid #222;
+      box-sizing: border-box;
+      z-index: 10;
+      flex-wrap: wrap;
+    }
+
+    #app-title {
+      color: #fff;
+      margin: 0;
+      font-size: 1.1em;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    #toolbar-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #toolbar-buttons button {
+      padding: 8px 12px;
+      font-size: 1.2em;
+      border-radius: 4px;
+      border: 1px solid #444;
+      background: #20232a;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #toolbar-buttons button:hover {
+      border-color: #26a69a;
+      background: #26a69a;
+      transform: translateY(-1px);
+    }
+
+    #toolbar-buttons button:active {
+      transform: translateY(0);
+    }
+
+    .left-section {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex: 1;
+    }
+
+    .center-section {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .right-section {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    #symbol-select {
+      padding: 8px 12px;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: 1px solid #444;
+      background: #20232a;
+      color: #fff;
+      cursor: pointer;
+      min-width: 150px;
+    }
+
+    #symbol-select:hover {
+      border-color: #666;
+    }
+
+    #symbol-select:focus {
+      outline: none;
+      border-color: #26a69a;
+    }
+
+    #current-price {
+      color: #26a69a;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    #chart {
+      width: 100vw;
+      height: calc(100vh - 80px);
+    }
+
+    .loading {
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .price-change {
+      font-size: 0.9em;
+      margin-left: 10px;
+    }
+
+    .price-up {
+      color: #26a69a;
+    }
+
+    .price-down {
+      color: #ef5350;
+    }
+  </style>
+</head>
+<body>
+  <!-- Barra superiore -->
+  <div id="topbar">
+    <div class="left-section">
+      <h4 id="app-title">📊 4H StratMC</h4>
+      <select id="symbol-select">
+        <option value="">Seleziona Asset...</option>
+      </select>
+    </div>
+    <div class="center-section">
+      <span id="current-price"></span>
+      <span id="price-change" class="price-change"></span>
+    </div>
+    <div class="right-section">
+      <div id="toolbar-buttons">
+        <button id="drawing-tools-btn" title="Strumenti di Disegno">✏️</button>
+        <button id="indicators-btn" title="Gestisci Indicatori">📈</button>
+        <button id="screenshot-btn" title="Salva Screenshot">📸</button>
+        <button id="fullscreen-btn" title="Schermo Intero">⛶</button>
+        <button id="refresh-btn" title="Aggiorna Dati">🔄</button>
+      </div>
+    </div>
+  </div>
+  <div id="chart"></div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      const watchlistSymbols = ['BTCUSDC', 'ETHUSDC', 'BNBUSDC', 'SOLUSDC', 'ADAUSDC', 'FETUSDC'];
+      const symbolSelect = document.getElementById('symbol-select');
+      const currentPriceEl = document.getElementById('current-price');
+      const priceChangeEl = document.getElementById('price-change');
+      
+      let selectedSymbol = watchlistSymbols[0];
+      let chart;
+      let candleSeries;
+      let lastPrice = 0;
+
+      // Popola il menu a tendina
+      watchlistSymbols.forEach(symbol => {
+        const option = document.createElement('option');
+        option.value = symbol;
+        option.textContent = symbol;
+        symbolSelect.appendChild(option);
+      });
+
+      // Imposta il primo simbolo come selezionato
+      symbolSelect.value = selectedSymbol;
+
+      // Event listener per il cambio di simbolo
+      symbolSelect.addEventListener('change', function() {
+        const newSymbol = this.value;
+        if (newSymbol && newSymbol !== selectedSymbol) {
+          selectedSymbol = newSymbol;
+          loadBinanceData(selectedSymbol);
+          getCurrentPrice(selectedSymbol);
+        }
+      });
+
+      // Funzione per ottenere il prezzo corrente
+      function getCurrentPrice(symbol) {
+        fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`)
+          .then(response => response.json())
+          .then(data => {
+            const price = parseFloat(data.lastPrice);
+            const change = parseFloat(data.priceChangePercent);
+            
+            currentPriceEl.textContent = `$${price.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 6
+            })}`;
+            
+            priceChangeEl.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+            priceChangeEl.className = `price-change ${change >= 0 ? 'price-up' : 'price-down'}`;
+            
+            lastPrice = price;
+          })
+          .catch(err => console.error('Errore caricamento prezzo:', err));
+      }
+
+      // Funzione per caricare i dati da Binance
+      function loadBinanceData(symbol) {
+        currentPriceEl.textContent = 'Caricamento...';
+        priceChangeEl.textContent = '';
+        
+        fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=4h&limit=100`)
+          .then(response => response.json())
+          .then(data => {
+            const formatted = data.map(c => ({
+              time: Math.floor(c[0] / 1000),
+              open: parseFloat(c[1]),
+              high: parseFloat(c[2]),
+              low: parseFloat(c[3]),
+              close: parseFloat(c[4]),
+            }));
+            candleSeries.setData(formatted);
+          })
+          .catch(err => {
+            console.error('Errore caricamento dati Binance:', err);
+            currentPriceEl.textContent = 'Errore caricamento';
+          });
+      }
+
+      // Inizializza il grafico
+      function initChart() {
+        const chartContainer = document.getElementById('chart');
+        chart = LightweightCharts.createChart(chartContainer, {
+          width: chartContainer.clientWidth,
+          height: chartContainer.clientHeight,
+          layout: { 
+            background: { color: '#181a20' }, 
+            textColor: '#d1d4dc' 
+          },
+          grid: { 
+            vertLines: { color: '#222' }, 
+            horzLines: { color: '#222' } 
+          },
+          timeScale: { 
+            timeVisible: true, 
+            secondsVisible: false 
+          },
+          rightPriceScale: {
+            borderColor: '#444',
+          },
+          crosshair: {
+            mode: LightweightCharts.CrosshairMode.Normal,
+          },
+        });
+
+        candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+          upColor: '#26a69a', 
+          downColor: '#ef5350', 
+          borderVisible: false,
+          wickUpColor: '#26a69a', 
+          wickDownColor: '#ef5350',
+        });
+
+        // Resize dinamico
+        window.addEventListener('resize', () => {
+          chart.applyOptions({
+            width: chartContainer.clientWidth,
+            height: chartContainer.clientHeight
+          });
+        });
+      }
+
+      // Event listeners per i pulsanti della toolbar
+      document.getElementById('drawing-tools-btn').addEventListener('click', function() {
+        openDrawingToolsPanel();
+      });
+
+      document.getElementById('indicators-btn').addEventListener('click', function() {
+        openIndicatorsPanel();
+      });
+
+      document.getElementById('screenshot-btn').addEventListener('click', function() {
+        takeScreenshot();
+      });
+
+      document.getElementById('fullscreen-btn').addEventListener('click', function() {
+        toggleFullscreen();
+      });
+
+      document.getElementById('refresh-btn').addEventListener('click', function() {
+        if (selectedSymbol) {
+          loadBinanceData(selectedSymbol);
+          getCurrentPrice(selectedSymbol);
+        }
+      });
+
+      // Funzione per aprire il pannello strumenti di disegno
+      function openDrawingToolsPanel() {
+        // Verifica se il file drawing-tools.js è caricato
+        if (typeof window.DrawingTools !== 'undefined') {
+          // Apri il pannello strumenti di disegno
+          window.DrawingTools.openPanel(chart, candleSeries);
+        } else {
+          // Se il file non è caricato, carica dinamicamente
+          console.log('Caricamento drawing-tools.js...');
+          loadDrawingToolsScript();
+        }
+      }
+
+      // Funzione per caricare dinamicamente il file strumenti di disegno
+      function loadDrawingToolsScript() {
+        const script = document.createElement('script');
+        script.src = 'drawing-tools.js';
+        script.onload = function() {
+          console.log('drawing-tools.js caricato con successo');
+          if (typeof window.DrawingTools !== 'undefined') {
+            window.DrawingTools.openPanel(chart, candleSeries);
+          }
+        };
+        script.onerror = function() {
+          alert('Errore: impossibile caricare drawing-tools.js\nAssicurati che il file sia presente nella stessa cartella.');
+        };
+        document.head.appendChild(script);
+      }
+
+      // Funzione per aprire il pannello indicatori
+      function openIndicatorsPanel() {
+        // Verifica se il file indicators.js è caricato
+        if (typeof window.TechnicalIndicators !== 'undefined') {
+          // Apri il pannello indicatori
+          window.TechnicalIndicators.openPanel(chart, candleSeries);
+        } else {
+          // Se il file non è caricato, mostra un messaggio o carica dinamicamente
+          console.log('Caricamento indicators.js...');
+          loadIndicatorsScript();
+        }
+      }
+
+      // Funzione per caricare dinamicamente il file indicatori
+      function loadIndicatorsScript() {
+        const script = document.createElement('script');
+        script.src = 'indicators.js';
+        script.onload = function() {
+          console.log('indicators.js caricato con successo');
+          if (typeof window.TechnicalIndicators !== 'undefined') {
+            window.TechnicalIndicators.openPanel(chart, candleSeries);
+          }
+        };
+        script.onerror = function() {
+          alert('Errore: impossibile caricare indicators.js\nAssicurati che il file sia presente nella stessa cartella.');
+        };
+        document.head.appendChild(script);
+      }
+
+      // Funzione per lo screenshot
+		function takeScreenshot() {
+		html2canvas(document.getElementById('chart')).then(canvas => {
+		const link = document.createElement('a');
+		link.download = `${selectedSymbol}_chart_${new Date().getTime()}.png`;
+		link.href = canvas.toDataURL();
+		link.click();
+		});
+		}
+
+      // Funzione per schermo intero
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(err => {
+            console.log('Errore fullscreen:', err);
+          });
+        } else {
+          document.exitFullscreen();
+        }
+      }
+      initChart();
+      loadBinanceData(selectedSymbol);
+      getCurrentPrice(selectedSymbol);
+
+      // Aggiorna il prezzo ogni 10 secondi
+      setInterval(() => {
+        if (selectedSymbol) {
+          getCurrentPrice(selectedSymbol);
+        }
+      }, 10000);
+    });
+  </script>
+</body>
+</html>
