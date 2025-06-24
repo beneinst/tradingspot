@@ -1,345 +1,138 @@
 // indicators.js - Gestione Indicatori Tecnici
 // Versione: 1.0
 
-window.TechnicalIndicators = (function() {
-    'use strict';
+// indicators.js
 
-    let chartInstance = null;
-    let candleSeriesInstance = null;
-    let indicatorSeries = {};
-    let isIndicatorsPanelOpen = false;
+(function() {
+  // Oggetto per tenere traccia delle serie degli indicatori
+  let indicatorSeries = {};
 
-    // Configurazione indicatori disponibili
-    const availableIndicators = {
-        'sma': {
-            name: 'Simple Moving Average',
-            shortName: 'SMA',
-            params: { period: 20 },
-            color: '#2196F3'
-        },
-        'ema': {
-            name: 'Exponential Moving Average', 
-            shortName: 'EMA',
-            params: { period: 20 },
-            color: '#FF9800'
-        },
-        'rsi': {
-            name: 'Relative Strength Index',
-            shortName: 'RSI',
-            params: { period: 14 },
-            color: '#9C27B0'
-        },
-        'bollinger': {
-            name: 'Bollinger Bands',
-            shortName: 'BB',
-            params: { period: 20, stdDev: 2 },
-            color: '#4CAF50'
-        }
-    };
-
-    // Funzione principale per aprire il pannello
-    function openPanel(chart, candleSeries) {
-        chartInstance = chart;
-        candleSeriesInstance = candleSeries;
-        
-        if (isIndicatorsPanelOpen) {
-            closePanel();
-            return;
-        }
-
-        createIndicatorsPanel();
-        isIndicatorsPanelOpen = true;
+  // --- Calcolo EMA ---
+  function calculateEMA(data, period) {
+    if (!data || data.length < period) return [];
+    const emaData = [];
+    let k = 2 / (period + 1);
+    let emaPrev = data[0].close;
+    for (let i = 0; i < data.length; i++) {
+      let ema = i === 0 ? data[i].close : (data[i].close - emaPrev) * k + emaPrev;
+      emaPrev = ema;
+      if (i >= period - 1) emaData.push({ time: data[i].time, value: ema });
     }
+    return emaData;
+  }
 
-    // Crea il pannello degli indicatori
-    function createIndicatorsPanel() {
-        // Rimuovi pannello esistente se presente
-        const existingPanel = document.getElementById('indicators-panel');
-        if (existingPanel) {
-            existingPanel.remove();
-        }
-
-        const panel = document.createElement('div');
-        panel.id = 'indicators-panel';
-        panel.innerHTML = `
-            <div class="indicators-header">
-                <h3>📈 Indicatori Tecnici</h3>
-                <button id="close-indicators" class="close-btn">✕</button>
-            </div>
-            <div class="indicators-content">
-                <div class="indicator-section">
-                    <h4>Medie Mobili</h4>
-                    <div class="indicator-item">
-                        <label>
-                            <input type="checkbox" id="sma-toggle"> SMA (20)
-                        </label>
-                        <input type="number" id="sma-period" value="20" min="1" max="200">
-                    </div>
-                    <div class="indicator-item">
-                        <label>
-                            <input type="checkbox" id="ema-toggle"> EMA (20)
-                        </label>
-                        <input type="number" id="ema-period" value="20" min="1" max="200">
-                    </div>
-                </div>
-                <div class="indicator-section">
-                    <h4>Oscillatori</h4>
-                    <div class="indicator-item">
-                        <label>
-                            <input type="checkbox" id="rsi-toggle"> RSI (14)
-                        </label>
-                        <input type="number" id="rsi-period" value="14" min="1" max="100">
-                    </div>
-                </div>
-                <div class="indicator-section">
-                    <h4>Bande e Canali</h4>
-                    <div class="indicator-item">
-                        <label>
-                            <input type="checkbox" id="bollinger-toggle"> Bollinger Bands
-                        </label>
-                        <input type="number" id="bollinger-period" value="20" min="1" max="100">
-                    </div>
-                </div>
-                <div class="indicator-actions">
-                    <button id="apply-indicators" class="apply-btn">Applica Indicatori</button>
-                    <button id="clear-indicators" class="clear-btn">Rimuovi Tutti</button>
-                </div>
-            </div>
-        `;
-
-        // Stili CSS per il pannello
-        const style = document.createElement('style');
-        style.textContent = `
-            #indicators-panel {
-                position: fixed;
-                top: 80px;
-                right: 20px;
-                width: 320px;
-                background: #23272f;
-                border: 1px solid #444;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                z-index: 1000;
-                color: #fff;
-                font-family: 'Trebuchet MS', sans-serif;
-            }
-            .indicators-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 12px 16px;
-                border-bottom: 1px solid #444;
-                background: #2a2d35;
-                border-radius: 8px 8px 0 0;
-            }
-            .indicators-header h3 {
-                margin: 0;
-                font-size: 1.1em;
-            }
-            .close-btn {
-                background: none;
-                border: none;
-                color: #fff;
-                font-size: 1.2em;
-                cursor: pointer;
-                padding: 4px 8px;
-                border-radius: 4px;
-            }
-            .close-btn:hover {
-                background: #ef5350;
-            }
-            .indicators-content {
-                padding: 16px;
-                max-height: 400px;
-                overflow-y: auto;
-            }
-            .indicator-section {
-                margin-bottom: 20px;
-            }
-            .indicator-section h4 {
-                margin: 0 0 10px 0;
-                font-size: 0.9em;
-                color: #26a69a;
-                border-bottom: 1px solid #444;
-                padding-bottom: 5px;
-            }
-            .indicator-item {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 8px;
-                padding: 6px 0;
-            }
-            .indicator-item label {
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-                flex: 1;
-            }
-            .indicator-item input[type="checkbox"] {
-                margin-right: 8px;
-            }
-            .indicator-item input[type="number"] {
-                width: 60px;
-                padding: 4px 6px;
-                background: #20232a;
-                border: 1px solid #444;
-                border-radius: 4px;
-                color: #fff;
-                font-size: 0.9em;
-            }
-            .indicator-actions {
-                margin-top: 20px;
-                display: flex;
-                gap: 10px;
-            }
-            .apply-btn, .clear-btn {
-                flex: 1;
-                padding: 10px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-weight: bold;
-                transition: all 0.2s ease;
-            }
-            .apply-btn {
-                background: #26a69a;
-                color: white;
-            }
-            .apply-btn:hover {
-                background: #1e8e85;
-            }
-            .clear-btn {
-                background: #ef5350;
-                color: white;
-            }
-            .clear-btn:hover {
-                background: #d32f2f;
-            }
-        `;
-        document.head.appendChild(style);
-        document.body.appendChild(panel);
-
-        // Event listeners
-        setupEventListeners();
+  // --- Calcolo Bollinger Bands ---
+  function calculateBollingerBands(data, period, stdDevMultiplier) {
+    if (!data || data.length < period) return { upper: [], middle: [], lower: [] };
+    const bands = { upper: [], middle: [], lower: [] };
+    for (let i = 0; i < data.length; i++) {
+      if (i < period - 1) continue;
+      let slice = data.slice(i - period + 1, i + 1);
+      let mean = slice.reduce((sum, c) => sum + c.close, 0) / period;
+      let variance = slice.reduce((sum, c) => sum + Math.pow(c.close - mean, 2), 0) / period;
+      let stdev = Math.sqrt(variance);
+      bands.middle.push({ time: data[i].time, value: mean });
+      bands.upper.push({ time: data[i].time, value: mean + stdev * stdDevMultiplier });
+      bands.lower.push({ time: data[i].time, value: mean - stdev * stdDevMultiplier });
     }
+    return bands;
+  }
 
-    // Configura gli event listeners
-    function setupEventListeners() {
-        document.getElementById('close-indicators').addEventListener('click', closePanel);
-        document.getElementById('apply-indicators').addEventListener('click', applySelectedIndicators);
-        document.getElementById('clear-indicators').addEventListener('click', clearAllIndicators);
+  // --- Calcolo Linear Regression ---
+  function calculateLinearRegression(data, period, deviationMultiplier) {
+    if (!data || data.length < period) return { middle: [], upper: [], lower: [] };
+    const linReg = [];
+    const upper = [];
+    const lower = [];
+    for (let i = period - 1; i < data.length; i++) {
+      let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+      for (let j = 0; j < period; j++) {
+        let x = j + 1;
+        let y = data[i - period + 1 + j].close;
+        sumX += x;
+        sumY += y;
+        sumXY += x * y;
+        sumX2 += x * x;
+      }
+      let slope = (period * sumXY - sumX * sumY) / (period * sumX2 - sumX * sumX);
+      let intercept = (sumY - slope * sumX) / period;
+      let regValue = slope * period + intercept;
+      let variance = 0;
+      for (let j = 0; j < period; j++) {
+        let x = j + 1;
+        let y = data[i - period + 1 + j].close;
+        let yPred = slope * x + intercept;
+        variance += Math.pow(y - yPred, 2);
+      }
+      let stdev = Math.sqrt(variance / period);
+      linReg.push({ time: data[i].time, value: regValue });
+      upper.push({ time: data[i].time, value: regValue + deviationMultiplier * stdev });
+      lower.push({ time: data[i].time, value: regValue - deviationMultiplier * stdev });
     }
+    return { middle: linReg, upper: upper, lower: lower };
+  }
 
-    // Chiude il pannello
-    function closePanel() {
-        const panel = document.getElementById('indicators-panel');
-        if (panel) {
-            panel.remove();
-        }
-        isIndicatorsPanelOpen = false;
-    }
+  // --- Funzione per aggiornare gli indicatori ---
+  function updateIndicators(chart, candleSeries, candleData) {
+    // Rimuovi tutte le serie indicatori precedenti
+    Object.keys(indicatorSeries).forEach(key => {
+      if (indicatorSeries[key]) {
+        chart.removeSeries(indicatorSeries[key]);
+      }
+    });
+    indicatorSeries = {};
 
-    // Applica gli indicatori selezionati
-    function applySelectedIndicators() {
-        console.log('Applicazione indicatori...');
-        
-        // Esempio: applica SMA se selezionato
-        const smaToggle = document.getElementById('sma-toggle');
-        if (smaToggle && smaToggle.checked) {
-            const period = parseInt(document.getElementById('sma-period').value);
-            addSMA(period);
-        }
+    // Calcola indicatori SOLO se ci sono abbastanza dati
+    if (!candleData || candleData.length < 100) return;
 
-        // Esempio: applica EMA se selezionato
-        const emaToggle = document.getElementById('ema-toggle');
-        if (emaToggle && emaToggle.checked) {
-            const period = parseInt(document.getElementById('ema-period').value);
-            addEMA(period);
-        }
+    // --- Medie mobili ---
+    let ema21Data = calculateEMA(candleData, 21);
+    let ema50Data = calculateEMA(candleData, 50);
+    indicatorSeries.ema21 = chart.addSeries(LightweightCharts.LineSeries, { color: '#FF9800', lineWidth: 2 });
+    indicatorSeries.ema21.setData(ema21Data);
+    indicatorSeries.ema50 = chart.addSeries(LightweightCharts.LineSeries, { color: '#F44336', lineWidth: 2 });
+    indicatorSeries.ema50.setData(ema50Data);
 
-        console.log('Indicatori applicati');
-        closePanel();
-    }
+    // --- Bollinger Bands ---
+    let bbData = calculateBollingerBands(candleData, 20, 2);
+    indicatorSeries.bb_upper = chart.addSeries(LightweightCharts.LineSeries, { color: '#81C784', lineWidth: 1 });
+    indicatorSeries.bb_middle = chart.addSeries(LightweightCharts.LineSeries, { color: '#4CAF50', lineWidth: 1 });
+    indicatorSeries.bb_lower = chart.addSeries(LightweightCharts.LineSeries, { color: '#E57373', lineWidth: 1 });
+    indicatorSeries.bb_upper.setData(bbData.upper);
+    indicatorSeries.bb_middle.setData(bbData.middle);
+    indicatorSeries.bb_lower.setData(bbData.lower);
 
-    // Rimuove tutti gli indicatori
-    function clearAllIndicators() {
-        Object.keys(indicatorSeries).forEach(key => {
-            chartInstance.removeSeries(indicatorSeries[key]);
-        });
-        indicatorSeries = {};
-        console.log('Tutti gli indicatori rimossi');
-    }
+  // --- Linear Regression ---
+let linRegData = calculateLinearRegression(candleData, 100, 1);
 
-    // Funzioni per calcolare e aggiungere indicatori specifici
-    function addSMA(period) {
-        // Rimuovi SMA esistente
-        if (indicatorSeries.sma) {
-            chartInstance.removeSeries(indicatorSeries.sma);
-        }
+// Rimuovi eventuali serie precedenti
+['lr_upper', 'lr_middle', 'lr_lower', 'lr_channel'].forEach(key => {
+  if (indicatorSeries[key]) chart.removeSeries(indicatorSeries[key]);
+});
 
-        // Aggiungi nuova serie SMA
-        indicatorSeries.sma = chartInstance.addSeries(LightweightCharts.LineSeries, {
-            color: availableIndicators.sma.color,
-            lineWidth: 2,
-            title: `SMA(${period})`
-        });
+// Crea le linee
+indicatorSeries.lr_upper = chart.addSeries(LightweightCharts.LineSeries, { color: '#00BCD4', lineWidth: 1, lineStyle: 0 });
+indicatorSeries.lr_middle = chart.addSeries(LightweightCharts.LineSeries, { color: '#2196F3', lineWidth: 2, lineStyle: 0 });
+indicatorSeries.lr_lower = chart.addSeries(LightweightCharts.LineSeries, { color: '#00BCD4', lineWidth: 1, lineStyle: 0 });
 
-        // Calcola SMA (implementazione semplificata)
-        // In un'implementazione reale, dovresti calcolare la SMA dai dati delle candele
-        console.log(`SMA(${period}) aggiunto`);
-    }
+indicatorSeries.lr_upper.setData(linRegData.upper);
+indicatorSeries.lr_middle.setData(linRegData.middle);
+indicatorSeries.lr_lower.setData(linRegData.lower);
 
-    function addEMA(period) {
-        // Rimuovi EMA esistente
-        if (indicatorSeries.ema) {
-            chartInstance.removeSeries(indicatorSeries.ema);
-        }
+// (Opzionale, solo effetto visivo, NON canale reale)
+indicatorSeries.lr_channel = chart.addSeries(LightweightCharts.AreaSeries, {
+  topColor: 'rgba(0,188,212,0.10)',
+  bottomColor: 'rgba(0,188,212,0.02)',
+  lineColor: 'rgba(0,0,0,0)',
+  lineWidth: 1,
+});
+let areaData = linRegData.upper.map((u, i) => ({
+  time: u.time,
+  value: u.value,
+}));
+indicatorSeries.lr_channel.setData(areaData);
+  }
 
-        // Aggiungi nuova serie EMA
-        indicatorSeries.ema = chartInstance.addSeries(LightweightCharts.LineSeries, {
-            color: availableIndicators.ema.color,
-            lineWidth: 2,
-            title: `EMA(${period})`
-        });
-
-        console.log(`EMA(${period}) aggiunto`);
-    }
-
-    // Funzioni di calcolo indicatori (da implementare)
-    function calculateSMA(data, period) {
-        // Implementazione calcolo SMA
-        const smaData = [];
-        // ... logica di calcolo
-        return smaData;
-    }
-
-    function calculateEMA(data, period) {
-        // Implementazione calcolo EMA
-        const emaData = [];
-        // ... logica di calcolo
-        return emaData;
-    }
-
-    // API pubblica
-    return {
-        openPanel: openPanel,
-        closePanel: closePanel,
-        addIndicator: function(type, params) {
-            // Funzione per aggiungere indicatori programmaticamente
-            console.log(`Aggiungendo indicatore: ${type}`, params);
-        },
-        removeIndicator: function(type) {
-            // Funzione per rimuovere indicatori specifici
-            if (indicatorSeries[type]) {
-                chartInstance.removeSeries(indicatorSeries[type]);
-                delete indicatorSeries[type];
-            }
-        },
-        getAvailableIndicators: function() {
-            return availableIndicators;
-        }
-    };
+  // Espone la funzione pubblica
+  window.TechnicalIndicators = { updateIndicators };
 })();
-
-console.log('📈 Modulo Indicatori Tecnici caricato');

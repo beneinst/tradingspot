@@ -1,512 +1,479 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>ChartFlow</title>
-   
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="icon" type="image/png" href="https://beneinst.github.io/tradingspot/favicon.png">
-  <!-- Libreria Lightweight Charts da CDN -->
-  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <!-- File JavaScript per gli indicatori tecnici -->
-  <script src="indicators.js"></script>
-  <!-- File JavaScript per gli strumenti di disegno -->
-  <script src="drawing-tools.js"></script>
-  <style>
-  /* Stili Globali per tutti i dispositivi (desktop first approach, o base) */
-  html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    font-family: 'Trebuchet MS', sans-serif;
-    font-size: 14px;
-    background: linear-gradient(to bottom, #000000 0%, #050505 50%, #131722 100%);
-    overflow-x: hidden; /* Previene lo scroll orizzontale */
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Trading Avanzata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  #page-title {
-    color: #fff;
-    margin: 0;
-    padding: 16px 24px 0 24px;
-    font-size: 1.2em;
-    letter-spacing: 1px;
-  }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-  #topbar {
-    width: 100%;
-    background: #23272f;
-    padding: 12px 18px;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1.5px solid #222;
-    box-sizing: border-box;
-    z-index: 10;
-    flex-wrap: wrap; /* Permette agli elementi di andare a capo su schermi piccoli */
-  }
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
 
-  #app-title {
-    color: #fff;
-    margin: 0;
-    font-size: 1.1em;
-    letter-spacing: 1px;
-    white-space: nowrap; /* Mantiene il titolo su una riga se possibile */
-  }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
 
-  #toolbar-buttons {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
 
-  #toolbar-buttons button {
-    padding: 8px 12px;
-    font-size: 1.2em;
-    border-radius: 4px;
-    border: 1px solid #444;
-    background: #20232a;
-    color: #fff;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4fc3f7;
+            border-bottom: 2px solid rgba(79, 195, 247, 0.3);
+            padding-bottom: 8px;
+        }
 
-  #toolbar-buttons button:hover {
-    border-color: #26a69a;
-    background: #26a69a;
-    transform: translateY(-1px);
-  }
+        .signal-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
 
-  #toolbar-buttons button:active {
-    transform: translateY(0);
-  }
+        .signal-buy {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+        }
 
-  .left-section {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    flex: 1; /* Permette alla sezione di espandersi */
-    min-width: 0; /* Importante per i flex items per non traboccare */
-  }
+        .signal-sell {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+        }
 
-  .center-section {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-  }
+        .signal-neutral {
+            background: linear-gradient(135deg, #757575, #9e9e9e);
+            color: white;
+        }
 
-  .right-section {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
+        .timer-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+        }
 
-  #symbol-select {
-    padding: 8px 12px;
-    font-size: 1rem;
-    border-radius: 4px;
-    border: 1px solid #444;
-    background: #20232a;
-    color: #fff;
-    cursor: pointer;
-    min-width: 150px; /* Larghezza minima per desktop */
-    flex-grow: 1; /* Permette di espandersi nel flex container */
-  }
+        .timer-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
 
-  #symbol-select:hover {
-    border-color: #666;
-  }
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
 
-  #symbol-select:focus {
-    outline: none;
-    border-color: #26a69a;
-  }
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
 
-  #current-price {
-    color: #26a69a;
-    font-weight: bold;
-    font-size: 1.1em;
-    white-space: nowrap; /* Evita che il prezzo si rompa su più righe */
-  }
+        .indicator-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
 
-  #chart {
-    /* Larghezza al 100% del suo contenitore, non della viewport */
-    /* L'altezza deve tenere conto della topbar, che ora potrebbe avvolgersi su più righe */
-    width: 100%; 
-    height: calc(100vh - var(--topbar-height, 64px)); /* Placeholder per l'altezza della topbar */
-    /* Verrà regolata in JS in base all'altezza dinamica della topbar */
-  }
+        .indicator-value {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
 
-  .loading {
-    color: #fff;
-    text-align: center;
-    padding: 20px;
-  }
+        .indicator-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
 
-  .price-change {
-    font-size: 0.9em;
-    margin-left: 10px;
-    white-space: nowrap; /* Evita che la variazione di prezzo si rompa */
-  }
+        .confluence-score {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 10px 0;
+        }
 
-  .price-up {
-    color: #26a69a;
-  }
+        .score-positive {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+        }
 
-  .price-down {
-    color: #ef5350;
-  }
+        .score-negative {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+        }
 
-  /* MEDIA QUERY per dispositivi con larghezza massima di 480px */
-  @media (max-width: 480px) {
-    #page-title {
-      font-size: 1em; /* Riduci la dimensione del font per il titolo principale */
-      padding: 12px 16px 0 16px; /* Riduci il padding */
-    }
+        .score-neutral {
+            background: linear-gradient(135deg, #757575, #9e9e9e);
+            color: white;
+        }
 
-    #topbar {
-      flex-direction: column; /* Impila gli elementi verticalmente */
-      align-items: flex-start; /* Allinea a sinistra quando impilati */
-      padding: 10px 15px; /* Riduci il padding della topbar */
-      gap: 10px; /* Riduci lo spazio tra gli elementi */
-	  font-size: 14px;
-    }
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
 
-    #app-title {
-      font-size: 1em; /* Riduci la dimensione del font del titolo app */
-      width: 100%; /* Occupa tutta la larghezza disponibile */
-      text-align: center; /* Centra il titolo */
-    }
+        .stats-table th,
+        .stats-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    .left-section,
-    .center-section,
-    .right-section {
-      flex-direction: column; /* Impila le sezioni interne verticalmente */
-      width: 100%; /* Le sezioni interne occupano tutta la larghezza */
-      align-items: center; /* Centra gli elementi all'interno delle sezioni */
-      gap: 5px; /* Riduci lo spazio tra gli elementi */
-    }
-    
-    #toolbar-buttons {
-      width: 100%;
-      justify-content: space-around; /* Distribuisci i bottoni orizzontalmente */
-      gap: 5px; /* Riduci il gap */
-    }
+        .stats-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+        }
 
-    #toolbar-buttons button {
-      min-width: unset; /* Rimuovi la larghezza minima fissa */
-      flex-grow: 1; /* Permetti ai bottoni di espandersi */
-      font-size: 1em; /* Riduci dimensione font bottoni */
-      padding: 6px 8px; /* Riduci padding bottoni */
-      height: 36px; /* Riduci l'altezza dei bottoni */
-    }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
 
-    #symbol-select {
-      min-width: 100%; /* Occupa tutta la larghezza disponibile */
-      font-size: 0.9em; /* Riduci la dimensione del font del selettore */
-    }
+        .status-active { background: #4caf50; }
+        .status-warning { background: #ff9800; }
+        .status-danger { background: #f44336; }
+        .status-inactive { background: #757575; }
 
-    #current-price,
-    .price-change {
-      font-size: 1em; /* Adatta la dimensione del font per i prezzi */
-      margin-left: 0; /* Rimuovi il margine a sinistra */
-    }
+        .refresh-btn {
+            background: linear-gradient(135deg, #2196f3, #21cbf3);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
 
-    #chart {
-      /* Su mobile, l'altezza della topbar potrebbe variare di più */
-      /* È consigliabile calcolare dinamicamente l'altezza della topbar in JavaScript */
-      /* per un'esperienza più robusta. Per ora, un'altezza fissa o vw */
-      height: calc(100vh - 120px); /* Regola questa altezza in base a quanto occupa la topbar su mobile */
-    }
-  }
-</style>
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .pattern-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .pattern-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            margin: 5px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .pattern-bullish { border-left: 4px solid #4caf50; }
+        .pattern-bearish { border-left: 4px solid #f44336; }
+        .pattern-neutral { border-left: 4px solid #ff9800; }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 10px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+	<script type="module" src="index.js"></script>
+
 </head>
 <body>
-  <!-- Barra superiore -->
-  <div id="topbar">
-    <div class="left-section">
-      <h4 id="app-title">📊 4H StratMC</h4>
-      <select id="symbol-select">
-        <option value="">Seleziona Asset...</option>
-      </select>
+
+    <div style="margin-bottom: 20px; text-align: center;">
+        <label for="cryptoSelect">Seleziona Cripto: </label>
+        <select id="cryptoSelect" onchange="changeSymbol()">
+            <option value="btcusdt">BTC/USDT</option>
+            <option value="ethusdt">ETH/USDT</option>
+            <option value="bnbusdt">BNB/USDT</option>
+            <option value="xrpusdt">XRP/USDT</option>
+            <option value="solusdt">SOL/USDT</option>
+            <!-- Puoi aggiungere altre cripto -->
+        </select>
     </div>
-    <div class="center-section">
-      <span id="current-price"></span>
-      <span id="price-change" class="price-change"></span>
+
+    <div class="dashboard-container">
+               <!-- Segnale Principale -->
+        <div class="card">
+            <h3 class="card-title">🎯 Segnale Principale</h3>
+            <div id="mainSignal" class="signal-status signal-neutral">
+                <span>IN ATTESA</span>
+                <span id="signalStrength">0.0</span>
+            </div>
+            <div class="timer-container">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Timer Status:</span>
+                    <span id="timerStatus">NESSUN OK</span>
+                </div>
+                <div class="timer-bar">
+                    <div id="timerFill" class="timer-fill" style="width: 0%"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.9em; opacity: 0.8;">
+                    <span id="timerProgress">0/6</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confluence Score -->
+        <div class="card">
+            <h3 class="card-title">⚖️ Confluence Score</h3>
+            <div id="confluenceScore" class="confluence-score score-neutral">
+                0.0
+            </div>
+            <div style="text-align: center; font-size: 0.9em; opacity: 0.8;">
+                Soglia: ±0.5 per segnale valido
+            </div>
+        </div>
+
+        <!-- Indicatori Principali -->
+        <div class="card">
+            <h3 class="card-title">📊 Indicatori Principali</h3>
+            <div class="indicator-grid">
+                <div class="indicator-item">
+                    <div id="linregValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">LinReg Position</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="pearsonValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">Pearson R</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="bbValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">BB Position</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="stochValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">Stoch K</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Condizioni Base -->
+        <div class="card">
+            <h3 class="card-title">✅ Condizioni Base</h3>
+            <table class="stats-table">
+                <tr>
+                    <td><span id="linregStatus" class="status-indicator status-inactive"></span>LinReg in Zona</td>
+                    <td id="linregCheck">❌</td>
+                </tr>
+                <tr>
+                    <td><span id="pearsonStatus" class="status-indicator status-inactive"></span>Pearson Valido</td>
+                    <td id="pearsonCheck">❌</td>
+                </tr>
+                <tr>
+                    <td><span id="secondaryStatus" class="status-indicator status-inactive"></span>Indicatori Secondari</td>
+                    <td id="secondaryCheck">0/2</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Indicatori Secondari -->
+        <div class="card">
+            <h3 class="card-title">🔧 Indicatori Secondari</h3>
+            <div class="indicator-grid">
+                <div class="indicator-item">
+                    <div id="macdStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">MACD</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="momentumStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">Momentum</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="trendStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">Trend</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="paStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">Price Action</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pattern Candele -->
+        <div class="card">
+            <h3 class="card-title">🕯️ Pattern Candele</h3>
+            <div class="pattern-list" id="patternList">
+                <div class="pattern-item pattern-neutral">
+                    <span>Nessun pattern rilevato</span>
+                    <span>--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiche Timer -->
+        <div class="card">
+            <h3 class="card-title">⏱️ Statistiche Timer</h3>
+            <table class="stats-table">
+                <tr>
+                    <td>Ultimo Segnale OK:</td>
+                    <td id="lastSignalTime">Nessuno</td>
+                </tr>
+                <tr>
+                    <td>Tipo Ultimo Segnale:</td>
+                    <td id="lastSignalType">--</td>
+                </tr>
+                <tr>
+                    <td>Barre Trascorse:</td>
+                    <td id="barsElapsed">--</td>
+                </tr>
+                <tr>
+                    <td>Barre Rimanenti:</td>
+                    <td id="barsRemaining">--</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Controlli -->
+        <div class="card">
+            <h3 class="card-title">🎮 Controlli</h3>
+			<button class="refresh-btn" onclick="window.open('index-grafici.html')">
+            📈 Grafico
+        </button>
+            <button class="refresh-btn" onclick="refreshData()">
+                🔄 Aggiorna Dati
+            </button>
+            <button class="refresh-btn" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
+                ⏰ Auto Refresh: OFF
+            </button>
+            <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                Ultimo aggiornamento: <span id="lastUpdate">--</span>
+            </div>
+        </div>
     </div>
-    <div class="right-section">
-      <div id="toolbar-buttons">
-        <button id="drawing-tools-btn" title="Strumenti di Disegno">✏️</button>
-        <button id="indicators-btn" title="Gestisci Indicatori">📈</button>
-        <button id="screenshot-btn" title="Salva Screenshot">📸</button>
-        <button id="fullscreen-btn" title="Schermo Intero">⛶</button>
-        <button id="refresh-btn" title="Aggiorna Dati">🔄</button>
-      </div>
-    </div>
-  </div>
-  <div id="chart"></div>
 
-  <script>
-    window.addEventListener('DOMContentLoaded', function() {
-      const watchlistSymbols = [
-  'BTCUSDC',
-  'ETHUSDC',
-  'SOLUSDC',
-  'FETUSDC',
-  'DOTUSDC',
-  'LTCUSDC',
-  'BNBUSDC',
-  'ADAUSDC',
-  'FILUSDC',
-  'AVAXUSDC',
-  'MANAUSDC',
-  'SUIUSDC',
-  'ALGOUSDT', 
-  'NEARUSDC',
-  'LINKUSDC',
-  'UNIUSDC',
-  'BELUSDC',
-  'SLFUSDC', 
-  'APEUSDC',
-  'DOGEUSDC',
-  'ATOMUSDC'
-];
-      const symbolSelect = document.getElementById('symbol-select');
-      const currentPriceEl = document.getElementById('current-price');
-      const priceChangeEl = document.getElementById('price-change');
-      
-      let selectedSymbol = watchlistSymbols[0];
-      let chart;
-      let candleSeries;
-      let lastPrice = 0;
+    <script>
+        let socket = null;
+        let currentSymbol = 'btcusdt';
 
-      // Popola il menu a tendina
-      watchlistSymbols.forEach(symbol => {
-        const option = document.createElement('option');
-        option.value = symbol;
-        option.textContent = symbol;
-        symbolSelect.appendChild(option);
-      });
+        function connectBinance(symbol) {
+            if (socket) socket.close();
 
-      // Imposta il primo simbolo come selezionato
-      symbolSelect.value = selectedSymbol;
+            socket = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_1m`);
+            console.log('Connesso a Binance per', symbol);
 
-      // Event listener per il cambio di simbolo
-      symbolSelect.addEventListener('change', function() {
-        const newSymbol = this.value;
-        if (newSymbol && newSymbol !== selectedSymbol) {
-          selectedSymbol = newSymbol;
-          loadBinanceData(selectedSymbol);
-          getCurrentPrice(selectedSymbol);
+            socket.onmessage = function (event) {
+                const message = JSON.parse(event.data);
+                const candlestick = message.k;
+
+                if (candlestick.x) { // Solo se la candela è chiusa
+                    const candle = {
+                        time: candlestick.t,
+                        open: parseFloat(candlestick.o),
+                        high: parseFloat(candlestick.h),
+                        low: parseFloat(candlestick.l),
+                        close: parseFloat(candlestick.c)
+                    };
+
+                    // Chiama la tua logica di calcolo
+                    processNewCandle(candle); // Questa funzione la scrivi in logica.js
+                }
+            };
+
+            socket.onclose = function () {
+                console.log('Connessione chiusa per', symbol);
+            };
         }
-      });
 
-      // Funzione per ottenere il prezzo corrente
-      function getCurrentPrice(symbol) {
-        fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`)
-          .then(response => response.json())
-          .then(data => {
-            const price = parseFloat(data.lastPrice);
-            const change = parseFloat(data.priceChangePercent);
-            
-            currentPriceEl.textContent = `$${price.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 6
-            })}`;
-            
-            priceChangeEl.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-            priceChangeEl.className = `price-change ${change >= 0 ? 'price-up' : 'price-down'}`;
-            
-            lastPrice = price;
-          })
-          .catch(err => console.error('Errore caricamento prezzo:', err));
-      }
-
-      // Funzione per caricare i dati da Binance
-      function loadBinanceData(symbol) {
-        currentPriceEl.textContent = 'Caricamento...';
-        priceChangeEl.textContent = '';
-        
-        fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=4h&limit=100`)
-          .then(response => response.json())
-          .then(data => {
-            const formatted = data.map(c => ({
-              time: Math.floor(c[0] / 1000),
-              open: parseFloat(c[1]),
-              high: parseFloat(c[2]),
-              low: parseFloat(c[3]),
-              close: parseFloat(c[4]),
-            }));
-            candleSeries.setData(formatted);
-          })
-          .catch(err => {
-            console.error('Errore caricamento dati Binance:', err);
-            currentPriceEl.textContent = 'Errore caricamento';
-          });
-      }
-
-      // Inizializza il grafico
-      function initChart() {
-        const chartContainer = document.getElementById('chart');
-        chart = LightweightCharts.createChart(chartContainer, {
-          width: chartContainer.clientWidth,
-          height: chartContainer.clientHeight,
-          layout: { 
-            background: { color: '#181a20' }, 
-            textColor: '#d1d4dc' 
-          },
-          grid: { 
-            vertLines: { color: '#222' }, 
-            horzLines: { color: '#222' } 
-          },
-          timeScale: { 
-            timeVisible: true, 
-            secondsVisible: false 
-          },
-          rightPriceScale: {
-            borderColor: '#444',
-          },
-          crosshair: {
-            mode: LightweightCharts.CrosshairMode.Normal,
-          },
-        });
-
-        candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
-          upColor: '#26a69a', 
-          downColor: '#ef5350', 
-          borderVisible: false,
-          wickUpColor: '#26a69a', 
-          wickDownColor: '#ef5350',
-        });
-
-        // Resize dinamico
-        window.addEventListener('resize', () => {
-          chart.applyOptions({
-            width: chartContainer.clientWidth,
-            height: chartContainer.clientHeight
-          });
-        });
-      }
-
-      // Event listeners per i pulsanti della toolbar
-      document.getElementById('drawing-tools-btn').addEventListener('click', function() {
-        openDrawingToolsPanel();
-      });
-
-      document.getElementById('indicators-btn').addEventListener('click', function() {
-        openIndicatorsPanel();
-      });
-
-      document.getElementById('screenshot-btn').addEventListener('click', function() {
-        takeScreenshot();
-      });
-
-      document.getElementById('fullscreen-btn').addEventListener('click', function() {
-        toggleFullscreen();
-      });
-
-      document.getElementById('refresh-btn').addEventListener('click', function() {
-        if (selectedSymbol) {
-          loadBinanceData(selectedSymbol);
-          getCurrentPrice(selectedSymbol);
+        function changeSymbol() {
+            const select = document.getElementById('cryptoSelect');
+            currentSymbol = select.value;
+            connectBinance(currentSymbol);
         }
-      });
 
-      // Funzione per aprire il pannello strumenti di disegno
-      function openDrawingToolsPanel() {
-        // Verifica se il file drawing-tools.js è caricato
-        if (typeof window.DrawingTools !== 'undefined') {
-          // Apri il pannello strumenti di disegno
-          window.DrawingTools.openPanel(chart, candleSeries);
-        } else {
-          // Se il file non è caricato, carica dinamicamente
-          console.log('Caricamento drawing-tools.js...');
-          loadDrawingToolsScript();
+        // Funzione da chiamare per aggiornare la dashboard con nuovi dati
+        function updateDashboard(calculations) {
+            // Esempio: Aggiorno solo alcuni campi (puoi espandere)
+            document.getElementById('linregValue').innerText = calculations.linreg.toFixed(2);
+            document.getElementById('pearsonValue').innerText = calculations.pearson.toFixed(2);
+            document.getElementById('bbValue').innerText = calculations.bb.toFixed(2);
+            document.getElementById('stochValue').innerText = calculations.stoch.toFixed(2);
+
+            // Aggiorna confluence score
+            document.getElementById('confluenceScore').innerText = calculations.score.toFixed(2);
+            document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString();
+
+            // Aggiorna segnali e stati visivi se vuoi
         }
-      }
 
-      // Funzione per caricare dinamicamente il file strumenti di disegno
-      function loadDrawingToolsScript() {
-        const script = document.createElement('script');
-        script.src = 'drawing-tools.js';
-        script.onload = function() {
-          console.log('drawing-tools.js caricato con successo');
-          if (typeof window.DrawingTools !== 'undefined') {
-            window.DrawingTools.openPanel(chart, candleSeries);
-          }
+        // Connessione iniziale
+        window.onload = function () {
+            connectBinance(currentSymbol);
         };
-        script.onerror = function() {
-          alert('Errore: impossibile caricare drawing-tools.js\nAssicurati che il file sia presente nella stessa cartella.');
-        };
-        document.head.appendChild(script);
-      }
 
-      // Funzione per aprire il pannello indicatori
-      function openIndicatorsPanel() {
-        // Verifica se il file indicators.js è caricato
-        if (typeof window.TechnicalIndicators !== 'undefined') {
-          // Apri il pannello indicatori
-          window.TechnicalIndicators.openPanel(chart, candleSeries);
-        } else {
-          // Se il file non è caricato, mostra un messaggio o carica dinamicamente
-          console.log('Caricamento indicators.js...');
-          loadIndicatorsScript();
+        function refreshData() {
+            console.log('Refresh manuale richiesto.');
+            // Puoi implementare logiche per ricalcolo manuale se serve
         }
-      }
 
-      // Funzione per caricare dinamicamente il file indicatori
-      function loadIndicatorsScript() {
-        const script = document.createElement('script');
-        script.src = 'indicators.js';
-        script.onload = function() {
-          console.log('indicators.js caricato con successo');
-          if (typeof window.TechnicalIndicators !== 'undefined') {
-            window.TechnicalIndicators.openPanel(chart, candleSeries);
-          }
-        };
-        script.onerror = function() {
-          alert('Errore: impossibile caricare indicators.js\nAssicurati che il file sia presente nella stessa cartella.');
-        };
-        document.head.appendChild(script);
-      }
+        let autoRefresh = false;
+        let refreshInterval = null;
 
-      // Funzione per lo screenshot
-		function takeScreenshot() {
-		html2canvas(document.getElementById('chart')).then(canvas => {
-		const link = document.createElement('a');
-		link.download = `${selectedSymbol}_chart_${new Date().getTime()}.png`;
-		link.href = canvas.toDataURL();
-		link.click();
-		});
-		}
-
-      // Funzione per schermo intero
-      function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(err => {
-            console.log('Errore fullscreen:', err);
-          });
-        } else {
-          document.exitFullscreen();
+        function toggleAutoRefresh() {
+            autoRefresh = !autoRefresh;
+            const btn = document.getElementById('autoRefreshBtn');
+            if (autoRefresh) {
+                refreshInterval = setInterval(() => {
+                    console.log('Auto refresh...');
+                }, 60000);
+                btn.innerText = '⏰ Auto Refresh: ON';
+            } else {
+                clearInterval(refreshInterval);
+                btn.innerText = '⏰ Auto Refresh: OFF';
+            }
         }
-      }
-      initChart();
-      loadBinanceData(selectedSymbol);
-      getCurrentPrice(selectedSymbol);
-
-      // Aggiorna il prezzo ogni 10 secondi
-      setInterval(() => {
-        if (selectedSymbol) {
-          getCurrentPrice(selectedSymbol);
-        }
-      }, 10000);
-    });
-  </script>
+    </script>
 </body>
 </html>

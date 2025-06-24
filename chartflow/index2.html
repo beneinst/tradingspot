@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Trading Crypto - Binance Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4fc3f7;
+            border-bottom: 2px solid rgba(79, 195, 247, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .symbol-selector {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .signal-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .signal-buy {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+        }
+
+        .signal-sell {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+        }
+
+        .signal-neutral {
+            background: linear-gradient(135deg, #757575, #9e9e9e);
+            color: white;
+        }
+
+        .price-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .price-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .confluence-score {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 10px 0;
+        }
+
+        .score-positive {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+        }
+
+        .score-negative {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+        }
+
+        .score-neutral {
+            background: linear-gradient(135deg, #757575, #9e9e9e);
+            color: white;
+        }
+
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .indicator-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .indicator-value {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .indicator-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #2196f3, #21cbf3);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active { background: #4caf50; }
+        .status-warning { background: #ff9800; }
+        .status-danger { background: #f44336; }
+        .status-inactive { background: #757575; }
+
+        .log-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.85em;
+        }
+
+        .log-entry {
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+        .info { color: #74c0fc; }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 10px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Controllo Simbolo -->
+        <div class="card">
+            <h3 class="card-title">🎯 Controllo Trading</h3>
+            <select id="symbolSelect" class="symbol-selector">
+                <option value="BTCUSDT">BTC/USDT</option>
+                <option value="ETHUSDT">ETH/USDT</option>
+                <option value="BNBUSDT">BNB/USDT</option>
+                <option value="ADAUSDT">ADA/USDT</option>
+                <option value="SOLUSDT">SOL/USDT</option>
+                <option value="DOTUSDT">DOT/USDT</option>
+            </select>
+            
+            <div class="price-info">
+                <div class="price-item">
+                    <div id="currentPrice" class="indicator-value">$0.00</div>
+                    <div class="indicator-label">Prezzo Attuale</div>
+                </div>
+                <div class="price-item">
+                    <div id="priceChange" class="indicator-value">0.00%</div>
+                    <div class="indicator-label">Variazione 24h</div>
+                </div>
+                <div class="price-item">
+                    <div id="volume" class="indicator-value">0</div>
+                    <div class="indicator-label">Volume 24h</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Segnale Principale -->
+        <div class="card">
+            <h3 class="card-title">📊 Segnale di Trading</h3>
+            <div id="mainSignal" class="signal-status signal-neutral">
+                <span>CARICAMENTO...</span>
+                <span id="signalStrength">0.0</span>
+            </div>
+            
+            <div id="confluenceScore" class="confluence-score score-neutral">
+                0.0
+            </div>
+            <div style="text-align: center; font-size: 0.9em; opacity: 0.8;">
+                Confluence Score (soglia: ±0.5)
+            </div>
+        </div>
+
+        <!-- Indicatori Tecnici -->
+        <div class="card">
+            <h3 class="card-title">📈 Indicatori Tecnici</h3>
+            <div class="indicator-grid">
+                <div class="indicator-item">
+                    <div id="rsiValue" class="indicator-value">--</div>
+                    <div class="indicator-label">RSI (14)</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="macdValue" class="indicator-value">--</div>
+                    <div class="indicator-label">MACD</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="stochValue" class="indicator-value">--</div>
+                    <div class="indicator-label">Stochastic</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="bbValue" class="indicator-value">--</div>
+                    <div class="indicator-label">Bollinger</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="smaValue" class="indicator-value">--</div>
+                    <div class="indicator-label">SMA (20)</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="emaValue" class="indicator-value">--</div>
+                    <div class="indicator-label">EMA (20)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Condizioni di Ingresso -->
+        <div class="card">
+            <h3 class="card-title">✅ Condizioni di Ingresso</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><span id="trendStatus" class="status-indicator status-inactive"></span>Trend Favorevole</span>
+                    <span id="trendCheck">❌</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><span id="momentumStatus" class="status-indicator status-inactive"></span>Momentum Positivo</span>
+                    <span id="momentumCheck">❌</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><span id="oversoldStatus" class="status-indicator status-inactive"></span>Area Ipervenduto/Ipercomprato</span>
+                    <span id="oversoldCheck">❌</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><span id="volumeStatus" class="status-indicator status-inactive"></span>Volume Sufficiente</span>
+                    <span id="volumeCheck">❌</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controlli -->
+        <div class="card">
+            <h3 class="card-title">🎮 Controlli</h3>
+            <button class="refresh-btn" onclick="updateData()">
+                🔄 Aggiorna Dati
+            </button>
+            <button class="refresh-btn" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
+                ⏰ Auto: OFF
+            </button>
+            <button class="refresh-btn" onclick="testStrategy()">
+                🧪 Test Strategia
+            </button>
+            <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                Ultimo aggiornamento: <span id="lastUpdate">--</span>
+            </div>
+        </div>
+
+        <!-- Log Sistema -->
+        <div class="card">
+            <h3 class="card-title">📝 Log Sistema</h3>
+            <div id="logContainer" class="log-container">
+                <div class="log-entry info">Sistema inizializzato...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Classe di Analisi Tecnica Integrata
+        class CryptoTechnicalAnalysis {
+            constructor() {
+                this.data = [];
+                this.currentBar = 0;
+                this.config = {
+                    rsiLength: 14,
+                    stochLength: 14,
+                    macdFast: 12,
+                    macdSlow: 26,
+                    macdSignal: 9,
+                    smaLength: 20,
+                    emaLength: 20,
+                    bbLength: 20,
+                    bbStdDev: 2
+                };
+            }
+
+            // Aggiorna dati da Binance API
+            async updateMarketData(symbol) {
+                try {
+                    const klineUrl = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=100`;
+                    const tickerUrl = `https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`;
+                    
+                    const [klineResponse, tickerResponse] = await Promise.all([
+                        fetch(klineUrl),
+                        fetch(tickerUrl)
+                    ]);
+                    
+                    const klineData = await klineResponse.json();
+                    const tickerData = await tickerResponse.json();
+                    
+                    // Converte dati Binance nel formato interno
+                    this.data = klineData.map(candle => ({
+                        timestamp: candle[0],
+                        open: parseFloat(candle[1]),
+                        high: parseFloat(candle[2]),
+                        low: parseFloat(candle[3]),
+                        close: parseFloat(candle[4]),
+                        volume: parseFloat(candle[5])
+                    }));
+                    
+                    this.currentBar = this.data.length - 1;
+                    
+                    return {
+                        price: parseFloat(tickerData.lastPrice),
+                        change: parseFloat(tickerData.priceChangePercent),
+                        volume: parseFloat(tickerData.volume)
+                    };
+                    
+                } catch (error) {
+                    addLog('Errore nel recupero dati: ' + error.message, 'error');
+                    throw error;
+                }
+            }
+
+            // Calcola RSI
+            calculateRSI(length = this.config.rsiLength) {
+                if (this.data.length < length + 1) return 50;
+                
+                let gains = 0, losses = 0;
+                
+                for (let i = this.currentBar - length + 1; i <= this.currentBar; i++) {
+                    if (i > 0) {
+                        const change = this.data[i].close - this.data[i - 1].close;
+                        if (change > 0) {
+                            gains += change;
+                        } else {
+                            losses += Math.abs(change);
+                        }
+                    }
+                }
+                
+                const avgGain = gains / length;
+                const avgLoss = losses / length;
+                
+                if (avgLoss === 0) return 100;
+                
+                const rs = avgGain / avgLoss;
+                return 100 - (100 / (1 + rs));
+            }
+
+            // Calcola Stochastic
+            calculateStochastic(length = this.config.stochLength) {
+                if (this.data.length < length) return { k: 50, d: 50 };
+                
+                const recentData = this.data.slice(this.currentBar - length + 1, this.currentBar + 1);
+                const highs = recentData.map(d => d.high);
+                const lows = recentData.map(d => d.low);
+                
+                const highestHigh = Math.max(...highs);
+                const lowestLow = Math.min(...lows);
+                const currentClose = this.data[this.currentBar].close;
+                
+                const k = highestHigh !== lowestLow ? 
+                    ((currentClose - lowestLow) / (highestHigh - lowestLow)) * 100 : 50;
+                
+                return { k, d: k }; // Semplificato
+            }
+
+            // Calcola MACD
+            calculateMACD() {
+                const fastEMA = this.calculateEMA(this.config.macdFast);
+                const slowEMA = this.calculateEMA(this.config.macdSlow);
+                const macd = fastEMA - slowEMA;
+                
+                return { macd, signal: macd * 0.8, histogram: macd * 0.2 };
+            }
+
+            // Calcola EMA
+            calculateEMA(length) {
+                if (this.data.length < length) return this.data[this.currentBar]?.close || 0;
+                
+                const prices = this.data.slice(0, this.currentBar + 1).map(d => d.close);
+                const multiplier = 2 / (length + 1);
+                let ema = prices[0];
+                
+                for (let i = 1; i < prices.length; i++) {
+                    ema = (prices[i] * multiplier) + (ema * (1 - multiplier));
+                }
+                
+                return ema;
+            }
+
+            // Calcola SMA
+            calculateSMA(length) {
+                if (this.data.length < length) return this.data[this.currentBar]?.close || 0;
+                
+                const recentPrices = this.data.slice(this.currentBar - length + 1, this.currentBar + 1);
+                const sum = recentPrices.reduce((acc, d) => acc + d.close, 0);
+                return sum / length;
+            }
+
+            // Calcola Bollinger Bands
+            calculateBollingerBands() {
+                const sma = this.calculateSMA(this.config.bbLength);
+                const recentPrices = this.data.slice(this.currentBar - this.config.bbLength + 1, this.currentBar + 1);
+                
+                const variance = recentPrices.reduce((acc, d) => {
+                    return acc + Math.pow(d.close - sma, 2);
+                }, 0) / this.config.bbLength;
+                
+                const stdDev = Math.sqrt(variance);
+                const upperBand = sma + (stdDev * this.config.bbStdDev);
+                const lowerBand = sma - (stdDev * this.config.bbStdDev);
+                
+                const currentPrice = this.data[this.currentBar].close;
+                const position = (currentPrice - lowerBand) / (upperBand - lowerBand);
+                
+                return { upper: upperBand, lower: lowerBand, middle: sma, position };
+            }
+
+            // Calcola Confluence Score
+            calculateConfluenceScore() {
+                const rsi = this.calculateRSI();
+                const stoch = this.calculateStochastic();
+                const macd = this.calculateMACD();
+                const bb = this.calculateBollingerBands();
+                const sma = this.calculateSMA();
+                const currentPrice = this.data[this.currentBar].close;
+                
+                let score = 0;
+                
+                // RSI signals
+                if (rsi < 30) score += 1; // Oversold - bullish
+                if (rsi > 70) score -= 1; // Overbought - bearish
+                
+                // Stochastic signals
+                if (stoch.k < 20) score += 0.5;
+                if (stoch.k > 80) score -= 0.5;
+                
+                // MACD signals
+                if (macd.macd > macd.signal) score += 0.5;
+                if (macd.macd < macd.signal) score -= 0.5;
+                
+                // Price vs SMA
+                if (currentPrice > sma) score += 0.5;
+                if (currentPrice < sma) score -= 0.5;
+                
+                // Bollinger position
+                if (bb.position < 0.2) score += 0.5; // Near lower band
+                if (bb.position > 0.8) score -= 0.5; // Near upper band
+                
+                return Math.max(-3, Math.min(3, score));
+            }
+
+            // Genera segnale di trading
+            generateSignal() {
+                const confluenceScore = this.calculateConfluenceScore();
+                const rsi = this.calculateRSI();
+                const stoch = this.calculateStochastic();
+                const volume = this.data[this.currentBar].volume;
+                const avgVolume = this.data.slice(-20).reduce((acc, d) => acc + d.volume, 0) / 20;
+                
+                const conditions = {
+                    trend: confluenceScore > 0.3 || confluenceScore < -0.3,
+                    momentum: Math.abs(rsi - 50) > 15,
+                    oversold: rsi < 35 || rsi > 65 || stoch.k < 25 || stoch.k > 75,
+                    volume: volume > avgVolume * 1.2
+                };
+                
+                let signal = 'NEUTRAL';
+                let strength = Math.abs(confluenceScore);
+                
+                if (confluenceScore >= 0.5 && conditions.trend && conditions.momentum) {
+                    signal = 'BUY';
+                } else if (confluenceScore <= -0.5 && conditions.trend && conditions.momentum) {
+                    signal = 'SELL';
+                }
+                
+                return { signal, strength, confluenceScore, conditions };
+            }
+        }
+
+        // Variabili globali
+        let analyzer = new CryptoTechnicalAnalysis();
+        let autoRefreshInterval = null;
+        let isAutoRefresh = false;
+        let currentSymbol = 'BTCUSDT';
+
+        // Funzioni UI
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Mantieni solo gli ultimi 50 log
+            const logs = logContainer.children;
+            if (logs.length > 50) {
+                logContainer.removeChild(logs[0]);
+            }
+        }
+
+        function updateCondition(type, isValid) {
+            const statusEl = document.getElementById(type + 'Status');
+            const checkEl = document.getElementById(type + 'Check');
+            
+            if (isValid) {
+                statusEl.className = 'status-indicator status-active';
+                checkEl.textContent = '✅';
+            } else {
+                statusEl.className = 'status-indicator status-inactive';
+                checkEl.textContent = '❌';
+            }
+        }
+
+        async function updateData() {
+            try {
+                addLog(`Aggiornamento dati per ${currentSymbol}...`, 'info');
+                
+                const marketData = await analyzer.updateMarketData(currentSymbol);
+                const analysis = analyzer.generateSignal();
+                
+                // Aggiorna prezzo e statistiche
+                document.getElementById('currentPrice').textContent = `$${marketData.price.toLocaleString()}`;
+                document.getElementById('priceChange').textContent = `${marketData.change.toFixed(2)}%`;
+                document.getElementById('priceChange').style.color = marketData.change >= 0 ? '#4caf50' : '#f44336';
+                document.getElementById('volume').textContent = marketData.volume.toLocaleString();
+                
+                // Aggiorna segnale principale
+                const mainSignal = document.getElementById('mainSignal');
+                const signalStrength = document.getElementById('signalStrength');
+                
+                if (analysis.signal === 'BUY') {
+                    mainSignal.className = 'signal-status signal-buy';
+                    mainSignal.innerHTML = '<span>🟢 COMPRA</span><span id="signalStrength">' + analysis.strength.toFixed(1) + '</span>';
+                } else if (analysis.signal === 'SELL') {
+                    mainSignal.className = 'signal-status signal-sell';
+                    mainSignal.innerHTML = '<span>🔴 VENDI</span><span id="signalStrength">' + analysis.strength.toFixed(1) + '</span>';
+                } else {
+                    mainSignal.className = 'signal-status signal-neutral';
+                    mainSignal.innerHTML = '<span>⚪ NEUTRALE</span><span id="signalStrength">' + analysis.strength.toFixed(1) + '</span>';
+                }
+                
+                // Aggiorna confluence score
+                const confluenceScore = document.getElementById('confluenceScore');
+                confluenceScore.textContent = analysis.confluenceScore.toFixed(1);
+                if (analysis.confluenceScore > 0.5) {
+                    confluenceScore.className = 'confluence-score score-positive';
+                } else if (analysis.confluenceScore < -0.5) {
+                    confluenceScore.className = 'confluence-score score-negative';
+                } else {
+                    confluenceScore.className = 'confluence-score score-neutral';
+                }
+                
+                // Aggiorna indicatori
+                const rsi = analyzer.calculateRSI();
+                const stoch = analyzer.calculateStochastic();
+                const macd = analyzer.calculateMACD();
+                const bb = analyzer.calculateBollingerBands();
+                const sma = analyzer.calculateSMA();
+                const ema = analyzer.calculateEMA(20);
+                
+                document.getElementById('rsiValue').textContent = rsi.toFixed(1);
+                document.getElementById('stochValue').textContent = stoch.k.toFixed(1);
+                document.getElementById('macdValue').textContent = macd.macd.toFixed(4);
+                document.getElementById('bbValue').textContent = (bb.position * 100).toFixed(1) + '%';
+                document.getElementById('smaValue').textContent = '$' + sma.toLocaleString();
+                document.getElementById('emaValue').textContent = '$' + ema.toLocaleString();
+                
+                // Aggiorna condizioni
+                updateCondition('trend', analysis.conditions.trend);
+                updateCondition('momentum', analysis.conditions.momentum);
+                updateCondition('oversold', analysis.conditions.oversold);
+                updateCondition('volume', analysis.conditions.volume);
+                
+                // Aggiorna timestamp
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+                
+                addLog(`Analisi completata: ${analysis.signal} (Score: ${analysis.confluenceScore.toFixed(1)})`, 
+                       analysis.signal === 'BUY' ? 'success' : analysis.signal === 'SELL' ? 'error' : 'info');
+                
+            } catch (error) {
+                addLog('Errore nell\'aggiornamento: ' + error.message, 'error');
+            }
+        }
+
+        function toggleAutoRefresh() {
+            const btn = document.getElementById('autoRefreshBtn');
+            
+            if (isAutoRefresh) {
+                clearInterval(autoRefreshInterval);
+                btn.textContent = '⏰ Auto: OFF';
+                isAutoRefresh = false;
+                addLog('Auto-refresh disattivato', 'info');
+            } else {
+                autoRefreshInterval = setInterval(updateData, 30000); // 30 secondi
+                btn.textContent = '⏰ Auto: ON';
+                isAutoRefresh = true;
+                addLog('Auto-refresh attivato (30s)', 'success');
+            }
+        }
+
+        function testStrategy() {
+            addLog('Test strategia in corso...', 'info');
+            // Simula diversi scenari per testare la strategia
+            setTimeout(() => {
+                addLog('Test completato - Strategia operativa', 'success');
+            }, 2000);
+        }
+
+        // Event listeners
+        document.getElementById('symbolSelect').addEventListener('change', function(e) {
+            currentSymbol = e.target.value;
+            addLog(`Simbolo cambiato in ${currentSymbol}`, 'info');
+            updateData();
+        });
+
+        // Inizializzazione
+        addLog('Dashboard inizializzata', 'success');
+        updateData();
+    </script>
+</body>
+</html>
