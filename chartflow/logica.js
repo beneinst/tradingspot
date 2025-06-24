@@ -1,4 +1,4 @@
-// logica.js - Traduzione da Java a JavaScript per la Strategia Multi-Confluenza
+// logica.js - Strategia Multi-Confluenza con salvataggio locale
 
 // ================= CONFIGURAZIONI =================
 
@@ -48,7 +48,41 @@ const state = {
     highs: [],
     lows: [],
     opens: [],
+    lastUpdate: null, // per gestire anche un timer
 };
+
+// ================= SALVATAGGIO E RIPRISTINO =================
+
+function saveState(symbol) {
+    const savedData = {
+        prices: state.prices,
+        highs: state.highs,
+        lows: state.lows,
+        opens: state.opens,
+        lastUpdate: Date.now(),
+    };
+    localStorage.setItem(`savedState_${symbol}`, JSON.stringify(savedData));
+}
+
+function loadState(symbol) {
+    const saved = localStorage.getItem(`savedState_${symbol}`);
+    if (!saved) return false;
+
+    try {
+        const data = JSON.parse(saved);
+        state.prices = data.prices || [];
+        state.highs = data.highs || [];
+        state.lows = data.lows || [];
+        state.opens = data.opens || [];
+        state.lastUpdate = data.lastUpdate || null;
+
+        console.log(`Stato recuperato da LocalStorage per ${symbol}`);
+        return true;
+    } catch (error) {
+        console.error('Errore nel caricamento dello stato salvato:', error);
+        return false;
+    }
+}
 
 // ================= FUNZIONI DI UTILITÀ =================
 
@@ -107,7 +141,6 @@ function lowest(values, period) {
 // ================= CALCOLI =================
 
 function calculateIndicators() {
-    // Controllo dati sufficienti
     if (state.prices.length < Math.max(config.lengthInput, config.bbLength, config.emaLength, config.smaLength, config.momentumLength + 1)) {
         console.log('Dati insufficienti per il calcolo degli indicatori.');
         return null;
@@ -115,20 +148,17 @@ function calculateIndicators() {
 
     const currentPrice = state.prices[state.prices.length - 1];
 
-    // Bollinger Bands
     const bbBasis = sma(state.prices, config.bbLength);
     const bbDev = config.bbMult * stdev(state.prices, config.bbLength);
     const bbUpper = bbBasis + bbDev;
     const bbLower = bbBasis - bbDev;
     const bbPosition = ((currentPrice - bbLower) / (bbUpper - bbLower)) * 2 - 1;
 
-    // Trend con EMA e SMA
     const emaValue = ema(state.prices, config.emaLength);
     const smaValue = sma(state.prices, config.smaLength);
     const trendBullish = emaValue > smaValue && currentPrice > emaValue;
     const trendBearish = emaValue < smaValue && currentPrice < emaValue;
 
-    // Momentum
     let momentumBullish = false;
     let momentumBearish = false;
 
@@ -138,12 +168,10 @@ function calculateIndicators() {
         momentumBearish = momentum < 0;
     }
 
-    // Stochastic RSI
     const stochData = calcStochRsi();
     const stochK = stochData ? stochData[0] : 0;
     const stochD = stochData ? stochData[1] : 0;
 
-    // Log per controllo
     console.log('Calcoli indicatori:', {
         bbPosition,
         emaValue,
@@ -167,7 +195,6 @@ function calculateIndicators() {
     };
 }
 
-
 function calcStochRsi() {
     if (state.prices.length < Math.max(config.stochRsiRsiLength, config.stochRsiLength + config.stochRsiD - 1)) {
         return [50, 50];
@@ -190,7 +217,6 @@ function calcStochRsi() {
     const stochRsiK = (highestRsi !== lowestRsi) ?
         100 * (currentRsi - lowestRsi) / (highestRsi - lowestRsi) : 50;
 
-    // Calcolo semplice della media mobile semplice di K per D
     const recentKs = [];
     for (let i = rsiValues.length - config.stochRsiD; i < rsiValues.length; i++) {
         const h = highest(rsiValues.slice(i - config.stochRsiLength + 1, i + 1), config.stochRsiLength);
@@ -203,14 +229,14 @@ function calcStochRsi() {
     return [stochRsiK, stochRsiD];
 }
 
-
 // ================= AGGIUNTA DATI =================
 
-function addTick(open, high, low, close) {
+function addTick(open, high, low, close, symbol = 'btcusdt') {
     state.opens.push(open);
     state.highs.push(high);
     state.lows.push(low);
     state.prices.push(close);
+    state.lastUpdate = Date.now();
 
     const maxSize = config.lengthInput + 50;
     if (state.prices.length > maxSize) {
@@ -219,10 +245,12 @@ function addTick(open, high, low, close) {
         state.lows.shift();
         state.prices.shift();
     }
+
+    saveState(symbol);
 }
 
-function processNewCandle(candle) {
-    addTick(candle.open, candle.high, candle.low, candle.close);
+function processNewCandle(candle, symbol = 'btcusdt') {
+    addTick(candle.open, candle.high, candle.low, candle.close, symbol);
     const result = calculateIndicators();
 
     if (result) {
@@ -245,7 +273,6 @@ function processNewCandle(candle) {
     return null;
 }
 
-
-
 // ================= ESPORTAZIONE =================
-export { addTick, calculateIndicators, state, config, processNewCandle };
+
+export { addTick, calculateIndicators, state, config, processNewCandle, saveState, loadState };
