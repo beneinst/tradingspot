@@ -42,30 +42,6 @@ const CORS_PROXIES = [
     }
 ];
 
-// Funzione fetch ottimizzata
-async function fetchWithProxy(url, options = {}) {
-    for (let attempt = 1; attempt <= CONFIG.maxRetries; attempt++) {
-        const proxy = CORS_PROXIES[0];
-        try {
-            const proxyUrl = proxy.url + encodeURIComponent(url);
-            const response = await fetch(proxyUrl, {
-                ...options,
-                headers: { ...options.headers, ...proxy.headers }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            
-            return await response.json();
-        } catch (error) {
-            const delay = Math.min(30000, Math.pow(2, attempt) * 1000);
-            debugLog(`Tentativo ${attempt} fallito, riprovo in ${delay}ms`);
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-    }
-    throw new Error('Tutti i tentativi falliti');
-}
 
 
 let websocket = null;
