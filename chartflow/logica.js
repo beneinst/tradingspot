@@ -186,27 +186,21 @@ function addTick(open, high, low, close) {
     }
 }
 
-// ================= ESPORTAZIONE =================
-
-import { addTick, calculateIndicators } from './logica.js';
-
 function processNewCandle(candle) {
     addTick(candle.open, candle.high, candle.low, candle.close);
     const result = calculateIndicators();
     if (result) {
-        // Devi creare un oggetto compatibile con updateDashboard
         const calculations = {
-            linreg: 0, // Inserisci il calcolo corretto se lo aggiungi
-            pearson: 0, // Inserisci il calcolo corretto se lo aggiungi
+            linreg: 0, // da calcolare
+            pearson: 0, // da calcolare
             bb: result.bbPosition,
             stoch: result.stochK,
-            score: result.bbPosition // o crea una formula di score
+            score: result.bbPosition // o altra formula
         };
+        // La funzione updateDashboard è nel file index.js
         updateDashboard(calculations);
     }
 }
 
-export { processNewCandle };
-
-
-export { addTick, calculateIndicators, state, config };
+// ================= ESPORTAZIONE =================
+export { addTick, calculateIndicators, state, config, processNewCandle };
