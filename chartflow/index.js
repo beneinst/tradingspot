@@ -226,79 +226,69 @@ async function fetchHistoricalDataForSymbol(symbolValue) {
 }
 
 
+
 // ================= INIZIALIZZAZIONE DATI STORICI PER SIMBOLO =================
 async function initializeHistoricalDataForSymbol(symbol) {
     try {
         debugLog(`[${symbol}] Inizializzazione...`);
-        
-        // 1. Caricamento da storage
         let candles = loadFromStorage(`candles_${symbol}`);
-        if (candles && candles.length >= 50) { // Soglia minima più bassa
+        if (candles && candles.length >= 50) {
             debugLog(`[${symbol}] ${candles.length} candele caricate da storage`);
-            
-            // Processa le candele
             for (const candle of candles) {
                 processNewCandle(candle, symbol.toLowerCase());
             }
-            
             return { success: true, loaded: candles.length, source: 'storage' };
         }
-
-        // 2. Fetch da API
-        const rawData = await fetchHistoricalDataForSymbol(symbol, CONFIG.interval, CONFIG.historyLimit);
-        let parsedCandles = [];
-        
-        for (let i = 0; i < rawData.length; i++) {
-            const result = parseHistoricalCandle(rawData[i], i);
-            if (result.candle) {
-                parsedCandles.push(result.candle);
-            }
-        }
-        
-        // Salva in storage
+        // Qui ottieni rawData come array di [timestamp, close]
+        const rawData = await fetchHistoricalDataForSymbol(symbol);
+        let parsedCandles = rawData.map(([timestamp, close]) => ({
+            timestamp,
+            open: close,
+            high: close,
+            low: close,
+            close,
+            volume: 0
+        }));
         saveToStorage(`candles_${symbol}`, parsedCandles);
-        
-        // Processa le candele
         for (const candle of parsedCandles) {
             processNewCandle(candle, symbol.toLowerCase());
         }
-        
         debugLog(`[${symbol}] ${parsedCandles.length} candele elaborate e salvate`);
         return { success: true, loaded: parsedCandles.length, source: 'api' };
-        
     } catch (error) {
         debugError(`[${symbol}] Errore inizializzazione: ${error.message}`);
         return { success: false, error: error.message };
     }
 }
 
+
 // ================= PARSING CANDELE =================
-function parseHistoricalCandle(rawCandle, index) {
-    try {
-        if (!Array.isArray(rawCandle) || rawCandle.length < 6) {
-            return { candle: null, error: `Formato non valido (index: ${index})` };
-        }
+// =====function parseHistoricalCandle(rawCandle, index) {
+ // =====   try {
+  // =====      if (!Array.isArray(rawCandle) || rawCandle.length < 6) {
+  // =====          return { candle: null, error: `Formato non valido (index: ${index})` };
+  // =====      }
         
-        const [timestamp, open, high, low, close, volume] = rawCandle;
-        const candle = {
-            timestamp: parseInt(timestamp),
-            open: parseFloat(open),
-            high: parseFloat(high),
-            low: parseFloat(low),
-            close: parseFloat(close),
-            volume: parseFloat(volume)
-        };
+  // =====      const [timestamp, open, high, low, close, volume] = rawCandle;
+  // =====      const candle = {
+   // =====         timestamp: parseInt(timestamp),
+  // =====          open: parseFloat(open),
+  // =====          high: parseFloat(high),
+  // =====          low: parseFloat(low),
+  // =====          close: parseFloat(close),
+  // =====          volume: parseFloat(volume)
+  // =====      };
         
         // Validazione
-        if (Object.values(candle).some(val => isNaN(val))) {
-            return { candle: null, error: 'Valori non numerici' };
-        }
+  // =====      if (Object.values(candle).some(val => isNaN(val))) {
+  // =====          return { candle: null, error: 'Valori non numerici' };
+  // =====      }
         
-        return { candle, error: null };
-    } catch (error) {
-        return { candle: null, error: `Errore parsing: ${error.message}` };
-    }
-}
+ // =====       return { candle, error: null };
+ // =====   } catch (error) {
+ // =====       return { candle: null, error: `Errore parsing: ${error.message}` };
+ // =====   }
+// =====}
 
 // ================= AGGIORNAMENTO UI =================
 function updateDashboardUI() {
