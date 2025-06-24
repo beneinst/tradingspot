@@ -189,17 +189,15 @@ function addTick(open, high, low, close) {
 function processNewCandle(candle) {
     addTick(candle.open, candle.high, candle.low, candle.close);
     const result = calculateIndicators();
-    if (result) {
-        const calculations = {
-            linreg: 0, // da calcolare
-            pearson: 0, // da calcolare
-            bb: result.bbPosition,
-            stoch: result.stochK,
-            score: result.bbPosition // o altra formula
-        };
-        // La funzione updateDashboard è nel file index.js
-        updateDashboard(calculations);
-    }
+    if (!result) return null;
+
+    return {
+        linreg: 0,    // placeholder da calcolare se serve
+        pearson: 0,   // placeholder da calcolare se serve
+        bb: result.bbPosition,
+        stoch: result.stochK,
+        score: result.bbPosition // esempio di score, da personalizzare
+    };
 }
 
 // ================= ESPORTAZIONE =================
