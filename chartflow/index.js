@@ -443,21 +443,3 @@ window.tradingApp = {
     disableDebug: () => { CONFIG.debugMode = false; }
 };
 
-// ================= CARICAMENTO DATI DA FILE JSON (OPZIONALE) =================
-function loadDataFromJsonFile(file, callback) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            callback(null, data);
-        } catch (error) {
-            callback(error, null);
-        }
-    };
-    reader.onerror = function(error) {
-        callback(error, null);
-    };
-    reader.readAsText(file);
-}
-
-};
