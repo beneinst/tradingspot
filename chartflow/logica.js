@@ -193,17 +193,22 @@ function processNewCandle(candle) {
     if (result) {
         console.log("processNewCandle:", candle, result);
 
+        // Simuliamo valori per vedere cambiamenti sulla dashboard
+        const linregFake = (Math.random() * 2 - 1).toFixed(2); // Valore casuale tra -1 e +1
+        const pearsonFake = (Math.random() * 2 - 1).toFixed(2); // Valore casuale tra -1 e +1
+
         return {
-            linreg: 0.7,      // per test puoi mettere un valore fisso o calcolarlo
-            pearson: 0.8,     // per test puoi mettere un valore fisso o calcolarlo
+            linreg: parseFloat(linregFake),
+            pearson: parseFloat(pearsonFake),
             bb: result.bbPosition,
             stoch: result.stochK,
-            score: (result.bbPosition + result.stochK) / 2 // esempio di score medio
+            score: (result.bbPosition + result.stochK + parseFloat(linregFake) + parseFloat(pearsonFake)) / 4
         };
     }
 
     return null;
 }
+
 
 // ================= ESPORTAZIONE =================
 export { addTick, calculateIndicators, state, config, processNewCandle };
