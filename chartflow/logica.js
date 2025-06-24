@@ -169,9 +169,10 @@ function calculateIndicators() {
 
 
 function calcStochRsi() {
-    if (state.prices.length < Math.max(config.stochRsiRsiLength, config.stochRsiLength)) {
-        return [50, 50];
-    }
+    if (state.prices.length < 20) { // esempio
+    console.log('Dati insufficienti per il calcolo degli indicatori.');
+    return null;
+}
 
     const rsiValues = [];
     for (let i = config.stochRsiRsiLength; i < state.prices.length; i++) {
