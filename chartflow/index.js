@@ -3,48 +3,62 @@ import { processNewCandle, addTick, state } from './logica.js';
 let socket = null;
 let currentSymbol = 'btcusdt';
 
+// Carica storico 4H
 async function loadHistoricalData(symbol) {
     try {
-        const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=1m&limit=100`);
+        const url = `https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=4h&limit=100`;
+        const response = await fetch(url);
         const data = await response.json();
 
-        // Azzera i dati precedenti
+        // Reset dati
         state.prices = [];
         state.highs = [];
         state.lows = [];
         state.opens = [];
 
         data.forEach(candle => {
-            addTick(parseFloat(candle[1]), parseFloat(candle[2]), parseFloat(candle[3]), parseFloat(candle[4]));
+            // candle: [openTime, open, high, low, close, ...]
+            addTick(
+                parseFloat(candle[1]),
+                parseFloat(candle[2]),
+                parseFloat(candle[3]),
+                parseFloat(candle[4])
+            );
         });
 
-        console.log('Dati storici caricati per', symbol);
+        console.log(`Dati storici 4H caricati per ${symbol}`);
     } catch (error) {
-        console.error('Errore nel caricamento dei dati storici:', error);
+        console.error('Errore caricamento dati storici:', error);
     }
 }
 
+// Connessione websocket 4H
 function connectBinance(symbol) {
-    if (socket) socket.close();
+    if (socket) {
+        socket.close();
+        socket = null;
+    }
 
-    socket = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_1m`);
-    console.log('Connesso a Binance per', symbol);
+    socket = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_4h`);
 
-    socket.onmessage = function (event) {
+    socket.onopen = () => {
+        console.log(`WebSocket connesso per ${symbol}`);
+    };
+
+    socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
         const candlestick = message.k;
 
-        // Solo se la candela è chiusa
-        if (candlestick.x) {
+        if (candlestick.x) {  // candela chiusa
             const candle = {
                 time: candlestick.t,
                 open: parseFloat(candlestick.o),
                 high: parseFloat(candlestick.h),
                 low: parseFloat(candlestick.l),
-                close: parseFloat(candlestick.c)
+                close: parseFloat(candlestick.c),
             };
             const calculations = processNewCandle(candle);
-            console.log("Calcoli ricevuti:", calculations);
+            console.log('Calcoli ricevuti:', calculations);
 
             if (calculations) {
                 updateDashboard(calculations);
@@ -52,20 +66,29 @@ function connectBinance(symbol) {
         }
     };
 
-    socket.onclose = function () {
-        console.log('Connessione chiusa per', symbol);
+    socket.onclose = () => {
+        console.log(`WebSocket chiuso per ${symbol}`);
+    };
+
+    socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
     };
 }
 
+// Cambio simbolo selezionato
 function changeSymbol() {
     const select = document.getElementById('cryptoSelect');
-    currentSymbol = select.value;
+    const newSymbol = select.value;
+    if (!newSymbol) return;
+
+    currentSymbol = newSymbol;
 
     loadHistoricalData(currentSymbol).then(() => {
         connectBinance(currentSymbol);
     });
 }
 
+// Aggiorna i valori in dashboard
 function updateDashboard(calculations) {
     document.getElementById('linregValue').innerText = calculations.linreg.toFixed(2);
     document.getElementById('pearsonValue').innerText = calculations.pearson.toFixed(2);
@@ -75,9 +98,10 @@ function updateDashboard(calculations) {
     document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString();
 }
 
+// Refresh manuale (per ora solo log)
 function refreshData() {
-    console.log('Refresh manuale richiesto.');
-    // Puoi implementare un ricalcolo manuale se necessario
+    console.log('Refresh manuale richiesto');
+    // eventualmente potresti ricaricare dati o ricalcolare indicatori
 }
 
 let autoRefresh = false;
@@ -88,8 +112,8 @@ function toggleAutoRefresh() {
     const btn = document.getElementById('autoRefreshBtn');
     if (autoRefresh) {
         refreshInterval = setInterval(() => {
-            console.log('Auto refresh...');
-            // Puoi decidere se aggiungere logiche di refresh dati
+            console.log('Auto refresh attivo');
+            // Qui puoi decidere di ricaricare storico o ricalcolare indicatori se vuoi
         }, 60000);
         btn.innerText = '⏰ Auto Refresh: ON';
     } else {
@@ -98,15 +122,22 @@ function toggleAutoRefresh() {
     }
 }
 
-// Esportiamo per accesso da HTML
+// Esportiamo su window per poterli usare nell’HTML inline se serve
 window.connectBinance = connectBinance;
 window.changeSymbol = changeSymbol;
 window.updateDashboard = updateDashboard;
 window.refreshData = refreshData;
 window.toggleAutoRefresh = toggleAutoRefresh;
 
-window.onload = function () {
+// All’avvio carica storico e connette websocket
+window.onload = () => {
     loadHistoricalData(currentSymbol).then(() => {
         connectBinance(currentSymbol);
     });
+
+    // Se vuoi, aggiungi listener al select (meglio di onchange inline)
+    const select = document.getElementById('cryptoSelect');
+    if (select) {
+        select.addEventListener('change', changeSymbol);
+    }
 };
