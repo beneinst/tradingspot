@@ -3,12 +3,12 @@ import { processNewCandle, addTick, state } from './logica.js';
 let socket = null;
 let currentSymbol = 'btcusdt';
 
-// Carica storico 4H
+// Caricamento dati storici con supporto LocalStorage e aggiornamento in background
 async function loadHistoricalData(symbol) {
-    try {
-        const url = `https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=4h&limit=200`;
-        const response = await fetch(url);
-        const data = await response.json();
+    // Provo a caricare da LocalStorage
+    const savedData = localStorage.getItem(`historicalData_${symbol}`);
+    if (savedData) {
+        const data = JSON.parse(savedData);
 
         // Reset dati
         state.prices = [];
@@ -17,7 +17,6 @@ async function loadHistoricalData(symbol) {
         state.opens = [];
 
         data.forEach(candle => {
-            // candle: [openTime, open, high, low, close, ...]
             addTick(
                 parseFloat(candle[1]),
                 parseFloat(candle[2]),
@@ -26,9 +25,45 @@ async function loadHistoricalData(symbol) {
             );
         });
 
-        console.log(`Dati storici 4H caricati per ${symbol}`);
+        console.log(`Dati storici 4H caricati da locale per ${symbol}`);
+
+        // Avvio aggiornamento dati in background
+        fetchAndUpdateHistoricalData(symbol);
+
+        return;
+    }
+
+    // Se non ci sono dati locali, carico dal server
+    await fetchAndUpdateHistoricalData(symbol);
+}
+
+// Fetch dati storici da server e aggiornamento stato + LocalStorage
+async function fetchAndUpdateHistoricalData(symbol) {
+    try {
+        const url = `https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=4h&limit=200`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        localStorage.setItem(`historicalData_${symbol}`, JSON.stringify(data));
+
+        // Reset dati
+        state.prices = [];
+        state.highs = [];
+        state.lows = [];
+        state.opens = [];
+
+        data.forEach(candle => {
+            addTick(
+                parseFloat(candle[1]),
+                parseFloat(candle[2]),
+                parseFloat(candle[3]),
+                parseFloat(candle[4])
+            );
+        });
+
+        console.log(`Dati storici 4H aggiornati da server per ${symbol}`);
     } catch (error) {
-        console.error('Errore caricamento dati storici:', error);
+        console.error('Errore aggiornamento dati storici:', error);
     }
 }
 
@@ -83,9 +118,25 @@ function changeSymbol() {
 
     currentSymbol = newSymbol;
 
+    showLoadingMessage(true, `Caricamento dati storici 4H per ${newSymbol}...`);
+
     loadHistoricalData(currentSymbol).then(() => {
         connectBinance(currentSymbol);
+        showLoadingMessage(false);
     });
+}
+
+// Mostra/nascondi messaggio di caricamento
+function showLoadingMessage(show, message = '') {
+    const loadingElem = document.getElementById('loadingMessage');
+    if (!loadingElem) return;
+
+    if (show) {
+        loadingElem.innerText = message;
+        loadingElem.style.display = 'block';
+    } else {
+        loadingElem.style.display = 'none';
+    }
 }
 
 // Aggiorna i valori in dashboard
@@ -113,7 +164,7 @@ function toggleAutoRefresh() {
     if (autoRefresh) {
         refreshInterval = setInterval(() => {
             console.log('Auto refresh attivo');
-            // Qui puoi decidere di ricaricare storico o ricalcolare indicatori se vuoi
+            // Puoi decidere se aggiungere logiche di refresh dati o ricalcolo
         }, 60000);
         btn.innerText = '⏰ Auto Refresh: ON';
     } else {
@@ -128,14 +179,17 @@ window.changeSymbol = changeSymbol;
 window.updateDashboard = updateDashboard;
 window.refreshData = refreshData;
 window.toggleAutoRefresh = toggleAutoRefresh;
+window.showLoadingMessage = showLoadingMessage;
 
 // All’avvio carica storico e connette websocket
 window.onload = () => {
+    showLoadingMessage(true, `Caricamento dati storici 4H per ${currentSymbol}...`);
     loadHistoricalData(currentSymbol).then(() => {
         connectBinance(currentSymbol);
+        showLoadingMessage(false);
     });
 
-    // Se vuoi, aggiungi listener al select (meglio di onchange inline)
+    // Listener select
     const select = document.getElementById('cryptoSelect');
     if (select) {
         select.addEventListener('change', changeSymbol);
