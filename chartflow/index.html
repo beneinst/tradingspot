@@ -278,41 +278,37 @@ h2 {
 </head>
 <body>
 
-   
-
-   	
-	<div class="dashboard-container">
-    <!-- Segnale Principale -->
+ <div class="dashboard-container">
+    <!-- Card: Seleziona Cripto -->
     <div class="card">
         <div class="crypto-select-box">
-            <label for="cryptoSelect"><h3 class="card-title">🎯 Seleziona Cripto</h3></label>
+            <label for="cryptoSelect">
+                <h3 class="card-title">🎯 Seleziona Cripto</h3>
+            </label>
             <select id="cryptoSelect" class="cryptoSelect" onchange="changeSymbol()"></select>
         </div>
     </div>
 
-
-	
-</div>
-
-            <h3 class="card-title"><br>🎯 Se26gnale Principale</h3>
-            <div id="mainSignal" class="signal-status signal-neutral">
-                <span>IN ATTESA</span>
-                <span id="signalStrength">0.0</span>
+    <!-- Card: Segnale Principale -->
+    <div class="card">
+        <h3 class="card-title"><br>🎯 Segnale Principale</h3>
+        <div id="mainSignal" class="signal-status signal-neutral">
+            <span>IN ATTESA</span>
+            <span id="signalStrength">0.0</span>
+        </div>
+        <div class="timer-container">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span>Timer Status:</span>
+                <span id="timerStatus">NESSUN OK</span>
             </div>
-            <div class="timer-container">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span>Timer Status:</span>
-                    <span id="timerStatus">NESSUN OK</span>
-                </div>
-                <div class="timer-bar">
-                    <div id="timerFill" class="timer-fill" style="width: 0%"></div>
-                </div>
-                <div style="text-align: center; font-size: 0.9em; opacity: 0.8;">
-                    <span id="timerProgress">0/6</span>
-                </div>
+            <div class="timer-bar">
+                <div id="timerFill" class="timer-fill" style="width: 0%"></div>
+            </div>
+            <div style="text-align: center; font-size: 0.9em; opacity: 0.8;">
+                <span id="timerProgress">0/6</span>
             </div>
         </div>
-
+    </div>
         <!-- Confluence Score -->
         <div class="card">
             <h3 class="card-title">⚖️ Confluence Score</h3>
