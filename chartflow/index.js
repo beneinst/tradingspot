@@ -35,10 +35,38 @@ const CONFIG = {
 
 // ================ CORS PROXIES ================
 const CORS_PROXIES = [
-    { url: 'https://api.allorigins.win/raw?url=', name: 'AllOrigins', headers: {} },
-    { url: 'https://corsproxy.io/?', name: 'CorsProxy.io', headers: {} },
-    { url: 'https://api.cors.sh/', name: 'CORS.SH', headers: { 'x-cors-api-key': 'temp_377b9736f23299227d1968c88d19f0e7' } }
+    { 
+        url: 'https://corsproxy.io/?', 
+        name: 'CorsProxy',
+        headers: {} 
+    }
 ];
+
+// Funzione fetch ottimizzata
+async function fetchWithProxy(url, options = {}) {
+    for (let attempt = 1; attempt <= CONFIG.maxRetries; attempt++) {
+        const proxy = CORS_PROXIES[0];
+        try {
+            const proxyUrl = proxy.url + encodeURIComponent(url);
+            const response = await fetch(proxyUrl, {
+                ...options,
+                headers: { ...options.headers, ...proxy.headers }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            const delay = Math.min(30000, Math.pow(2, attempt) * 1000);
+            debugLog(`Tentativo ${attempt} fallito, riprovo in ${delay}ms`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+    throw new Error('Tutti i tentativi falliti');
+}
+
 
 let websocket = null;
 let reconnectAttempts = 0;
@@ -197,6 +225,8 @@ async function fetchWithProxy(url, options = {}) {
         }
     }
 }
+const backupProxy = 'https://api.allorigins.win/raw?url=';
+
 
 // ================ FETCH DATI STORICI DA COINGECKO ================
 function getCoinInfoByValue(value) {
@@ -211,21 +241,21 @@ function buildCoinGeckoUrl(coin) {
 async function fetchHistoricalDataForSymbol(symbolValue) {
     const coin = getCoinInfoByValue(symbolValue);
     if (!coin) throw new Error('Crypto non trovata');
-    const url = buildCoinGeckoUrl(coin);
-    let retries = CONFIG.maxRetries;
-    for (let attempt = 1; attempt <= retries; attempt++) {
-        try {
-            debugLog(`[${symbolValue}] Tentativo ${attempt}/${retries} - CoinGecko`);
-            showLoadingMessage(`📊 Caricamento ${coin.label}... (${attempt}/${retries})`);
-            const data = await fetchWithProxy(url);
-            if (!data.prices || !Array.isArray(data.prices)) throw new Error('Formato dati non valido');
-            debugLog(`✅ [${symbolValue}] Ricevuti ${data.prices.length} punti`);
-            return data.prices;
-        } catch (error) {
-            debugError(`[${symbolValue}] Tentativo ${attempt} fallito: ${error.message}`);
-            if (attempt === retries) throw new Error(`Impossibile recuperare dati per ${symbolValue}: ${error.message}`);
-            await new Promise(resolve => setTimeout(resolve, CONFIG.retryDelay * attempt));
+    
+    const url = `https://api.coingecko.com/api/v3/coins/${coin.id}/market_chart?vs_currency=${coin.vs_currency}&days=90&interval=4h`;
+    
+    try {
+        const data = await fetchWithProxy(url);
+        
+        // VERIFICA FORMATO DATI
+        if (!data || !data.prices || !Array.isArray(data.prices)) {
+            throw new Error('Formato dati non valido');
         }
+        
+        return data.prices;
+    } catch (error) {
+        debugError(`Fetch fallito per ${symbolValue}: ${error.message}`);
+        throw error;
     }
 }
 
