@@ -450,7 +450,7 @@ export {
     processNewCandle,
     saveState, 
     loadState, 
-    clearState,
+    clearState as resetState,
     isDataStale,
     getStateInfo,
     validateConfig,
