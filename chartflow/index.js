@@ -1,13 +1,10 @@
 // ================= CONFIGURAZIONE MULTI-SIMBOLO =================
 import { processNewCandle, loadState, getStateInfo, resetState } from './logica.js';
 
-
 // =================== CONFIGURAZIONE ===================
 const COINS = [
-
-	{ id: 'bitcoin', label: 'BTC/USDT', value: 'btcusdt', vs_currency: 'usd' },
+    { id: 'bitcoin', label: 'BTC/USDT', value: 'btcusdt', vs_currency: 'usd' },
     { id: 'cosmos', label: 'ATOM/USDT', value: 'atomusdt', vs_currency: 'usd' },
-    
     { id: 'ethereum', label: 'ETH/USDT', value: 'ethusdt', vs_currency: 'usd' },
     { id: 'fetch-ai', label: 'FET/USDC', value: 'fetusdc', vs_currency: 'usd' },
     { id: 'solana', label: 'SOL/USDC', value: 'solusdc', vs_currency: 'usd' },
@@ -33,31 +30,18 @@ const CONFIG = {
     currentSymbol: 'btcusdt' // default
 };
 
-// ================ CORS PROXIES ================
-// ===== const CORS_PROXIES = [
-// =====    { 
-// =====        url: 'https://corsproxy.io/?', 
-// =====        name: 'CorsProxy',
-// =====        headers: {} 
-// =====    }
-// ===== ];
-
-
-
 let websocket = null;
 let reconnectAttempts = 0;
 let connectionStatus = 'DISCONNESSO';
 let isInitialized = false;
 let autoRefreshInterval = null;
-let currentCorsProxy = 0;
 
-// ================= STORAGE ALTERNATIVO (IN-MEMORY) =================
+// ================= STORAGE (LOCALSTORAGE + FALLBACK IN-MEMORY) =================
 const memoryStorage = new Map();
 
 function saveToStorage(key, data, ttlMs = 60*24*60*60*1000) {
     const expiry = Date.now() + ttlMs;
     try {
-        // Prova localStorage prima
         if (typeof localStorage !== 'undefined') {
             localStorage.setItem(key, JSON.stringify({ value: data, expiry }));
             debugLog(`Salvato in localStorage: ${key}`);
@@ -65,7 +49,6 @@ function saveToStorage(key, data, ttlMs = 60*24*60*60*1000) {
             throw new Error('localStorage non disponibile');
         }
     } catch (error) {
-        // Fallback a memoria
         memoryStorage.set(key, { value: data, expiry });
         debugLog(`Salvato in memoria: ${key}`);
     }
@@ -73,7 +56,6 @@ function saveToStorage(key, data, ttlMs = 60*24*60*60*1000) {
 
 function loadFromStorage(key) {
     try {
-        // Prova localStorage prima
         if (typeof localStorage !== 'undefined') {
             const itemStr = localStorage.getItem(key);
             if (itemStr) {
@@ -89,8 +71,6 @@ function loadFromStorage(key) {
     } catch (error) {
         debugLog(`Errore localStorage per ${key}, uso memoria`);
     }
-    
-    // Fallback a memoria
     const item = memoryStorage.get(key);
     if (item) {
         if (Date.now() > item.expiry) {
@@ -122,8 +102,6 @@ function debugError(message, error = null) {
     } else {
         console.error(`[${timestamp}] ERROR: ${message}`);
     }
-    
-    // Mostra errore nell'UI
     showLoadingMessage(`❌ ${message}`, 'error');
 }
 
@@ -134,7 +112,6 @@ function showLoadingMessage(message, type = 'info') {
         loadingEl.style.display = 'block';
         loadingEl.textContent = message;
         loadingEl.style.color = type === 'error' ? '#f44336' : '#4caf50';
-        
         if (type !== 'error') {
             setTimeout(() => {
                 loadingEl.style.display = 'none';
@@ -150,7 +127,7 @@ function updateLastUpdate() {
     }
 }
 
-// ================ POPOLAMENTO SELECT DINAMICO ================
+// ================= POPOLAMENTO SELECT =================
 function populateCryptoSelect() {
     const select = document.getElementById('cryptoSelect');
     if (!select) return;
@@ -165,42 +142,7 @@ function populateCryptoSelect() {
 }
 document.addEventListener('DOMContentLoaded', populateCryptoSelect);
 
-
-
-// ================ FETCH DATI STORICI DA COINGECKO ================
-function getCoinInfoByValue(value) {
-    return COINS.find(c => c.value === value.toLowerCase());
-}
-
-
-function buildCoinGeckoUrl(coin) {
-    // CoinGecko: /coins/{id}/market_chart?vs_currency={vs_currency}&days=90&interval=4h
-    return `https://api.coingecko.com/api/v3/coins/${coin.id}/market_chart?vs_currency=${coin.vs_currency}&days=90&interval=4h`;
-}
-async function fetchHistoricalDataForSymbol(symbolValue) {
-    const coin = getCoinInfoByValue(symbolValue);
-    if (!coin) throw new Error('Crypto non trovata');
-    
-    const url = `https://api.coingecko.com/api/v3/coins/${coin.id}/market_chart?vs_currency=${coin.vs_currency}&days=90&interval=4h`;
-    
-    try {
-        const data = await fetchWithProxy(url);
-        
-        // VERIFICA FORMATO DATI
-        if (!data || !data.prices || !Array.isArray(data.prices)) {
-            throw new Error('Formato dati non valido');
-        }
-        
-        return data.prices;
-    } catch (error) {
-        debugError(`Fetch fallito per ${symbolValue}: ${error.message}`);
-        throw error;
-    }
-}
-
-
-
-// ================= INIZIALIZZAZIONE DATI STORICI PER SIMBOLO =================
+// ================= INIZIALIZZAZIONE DATI STORICI (SOLO OFFLINE) =================
 async function initializeHistoricalDataForSymbol(symbol) {
     try {
         symbol = symbol.toLowerCase();
@@ -213,7 +155,7 @@ async function initializeHistoricalDataForSymbol(symbol) {
             }
             return { success: true, loaded: candles.length, source: 'storage' };
         } else {
-            showLoadingMessage('⚠️ Nessun dato disponibile offline. Connettiti per scaricare nuovi dati.', 'warning');
+            showLoadingMessage('⚠️ Nessun dato disponibile offline. Carica manualmente i dati.', 'warning');
             return { success: false, error: 'No offline data available', source: 'storage' };
         }
     } catch (error) {
@@ -221,7 +163,6 @@ async function initializeHistoricalDataForSymbol(symbol) {
         return { success: false, error: error.message };
     }
 }
-
 
 // ================= AGGIORNAMENTO UI =================
 function updateDashboardUI() {
@@ -231,44 +172,29 @@ function updateDashboardUI() {
             debugLog('Nessun stato disponibile per aggiornare la UI');
             return;
         }
-        
         debugLog('Aggiornamento UI con stato:', stateInfo);
-        
-        // Aggiorna segnale principale
         const mainSignalEl = document.getElementById('mainSignal');
         const signalStrengthEl = document.getElementById('signalStrength');
-        
         if (mainSignalEl && signalStrengthEl) {
             const signal = stateInfo.signal || 'NEUTRO';
             const strength = stateInfo.confluenceScore || 0;
-            
             mainSignalEl.className = `signal-status signal-${signal.toLowerCase()}`;
             mainSignalEl.querySelector('span').textContent = signal;
             signalStrengthEl.textContent = strength.toFixed(2);
         }
-        
-        // Aggiorna confluence score
         const confluenceScoreEl = document.getElementById('confluenceScore');
         if (confluenceScoreEl) {
             const score = stateInfo.confluenceScore || 0;
             confluenceScoreEl.textContent = score.toFixed(2);
-            
             let scoreClass = 'score-neutral';
             if (score > 0.5) scoreClass = 'score-positive';
             else if (score < -0.5) scoreClass = 'score-negative';
-            
             confluenceScoreEl.className = `confluence-score ${scoreClass}`;
         }
-        
-        // Aggiorna indicatori principali
         updateIndicatorValues(stateInfo);
-        
-        // Aggiorna timestamp
         updateLastUpdate();
-        
         debugLog('✅ UI aggiornata con successo');
-        
-     } catch (error) {
+    } catch (error) {
         debugError('Errore aggiornamento UI:', error);
     }
 }
@@ -280,7 +206,6 @@ function updateIndicatorValues(stateInfo) {
         'bbValue': stateInfo.bbPosition || 0,
         'stochValue': stateInfo.stochK || 0
     };
-    
     for (const [id, value] of Object.entries(indicators)) {
         const el = document.getElementById(id);
         if (el) {
@@ -289,21 +214,14 @@ function updateIndicatorValues(stateInfo) {
     }
 }
 
-// ================= WEBSOCKET =================
-function buildCombinedStreamUrl() {
-    // Per ora usa solo il simbolo corrente per semplificare
-    const stream = `${CONFIG.currentSymbol}@kline_${CONFIG.interval}`;
-    return `${CONFIG.wsUrl}${stream}`;
-}
-
+// ================= WEBSOCKET (OPZIONALE, SOLO SE USI SERVER LOCALE) =================
+// Se non usi WebSocket, puoi commentare/eliminare tutto questo blocco
 function parseWebSocketMessage(data) {
     try {
         const jsonData = JSON.parse(data);
         if (!jsonData.stream || !jsonData.data) return null;
-        
         const symbol = jsonData.stream.split('@')[0];
         const k = jsonData.data.k;
-        
         return {
             symbol,
             candle: {
@@ -325,19 +243,12 @@ function parseWebSocketMessage(data) {
 function handleWebSocketMessage(event) {
     const parsed = parseWebSocketMessage(event.data);
     if (!parsed) return;
-    
     const { symbol, candle } = parsed;
     debugLog(`[WS] ${symbol}: ${candle.close} (closed: ${candle.closed})`);
-    
-    // Processa sempre la candela
     processNewCandle(candle, symbol);
-    
-    // Se è il simbolo corrente, aggiorna UI
     if (symbol === CONFIG.currentSymbol) {
         updateDashboardUI();
     }
-    
-    // Se candela chiusa, salva in storage
     if (candle.closed) {
         let candles = loadFromStorage(`candles_${symbol.toUpperCase()}`) || [];
         candles.push(candle);
@@ -348,33 +259,27 @@ function handleWebSocketMessage(event) {
     }
 }
 
-// ================= CONNESSIONE WEBSOCKET =================
 function connectWebSocket() {
     if (websocket && websocket.readyState === WebSocket.OPEN) {
         websocket.close();
     }
-    
-    const wsUrl = buildCombinedStreamUrl();
+    // Nota: solo se usi un server WebSocket locale, altrimenti commenta/elimina
+    const wsUrl = buildCombinedStreamUrl(); // Assicurati che questa funzione esista solo se serve
     debugLog(`Connessione WebSocket: ${wsUrl}`);
     websocket = new WebSocket(wsUrl);
-
     websocket.onopen = function() {
         debugLog('✅ WebSocket connesso');
         reconnectAttempts = 0;
         updateConnectionStatus('CONNESSO');
     };
-
     websocket.onmessage = handleWebSocketMessage;
-
     websocket.onerror = function(error) {
         debugError('Errore WebSocket', error);
-        updateConnectionStatus('ERRORE');
+        update2ConnectionStatus('ERRORE');
     };
-
     websocket.onclose = function(event) {
         debugLog('WebSocket disconnesso', { code: event.code, reason: event.reason });
         updateConnectionStatus('DISCONNESSO');
-        
         if (isInitialized && reconnectAttempts < CONFIG.maxRetries) {
             reconnectAttempts++;
             debugLog(`Riconnessione ${reconnectAttempts}/${CONFIG.maxRetries} in ${CONFIG.retryDelay}ms`);
@@ -388,29 +293,20 @@ function updateConnectionStatus(status) {
     debugLog(`Stato connessione: ${status}`);
 }
 
-// ================= INIZIALIZZAZIONE PRINCIPALE =================
+// ================= INIZIALIZZAZIONE PRINCIPALE (SOLO OFFLINE) =================
 async function initializeApplication() {
     try {
         debugLog('🚀 AVVIO INIZIALIZZAZIONE');
         showLoadingMessage('🚀 Inizializzazione sistema...');
-        
-        // Inizializza solo il simbolo corrente per ora
         const result = await initializeHistoricalDataForSymbol(CONFIG.currentSymbol);
-        
         if (!result.success) {
             throw new Error(result.error);
         }
-        
         debugLog(`✅ ${CONFIG.currentSymbol} inizializzato: ${result.loaded} candele da ${result.source}`);
-        
-        // Aggiorna UI iniziale
         updateDashboardUI();
-        
         isInitialized = true;
         showLoadingMessage('✅ Sistema inizializzato correttamente');
-        
         return true;
-        
     } catch (error) {
         debugError('❌ Errore inizializzazione:', error);
         showLoadingMessage(`❌ Errore: ${error.message}`, 'error');
@@ -419,28 +315,20 @@ async function initializeApplication() {
     }
 }
 
-// ================= CAMBIO SIMBOLO =================
+// ================= CAMBIO SIMBOLO (SOLO OFFLINE) =================
 async function changeSymbol() {
     const selectEl = document.getElementById('cryptoSelect');
     if (!selectEl) return;
-    
     const newSymbol = selectEl.value;
     if (newSymbol === CONFIG.currentSymbol) return;
-    
     debugLog(`Cambio simbolo: ${CONFIG.currentSymbol} -> ${newSymbol}`);
     CONFIG.currentSymbol = newSymbol;
-    
-    // Disconnetti WebSocket corrente
     if (websocket) websocket.close();
-    
-    // Inizializza nuovo simbolo
     showLoadingMessage(`📊 Caricamento ${newSymbol.toUpperCase()}...`);
-    
     try {
         const result = await initializeHistoricalDataForSymbol(newSymbol);
         if (result.success) {
             updateDashboardUI();
-            connectWebSocket(); // Riconnetti con nuovo simbolo
             showLoadingMessage(`✅ ${newSymbol.toUpperCase()} caricato`);
         } else {
             throw new Error(result.error);
@@ -451,19 +339,15 @@ async function changeSymbol() {
     }
 }
 
-// ================= REFRESH MANUALE =================
+// ================= REFRESH MANUALE (SOLO OFFLINE) =================
 async function refreshData() {
     debugLog('🔄 Refresh manuale richiesto');
     showLoadingMessage('🔄 Aggiornamento dati...');
-    
     try {
-        // Rimuovi dati cached
         if (typeof localStorage !== 'undefined') {
             localStorage.removeItem(`candles_${CONFIG.currentSymbol.toUpperCase()}`);
         }
         memoryStorage.delete(`candles_${CONFIG.currentSymbol.toUpperCase()}`);
-        
-        // Reinizializza
         const result = await initializeHistoricalDataForSymbol(CONFIG.currentSymbol);
         if (result.success) {
             updateDashboardUI();
@@ -477,11 +361,10 @@ async function refreshData() {
     }
 }
 
-// ================= AUTO REFRESH =================
+// ================= AUTO REFRESH (SOLO UI, NON DATI) =================
 function toggleAutoRefresh() {
     const btn = document.getElementById('autoRefreshBtn');
     if (!btn) return;
-    
     if (autoRefreshInterval) {
         clearInterval(autoRefreshInterval);
         autoRefreshInterval = null;
@@ -497,7 +380,7 @@ function toggleAutoRefresh() {
     }
 }
 
-// ================= AVVIO APPLICAZIONE =================
+// ================= AVVIO AUTOMATICO =================
 async function startApplication() {
     try {
         debugLog('🎯 AVVIO APPLICAZIONE TRADING', {
@@ -505,18 +388,14 @@ async function startApplication() {
             interval: CONFIG.interval,
             timestamp: new Date().toISOString()
         });
-        
         const initialized = await initializeApplication();
         if (!initialized) {
             debugError('❌ Inizializzazione fallita');
             return;
         }
-        
-        // Avvia WebSocket
-        connectWebSocket();
-        
+        // Se usi WebSocket locale, decommenta questa riga
+        // connectWebSocket();
         debugLog('✅ APPLICAZIONE AVVIATA CON SUCCESSO');
-        
     } catch (error) {
         debugError('❌ ERRORE CRITICO NELL\'AVVIO', error);
     }
@@ -562,4 +441,23 @@ window.tradingApp = {
     restart: startApplication,
     enableDebug: () => { CONFIG.debugMode = true; },
     disableDebug: () => { CONFIG.debugMode = false; }
+};
+
+// ================= CARICAMENTO DATI DA FILE JSON (OPZIONALE) =================
+function loadDataFromJsonFile(file, callback) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            callback(null, data);
+        } catch (error) {
+            callback(error, null);
+        }
+    };
+    reader.onerror = function(error) {
+        callback(error, null);
+    };
+    reader.readAsText(file);
+}
+
 };
