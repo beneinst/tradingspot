@@ -22,7 +22,7 @@ const CORS_PROXIES = [
 
 const CONFIG = {
     symbols: [
-        'ATOMUSDC', 'BTCUSDT', 'ETHUSDT', 'FETUSDC', 'SOLUSDC', 'BNBUSDC',
+        'ATOMUSDT', 'BTCUSDT', 'ETHUSDT', 'FETUSDC', 'SOLUSDC', 'BNBUSDC',
         'ADAEUR', 'UNIUSDC', 'MANAUSDT', 'LTCUSDT', 'ALGOUSDT', 'AVAXUSDT',
         'AVAXUSDC', 'DOTUSDC', 'NEARUSDC', 'SUIUSDC'
     ],
