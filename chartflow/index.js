@@ -1,12 +1,24 @@
 // ================= CONFIGURAZIONE MULTI-SIMBOLO =================
 import { processNewCandle, loadState, getStateInfo, resetState } from './logica.js';
 
-// Scegli un proxy CORS affidabile (cors.sh è stabile e offre una free API key: https://cors.sh)
-// Demo cors-anywhere: https://cors-anywhere.herokuapp.com/ (richiede opt-in manuale)
-// const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/'; // meno affidabile, solo per test
-const CORS_PROXY = 'https://api.cors.sh/'; // CORS.SH: richiede header 'x-cors-api-key'
-
-const CORS_API_KEY = 'temp_377b9736f23299227d1968c88d19f0e7'; // ottienila gratis su https://cors.sh
+// CORS Proxies alternativi (testati in ordine di priorità)
+const CORS_PROXIES = [
+    { 
+        url: 'https://api.allorigins.win/raw?url=', 
+        name: 'AllOrigins',
+        headers: {} 
+    },
+    { 
+        url: 'https://corsproxy.io/?', 
+        name: 'CorsProxy.io',
+        headers: {} 
+    },
+    { 
+        url: 'https://api.cors.sh/', 
+        name: 'CORS.SH',
+        headers: { 'x-cors-api-key': 'temp_377b9736f23299227d1968c88d19f0e7' }
+    }
+];
 
 const CONFIG = {
     symbols: [
@@ -20,13 +32,68 @@ const CONFIG = {
     maxRetries: 3,
     retryDelay: 5000,
     historyLimit: 200,
-    debugMode: true
+    debugMode: true,
+    currentSymbol: 'atomusdc' // Default symbol
 };
 
 let websocket = null;
 let reconnectAttempts = 0;
 let connectionStatus = 'DISCONNESSO';
 let isInitialized = false;
+let autoRefreshInterval = null;
+let currentCorsProxy = 0;
+
+// ================= STORAGE ALTERNATIVO (IN-MEMORY) =================
+const memoryStorage = new Map();
+
+function saveToStorage(key, data, ttlMs = 60*24*60*60*1000) {
+    const expiry = Date.now() + ttlMs;
+    try {
+        // Prova localStorage prima
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(key, JSON.stringify({ value: data, expiry }));
+            debugLog(`Salvato in localStorage: ${key}`);
+        } else {
+            throw new Error('localStorage non disponibile');
+        }
+    } catch (error) {
+        // Fallback a memoria
+        memoryStorage.set(key, { value: data, expiry });
+        debugLog(`Salvato in memoria: ${key}`);
+    }
+}
+
+function loadFromStorage(key) {
+    try {
+        // Prova localStorage prima
+        if (typeof localStorage !== 'undefined') {
+            const itemStr = localStorage.getItem(key);
+            if (itemStr) {
+                const item = JSON.parse(itemStr);
+                if (Date.now() > item.expiry) {
+                    localStorage.removeItem(key);
+                    return null;
+                }
+                debugLog(`Caricato da localStorage: ${key}`);
+                return item.value;
+            }
+        }
+    } catch (error) {
+        debugLog(`Errore localStorage per ${key}, uso memoria`);
+    }
+    
+    // Fallback a memoria
+    const item = memoryStorage.get(key);
+    if (item) {
+        if (Date.now() > item.expiry) {
+            memoryStorage.delete(key);
+            return null;
+        }
+        debugLog(`Caricato da memoria: ${key}`);
+        return item.value;
+    }
+    return null;
+}
 
 // ================= UTILITÀ DI DEBUG =================
 function debugLog(message, data = null) {
@@ -47,44 +114,69 @@ function debugError(message, error = null) {
     } else {
         console.error(`[${timestamp}] ERROR: ${message}`);
     }
+    
+    // Mostra errore nell'UI
+    showLoadingMessage(`❌ ${message}`, 'error');
 }
 
-// ================= GESTIONE DATI STORICI LOCALE =================
-function saveCandlesToLocal(symbol, candles, ttlMs = 60*24*60*60*1000) { // 60 giorni
-    const now = Date.now();
-    const item = {
-        value: candles,
-        expiry: now + ttlMs
-    };
-    localStorage.setItem(`candles_${symbol}`, JSON.stringify(item));
+// ================= UI HELPERS =================
+function showLoadingMessage(message, type = 'info') {
+    const loadingEl = document.getElementById('loadingMessage');
+    if (loadingEl) {
+        loadingEl.style.display = 'block';
+        loadingEl.textContent = message;
+        loadingEl.style.color = type === 'error' ? '#f44336' : '#4caf50';
+        
+        if (type !== 'error') {
+            setTimeout(() => {
+                loadingEl.style.display = 'none';
+            }, 3000);
+        }
+    }
 }
 
-function loadCandlesFromLocal(symbol) {
-    const itemStr = localStorage.getItem(`candles_${symbol}`);
-    if (!itemStr) return null;
-    const item = JSON.parse(itemStr);
-    if (Date.now() > item.expiry) {
-        localStorage.removeItem(`candles_${symbol}`);
-        return null;
+function updateLastUpdate() {
+    const lastUpdateEl = document.getElementById('lastUpdate');
+    if (lastUpdateEl) {
+        lastUpdateEl.textContent = new Date().toLocaleTimeString();
     }
-    return item.value;
 }
 
-// ================= GESTIONE ERRORI =================
-function handleApiError(error, context) {
-    debugError(`Errore API in ${context}`, error);
-
-    if (error.message && error.message.includes('429')) {
-        debugError('Rate limit raggiunto, attendere prima di riprovare');
-        return { type: 'rate_limit', retry: true, delay: 60000 };
+// ================= FETCH CON PROXY MULTIPLI =================
+async function fetchWithProxy(url, options = {}) {
+    for (let i = 0; i < CORS_PROXIES.length; i++) {
+        const proxyIndex = (currentCorsProxy + i) % CORS_PROXIES.length;
+        const proxy = CORS_PROXIES[proxyIndex];
+        
+        try {
+            debugLog(`Tentativo con ${proxy.name}: ${proxy.url}`);
+            
+            const proxyUrl = proxy.url + encodeURIComponent(url);
+            const fetchOptions = {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    ...proxy.headers
+                }
+            };
+            
+            const response = await fetch(proxyUrl, fetchOptions);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            debugLog(`✅ Successo con ${proxy.name}`);
+            currentCorsProxy = proxyIndex; // Ricorda il proxy funzionante
+            return data;
+            
+        } catch (error) {
+            debugLog(`❌ Fallito con ${proxy.name}: ${error.message}`);
+            if (i === CORS_PROXIES.length - 1) {
+                throw new Error(`Tutti i proxy CORS falliti. Ultimo errore: ${error.message}`);
+            }
+        }
     }
-
-    if (error.message && error.message.includes('Network')) {
-        debugError('Problema di connessione di rete');
-        return { type: 'network', retry: true, delay: 5000 };
-    }
-
-    return { type: 'generic', retry: false };
 }
 
 // ================= FETCH DATI STORICI =================
@@ -94,28 +186,26 @@ async function fetchHistoricalDataForSymbol(symbol, interval, limit) {
 
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
-            debugLog(`Tentativo ${attempt}/${retries} - Recupero dati storici per ${symbol}`);
-            // Se usi cors.sh DEVI aggiungere la tua API key nell'header
-            const fetchOptions = CORS_PROXY.includes('cors.sh')
-                ? { headers: { 'x-cors-api-key': CORS_API_KEY } }
-                : {};
-            const response = await fetch(CORS_PROXY + url, fetchOptions);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            const data = await response.json();
+            debugLog(`[${symbol}] Tentativo ${attempt}/${retries} - Recupero dati storici`);
+            showLoadingMessage(`📊 Caricamento ${symbol}... (${attempt}/${retries})`);
+            
+            const data = await fetchWithProxy(url);
+            
             if (!Array.isArray(data) || data.length === 0) {
                 throw new Error('Dati storici vuoti o formato non valido');
             }
-            debugLog(`✅ Ricevute ${data.length} candele per ${symbol}`);
+            
+            debugLog(`✅ [${symbol}] Ricevute ${data.length} candele`);
             return data;
+            
         } catch (error) {
-            const errorInfo = handleApiError(error, 'fetchHistoricalData');
-            if (attempt === retries || !errorInfo.retry) {
-                throw new Error(`Impossibile recuperare dati storici dopo ${retries} tentativi: ${error.message}`);
+            debugError(`[${symbol}] Tentativo ${attempt} fallito: ${error.message}`);
+            
+            if (attempt === retries) {
+                throw new Error(`Impossibile recuperare dati per ${symbol}: ${error.message}`);
             }
-            debugError(`Tentativo ${attempt} fallito, riprovo in ${errorInfo.delay}ms`);
-            await new Promise(resolve => setTimeout(resolve, errorInfo.delay));
+            
+            await new Promise(resolve => setTimeout(resolve, CONFIG.retryDelay * attempt));
         }
     }
 }
@@ -123,32 +213,45 @@ async function fetchHistoricalDataForSymbol(symbol, interval, limit) {
 // ================= INIZIALIZZAZIONE DATI STORICI PER SIMBOLO =================
 async function initializeHistoricalDataForSymbol(symbol) {
     try {
-        debugLog(`[${symbol}] Inizializzazione dati storici...`);
-        // 1. Caricamento locale
-        let candles = loadCandlesFromLocal(symbol);
-        if (candles && candles.length >= CONFIG.historyLimit) {
-            debugLog(`[${symbol}] Dati storici caricati da localStorage`, { candles: candles.length });
+        debugLog(`[${symbol}] Inizializzazione...`);
+        
+        // 1. Caricamento da storage
+        let candles = loadFromStorage(`candles_${symbol}`);
+        if (candles && candles.length >= 50) { // Soglia minima più bassa
+            debugLog(`[${symbol}] ${candles.length} candele caricate da storage`);
+            
+            // Processa le candele
             for (const candle of candles) {
                 processNewCandle(candle, symbol.toLowerCase());
             }
-            return { success: true, loaded: candles.length, source: 'local' };
+            
+            return { success: true, loaded: candles.length, source: 'storage' };
         }
 
         // 2. Fetch da API
         const rawData = await fetchHistoricalDataForSymbol(symbol, CONFIG.interval, CONFIG.historyLimit);
         let parsedCandles = [];
+        
         for (let i = 0; i < rawData.length; i++) {
             const result = parseHistoricalCandle(rawData[i], i);
-            if (result.candle) parsedCandles.push(result.candle);
+            if (result.candle) {
+                parsedCandles.push(result.candle);
+            }
         }
-        saveCandlesToLocal(symbol, parsedCandles);
+        
+        // Salva in storage
+        saveToStorage(`candles_${symbol}`, parsedCandles);
+        
+        // Processa le candele
         for (const candle of parsedCandles) {
             processNewCandle(candle, symbol.toLowerCase());
         }
+        
         debugLog(`[${symbol}] ${parsedCandles.length} candele elaborate e salvate`);
         return { success: true, loaded: parsedCandles.length, source: 'api' };
+        
     } catch (error) {
-        debugError(`[${symbol}] Errore inizializzazione dati storici`, error);
+        debugError(`[${symbol}] Errore inizializzazione: ${error.message}`);
         return { success: false, error: error.message };
     }
 }
@@ -157,8 +260,9 @@ async function initializeHistoricalDataForSymbol(symbol) {
 function parseHistoricalCandle(rawCandle, index) {
     try {
         if (!Array.isArray(rawCandle) || rawCandle.length < 6) {
-            return { candle: null, error: `Formato array non valido (index: ${index})` };
+            return { candle: null, error: `Formato non valido (index: ${index})` };
         }
+        
         const [timestamp, open, high, low, close, volume] = rawCandle;
         const candle = {
             timestamp: parseInt(timestamp),
@@ -168,30 +272,99 @@ function parseHistoricalCandle(rawCandle, index) {
             close: parseFloat(close),
             volume: parseFloat(volume)
         };
-        // Validazione base
-        if (isNaN(candle.timestamp) || isNaN(candle.open)) {
+        
+        // Validazione
+        if (Object.values(candle).some(val => isNaN(val))) {
             return { candle: null, error: 'Valori non numerici' };
         }
+        
         return { candle, error: null };
     } catch (error) {
         return { candle: null, error: `Errore parsing: ${error.message}` };
     }
 }
 
-// ================= WEBSOCKET MULTI-SIMBOLO =================
+// ================= AGGIORNAMENTO UI =================
+function updateDashboardUI() {
+    try {
+        const stateInfo = getStateInfo(CONFIG.currentSymbol);
+        if (!stateInfo) {
+            debugLog('Nessun stato disponibile per aggiornare la UI');
+            return;
+        }
+        
+        debugLog('Aggiornamento UI con stato:', stateInfo);
+        
+        // Aggiorna segnale principale
+        const mainSignalEl = document.getElementById('mainSignal');
+        const signalStrengthEl = document.getElementById('signalStrength');
+        
+        if (mainSignalEl && signalStrengthEl) {
+            const signal = stateInfo.signal || 'NEUTRO';
+            const strength = stateInfo.confluenceScore || 0;
+            
+            mainSignalEl.className = `signal-status signal-${signal.toLowerCase()}`;
+            mainSignalEl.querySelector('span').textContent = signal;
+            signalStrengthEl.textContent = strength.toFixed(2);
+        }
+        
+        // Aggiorna confluence score
+        const confluenceScoreEl = document.getElementById('confluenceScore');
+        if (confluenceScoreEl) {
+            const score = stateInfo.confluenceScore || 0;
+            confluenceScoreEl.textContent = score.toFixed(2);
+            
+            let scoreClass = 'score-neutral';
+            if (score > 0.5) scoreClass = 'score-positive';
+            else if (score < -0.5) scoreClass = 'score-negative';
+            
+            confluenceScoreEl.className = `confluence-score ${scoreClass}`;
+        }
+        
+        // Aggiorna indicatori principali
+        updateIndicatorValues(stateInfo);
+        
+        // Aggiorna timestamp
+        updateLastUpdate();
+        
+        debugLog('✅ UI aggiornata con successo');
+        
+    } catch (error) {
+        debugError('Errore aggiornamento UI:', error);
+    }
+}
+
+function updateIndicatorValues(stateInfo) {
+    const indicators = {
+        'linregValue': stateInfo.linregPosition || 0,
+        'pearsonValue': stateInfo.pearsonR || 0,
+        'bbValue': stateInfo.bbPosition || 0,
+        'stochValue': stateInfo.stochK || 0
+    };
+    
+    for (const [id, value] of Object.entries(indicators)) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.textContent = typeof value === 'number' ? value.toFixed(2) : value;
+        }
+    }
+}
+
+// ================= WEBSOCKET =================
 function buildCombinedStreamUrl() {
-    const streams = CONFIG.symbols.map(
-        symbol => `${symbol.toLowerCase()}@kline_${CONFIG.interval}`
-    ).join('/');
-    return `${CONFIG.wsUrl}${streams}`;
+    // Per ora usa solo il simbolo corrente per semplificare
+    const stream = `${CONFIG.currentSymbol}@kline_${CONFIG.interval}`;
+    return `${CONFIG.wsUrl}${stream}`;
 }
 
 function parseWebSocketMessage(data) {
     try {
         const jsonData = JSON.parse(data);
         if (!jsonData.stream || !jsonData.data) return null;
-        const symbol = jsonData.stream.split('@')[0].toUpperCase();
+        
+        const symbol = jsonData.stream.split('@')[0];
         const k = jsonData.data.k;
+        
         return {
             symbol,
             candle: {
@@ -205,7 +378,7 @@ function parseWebSocketMessage(data) {
             }
         };
     } catch (error) {
-        debugError('Errore parsing messaggio WebSocket', error);
+        debugError('Errore parsing WebSocket:', error);
         return null;
     }
 }
@@ -213,130 +386,218 @@ function parseWebSocketMessage(data) {
 function handleWebSocketMessage(event) {
     const parsed = parseWebSocketMessage(event.data);
     if (!parsed) return;
+    
     const { symbol, candle } = parsed;
-    debugLog(`[${symbol}] Ricevuta candela`, candle);
-
-    // Aggiorna localStorage solo se candela chiusa
+    debugLog(`[WS] ${symbol}: ${candle.close} (closed: ${candle.closed})`);
+    
+    // Processa sempre la candela
+    processNewCandle(candle, symbol);
+    
+    // Se è il simbolo corrente, aggiorna UI
+    if (symbol === CONFIG.currentSymbol) {
+        updateDashboardUI();
+    }
+    
+    // Se candela chiusa, salva in storage
     if (candle.closed) {
-        processNewCandle(candle, symbol.toLowerCase());
-        // Aggiorna localStorage
-        let candles = loadCandlesFromLocal(symbol) || [];
+        let candles = loadFromStorage(`candles_${symbol.toUpperCase()}`) || [];
         candles.push(candle);
-        if (candles.length > CONFIG.historyLimit) candles = candles.slice(-CONFIG.historyLimit);
-        saveCandlesToLocal(symbol, candles);
-        updateDashboard(symbol, candle); // Implementa questa funzione per la UI
+        if (candles.length > CONFIG.historyLimit) {
+            candles = candles.slice(-CONFIG.historyLimit);
+        }
+        saveToStorage(`candles_${symbol.toUpperCase()}`, candles);
     }
 }
 
-// ================= DASHBOARD PLACEHOLDER =================
-function updateDashboard(symbol, candle) {
-    // Da implementare: aggiorna la UI per il simbolo specifico
-    debugLog(`[UI] Aggiornamento ${symbol}: ${candle.close}`);
-}
-
-// ================= INIZIALIZZAZIONE MULTI-SIMBOLO =================
-async function initializeApplication() {
-    try {
-        debugLog('🚀 AVVIO INIZIALIZZAZIONE APPLICAZIONE');
-        await Promise.all(CONFIG.symbols.map(symbol =>
-            initializeHistoricalDataForSymbol(symbol)
-        ));
-        isInitialized = true;
-        debugLog('✅ Sistema inizializzato correttamente');
-        return true;
-    } catch (error) {
-        debugError('❌ Errore critico nell\'inizializzazione', error);
-        isInitialized = false;
-        return false;
-    }
-}
-
-// ================= WEBSOCKET CONNECTION =================
+// ================= CONNESSIONE WEBSOCKET =================
 function connectWebSocket() {
-    if (websocket) websocket.close();
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        websocket.close();
+    }
+    
     const wsUrl = buildCombinedStreamUrl();
-    debugLog(`Connessione WebSocket combinata: ${wsUrl}`);
+    debugLog(`Connessione WebSocket: ${wsUrl}`);
     websocket = new WebSocket(wsUrl);
 
-    websocket.onopen = function () {
-        debugLog(`✅ WebSocket combinato connesso`);
+    websocket.onopen = function() {
+        debugLog('✅ WebSocket connesso');
         reconnectAttempts = 0;
         updateConnectionStatus('CONNESSO');
     };
 
     websocket.onmessage = handleWebSocketMessage;
 
-    websocket.onerror = function (error) {
+    websocket.onerror = function(error) {
         debugError('Errore WebSocket', error);
         updateConnectionStatus('ERRORE');
     };
 
-    websocket.onclose = function (event) {
+    websocket.onclose = function(event) {
         debugLog('WebSocket disconnesso', { code: event.code, reason: event.reason });
         updateConnectionStatus('DISCONNESSO');
+        
         if (isInitialized && reconnectAttempts < CONFIG.maxRetries) {
             reconnectAttempts++;
             debugLog(`Riconnessione ${reconnectAttempts}/${CONFIG.maxRetries} in ${CONFIG.retryDelay}ms`);
             setTimeout(connectWebSocket, CONFIG.retryDelay);
-        } else if (reconnectAttempts >= CONFIG.maxRetries) {
-            debugError('Numero massimo di tentativi di riconnessione raggiunto');
         }
     };
 }
 
 function updateConnectionStatus(status) {
     connectionStatus = status;
-    debugLog('Stato connessione aggiornato', status);
-    const statusElement = document.getElementById('connection-status');
-    if (statusElement) {
-        statusElement.textContent = status;
-        statusElement.className = `status ${status.toLowerCase()}`;
+    debugLog(`Stato connessione: ${status}`);
+}
+
+// ================= INIZIALIZZAZIONE PRINCIPALE =================
+async function initializeApplication() {
+    try {
+        debugLog('🚀 AVVIO INIZIALIZZAZIONE');
+        showLoadingMessage('🚀 Inizializzazione sistema...');
+        
+        // Inizializza solo il simbolo corrente per ora
+        const result = await initializeHistoricalDataForSymbol(CONFIG.currentSymbol.toUpperCase());
+        
+        if (!result.success) {
+            throw new Error(result.error);
+        }
+        
+        debugLog(`✅ ${CONFIG.currentSymbol} inizializzato: ${result.loaded} candele da ${result.source}`);
+        
+        // Aggiorna UI iniziale
+        updateDashboardUI();
+        
+        isInitialized = true;
+        showLoadingMessage('✅ Sistema inizializzato correttamente');
+        
+        return true;
+        
+    } catch (error) {
+        debugError('❌ Errore inizializzazione:', error);
+        showLoadingMessage(`❌ Errore: ${error.message}`, 'error');
+        isInitialized = false;
+        return false;
     }
-    window.dispatchEvent(new CustomEvent('connectionStatusChanged', {
-        detail: { status, timestamp: Date.now() }
-    }));
+}
+
+// ================= CAMBIO SIMBOLO =================
+async function changeSymbol() {
+    const selectEl = document.getElementById('cryptoSelect');
+    if (!selectEl) return;
+    
+    const newSymbol = selectEl.value;
+    if (newSymbol === CONFIG.currentSymbol) return;
+    
+    debugLog(`Cambio simbolo: ${CONFIG.currentSymbol} -> ${newSymbol}`);
+    CONFIG.currentSymbol = newSymbol;
+    
+    // Disconnetti WebSocket corrente
+    if (websocket) websocket.close();
+    
+    // Inizializza nuovo simbolo
+    showLoadingMessage(`📊 Caricamento ${newSymbol.toUpperCase()}...`);
+    
+    try {
+        const result = await initializeHistoricalDataForSymbol(newSymbol.toUpperCase());
+        if (result.success) {
+            updateDashboardUI();
+            connectWebSocket(); // Riconnetti con nuovo simbolo
+            showLoadingMessage(`✅ ${newSymbol.toUpperCase()} caricato`);
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        debugError(`Errore cambio simbolo: ${error.message}`);
+        showLoadingMessage(`❌ Errore caricamento ${newSymbol}`, 'error');
+    }
+}
+
+// ================= REFRESH MANUALE =================
+async function refreshData() {
+    debugLog('🔄 Refresh manuale richiesto');
+    showLoadingMessage('🔄 Aggiornamento dati...');
+    
+    try {
+        // Rimuovi dati cached
+        if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem(`candles_${CONFIG.currentSymbol.toUpperCase()}`);
+        }
+        memoryStorage.delete(`candles_${CONFIG.currentSymbol.toUpperCase()}`);
+        
+        // Reinizializza
+        const result = await initializeHistoricalDataForSymbol(CONFIG.currentSymbol.toUpperCase());
+        if (result.success) {
+            updateDashboardUI();
+            showLoadingMessage('✅ Dati aggiornati');
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        debugError(`Errore refresh: ${error.message}`);
+        showLoadingMessage(`❌ Errore refresh: ${error.message}`, 'error');
+    }
+}
+
+// ================= AUTO REFRESH =================
+function toggleAutoRefresh() {
+    const btn = document.getElementById('autoRefreshBtn');
+    if (!btn) return;
+    
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+        btn.textContent = '⏰ Auto Refresh: OFF';
+        debugLog('Auto refresh disattivato');
+    } else {
+        autoRefreshInterval = setInterval(() => {
+            debugLog('Auto refresh...');
+            updateDashboardUI();
+        }, 30000); // 30 secondi
+        btn.textContent = '⏰ Auto Refresh: ON';
+        debugLog('Auto refresh attivato (30s)');
+    }
 }
 
 // ================= AVVIO APPLICAZIONE =================
 async function startApplication() {
     try {
         debugLog('🎯 AVVIO APPLICAZIONE TRADING', {
-            symbols: CONFIG.symbols,
+            currentSymbol: CONFIG.currentSymbol,
             interval: CONFIG.interval,
             timestamp: new Date().toISOString()
         });
+        
         const initialized = await initializeApplication();
         if (!initialized) {
-            debugError('❌ Inizializzazione fallita, impossibile continuare');
-            updateConnectionStatus('ERRORE_INIT');
+            debugError('❌ Inizializzazione fallita');
             return;
         }
-        debugLog('Avvio connessione WebSocket...');
+        
+        // Avvia WebSocket
         connectWebSocket();
+        
         debugLog('✅ APPLICAZIONE AVVIATA CON SUCCESSO');
+        
     } catch (error) {
         debugError('❌ ERRORE CRITICO NELL\'AVVIO', error);
-        updateConnectionStatus('ERRORE_CRITICO');
     }
 }
 
-// ================= GESTIONE FINESTRA =================
-window.addEventListener('beforeunload', function () {
-    debugLog('Chiusura applicazione...');
-    if (websocket && websocket.readyState === WebSocket.OPEN) {
-        websocket.close();
-    }
+// ================= ESPOSIZIONE FUNZIONI GLOBALI =================
+window.changeSymbol = changeSymbol;
+window.refreshData = refreshData;
+window.toggleAutoRefresh = toggleAutoRefresh;
+
+// ================= GESTIONE EVENTI =================
+window.addEventListener('beforeunload', function() {
+    if (websocket) websocket.close();
+    if (autoRefreshInterval) clearInterval(autoRefreshInterval);
 });
 
-document.addEventListener('visibilitychange', function () {
-    if (document.hidden) {
-        debugLog('Pagina nascosta');
-    } else {
-        debugLog('Pagina visibile');
-        if (isInitialized && (!websocket || websocket.readyState !== WebSocket.OPEN)) {
-            debugLog('Riconnessione dopo visibilità...');
-            setTimeout(connectWebSocket, 1000);
-        }
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden && isInitialized && (!websocket || websocket.readyState !== WebSocket.OPEN)) {
+        debugLog('Riconnessione dopo visibilità...');
+        setTimeout(connectWebSocket, 1000);
     }
 });
 
@@ -351,24 +612,15 @@ if (document.readyState === 'loading') {
 window.tradingApp = {
     isInitialized: () => isInitialized,
     getConnectionStatus: () => connectionStatus,
-    getStateInfo: (symbol) => getStateInfo(symbol ? symbol.toLowerCase() : CONFIG.symbols[0].toLowerCase()),
+    getCurrentSymbol: () => CONFIG.currentSymbol,
+    getStateInfo: () => getStateInfo(CONFIG.currentSymbol),
+    refreshData,
+    changeSymbol,
     reconnect: () => {
-        debugLog('Riconnessione manuale richiesta');
         reconnectAttempts = 0;
         connectWebSocket();
     },
-    restart: async () => {
-        debugLog('Restart completo richiesto');
-        if (websocket) websocket.close();
-        isInitialized = false;
-        reconnectAttempts = 0;
-        await startApplication();
-    },
+    restart: startApplication,
     enableDebug: () => { CONFIG.debugMode = true; },
-    disableDebug: () => { CONFIG.debugMode = false; },
-    resetState: (symbol) => {
-        debugLog('Reset stato richiesto');
-        resetState(symbol ? symbol.toLowerCase() : CONFIG.symbols[0].toLowerCase());
-        return getStateInfo(symbol ? symbol.toLowerCase() : CONFIG.symbols[0].toLowerCase());
-    }
+    disableDebug: () => { CONFIG.debugMode = false; }
 };
