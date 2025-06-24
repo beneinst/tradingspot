@@ -7,247 +7,302 @@
 	<link rel="icon" type="image/png" href="https://beneinst.github.io/tradingspot/favicon.png">
 	<script type="module" src="index.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+       /* Reset e base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: #ffffff;
-            min-height: 100vh;
-            padding: 20px;
-        }
+body {
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e1e1e 0%, #232a34 100%);
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 20px;
+}
 
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
+/* Dashboard grid */
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+}
 
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
+/* Card */
+.card {
+    background: #2c2c2c;
+    border-radius: 12px;
+    padding: 22px;
+    border: 1px solid #353535;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+    transition: all 0.3s;
+}
+.card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.65);
+}
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-        }
+.card-title {
+    font-size: 1.25em;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #739bf2;
+    border-bottom: 2px solid #3a3a3a;
+    padding-bottom: 7px;
+    letter-spacing: -0.1px;
+}
 
-        .card-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #4fc3f7;
-            border-bottom: 2px solid rgba(79, 195, 247, 0.3);
-            padding-bottom: 8px;
-        }
+/* Signal status */
+.signal-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 18px;
+    border-radius: 9px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 1.08em;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.18);
+}
+.signal-buy {
+    background: linear-gradient(135deg, #388e3c, #4caf50 80%);
+    color: #fff;
+}
+.signal-sell {
+    background: linear-gradient(135deg, #b71c1c, #f44336 80%);
+    color: #fff;
+}
+.signal-neutral {
+    background: linear-gradient(135deg, #424242, #757575 80%);
+    color: #fff;
+}
 
-        .signal-status {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            font-weight: 600;
-            font-size: 1.1em;
-        }
+/* Timer */
+.timer-container {
+    background: #232a34;
+    border-radius: 9px;
+    padding: 14px;
+    margin-top: 10px;
+}
+.timer-bar {
+    width: 100%;
+    height: 8px;
+    background: #222;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+.timer-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #ffe58f);
+    border-radius: 4px;
+    transition: width 0.3s;
+}
 
-        .signal-buy {
-            background: linear-gradient(135deg, #4caf50, #66bb6a);
-            color: white;
-        }
+/* Indicator grid */
+.indicator-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+.indicator-item {
+    background: #232a34;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+}
+.indicator-value {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #ffe58f;
+}
+.indicator-label {
+    font-size: 0.92em;
+    opacity: 0.8;
+    color: #aaa;
+}
 
-        .signal-sell {
-            background: linear-gradient(135deg, #f44336, #ef5350);
-            color: white;
-        }
+/* Confluence Score */
+.confluence-score {
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+    padding: 19px;
+    border-radius: 13px;
+    margin: 12px 0;
+}
+.score-positive {
+    background: linear-gradient(135deg, #388e3c, #4caf50 80%);
+    color: #fff;
+}
+.score-negative {
+    background: linear-gradient(135deg, #b71c1c, #f44336 80%);
+    color: #fff;
+}
+.score-neutral {
+    background: linear-gradient(135deg, #424242, #757575 80%);
+    color: #fff;
+}
 
-        .signal-neutral {
-            background: linear-gradient(135deg, #757575, #9e9e9e);
-            color: white;
-        }
+/* Stats Table */
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: #232a34;
+    color: #e0e0e0;
+}
+.stats-table th,
+.stats-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #353535;
+}
+.stats-table th {
+    background: #2c2c2c;
+    font-weight: 600;
+}
 
-        .timer-container {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 10px;
-        }
+/* Status Indicator */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+.status-active { background: #4caf50; }
+.status-warning { background: #ff9800; }
+.status-danger { background: #f44336; }
+.status-inactive { background: #757575; }
 
-        .timer-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
+/* Refresh Button */
+.refresh-btn {
+    background: linear-gradient(135deg, #2196f3, #21cbf3 80%);
+    border: none;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s;
+    margin-top: 10px;
+    box-shadow: 0 2px 10px rgba(33, 150, 243, 0.18);
+}
+.refresh-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(33, 150, 243, 0.32);
+}
 
-        .timer-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4caf50, #8bc34a);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
+/* Pattern List */
+.pattern-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+.pattern-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    margin: 5px 0;
+    background: #232a34;
+    border-radius: 5px;
+}
+.pattern-bullish { border-left: 4px solid #4caf50; }
+.pattern-bearish { border-left: 4px solid #f44336; }
+.pattern-neutral { border-left: 4px solid #ff9800; }
 
-        .indicator-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-        }
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 10px;
+    }
+    body {
+        padding: 10px;
+    }
+}
 
-        .indicator-item {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-        }
+/* Titoli */
+h2 {
+    color: #739bf2 !important;
+    font-weight: bold !important;
+    letter-spacing: -0.1px !important;
+}
 
-        .indicator-value {
-            font-size: 1.2em;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
+.cryptoSelect {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border-radius: 6px !important;
+    background: linear-gradient(135deg, #232a34 60%, #2c2c2c 100%) !important;
+    color: #ffe58f !important;
+    border: 1.5px solid #353535 !important;
+    font-size: 1em !important;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.18) !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    outline: none !important;
+    margin-bottom: 12px !important;
+    appearance: none !important;
+    cursor: pointer !important;
+}
 
-        .indicator-label {
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
+.cryptoSelect:focus, .cryptoSelect:hover {
+    border-color: #739bf2 !important;
+    box-shadow: 0 4px 18px rgba(115, 155, 242, 0.18) !important;
+    background: linear-gradient(135deg, #232a34 60%, #293a54 100%) !important;
+    color: #fff !important;
+}
 
-        .confluence-score {
-            font-size: 2em;
-            font-weight: bold;
-            text-align: center;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 10px 0;
-        }
+.cryptoSelect option {
+    background: #232a34 !important;
+    color: #ffe58f !important;
+    font-family: inherit !important;
+}
 
-        .score-positive {
-            background: linear-gradient(135deg, #4caf50, #66bb6a);
-            color: white;
-        }
 
-        .score-negative {
-            background: linear-gradient(135deg, #f44336, #ef5350);
-            color: white;
-        }
-
-        .score-neutral {
-            background: linear-gradient(135deg, #757575, #9e9e9e);
-            color: white;
-        }
-
-        .stats-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        .stats-table th,
-        .stats-table td {
-            padding: 8px 12px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stats-table th {
-            background: rgba(0, 0, 0, 0.2);
-            font-weight: 600;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status-active { background: #4caf50; }
-        .status-warning { background: #ff9800; }
-        .status-danger { background: #f44336; }
-        .status-inactive { background: #757575; }
-
-        .refresh-btn {
-            background: linear-gradient(135deg, #2196f3, #21cbf3);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .refresh-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
-        }
-
-        .pattern-list {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .pattern-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            margin: 5px 0;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-        }
-
-        .pattern-bullish { border-left: 4px solid #4caf50; }
-        .pattern-bearish { border-left: 4px solid #f44336; }
-        .pattern-neutral { border-left: 4px solid #ff9800; }
-
-        @media (max-width: 768px) {
-            .dashboard-container {
-                grid-template-columns: 1fr;
-                gap: 15px;
-                padding: 10px;
-            }
-            
-            body {
-                padding: 10px;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <div style="margin-bottom: 20px; text-align: center;">
-        <label for="cryptoSelect">Seleziona Cripto: </label>
-        <select id="cryptoSelect" onchange="changeSymbol()">
-            <option value="btcusdt">BTC/USDT</option>
-            <option value="ethusdt">ETH/USDT</option>
-            <option value="bnbusdt">BNB/USDT</option>
-            <option value="xrpusdt">XRP/USDT</option>
-            <option value="solusdt">SOL/USDT</option>
-            <!-- Puoi aggiungere altre cripto -->
-        </select>
-    </div>
+   
 
     <div class="dashboard-container">
+
                <!-- Segnale Principale -->
         <div class="card">
-            <h3 class="card-title">🎯 Segn8ale Principale</h3>
+	
+	<div class="crypto-select-box">
+    <label for="cryptoSelect"><h3 class="card-title">🎯 Seleziona Cripto</h3></label>
+    <select id="cryptoSelect" class="cryptoSelect" onchange="changeSymbol()">
+        <option value="adaeur">ADA/EUR</option>
+        <option value="algoeur">ALGO/EUR</option>
+        <option value="avaxeur">AVAX/EUR</option>
+        <option value="avaxusdc">AVAX/USDC</option>
+        <option value="btcusdc">BTC/USDC</option>
+        <option value="dorusdc">DOR/USDC</option>
+        <option value="etheur">ETH/EUR</option>
+        <option value="fetusdc">FET/USDC</option>
+        <option value="ltceur">LTC/EUR</option>
+        <option value="manaeur">MANA/EUR</option>
+        <option value="nearusdc">NEAR/USDC</option>
+        <option value="solusdc">SOL/USDC</option>
+        <option value="soleur">SOL/EUR</option>
+        <option value="suiusdc">SUI/USDC</option>
+        <option value="uniusdc">UNI/USDC</option>
+        <option value="uni eur">UNI/EUR</option>
+        <option value="atomusdc">ATOM/USDC</option>
+        <option value="bnbusdc">BNB/USDC</option>
+		</select>
+	
+</div>
+
+            <h3 class="card-title"><br>🎯 Segnale Principale</h3>
             <div id="mainSignal" class="signal-status signal-neutral">
                 <span>IN ATTESA</span>
                 <span id="signalStrength">0.0</span>
