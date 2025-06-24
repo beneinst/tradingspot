@@ -464,7 +464,7 @@ async function initializeApplication() {
         showLoadingMessage('🚀 Inizializzazione sistema...');
         
         // Inizializza solo il simbolo corrente per ora
-        const result = await initializeHistoricalDataForSymbol(CONFIG.currentSymbol.toUpperCase());
+        const result = await initializeHistoricalDataForSymbol(CONFIG.currentSymbol);
         
         if (!result.success) {
             throw new Error(result.error);
@@ -506,7 +506,7 @@ async function changeSymbol() {
     showLoadingMessage(`📊 Caricamento ${newSymbol.toUpperCase()}...`);
     
     try {
-        const result = await initializeHistoricalDataForSymbol(newSymbol.toUpperCase());
+        const result = await initializeHistoricalDataForSymbol(newSymbol);
         if (result.success) {
             updateDashboardUI();
             connectWebSocket(); // Riconnetti con nuovo simbolo
@@ -533,7 +533,7 @@ async function refreshData() {
         memoryStorage.delete(`candles_${CONFIG.currentSymbol.toUpperCase()}`);
         
         // Reinizializza
-        const result = await initializeHistoricalDataForSymbol(CONFIG.currentSymbol.toUpperCase());
+        const result = await initializeHistoricalDataForSymbol(CONFIG.currentSymbol);
         if (result.success) {
             updateDashboardUI();
             showLoadingMessage('✅ Dati aggiornati');
