@@ -21,6 +21,16 @@ let reconnectAttempts = 0;
 let connectionStatus = 'DISCONNESSO';
 let isInitialized = false;
 
+function changeSymbol(select) {
+    const symbol = select.value.toUpperCase();
+    debugLog(`Simbolo selezionato: ${symbol}`);
+    initializeHistoricalDataForSymbol(symbol).then(() => {
+        // Aggiorna la dashboard/grafico con i nuovi dati
+        updateDashboard(symbol, getLastCandle(symbol));
+    });
+}
+
+
 // ================= UTILITÀ DI DEBUG =================
 function debugLog(message, data = null) {
     if (CONFIG.debugMode) {
