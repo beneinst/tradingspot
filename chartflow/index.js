@@ -231,13 +231,14 @@ async function fetchHistoricalDataForSymbol(symbolValue) {
 
 // ================= INIZIALIZZAZIONE DATI STORICI PER SIMBOLO =================
 async function initializeHistoricalDataForSymbol(symbol) {
-    symbol = symbol.toLowerCase(); // <--- uniforma subito
+    try {
+        symbol = symbol.toLowerCase(); // <--- uniforma subito
         debugLog(`[${symbol}] Inizializzazione...`);
-        let candles = loadFromStorage(`candles_${symbol.toLowerCase()}`);
+        let candles = loadFromStorage(`candles_${symbol}`);
         if (candles && candles.length >= 50) {
             debugLog(`[${symbol}] ${candles.length} candele caricate da storage`);
             for (const candle of candles) {
-                processNewCandle(candle, symbol.toLowerCase());
+                processNewCandle(candle, symbol);
             }
             return { success: true, loaded: candles.length, source: 'storage' };
         }
@@ -253,7 +254,7 @@ async function initializeHistoricalDataForSymbol(symbol) {
         }));
         saveToStorage(`candles_${symbol}`, parsedCandles);
         for (const candle of parsedCandles) {
-            processNewCandle(candle, symbol.toLowerCase());
+            processNewCandle(candle, symbol);
         }
         debugLog(`[${symbol}] ${parsedCandles.length} candele elaborate e salvate`);
         return { success: true, loaded: parsedCandles.length, source: 'api' };
