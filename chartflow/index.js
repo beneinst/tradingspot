@@ -1,6 +1,6 @@
-// index.js - Fix per gestione candele storiche
+// index.js - Versione migliorata con migliore gestione errori
 
-import { processNewCandle, loadState, getStateInfo } from './logica.js';
+import { processNewCandle, loadState, getStateInfo, resetState } from './logica.js';
 
 // ================= CONFIGURAZIONE =================
 const CONFIG = {
@@ -10,51 +10,153 @@ const CONFIG = {
     apiUrl: 'https://api.binance.com/api/v3/klines',
     maxRetries: 3,
     retryDelay: 5000,
+    historyLimit: 200,
+    debugMode: true
 };
 
 let websocket = null;
 let reconnectAttempts = 0;
 let connectionStatus = 'DISCONNESSO';
+let isInitialized = false;
 
-// ================= GESTIONE DATI STORICI (CORRETTA) =================
+// ================= UTILITÀ DI DEBUG =================
 
-async function fetchHistoricalData(symbol, interval, limit = 200) {
-    const url = `${CONFIG.apiUrl}?symbol=${symbol}&interval=${interval}&limit=${limit}`;
-    
-    try {
-        console.log(`Recupero dati storici per ${symbol} (${limit} candele)`);
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
+function debugLog(message, data = null) {
+    if (CONFIG.debugMode) {
+        const timestamp = new Date().toISOString();
+        if (data) {
+            console.log(`[${timestamp}] ${message}`, data);
+        } else {
+            console.log(`[${timestamp}] ${message}`);
         }
-        
-        const data = await response.json();
-        
-        if (!Array.isArray(data) || data.length === 0) {
-            throw new Error('Nessun dato storico ricevuto');
-        }
-        
-        console.log(`Ricevute ${data.length} candele storiche per ${symbol}`);
-        return data;
-        
-    } catch (error) {
-        console.error(`Errore nel recupero dati storici per ${symbol}:`, error);
-        throw error;
     }
 }
 
-function parseHistoricalCandle(rawCandle) {
+function debugError(message, error = null) {
+    const timestamp = new Date().toISOString();
+    if (error) {
+        console.error(`[${timestamp}] ERROR: ${message}`, error);
+    } else {
+        console.error(`[${timestamp}] ERROR: ${message}`);
+    }
+}
+
+// ================= GESTIONE ERRORI MIGLIORATA =================
+
+function handleApiError(error, context) {
+    debugError(`Errore API in ${context}`, error);
+    
+    if (error.message.includes('429')) {
+        debugError('Rate limit raggiunto, attendere prima di riprovare');
+        return { type: 'rate_limit', retry: true, delay: 60000 };
+    }
+    
+    if (error.message.includes('Network')) {
+        debugError('Problema di connessione di rete');
+        return { type: 'network', retry: true, delay: 5000 };
+    }
+    
+    return { type: 'generic', retry: false };
+}
+
+// ================= GESTIONE DATI STORICI MIGLIORATA =================
+
+async function fetchHistoricalDataWithRetry(symbol, interval, limit = 200, retries = 3) {
+    const url = `${CONFIG.apiUrl}?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+    
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            debugLog(`Tentativo ${attempt}/${retries} - Recupero dati storici per ${symbol}`);
+            
+            const response = await fetch(url, {
+                headers: {
+                    'User-Agent': 'TradingApp/1.0'
+                },
+                timeout: 10000
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new Error('Dati storici vuoti o formato non valido');
+            }
+            
+            debugLog(`✅ Ricevute ${data.length} candele per ${symbol}`);
+            return data;
+            
+        } catch (error) {
+            const errorInfo = handleApiError(error, 'fetchHistoricalData');
+            
+            if (attempt === retries || !errorInfo.retry) {
+                throw new Error(`Impossibile recuperare dati storici dopo ${retries} tentativi: ${error.message}`);
+            }
+            
+            debugError(`Tentativo ${attempt} fallito, riprovo in ${errorInfo.delay}ms`);
+            await new Promise(resolve => setTimeout(resolve, errorInfo.delay));
+        }
+    }
+}
+
+function validateCandle(candle, source = 'unknown') {
+    const errors = [];
+    
+    // Controlli di base
+    if (!candle || typeof candle !== 'object') {
+        errors.push('Candela non è un oggetto valido');
+        return { valid: false, errors };
+    }
+    
+    // Controlli numerici
+    const requiredFields = ['timestamp', 'open', 'high', 'low', 'close', 'volume'];
+    for (const field of requiredFields) {
+        if (!(field in candle)) {
+            errors.push(`Campo mancante: ${field}`);
+        } else if (field === 'timestamp') {
+            if (!Number.isInteger(candle[field]) || candle[field] <= 0) {
+                errors.push(`Timestamp non valido: ${candle[field]}`);
+            }
+        } else {
+            if (typeof candle[field] !== 'number' || isNaN(candle[field]) || candle[field] < 0) {
+                errors.push(`Valore non valido per ${field}: ${candle[field]}`);
+            }
+        }
+    }
+    
+    // Controlli logici OHLC
+    if (errors.length === 0) {
+        const { open, high, low, close } = candle;
+        
+        if (high < low) {
+            errors.push(`High (${high}) < Low (${low})`);
+        }
+        if (close < low || close > high) {
+            errors.push(`Close (${close}) fuori range [${low}, ${high}]`);
+        }
+        if (open < low || open > high) {
+            errors.push(`Open (${open}) fuori range [${low}, ${high}]`);
+        }
+    }
+    
+    if (errors.length > 0) {
+        debugError(`Validazione candela fallita (${source})`, { candle, errors });
+        return { valid: false, errors };
+    }
+    
+    return { valid: true, errors: [] };
+}
+
+function parseHistoricalCandle(rawCandle, index) {
     try {
-        // Formato Binance: [timestamp, open, high, low, close, volume, close_time, ...]
         if (!Array.isArray(rawCandle) || rawCandle.length < 6) {
-            console.error('Formato candela storica non valido:', rawCandle);
-            return null;
+            return { candle: null, error: `Formato array non valido (index: ${index})` };
         }
         
         const [timestamp, open, high, low, close, volume] = rawCandle;
         
-        // Conversione e validazione
         const candle = {
             timestamp: parseInt(timestamp),
             open: parseFloat(open),
@@ -64,102 +166,127 @@ function parseHistoricalCandle(rawCandle) {
             volume: parseFloat(volume)
         };
         
-        // Validazione logica
-        if (isNaN(candle.open) || isNaN(candle.high) || isNaN(candle.low) || isNaN(candle.close)) {
-            console.error('Valori OHLC non numerici:', candle);
-            return null;
+        const validation = validateCandle(candle, `historical-${index}`);
+        
+        if (!validation.valid) {
+            return { candle: null, error: validation.errors.join(', ') };
         }
         
-        if (candle.high < candle.low || candle.close < candle.low || candle.close > candle.high || 
-            candle.open < candle.low || candle.open > candle.high) {
-            console.error('Valori OHLC logicamente inconsistenti:', candle);
-            return null;
-        }
-        
-        return candle;
+        return { candle, error: null };
         
     } catch (error) {
-        console.error('Errore nel parsing candela storica:', error, rawCandle);
-        return null;
+        return { candle: null, error: `Errore parsing: ${error.message}` };
     }
 }
 
-async function fetchAndUpdateHistoricalData(symbol, interval) {
+async function initializeHistoricalData(symbol, interval) {
     try {
-        const rawData = await fetchHistoricalData(symbol, interval);
+        debugLog('=== INIZIALIZZAZIONE DATI STORICI ===');
+        
+        // Controlla se abbiamo già dati validi
+        const stateInfo = getStateInfo(symbol.toLowerCase());
+        if (stateInfo && stateInfo.candles > 50) {
+            debugLog('Dati esistenti sufficienti trovati', stateInfo);
+            return { success: true, loaded: stateInfo.candles, processed: 0 };
+        }
+        
+        // Recupera dati freschi
+        const rawData = await fetchHistoricalDataWithRetry(symbol, interval, CONFIG.historyLimit);
+        
         let processedCount = 0;
         let errorCount = 0;
+        const errors = [];
         
-        console.log(`Processando ${rawData.length} candele storiche...`);
+        debugLog(`Processando ${rawData.length} candele storiche...`);
         
-        for (let i = 0; i < rawData.length; i++) {
-            const rawCandle = rawData[i];
-            const candle = parseHistoricalCandle(rawCandle);
+        // Processa in batch per migliori performance
+        const batchSize = 50;
+        for (let i = 0; i < rawData.length; i += batchSize) {
+            const batch = rawData.slice(i, Math.min(i + batchSize, rawData.length));
             
-            if (candle === null) {
-                errorCount++;
-                console.warn(`Candela ${i} saltata (formato non valido)`);
-                continue;
+            for (let j = 0; j < batch.length; j++) {
+                const globalIndex = i + j;
+                const result = parseHistoricalCandle(batch[j], globalIndex);
+                
+                if (result.error) {
+                    errorCount++;
+                    errors.push(`Candela ${globalIndex}: ${result.error}`);
+                    continue;
+                }
+                
+                const processResult = processNewCandle(result.candle, symbol.toLowerCase());
+                
+                if (processResult && !processResult.error) {
+                    processedCount++;
+                } else if (processResult && processResult.error !== 'insufficient_data') {
+                    errorCount++;
+                    errors.push(`Processing candela ${globalIndex}: ${processResult.error}`);
+                }
             }
             
-            // Processa la candela
-            const result = processNewCandle(candle, symbol.toLowerCase());
-            
-            if (result && !result.error) {
-                processedCount++;
-            } else if (result && result.error === 'insufficient_data') {
-                // Normale durante l'inizializzazione
-            } else {
-                errorCount++;
-                console.warn(`Errore processing candela ${i}:`, result);
+            // Log progresso
+            if ((i + batchSize) % 100 === 0 || i + batchSize >= rawData.length) {
+                debugLog(`Progresso: ${Math.min(i + batchSize, rawData.length)}/${rawData.length} candele elaborate`);
             }
         }
         
-        console.log(`Dati storici ${interval} aggiornati da server per ${symbol}:`);
-        console.log(`- Candele processate: ${processedCount}/${rawData.length}`);
-        console.log(`- Errori: ${errorCount}`);
-        console.log(`- Info stato:`, getStateInfo(symbol.toLowerCase()));
+        const finalState = getStateInfo(symbol.toLowerCase());
         
-        return processedCount > 0;
+        debugLog('=== RISULTATO INIZIALIZZAZIONE ===', {
+            totali: rawData.length,
+            processate: processedCount,
+            errori: errorCount,
+            statoFinale: finalState
+        });
+        
+        if (errorCount > 0 && CONFIG.debugMode) {
+            debugLog('Errori dettagliati:', errors.slice(0, 10)); // Mostra solo primi 10
+        }
+        
+        return {
+            success: processedCount > 0,
+            total: rawData.length,
+            processed: processedCount,
+            errors: errorCount,
+            state: finalState
+        };
         
     } catch (error) {
-        console.error(`Errore nell'aggiornamento dati storici per ${symbol}:`, error);
-        return false;
+        debugError('Errore critico nell\'inizializzazione dati storici', error);
+        return { success: false, error: error.message };
     }
 }
 
-// ================= GESTIONE WEBSOCKET (MIGLIORATA) =================
+// ================= GESTIONE WEBSOCKET MIGLIORATA =================
 
 function parseWebSocketCandle(klineData) {
     try {
         if (!klineData || !klineData.k) {
-            console.error('Dati kline WebSocket non validi:', klineData);
-            return null;
+            return { candle: null, error: 'Dati kline mancanti' };
         }
         
         const k = klineData.k;
         
         const candle = {
-            timestamp: parseInt(k.t), // timestamp di apertura
+            timestamp: parseInt(k.t),
             open: parseFloat(k.o),
             high: parseFloat(k.h),
             low: parseFloat(k.l),
             close: parseFloat(k.c),
             volume: parseFloat(k.v),
-            closed: k.x === true // se la candela è chiusa
+            closed: k.x === true
         };
         
-        // Validazione
-        if (isNaN(candle.open) || isNaN(candle.high) || isNaN(candle.low) || isNaN(candle.close)) {
-            console.error('Valori OHLC WebSocket non numerici:', candle);
-            return null;
+        const validation = validateCandle(candle, 'websocket');
+        
+        if (!validation.valid) {
+            return { candle: null, error: validation.errors.join(', ') };
         }
         
-        return candle;
+        return { candle, error: null };
         
     } catch (error) {
-        console.error('Errore nel parsing candela WebSocket:', error, klineData);
-        return null;
+        return { candle: null, error: `Parsing error: ${error.message}` };
     }
 }
 
@@ -168,64 +295,76 @@ function handleWebSocketMessage(event) {
         const data = JSON.parse(event.data);
         
         if (!data.k) {
-            console.warn('Messaggio WebSocket senza dati kline:', data);
+            debugLog('Messaggio WebSocket ignorato (no kline)', data);
             return;
         }
         
-        const candle = parseWebSocketCandle(data);
+        const parseResult = parseWebSocketCandle(data);
         
-        if (!candle) {
-            console.error('Impossibile parsare candela WebSocket');
+        if (parseResult.error) {
+            debugError('Errore parsing WebSocket', parseResult.error);
             return;
         }
         
-        // Log candele in corso (solo ogni 10 messaggi per non intasare)
-        if (!candle.closed && Math.random() < 0.1) {
-            console.log('Candela in corso:', {
-                symbol: data.k.s,
-                close: data.k.c,
-                closed: candle.closed,
-                timestamp: new Date(candle.timestamp).toISOString()
-            });
-        }
+        const candle = parseResult.candle;
         
-        // Processa solo candele chiuse per evitare ridondanza
-        if (candle.closed) {
-            console.log('Nuova candela chiusa ricevuta:', {
+        // Log periodico per candele in corso
+        if (!candle.closed && Math.random() < 0.05) { // 5% chance
+            debugLog('Candela in corso', {
                 symbol: data.k.s,
                 close: candle.close,
                 timestamp: new Date(candle.timestamp).toISOString()
             });
+        }
+        
+        // Processa solo candele chiuse
+        if (candle.closed) {
+            debugLog('Nuova candela chiusa', {
+                symbol: data.k.s,
+                close: candle.close,
+                volume: candle.volume,
+                timestamp: new Date(candle.timestamp).toISOString()
+            });
             
-            const result = processNewCandle(candle, data.k.s.toLowerCase());
+            if (!isInitialized) {
+                debugLog('Sistema non ancora inizializzato, candela ignorata');
+                return;
+            }
             
-            if (result && !result.error) {
-                console.log('Candela processata con successo:', {
-                    score: result.score,
-                    bb: result.bb,
-                    stochK: result.stochK,
-                    candles: result.candles
+            const processResult = processNewCandle(candle, data.k.s.toLowerCase());
+            
+            if (processResult && !processResult.error) {
+                debugLog('✅ Candela processata', {
+                    score: processResult.score,
+                    bb: processResult.bb,
+                    stochK: processResult.stochK,
+                    candlesTotal: processResult.candles
                 });
             } else {
-                console.warn('Errore nel processing candela WebSocket:', result);
+                debugError('❌ Errore processing candela', processResult);
             }
         }
         
     } catch (error) {
-        console.error('Errore nell\'elaborazione messaggio WebSocket:', error);
+        debugError('Errore elaborazione messaggio WebSocket', error);
     }
 }
 
 function connectWebSocket() {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        debugLog('WebSocket già connesso');
+        return;
+    }
+    
     const streamName = `${CONFIG.symbol.toLowerCase()}@kline_${CONFIG.interval}`;
     const wsUrl = `${CONFIG.wsUrl}${streamName}`;
     
-    console.log('Connessione WebSocket:', wsUrl);
+    debugLog('Connessione WebSocket', { url: wsUrl, attempt: reconnectAttempts + 1 });
     
     websocket = new WebSocket(wsUrl);
     
     websocket.onopen = function() {
-        console.log(`WebSocket connesso per ${CONFIG.symbol}`);
+        debugLog(`✅ WebSocket connesso per ${CONFIG.symbol}`);
         reconnectAttempts = 0;
         updateConnectionStatus('CONNESSO');
     };
@@ -233,28 +372,28 @@ function connectWebSocket() {
     websocket.onmessage = handleWebSocketMessage;
     
     websocket.onerror = function(error) {
-        console.error('Errore WebSocket:', error);
+        debugError('Errore WebSocket', error);
         updateConnectionStatus('ERRORE');
     };
     
     websocket.onclose = function(event) {
-        console.log('WebSocket disconnesso:', event.code, event.reason);
+        debugLog('WebSocket disconnesso', { code: event.code, reason: event.reason });
         updateConnectionStatus('DISCONNESSO');
         
-        // Riconnessione automatica
-        if (reconnectAttempts < CONFIG.maxRetries) {
+        // Riconnessione automatica solo se inizializzato
+        if (isInitialized && reconnectAttempts < CONFIG.maxRetries) {
             reconnectAttempts++;
-            console.log(`Tentativo di riconnessione ${reconnectAttempts}/${CONFIG.maxRetries} in ${CONFIG.retryDelay}ms`);
+            debugLog(`Riconnessione ${reconnectAttempts}/${CONFIG.maxRetries} in ${CONFIG.retryDelay}ms`);
             setTimeout(connectWebSocket, CONFIG.retryDelay);
-        } else {
-            console.error('Numero massimo di tentativi di riconnessione raggiunto');
+        } else if (reconnectAttempts >= CONFIG.maxRetries) {
+            debugError('Numero massimo di tentativi di riconnessione raggiunto');
         }
     };
 }
 
 function updateConnectionStatus(status) {
     connectionStatus = status;
-    console.log('Stato connessione:', status);
+    debugLog('Stato connessione aggiornato', status);
     
     // Aggiorna UI se presente
     const statusElement = document.getElementById('connection-status');
@@ -262,37 +401,45 @@ function updateConnectionStatus(status) {
         statusElement.textContent = status;
         statusElement.className = `status ${status.toLowerCase()}`;
     }
+    
+    // Evento personalizzato per altri componenti
+    window.dispatchEvent(new CustomEvent('connectionStatusChanged', {
+        detail: { status, timestamp: Date.now() }
+    }));
 }
 
-// ================= INIZIALIZZAZIONE =================
+// ================= INIZIALIZZAZIONE PRINCIPALE =================
 
-async function loadHistoricalData() {
+async function initializeApplication() {
     try {
-        console.log('=== INIZIALIZZAZIONE SISTEMA ===');
+        debugLog('🚀 AVVIO INIZIALIZZAZIONE APPLICAZIONE');
         
-        // Carica stato salvato
-        const stateLoaded = loadState(CONFIG.symbol.toLowerCase());
-        console.log('Stato precedente caricato:', stateLoaded);
+        const symbol = CONFIG.symbol.toLowerCase();
         
-        // Recupera dati storici freschi
-        const historicalLoaded = await fetchAndUpdateHistoricalData(CONFIG.symbol, CONFIG.interval);
+        // 1. Carica stato esistente
+        debugLog('Caricamento stato esistente...');
+        const stateLoaded = loadState(symbol);
+        debugLog('Stato caricato', stateLoaded);
         
-        if (historicalLoaded) {
-            console.log('✅ Dati storici caricati con successo');
-            
-            // Mostra info stato finale
-            const stateInfo = getStateInfo(CONFIG.symbol.toLowerCase());
-            console.log('Info stato finale:', stateInfo);
-            
-        } else {
-            console.error('❌ Errore nel caricamento dati storici');
-            return false;
+        // 2. Inizializza dati storici
+        debugLog('Inizializzazione dati storici...');
+        const historyResult = await initializeHistoricalData(CONFIG.symbol, CONFIG.interval);
+        
+        if (!historyResult.success) {
+            throw new Error(`Inizializzazione dati storici fallita: ${historyResult.error}`);
         }
+        
+        debugLog('✅ Dati storici inizializzati', historyResult);
+        
+        // 3. Marca come inizializzato
+        isInitialized = true;
+        debugLog('✅ Sistema inizializzato correttamente');
         
         return true;
         
     } catch (error) {
-        console.error('Errore nell\'inizializzazione:', error);
+        debugError('❌ Errore critico nell\'inizializzazione', error);
+        isInitialized = false;
         return false;
     }
 }
@@ -301,31 +448,57 @@ async function loadHistoricalData() {
 
 async function startApplication() {
     try {
-        console.log('🚀 Avvio applicazione trading...');
+        debugLog('🎯 AVVIO APPLICAZIONE TRADING', {
+            symbol: CONFIG.symbol,
+            interval: CONFIG.interval,
+            timestamp: new Date().toISOString()
+        });
         
-        // Carica dati storici
-        const initialized = await loadHistoricalData();
+        // Inizializza sistema
+        const initialized = await initializeApplication();
         
         if (!initialized) {
-            console.error('Inizializzazione fallita, impossibile continuare');
+            debugError('❌ Inizializzazione fallita, impossibile continuare');
+            updateConnectionStatus('ERRORE_INIT');
             return;
         }
         
         // Avvia WebSocket
+        debugLog('Avvio connessione WebSocket...');
         connectWebSocket();
         
-        console.log('✅ Applicazione avviata con successo');
+        debugLog('✅ APPLICAZIONE AVVIATA CON SUCCESSO');
+        
+        // Stato finale
+        const finalState = getStateInfo(CONFIG.symbol.toLowerCase());
+        debugLog('Stato finale sistema', finalState);
         
     } catch (error) {
-        console.error('Errore critico nell\'avvio:', error);
+        debugError('❌ ERRORE CRITICO NELL\'AVVIO', error);
+        updateConnectionStatus('ERRORE_CRITICO');
     }
 }
 
 // ================= GESTIONE FINESTRA =================
 
 window.addEventListener('beforeunload', function() {
+    debugLog('Chiusura applicazione...');
     if (websocket && websocket.readyState === WebSocket.OPEN) {
         websocket.close();
+    }
+});
+
+// Gestione visibilità pagina
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        debugLog('Pagina nascosta');
+    } else {
+        debugLog('Pagina visibile');
+        // Riconnetti se necessario
+        if (isInitialized && (!websocket || websocket.readyState !== WebSocket.OPEN)) {
+            debugLog('Riconnessione dopo visibilità...');
+            setTimeout(connectWebSocket, 1000);
+        }
     }
 });
 
@@ -338,10 +511,37 @@ if (document.readyState === 'loading') {
     startApplication();
 }
 
-// Export per debugging
+// ================= API PUBBLICA =================
+
 window.tradingApp = {
+    // Stato
+    isInitialized: () => isInitialized,
     getConnectionStatus: () => connectionStatus,
     getStateInfo: () => getStateInfo(CONFIG.symbol.toLowerCase()),
-    reconnect: connectWebSocket,
-    loadHistorical: () => loadHistoricalData()
+    
+    // Controlli
+    reconnect: () => {
+        debugLog('Riconnessione manuale richiesta');
+        reconnectAttempts = 0;
+        connectWebSocket();
+    },
+    
+    restart: async () => {
+        debugLog('Restart completo richiesto');
+        if (websocket) websocket.close();
+        isInitialized = false;
+        reconnectAttempts = 0;
+        await startApplication();
+    },
+    
+    // Debug
+    enableDebug: () => { CONFIG.debugMode = true; },
+    disableDebug: () => { CONFIG.debugMode = false; },
+    
+    // Reset
+    resetState: () => {
+        debugLog('Reset stato richiesto');
+        resetState(CONFIG.symbol.toLowerCase());
+        return getStateInfo(CONFIG.symbol.toLowerCase());
+    }
 };
