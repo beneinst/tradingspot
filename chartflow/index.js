@@ -203,7 +203,7 @@ function getCoinInfoByValue(value) {
     return COINS.find(c => c.value === value.toLowerCase());
 }
 
-}
+
 function buildCoinGeckoUrl(coin) {
     // CoinGecko: /coins/{id}/market_chart?vs_currency={vs_currency}&days=90&interval=4h
     return `https://api.coingecko.com/api/v3/coins/${coin.id}/market_chart?vs_currency=${coin.vs_currency}&days=90&interval=4h`;
