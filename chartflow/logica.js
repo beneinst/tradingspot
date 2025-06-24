@@ -193,9 +193,8 @@ function processNewCandle(candle) {
     if (result) {
         console.log("processNewCandle:", candle, result);
 
-        // Simuliamo valori per vedere cambiamenti sulla dashboard
-        const linregFake = (Math.random() * 2 - 1).toFixed(2); // Valore casuale tra -1 e +1
-        const pearsonFake = (Math.random() * 2 - 1).toFixed(2); // Valore casuale tra -1 e +1
+        const linregFake = (Math.random() * 2 - 1).toFixed(2);
+        const pearsonFake = (Math.random() * 2 - 1).toFixed(2);
 
         return {
             linreg: parseFloat(linregFake),
@@ -204,10 +203,13 @@ function processNewCandle(candle) {
             stoch: result.stochK,
             score: (result.bbPosition + result.stochK + parseFloat(linregFake) + parseFloat(pearsonFake)) / 4
         };
+    } else {
+        console.log("Indicatore non calcolabile, probabilmente dati insufficienti.");
     }
 
     return null;
 }
+
 
 
 // ================= ESPORTAZIONE =================
