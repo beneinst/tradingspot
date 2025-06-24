@@ -61,8 +61,8 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 13px 18px;
-    border-radius: 9px;
-    margin-bottom: 10px;
+    border-radius: 8px;
+    margin-bottom: 6px;
     font-weight: 600;
     font-size: 1.08em;
     box-shadow: 0 1px 6px rgba(0,0,0,0.18);
@@ -109,10 +109,18 @@ body {
     gap: 10px;
 }
 .indicator-item {
-    background: #232a34;
-    padding: 10px;
-    border-radius: 8px;
-    text-align: center;
+   background-color: #222831; /* come header-stat-item */
+  border: 1px solid #222831; /* bordo uguale allo sfondo per effetto "flat" */
+  color: #fff; /* testo chiaro */
+  border-radius: 10px; /* arrotondamento come header-stat-item */
+  padding: 10px 20px; /* padding come header-stat-item */
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.7); /* stessa ombra */
+  margin-bottom: 10px; /* opzionale, se vuoi distanziare i bottoni */
+  box-sizing: border-box;
+  text-align: center;
+  min-width: 140px; /* opzionale, per uniformità */
 }
 .indicator-value {
     font-size: 1.2em;
@@ -304,7 +312,7 @@ h2 {
 	
 </div>
 
-            <h3 class="card-title"><br>🎯 Se5gnale Principale</h3>
+            <h3 class="card-title"><br>🎯 Se6gnale Principale</h3>
             <div id="mainSignal" class="signal-status signal-neutral">
                 <span>IN ATTESA</span>
                 <span id="signalStrength">0.0</span>
