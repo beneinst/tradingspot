@@ -1,10 +1,17 @@
 // ================= CONFIGURAZIONE MULTI-SIMBOLO =================
 import { processNewCandle, loadState, getStateInfo, resetState } from './logica.js';
 
+// Scegli un proxy CORS affidabile (cors.sh è stabile e offre una free API key: https://cors.sh)
+// Demo cors-anywhere: https://cors-anywhere.herokuapp.com/ (richiede opt-in manuale)
+// const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/'; // meno affidabile, solo per test
+const CORS_PROXY = 'https://api.cors.sh/'; // CORS.SH: richiede header 'x-cors-api-key'
+
+const CORS_API_KEY = 'temp_377b9736f23299227d1968c88d19f0e7'; // ottienila gratis su https://cors.sh
+
 const CONFIG = {
     symbols: [
-        'ATOMUSDC', 'BTCUSDT', 'ETHEUR', 'FETUSDC', 'SOLUSDC', 'BNBUSDC',
-        'ADAEUR', 'UNIUSDC', 'MANAEUR', 'LTCEUR', 'ALGOEUR', 'AVAXEUR',
+        'ATOMUSDC', 'BTCUSDT', 'ETHUSDT', 'FETUSDC', 'SOLUSDC', 'BNBUSDC',
+        'ADAEUR', 'UNIUSDC', 'MANAUSDT', 'LTCUSDT', 'ALGOUSDT', 'AVAXUSDT',
         'AVAXUSDC', 'DOTUSDC', 'NEARUSDC', 'SUIUSDC'
     ],
     interval: '4h',
@@ -20,67 +27,6 @@ let websocket = null;
 let reconnectAttempts = 0;
 let connectionStatus = 'DISCONNESSO';
 let isInitialized = false;
-
-window.changeSymbol = function() {
-    const select = document.getElementById('cryptoSelect');
-    const symbol = select.value.toUpperCase();
-    debugLog(`Simbolo selezionato: ${symbol}`);
-    initializeHistoricalDataForSymbol(symbol).then(() => {
-        updateDashboard(symbol, getLastCandle(symbol));
-    });
-};
-
-// Cambio simbolo
-function changeSymbol() {
-    const select = document.getElementById('cryptoSelect');
-    const newSymbol = select.value;
-    if (!newSymbol || newSymbol === currentSymbol) return;
-    
-    console.log(`Cambio simbolo da ${currentSymbol} a ${newSymbol}`);
-    currentSymbol = newSymbol;
-    
-    showLoadingMessage(true, `Caricamento dati storici 4H per ${newSymbol}...`);
-    
-    loadHistoricalData(currentSymbol).then(() => {
-        connectBinance(currentSymbol);
-        showLoadingMessage(false);
-    }).catch(error => {
-        console.error('Errore cambio simbolo:', error);
-        showLoadingMessage(false);
-        showError(`Errore nel cambio simbolo: ${error.message}`);
-    });
-}
-
-// Mostra messaggio di caricamento
-function showLoadingMessage(show, message = '') {
-    const loadingElem = document.getElementById('loadingMessage');
-    if (!loadingElem) return;
-    
-    if (show) {
-        loadingElem.textContent = message;
-        loadingElem.style.display = 'block';
-        loadingElem.style.color = '#ffe58f';
-    } else {
-        loadingElem.style.display = 'none';
-    }
-}
-
-// Mostra errore
-function showError(message) {
-    const loadingElem = document.getElementById('loadingMessage');
-    if (loadingElem) {
-        loadingElem.textContent = `❌ ${message}`;
-        loadingElem.style.display = 'block';
-        loadingElem.style.color = '#f44336';
-        
-        // Nascondi dopo 5 secondi
-        setTimeout(() => {
-            loadingElem.style.display = 'none';
-        }, 5000);
-    }
-}
-
-
 
 // ================= UTILITÀ DI DEBUG =================
 function debugLog(message, data = null) {
@@ -104,22 +50,24 @@ function debugError(message, error = null) {
 }
 
 // ================= GESTIONE DATI STORICI LOCALE =================
-function saveCandlesToLocal(symbol, candles) {
-    try {
-        localStorage.setItem(`candles_${symbol}`, JSON.stringify(candles));
-    } catch (e) {
-        debugError(`Errore salvataggio localStorage per ${symbol}`, e);
-    }
+function saveCandlesToLocal(symbol, candles, ttlMs = 60*24*60*60*1000) { // 60 giorni
+    const now = Date.now();
+    const item = {
+        value: candles,
+        expiry: now + ttlMs
+    };
+    localStorage.setItem(`candles_${symbol}`, JSON.stringify(item));
 }
 
 function loadCandlesFromLocal(symbol) {
-    try {
-        const data = localStorage.getItem(`candles_${symbol}`);
-        return data ? JSON.parse(data) : null;
-    } catch (e) {
-        debugError(`Errore caricamento localStorage per ${symbol}`, e);
+    const itemStr = localStorage.getItem(`candles_${symbol}`);
+    if (!itemStr) return null;
+    const item = JSON.parse(itemStr);
+    if (Date.now() > item.expiry) {
+        localStorage.removeItem(`candles_${symbol}`);
         return null;
     }
+    return item.value;
 }
 
 // ================= GESTIONE ERRORI =================
@@ -147,7 +95,11 @@ async function fetchHistoricalDataForSymbol(symbol, interval, limit) {
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
             debugLog(`Tentativo ${attempt}/${retries} - Recupero dati storici per ${symbol}`);
-            const response = await fetch(url, { timeout: 10000 });
+            // Se usi cors.sh DEVI aggiungere la tua API key nell'header
+            const fetchOptions = CORS_PROXY.includes('cors.sh')
+                ? { headers: { 'x-cors-api-key': CORS_API_KEY } }
+                : {};
+            const response = await fetch(CORS_PROXY + url, fetchOptions);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
