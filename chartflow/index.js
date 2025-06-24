@@ -200,7 +200,7 @@ async function fetchWithProxy(url, options = {}) {
 
 // ================ FETCH DATI STORICI DA COINGECKO ================
 function getCoinInfoByValue(value) {
-    return COINS.find(c => c.value === value);
+    return COINS.find(c => c.value === symbol.toLowerCase());
 }
 function buildCoinGeckoUrl(coin) {
     // CoinGecko: /coins/{id}/market_chart?vs_currency={vs_currency}&days=90&interval=4h
@@ -231,9 +231,9 @@ async function fetchHistoricalDataForSymbol(symbolValue) {
 
 // ================= INIZIALIZZAZIONE DATI STORICI PER SIMBOLO =================
 async function initializeHistoricalDataForSymbol(symbol) {
-    try {
+    symbol = symbol.toLowerCase(); // <--- uniforma subito
         debugLog(`[${symbol}] Inizializzazione...`);
-        let candles = loadFromStorage(`candles_${symbol}`);
+        let candles = loadFromStorage(`candles_${symbol.toLowerCase()}`);
         if (candles && candles.length >= 50) {
             debugLog(`[${symbol}] ${candles.length} candele caricate da storage`);
             for (const candle of candles) {
