@@ -23,6 +23,7 @@ function connectBinance(symbol) {
                 close: parseFloat(candlestick.c)
             };
             const calculations = processNewCandle(candle);
+			console.log("Calcoli ricevuti:", calculations);
 
             if (calculations) {
                 updateDashboard(calculations);

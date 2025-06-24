@@ -189,15 +189,20 @@ function addTick(open, high, low, close) {
 function processNewCandle(candle) {
     addTick(candle.open, candle.high, candle.low, candle.close);
     const result = calculateIndicators();
-    if (!result) return null;
 
-    return {
-        linreg: 0,    // placeholder da calcolare se serve
-        pearson: 0,   // placeholder da calcolare se serve
-        bb: result.bbPosition,
-        stoch: result.stochK,
-        score: result.bbPosition // esempio di score, da personalizzare
-    };
+    if (result) {
+        console.log("processNewCandle:", candle, result);
+
+        return {
+            linreg: 0.7,      // per test puoi mettere un valore fisso o calcolarlo
+            pearson: 0.8,     // per test puoi mettere un valore fisso o calcolarlo
+            bb: result.bbPosition,
+            stoch: result.stochK,
+            score: (result.bbPosition + result.stochK) / 2 // esempio di score medio
+        };
+    }
+
+    return null;
 }
 
 // ================= ESPORTAZIONE =================
