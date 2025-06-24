@@ -169,10 +169,9 @@ function calculateIndicators() {
 
 
 function calcStochRsi() {
-    if (state.prices.length < 20) { // esempio
-    console.log('Dati insufficienti per il calcolo degli indicatori.');
-    return null;
-}
+    if (state.prices.length < Math.max(config.stochRsiRsiLength, config.stochRsiLength + config.stochRsiD - 1)) {
+        return [50, 50];
+    }
 
     const rsiValues = [];
     for (let i = config.stochRsiRsiLength; i < state.prices.length; i++) {
@@ -180,19 +179,30 @@ function calcStochRsi() {
         rsiValues.push(rsi(subset, config.stochRsiRsiLength));
     }
 
-    if (rsiValues.length < config.stochRsiLength) {
+    if (rsiValues.length < config.stochRsiLength + config.stochRsiD - 1) {
         return [50, 50];
     }
 
-    const highestRsi = highest(rsiValues, config.stochRsiLength);
-    const lowestRsi = lowest(rsiValues, config.stochRsiLength);
+    const highestRsi = highest(rsiValues.slice(-config.stochRsiLength), config.stochRsiLength);
+    const lowestRsi = lowest(rsiValues.slice(-config.stochRsiLength), config.stochRsiLength);
     const currentRsi = rsiValues[rsiValues.length - 1];
 
-    const stochRsi = (highestRsi !== lowestRsi) ?
+    const stochRsiK = (highestRsi !== lowestRsi) ?
         100 * (currentRsi - lowestRsi) / (highestRsi - lowestRsi) : 50;
 
-    return [stochRsi, stochRsi];
+    // Calcolo semplice della media mobile semplice di K per D
+    const recentKs = [];
+    for (let i = rsiValues.length - config.stochRsiD; i < rsiValues.length; i++) {
+        const h = highest(rsiValues.slice(i - config.stochRsiLength + 1, i + 1), config.stochRsiLength);
+        const l = lowest(rsiValues.slice(i - config.stochRsiLength + 1, i + 1), config.stochRsiLength);
+        const val = (h !== l) ? 100 * (rsiValues[i] - l) / (h - l) : 50;
+        recentKs.push(val);
+    }
+    const stochRsiD = sma(recentKs, recentKs.length);
+
+    return [stochRsiK, stochRsiD];
 }
+
 
 // ================= AGGIUNTA DATI =================
 
