@@ -6,7 +6,7 @@ let currentSymbol = 'btcusdt';
 // Carica storico 4H
 async function loadHistoricalData(symbol) {
     try {
-        const url = `https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=4h&limit=100`;
+        const url = `https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=4h&limit=200`;
         const response = await fetch(url);
         const data = await response.json();
 
