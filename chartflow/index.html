@@ -280,39 +280,21 @@ h2 {
 
    
 
-    <div class="dashboard-container">
+   	
+	<div class="dashboard-container">
+    <!-- Segnale Principale -->
+    <div class="card">
+        <div class="crypto-select-box">
+            <label for="cryptoSelect"><h3 class="card-title">🎯 Seleziona Cripto</h3></label>
+            <select id="cryptoSelect" class="cryptoSelect" onchange="changeSymbol()"></select>
+        </div>
+    </div>
+</div>
 
-               <!-- Segnale Principale -->
-        <div class="card">
-	
-	<div class="crypto-select-box">
-    <label for="cryptoSelect"><h3 class="card-title">🎯 Seleziona Cripto</h3></label>
-    <select id="cryptoSelect" class="cryptoSelect" onchange="changeSymbol()">
-	<option value="atomusdt">ATOM/USDT</option>
-	<option value="btcusdt">BTC/USDT</option>
-	<option value="ethusdt">ETH/USDT</option>
-	<option value="fetusdc">FET/USDC</option>
-	<option value="solusdc">SOL/USDC</option>
-	<option value="bnbusdc">BNB/USDC</option>
-	<option value="adaeur">ADA/EUR</option>
-	<option value="uniusdc">UNI/USDC</option>
-	<option value="manausdt">MANA/USDT</option>
-	<option value="ltcusdt">LTC/USDT</option>
-	<option value="algousdt">ALGO/USDT</option>
-	<option value="avaxusdt">AVAX/USDT</option>
-	<option value="avaxusdc">AVAX/USDC</option>
-	<option value="dotusdc">DOT/USDC</option>
-	<option value="nearusdc">NEAR/USDC</option>
-	<option value="suiusdc">SUI/USDC</option>
-        
-     
-        
-        
-		</select>
 	
 </div>
 
-            <h3 class="card-title"><br>🎯 Se14gnale Principale</h3>
+            <h3 class="card-title"><br>🎯 Se16gnale Principale</h3>
             <div id="mainSignal" class="signal-status signal-neutral">
                 <span>IN ATTESA</span>
                 <span id="signalStrength">0.0</span>

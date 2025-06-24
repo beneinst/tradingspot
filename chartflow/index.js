@@ -1,31 +1,42 @@
 // ================= CONFIGURAZIONE MULTI-SIMBOLO =================
 import { processNewCandle, loadState, getStateInfo, resetState } from './logica.js';
 
-// CORS Proxies alternativi (testati in ordine di priorità)
-// Esempio per CoinGecko
-const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
 
-async function getCoinGeckoData(symbol) {
-    const url = `${COINGECKO_BASE}/coins/${symbol}/market_chart?vs_currency=usd&days=30`;
-    const response = await fetch(url);
-    return await response.json();
-}
+// =================== CONFIGURAZIONE ===================
+const COINS = [
+    { id: 'cosmos', label: 'ATOM/USDT', value: 'atomusdt', vs_currency: 'usd' },
+    { id: 'bitcoin', label: 'BTC/USDT', value: 'btcusdt', vs_currency: 'usd' },
+    { id: 'ethereum', label: 'ETH/USDT', value: 'ethusdt', vs_currency: 'usd' },
+    { id: 'fetch-ai', label: 'FET/USDC', value: 'fetusdc', vs_currency: 'usd' },
+    { id: 'solana', label: 'SOL/USDC', value: 'solusdc', vs_currency: 'usd' },
+    { id: 'binancecoin', label: 'BNB/USDC', value: 'bnbusdc', vs_currency: 'usd' },
+    { id: 'cardano', label: 'ADA/EUR', value: 'adaeur', vs_currency: 'eur' },
+    { id: 'uniswap', label: 'UNI/USDC', value: 'uniusdc', vs_currency: 'usd' },
+    { id: 'decentraland', label: 'MANA/USDT', value: 'manausdt', vs_currency: 'usd' },
+    { id: 'litecoin', label: 'LTC/USDT', value: 'ltcusdt', vs_currency: 'usd' },
+    { id: 'algorand', label: 'ALGO/USDT', value: 'algousdt', vs_currency: 'usd' },
+    { id: 'avalanche-2', label: 'AVAX/USDT', value: 'avaxusdt', vs_currency: 'usd' },
+    { id: 'avalanche-2', label: 'AVAX/USDC', value: 'avaxusdc', vs_currency: 'usd' },
+    { id: 'polkadot', label: 'DOT/USDC', value: 'dotusdc', vs_currency: 'usd' },
+    { id: 'near', label: 'NEAR/USDC', value: 'nearusdc', vs_currency: 'usd' },
+    { id: 'suicoin', label: 'SUI/USDC', value: 'suiusdc', vs_currency: 'usd' }
+];
 
 const CONFIG = {
-    symbols: [
-        'ATOMUSDT', 'BTCUSDT', 'ETHUSDT', 'FETUSDC', 'SOLUSDC', 'BNBUSDC',
-        'ADAEUR', 'UNIUSDC', 'MANAUSDT', 'LTCUSDT', 'ALGOUSDT', 'AVAXUSDT',
-        'AVAXUSDC', 'DOTUSDC', 'NEARUSDC', 'SUIUSDC'
-    ],
     interval: '4h',
-    wsUrl: 'wss://stream.binance.com:9443/stream?streams=',
-    apiUrl: 'https://api.binance.com/api/v3/klines',
     maxRetries: 3,
     retryDelay: 5000,
     historyLimit: 200,
     debugMode: true,
-    currentSymbol: 'atomusdc' // Default symbol
+    currentSymbol: COINS[0].value // default
 };
+
+// ================ CORS PROXIES ================
+const CORS_PROXIES = [
+    { url: 'https://api.allorigins.win/raw?url=', name: 'AllOrigins', headers: {} },
+    { url: 'https://corsproxy.io/?', name: 'CorsProxy.io', headers: {} },
+    { url: 'https://api.cors.sh/', name: 'CORS.SH', headers: { 'x-cors-api-key': 'temp_377b9736f23299227d1968c88d19f0e7' } }
+];
 
 let websocket = null;
 let reconnectAttempts = 0;
@@ -133,6 +144,21 @@ function updateLastUpdate() {
     }
 }
 
+// ================ POPOLAMENTO SELECT DINAMICO ================
+function populateCryptoSelect() {
+    const select = document.getElementById('cryptoSelect');
+    if (!select) return;
+    select.innerHTML = '';
+    COINS.forEach(coin => {
+        const option = document.createElement('option');
+        option.value = coin.value;
+        option.textContent = coin.label;
+        select.appendChild(option);
+    });
+    select.value = CONFIG.currentSymbol;
+}
+document.addEventListener('DOMContentLoaded', populateCryptoSelect);
+
 // ================= FETCH CON PROXY MULTIPLI =================
 async function fetchWithProxy(url, options = {}) {
     for (let i = 0; i < CORS_PROXIES.length; i++) {
@@ -170,36 +196,35 @@ async function fetchWithProxy(url, options = {}) {
     }
 }
 
-// ================= FETCH DATI STORICI =================
-async function fetchHistoricalDataForSymbol(symbol, interval, limit) {
-    const url = `${CONFIG.apiUrl}?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+// ================ FETCH DATI STORICI DA COINGECKO ================
+function getCoinInfoByValue(value) {
+    return COINS.find(c => c.value === value);
+}
+function buildCoinGeckoUrl(coin) {
+    // CoinGecko: /coins/{id}/market_chart?vs_currency={vs_currency}&days=90&interval=4h
+    return `https://api.coingecko.com/api/v3/coins/${coin.id}/market_chart?vs_currency=${coin.vs_currency}&days=90&interval=4h`;
+}
+async function fetchHistoricalDataForSymbol(symbolValue) {
+    const coin = getCoinInfoByValue(symbolValue);
+    if (!coin) throw new Error('Crypto non trovata');
+    const url = buildCoinGeckoUrl(coin);
     let retries = CONFIG.maxRetries;
-
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
-            debugLog(`[${symbol}] Tentativo ${attempt}/${retries} - Recupero dati storici`);
-            showLoadingMessage(`📊 Caricamento ${symbol}... (${attempt}/${retries})`);
-            
+            debugLog(`[${symbolValue}] Tentativo ${attempt}/${retries} - CoinGecko`);
+            showLoadingMessage(`📊 Caricamento ${coin.label}... (${attempt}/${retries})`);
             const data = await fetchWithProxy(url);
-            
-            if (!Array.isArray(data) || data.length === 0) {
-                throw new Error('Dati storici vuoti o formato non valido');
-            }
-            
-            debugLog(`✅ [${symbol}] Ricevute ${data.length} candele`);
-            return data;
-            
+            if (!data.prices || !Array.isArray(data.prices)) throw new Error('Formato dati non valido');
+            debugLog(`✅ [${symbolValue}] Ricevuti ${data.prices.length} punti`);
+            return data.prices;
         } catch (error) {
-            debugError(`[${symbol}] Tentativo ${attempt} fallito: ${error.message}`);
-            
-            if (attempt === retries) {
-                throw new Error(`Impossibile recuperare dati per ${symbol}: ${error.message}`);
-            }
-            
+            debugError(`[${symbolValue}] Tentativo ${attempt} fallito: ${error.message}`);
+            if (attempt === retries) throw new Error(`Impossibile recuperare dati per ${symbolValue}: ${error.message}`);
             await new Promise(resolve => setTimeout(resolve, CONFIG.retryDelay * attempt));
         }
     }
 }
+
 
 // ================= INIZIALIZZAZIONE DATI STORICI PER SIMBOLO =================
 async function initializeHistoricalDataForSymbol(symbol) {
