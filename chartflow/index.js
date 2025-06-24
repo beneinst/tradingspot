@@ -4,7 +4,7 @@ import { processNewCandle, loadState, getStateInfo, resetState } from './logica.
 
 // =================== CONFIGURAZIONE ===================
 const COINS = [
-    { id: 'cosmos', label: 'ATOM/USDT', value: 'atomusdt', vs_currency: 'usd' },
+    { id: 'cosmos', label: 'ATOM/USDC', value: 'atomusdc', vs_currency: 'usd' },
     { id: 'bitcoin', label: 'BTC/USDT', value: 'btcusdt', vs_currency: 'usd' },
     { id: 'ethereum', label: 'ETH/USDT', value: 'ethusdt', vs_currency: 'usd' },
     { id: 'fetch-ai', label: 'FET/USDC', value: 'fetusdc', vs_currency: 'usd' },
