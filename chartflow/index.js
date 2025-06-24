@@ -200,7 +200,9 @@ async function fetchWithProxy(url, options = {}) {
 
 // ================ FETCH DATI STORICI DA COINGECKO ================
 function getCoinInfoByValue(value) {
-    return COINS.find(c => c.value === symbol.toLowerCase());
+    return COINS.find(c => c.value === value.toLowerCase());
+}
+
 }
 function buildCoinGeckoUrl(coin) {
     // CoinGecko: /coins/{id}/market_chart?vs_currency={vs_currency}&days=90&interval=4h
@@ -265,34 +267,6 @@ async function initializeHistoricalDataForSymbol(symbol) {
 }
 
 
-// ================= PARSING CANDELE =================
-// =====function parseHistoricalCandle(rawCandle, index) {
- // =====   try {
-  // =====      if (!Array.isArray(rawCandle) || rawCandle.length < 6) {
-  // =====          return { candle: null, error: `Formato non valido (index: ${index})` };
-  // =====      }
-        
-  // =====      const [timestamp, open, high, low, close, volume] = rawCandle;
-  // =====      const candle = {
-   // =====         timestamp: parseInt(timestamp),
-  // =====          open: parseFloat(open),
-  // =====          high: parseFloat(high),
-  // =====          low: parseFloat(low),
-  // =====          close: parseFloat(close),
-  // =====          volume: parseFloat(volume)
-  // =====      };
-        
-        // Validazione
-  // =====      if (Object.values(candle).some(val => isNaN(val))) {
-  // =====          return { candle: null, error: 'Valori non numerici' };
-  // =====      }
-        
- // =====       return { candle, error: null };
- // =====   } catch (error) {
- // =====       return { candle: null, error: `Errore parsing: ${error.message}` };
- // =====   }
-// =====}
-
 // ================= AGGIORNAMENTO UI =================
 function updateDashboardUI() {
     try {
@@ -338,7 +312,7 @@ function updateDashboardUI() {
         
         debugLog('✅ UI aggiornata con successo');
         
-    } catch (error) {
+     } catch (error) {
         debugError('Errore aggiornamento UI:', error);
     }
 }
