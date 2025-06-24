@@ -21,15 +21,6 @@ let reconnectAttempts = 0;
 let connectionStatus = 'DISCONNESSO';
 let isInitialized = false;
 
-function changeSymbol(select) {
-    const symbol = select.value.toUpperCase();
-    debugLog(`Simbolo selezionato: ${symbol}`);
-    initializeHistoricalDataForSymbol(symbol).then(() => {
-        // Aggiorna la dashboard/grafico con i nuovi dati
-        updateDashboard(symbol, getLastCandle(symbol));
-    });
-}
-
 window.changeSymbol = function() {
     const select = document.getElementById('cryptoSelect');
     const symbol = select.value.toUpperCase();
@@ -38,6 +29,56 @@ window.changeSymbol = function() {
         updateDashboard(symbol, getLastCandle(symbol));
     });
 };
+
+// Cambio simbolo
+function changeSymbol() {
+    const select = document.getElementById('cryptoSelect');
+    const newSymbol = select.value;
+    if (!newSymbol || newSymbol === currentSymbol) return;
+    
+    console.log(`Cambio simbolo da ${currentSymbol} a ${newSymbol}`);
+    currentSymbol = newSymbol;
+    
+    showLoadingMessage(true, `Caricamento dati storici 4H per ${newSymbol}...`);
+    
+    loadHistoricalData(currentSymbol).then(() => {
+        connectBinance(currentSymbol);
+        showLoadingMessage(false);
+    }).catch(error => {
+        console.error('Errore cambio simbolo:', error);
+        showLoadingMessage(false);
+        showError(`Errore nel cambio simbolo: ${error.message}`);
+    });
+}
+
+// Mostra messaggio di caricamento
+function showLoadingMessage(show, message = '') {
+    const loadingElem = document.getElementById('loadingMessage');
+    if (!loadingElem) return;
+    
+    if (show) {
+        loadingElem.textContent = message;
+        loadingElem.style.display = 'block';
+        loadingElem.style.color = '#ffe58f';
+    } else {
+        loadingElem.style.display = 'none';
+    }
+}
+
+// Mostra errore
+function showError(message) {
+    const loadingElem = document.getElementById('loadingMessage');
+    if (loadingElem) {
+        loadingElem.textContent = `❌ ${message}`;
+        loadingElem.style.display = 'block';
+        loadingElem.style.color = '#f44336';
+        
+        // Nascondi dopo 5 secondi
+        setTimeout(() => {
+            loadingElem.style.display = 'none';
+        }, 5000);
+    }
+}
 
 
 
