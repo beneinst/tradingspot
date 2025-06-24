@@ -30,6 +30,16 @@ function changeSymbol(select) {
     });
 }
 
+window.changeSymbol = function() {
+    const select = document.getElementById('cryptoSelect');
+    const symbol = select.value.toUpperCase();
+    debugLog(`Simbolo selezionato: ${symbol}`);
+    initializeHistoricalDataForSymbol(symbol).then(() => {
+        updateDashboard(symbol, getLastCandle(symbol));
+    });
+};
+
+
 
 // ================= UTILITÀ DI DEBUG =================
 function debugLog(message, data = null) {
