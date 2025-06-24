@@ -107,31 +107,54 @@ function lowest(values, period) {
 // ================= CALCOLI =================
 
 function calculateIndicators() {
-    if (state.prices.length < config.lengthInput) return null;
+    // Controllo dati sufficienti
+    if (state.prices.length < Math.max(config.lengthInput, config.bbLength, config.emaLength, config.smaLength, config.momentumLength + 1)) {
+        console.log('Dati insufficienti per il calcolo degli indicatori.');
+        return null;
+    }
 
     const currentPrice = state.prices[state.prices.length - 1];
 
+    // Bollinger Bands
     const bbBasis = sma(state.prices, config.bbLength);
     const bbDev = config.bbMult * stdev(state.prices, config.bbLength);
     const bbUpper = bbBasis + bbDev;
     const bbLower = bbBasis - bbDev;
-    const bbPosition = (currentPrice - bbLower) / (bbUpper - bbLower) * 2 - 1;
+    const bbPosition = ((currentPrice - bbLower) / (bbUpper - bbLower)) * 2 - 1;
 
+    // Trend con EMA e SMA
     const emaValue = ema(state.prices, config.emaLength);
     const smaValue = sma(state.prices, config.smaLength);
     const trendBullish = emaValue > smaValue && currentPrice > emaValue;
     const trendBearish = emaValue < smaValue && currentPrice < emaValue;
 
-    let momentumBullish = false, momentumBearish = false;
+    // Momentum
+    let momentumBullish = false;
+    let momentumBearish = false;
+
     if (state.prices.length >= config.momentumLength + 1) {
         const momentum = currentPrice - state.prices[state.prices.length - config.momentumLength - 1];
         momentumBullish = momentum > 0;
         momentumBearish = momentum < 0;
     }
 
+    // Stochastic RSI
     const stochData = calcStochRsi();
-    const stochK = stochData[0];
-    const stochD = stochData[1];
+    const stochK = stochData ? stochData[0] : 0;
+    const stochD = stochData ? stochData[1] : 0;
+
+    // Log per controllo
+    console.log('Calcoli indicatori:', {
+        bbPosition,
+        emaValue,
+        smaValue,
+        trendBullish,
+        trendBearish,
+        momentumBullish,
+        momentumBearish,
+        stochK,
+        stochD
+    });
 
     return {
         bbPosition,
@@ -140,9 +163,10 @@ function calculateIndicators() {
         momentumBullish,
         momentumBearish,
         stochK,
-        stochD,
+        stochD
     };
 }
+
 
 function calcStochRsi() {
     if (state.prices.length < Math.max(config.stochRsiRsiLength, config.stochRsiLength)) {
