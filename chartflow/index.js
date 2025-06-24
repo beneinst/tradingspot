@@ -2,23 +2,14 @@
 import { processNewCandle, loadState, getStateInfo, resetState } from './logica.js';
 
 // CORS Proxies alternativi (testati in ordine di priorità)
-const CORS_PROXIES = [
-    { 
-        url: 'https://api.allorigins.win/raw?url=', 
-        name: 'AllOrigins',
-        headers: {} 
-    },
-    { 
-        url: 'https://corsproxy.io/?', 
-        name: 'CorsProxy.io',
-        headers: {} 
-    },
-    { 
-        url: 'https://api.cors.sh/', 
-        name: 'CORS.SH',
-        headers: { 'x-cors-api-key': 'temp_377b9736f23299227d1968c88d19f0e7' }
-    }
-];
+// Esempio per CoinGecko
+const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
+
+async function getCoinGeckoData(symbol) {
+    const url = `${COINGECKO_BASE}/coins/${symbol}/market_chart?vs_currency=usd&days=30`;
+    const response = await fetch(url);
+    return await response.json();
+}
 
 const CONFIG = {
     symbols: [
