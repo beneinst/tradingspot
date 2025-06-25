@@ -35,6 +35,27 @@ let connectionStatus = 'DISCONNESSO';
 let isInitialized = false;
 let autoRefreshInterval = null;
 
+
+   // Variabili globali
+        let currentSymbol = '';
+        let autoRefreshInterval = null;
+        let isAutoRefreshActive = false;
+        let downloadedData = null;
+
+        // Funzioni di debug
+        function debugLog(message) {
+            console.log(`[DEBUG] ${message}`);
+            const debugDiv = document.getElementById('debugInfo');
+            if (debugDiv) {
+                debugDiv.style.display = 'block';
+                debugDiv.innerHTML += `<div>${new Date().toTimeString().split(' ')[0]} - ${message}</div>`;
+                // Scroll automatico all'ultimo messaggio
+                debugDiv.scrollTop = debugDiv.scrollHeight;
+            }
+        }
+
+     
+
 // ================= UTILITÀ DI DEBUG =================
 function debugLog(message, data = null) {
     if (CONFIG.debugMode) {

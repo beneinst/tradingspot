@@ -541,7 +541,7 @@
 
         <!-- Controlli -->
         <div class="card">
-            <h3 class="card-title">🎮 Contr7olli</h3>
+            <h3 class="card-title">🎮 Contr8olli</h3>
             <button class="refresh-btn" onclick="window.open('index-grafici.html', '_blank')">
                 📈 Grafico
             </button>
@@ -563,41 +563,10 @@
         </div>
     </div>
 
-    <script>
-        // Variabili globali
-        let currentSymbol = '';
-        let autoRefreshInterval = null;
-        let isAutoRefreshActive = false;
-        let downloadedData = null;
-
-        // Funzioni di debug
-        function debugLog(message) {
-            console.log(`[DEBUG] ${message}`);
-            const debugDiv = document.getElementById('debugInfo');
-            if (debugDiv) {
-                debugDiv.style.display = 'block';
-                debugDiv.innerHTML += `<div>${new Date().toTimeString().split(' ')[0]} - ${message}</div>`;
-                // Scroll automatico all'ultimo messaggio
-                debugDiv.scrollTop = debugDiv.scrollHeight;
-            }
-        }
-
+ </body>
+ </html>
      
       
 
-        // Cambia simbolo selezionato
-        function changeSymbol() {
-            const select = document.getElementById('cryptoSelect');
-            currentSymbol = select.value;
-            debugLog(`Simbolo cambiato a: ${currentSymbol}`);
-            
-            if (currentSymbol) {
-                showStatusMessage(`Simbolo selezionato: ${currentSymbol}`, 'success');
-                // Reset dei dati precedenti
-                downloadedData = null;
-            } else {
-                showStatusMessage('Nessun simbolo selezionato', 'error');
-            }
-        }
-
+      
        
