@@ -110,34 +110,6 @@ function populateCryptoSelect() {
     select.value = CONFIG.currentSymbol;
 }
 
-// ================= GESTIONeE DATI (SOLO UPLOAD JSON) =================
-
-// Funzione per gestire l'upload del file JSON
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    showLoadingMessage(`Caricamento file ${file.name} in corso...`);
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            // Qui puoi processare i dati caricati, ad esempio:
-            data.forEach(candle => {
-                processNewCandle(candle, CONFIG.currentSymbol);
-            });
-            updateDashboardUI();
-            showLoadingMessage(`✅ File ${file.name} caricato con successo`);
-        } catch (error) {
-            debugError(`Errore caricamento file: ${error.message}`);
-            showLoadingMessage(`❌ Errore caricamento file`, 'error');
-        }
-    };
-    reader.onerror = function(error) {
-        debugError(`Errore lettura file: ${error.target.error}`);
-        showLoadingMessage(`❌ Errore lettura file`, 'error');
-    };
-    reader.readAsText(file);
-}
 
 // ================= CAMBIO SIMBOLO =================
 async function changeSymbol() {
