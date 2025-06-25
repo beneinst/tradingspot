@@ -109,6 +109,7 @@ function populateCryptoSelect() {
     const select = document.getElementById('cryptoSelect');
     if (!select) return;
     select.innerHTML = '<option value="" disabled selected>Seleziona una criptovaluta...</option>';
+    console.log('COINS:', COINS); // DEBUG
     COINS.forEach(coin => {
         const option = document.createElement('option');
         option.value = coin.value;
