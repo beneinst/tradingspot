@@ -370,7 +370,7 @@ debugLog(`Processate ${candles.length} candele valide`);
 return candles;
 
 
-// ================= GESTIONE EVENTI =================
+// ================= GESTIONE EVENgTI =================
 document.addEventListener('DOMContentLoaded', populateCryptoSelect);
 const cryptoSelect = document.getElementById('cryptoSelect');
 if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);
