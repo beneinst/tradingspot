@@ -16,8 +16,6 @@ let isInitialized = false;
 
 
    // Variabili globali
-        let currentSymbol = '';
-       
         let isAutoRefreshActive = false;
         let downloadedData = null;
 
@@ -132,79 +130,81 @@ showLoadingMessage('Seleziona una criptovaluta e carica un file JSON per iniziar
 
 
  // Scarica dati da Binance API
-        async function downloadBinanceData() {
-            if (!currentSymbol) {
-                showStatusMessage('Seleziona prima una criptovaluta!', 'error');
-                return;
-            }
+async function downloadBinanceData() {
+    if (!CONFIG.currentSymbol) {
+        showStatusMessage('Seleziona prima una criptovaluta!', 'error');
+        return;
+    }
 
-            const downloadBtn = document.getElementById('downloadBtn');
-            downloadBtn.disabled = true;
-            downloadBtn.textContent = '⏳ Scaricando...';
-            
-            showLoadingMessage('Scaricando dati da Binance...');
-            debugLog(`Iniziando download per ${currentSymbol}`);
-            
-            try {
-                // API Binance per dati storici (500 candele 4h)
-                const url = `https://api.binance.com/api/v3/klines?symbol=${currentSymbol}&interval=4h&limit=500`;
-                debugLog(`URL API: ${url}`);
-                
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`Errore HTTP: ${response.status} - ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                debugLog(`Ricevuti ${data.length} record da Binance`);
-                
-                if (!data || data.length === 0) {
-                    throw new Error('Nessun dato ricevuto da Binance');
-                }
+    const downloadBtn = document.getElementById('downloadBtn');
+    downloadBtn.disabled = true;
+    downloadBtn.textContent = '⏳ Scaricando...';
 
-                // Converti i dati nel formato standard
-                downloadedData = data.map((k, index) => ({
-                    timestamp: k[0],
-                    open: parseFloat(k[1]),
-                    high: parseFloat(k[2]),
-                    low: parseFloat(k[3]),
-                    close: parseFloat(k[4]),
-                    volume: parseFloat(k[5]),
-                    closed: true
-                }));
+    showLoadingMessage('Scaricando dati da Binance...');
+    debugLog(`Iniziando download per ${CONFIG.currentSymbol}`);
 
-                debugLog(`Convertite ${downloadedData.length} candele`);
-                debugLog(`Prima candela: ${JSON.stringify(downloadedData[0])}`);
-                debugLog(`Ultima candela: ${JSON.stringify(downloadedData[downloadedData.length - 1])}`);
+    try {
+        // API Binance per dati storici (500 candele 4h)
+        const url = `https://api.binance.com/api/v3/klines?symbol=${CONFIG.currentSymbol}&interval=4h&limit=500`;
+        debugLog(`URL API: ${url}`);
 
-                hideLoadingMessage();
-                showStatusMessage(
-                    `✅ Dati scaricati con successo! ${downloadedData.length} candele 4h per ${currentSymbol}`, 
-                    'success'
-                );
+        const response = await fetch(url);
 
-                // Prova a passare i dati a logica.js se disponibile
-                if (typeof processNewCandle === 'function') {
-                    debugLog('logica.js trovato, processando dati...');
-                    processDownloadedData();
-                } else {
-                    debugLog('logica.js non trovato - dati pronti per il caricamento manuale');
-                    showStatusMessage('Dati pronti! logica.js non caricato automaticamente.', 'warning');
-                }
-                
-            } catch (error) {
-                debugLog(`Errore download: ${error.message}`);
-                hideLoadingMessage();
-                showStatusMessage(`❌ Errore nel download: ${error.message}`, 'error');
-            } finally {
-                downloadBtn.disabled = false;
-                downloadBtn.textContent = '📥 Scarica Dati';
-            }
+        if (!response.ok) {
+            throw new Error(`Errore HTTP: ${response.status} - ${response.statusText}`);
         }
-		
-		const downloadBtn = document.getElementById('downloadBtn');
+
+        const data = await response.json();
+        debugLog(`Ricevuti ${data.length} record da Binance`);
+
+        if (!data || data.length === 0) {
+            throw new Error('Nessun dato ricevuto da Binance');
+        }
+
+        // Converti i dati nel formato standard
+        downloadedData = data.map((k, index) => ({
+            timestamp: k[0],
+            open: parseFloat(k[1]),
+            high: parseFloat(k[2]),
+            low: parseFloat(k[3]),
+            close: parseFloat(k[4]),
+            volume: parseFloat(k[5]),
+            closed: true
+        }));
+
+        debugLog(`Convertite ${downloadedData.length} candele`);
+        debugLog(`Prima candela: ${JSON.stringify(downloadedData[0])}`);
+        debugLog(`Ultima candela: ${JSON.stringify(downloadedData[downloadedData.length - 1])}`);
+
+        hideLoadingMessage();
+        showStatusMessage(
+            `✅ Dati scaricati con successo! ${downloadedData.length} candele 4h per ${CONFIG.currentSymbol}`,
+            'success'
+        );
+
+        // Prova a passare i dati a logica.js se disponibile
+        if (typeof processNewCandle === 'function') {
+            debugLog('logica.js trovato, processando dati...');
+            processDownloadedData();
+        } else {
+            debugLog('logica.js non trovato - dati pronti per il caricamento manuale');
+            showStatusMessage('Dati pronti! logica.js non caricato automaticamente.', 'warning');
+        }
+
+    } catch (error) {
+        debugLog(`Errore download: ${error.message}`);
+        hideLoadingMessage();
+        showStatusMessage(`❌ Errore nel download: ${error.message}`, 'error');
+    } finally {
+        downloadBtn.disabled = false;
+        downloadBtn.textContent = '📥 Scarica Dati';
+    }
+}
+
+// Associa l'evento al bottone (una sola volta)
+const downloadBtn = document.getElementById('downloadBtn');
 if (downloadBtn) downloadBtn.addEventListener('click', downloadBinanceData);
+
 
 
         // Processa i dati scaricati con logica.js
@@ -376,7 +376,5 @@ const cryptoSelect = document.getElementById('cryptoSelect');
 if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);
 const uploadBtn = document.getElementById('uploadBtn');
 const fileInput = document.getElementById('fileInput');
-
-if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);
 if (uploadBtn) uploadBtn.addEventListener('click', () => fileInput.click());
 if (fileInput) fileInput.addEventListener('change', handleFileUpload);
