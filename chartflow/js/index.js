@@ -1,5 +1,5 @@
 // ================= CONFIGURAZIONE MULTI-SIMBOLO =================
-import { processNewCandle, loadState, getStateInfo, resetState } from './js/logica.js';
+import { processNewCandle, loadState, getStateInfo, resetState } from './logica.js';
 
 // Configurazione con valori in UPPERCASE (richiesto da Binance API)
 const COINS = [
