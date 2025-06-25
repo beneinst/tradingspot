@@ -399,14 +399,10 @@
                 </select>
 
                 <div class="btn-group">
-                    <button class="action-btn download" onclick="downloadBinanceData()" id="downloadBtn">
-                        📥 Scarica Dati
-                    </button>
-                    <button class="action-btn" onclick="triggerFileUpload()">
-                        📂 Carica File
-                    </button>
-                </div>
-                <input type="file" id="fileInput" class="file-input" accept=".json" onchange="handleFileUpload(event)">
+    <button id="downloadBtn" class="action-btn download">📥 Scarica Dati</button>
+    <button id="uploadBtn" class="action-btn">📂 Carica File</button>
+</div>
+               <input type="file" id="fileInput" class="file-input" accept=".json">
                 <div id="statusMessage" style="margin-top: 10px;"></div>
                 <div id="debugInfo" class="debug-info" style="display: none;"></div>
             </div>
@@ -559,6 +555,8 @@
                 Ultimo aggiornamento: <span id="lastUpdate">--</span>
             </div>
             <div id="loadingMessage" class="loading-message" style="display:none;"></div>
+			<div id="status" class="status-message"></div>
+
         </div>
     </div>
 

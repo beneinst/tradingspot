@@ -443,3 +443,90 @@ window.tradingApp = {
     disableDebug: () => { CONFIG.debugMode = false; }
 };
 
+import { initializeHistoricalDataForSymbol, updateDashboardUI } from './logica.js';
+import { debugLog, debugError, showLoadingMessage } from './utils.js'; // Se hai utils.js
+
+const cryptoSelect = document.getElementById('cryptoSelect');
+const downloadBtn = document.getElementById('downloadBtn');
+const uploadBtn = document.getElementById('uploadBtn');
+const fileInput = document.getElementById('fileInput');
+
+export let websocket = null; // Se usi websocket
+
+export const CONFIG = {
+    currentSymbol: ''
+};
+
+// Funzione per cambiare simbolo
+export async function changeSymbol() {
+    const selectEl = document.getElementById('cryptoSelect');
+    if (!selectEl) return;
+    const newSymbol = selectEl.value;
+    if (newSymbol === CONFIG.currentSymbol) return;
+    debugLog(`Cambio simbolo: ${CONFIG.currentSymbol} -> ${newSymbol}`);
+    CONFIG.currentSymbol = newSymbol;
+    if (websocket) websocket.close();
+    showLoadingMessage(`📊 Caricamento ${newSymbol.toUpperCase()}...`);
+    try {
+        const result = await initializeHistoricalDataForSymbol(newSymbol);
+        if (result.success) {
+            updateDashboardUI();
+            showLoadingMessage(`✅ ${newSymbol.toUpperCase()} caricato`);
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        debugError(`Errore cambio simbolo: ${error.message}`);
+        showLoadingMessage(`❌ Errore caricamento ${newSymbol}`, 'error');
+    }
+}
+
+// Funzione per scaricare dati (ad esempio da Binance)
+export async function downloadBinanceData() {
+    if (!CONFIG.currentSymbol) {
+        showLoadingMessage('Seleziona una criptovaluta!', 'error');
+        return;
+    }
+    showLoadingMessage(`Scaricando dati per ${CONFIG.currentSymbol}...`);
+    // ... logica di download qui ...
+}
+
+// Funzione per triggerare il file upload
+export function triggerFileUpload() {
+    fileInput.click();
+}
+
+// Funzione per gestire il file upload
+export function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    showLoadingMessage(`Caricando file ${file.name}...`);
+    // ... logica di caricamento qui ...
+}
+
+// Aggiungi event listener
+cryptoSelect.addEventListener('change', changeSymbol);
+downloadBtn.addEventListener('click', downloadBinanceData);
+uploadBtn.addEventListener('click', triggerFileUpload);
+fileInput.addEventListener('change', handleFileUpload);
+
+
+function debugLog(message) {
+    console.log(message);
+}
+
+function debugError(message) {
+    console.error(message);
+}
+
+function showLoadingMessage(message, type = 'info') {
+    // Esempio: mostra un messaggio in un div con id="status"
+    const statusEl = document.getElementById('status');
+    if (!statusEl) return;
+    statusEl.textContent = message;
+    if (type === 'error') {
+        statusEl.style.color = 'red';
+    } else {
+        statusEl.style.color = '';
+    }
+}
