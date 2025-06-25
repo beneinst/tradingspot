@@ -1,7 +1,6 @@
-// ================= CONFIGURAZIONE MULTI-SIMBOLO =================
+// =================== CONFIGURAZIONE MULTI-SIMBOLO ===================
 import { processNewCandle, loadState, getStateInfo, resetState } from './logica.js';
 
-// Configurazione con valori in UPPERCASE (richiesto da Binance API)
 const COINS = [
     { id: 'bitcoin', label: 'BTC/USDT', value: 'BTCUSDT', vs_currency: 'usd' },
     { id: 'cosmos', label: 'ATOM/USDT', value: 'ATOMUSDT', vs_currency: 'usd' },
@@ -21,9 +20,8 @@ const COINS = [
     { id: 'suicoin', label: 'SUI/USDC', value: 'SUIUSDC', vs_currency: 'usd' }
 ];
 
-// Configurazione globale
 const CONFIG = {
-    currentSymbol: 'BTCUSDT', // Valore di default in UPPERCASE
+    currentSymbol: 'BTCUSDT',
     interval: '4h',
     maxRetries: 3,
     retryDelay: 5000,
@@ -31,15 +29,9 @@ const CONFIG = {
     debugMode: true
 };
 
-let websocket = null;
-let reconnectAttempts = 0;
-let connectionStatus = 'DISCONNESSO';
-let isInitialized = false;
-
-let isAutoRefreshActive = false;
 let downloadedData = null;
 
-// ================= FUNZIONI DI DEBUG =================
+// =================== DEBUG & UI HELPERS ===================
 function debugLog(message, data = null) {
     const timestamp = new Date().toISOString();
     if (data) {
@@ -66,7 +58,6 @@ function debugError(message, error = null) {
     showLoadingMessage(`❌ ${message}`, 'error');
 }
 
-// ================= UI HELPERS =================
 function showStatusMessage(message, type = 'info') {
     const statusDiv = document.getElementById('statusMessage');
     if (statusDiv) {
@@ -89,7 +80,7 @@ function hideLoadingMessage() {
     if (loadingDiv) loadingDiv.style.display = 'none';
 }
 
-// ================= POPOLAMENTO SELECT =================
+// =================== POPOLAMENTO SELECT ===================
 function populateCryptoSelect() {
     const select = document.getElementById('cryptoSelect');
     if (!select) return;
@@ -103,20 +94,18 @@ function populateCryptoSelect() {
     select.value = CONFIG.currentSymbol;
 }
 
-// ================= CAMBIO SIMBOLO =================
-async function changeSymbol() {
+// =================== CAMBIO SIMBOLO ===================
+function changeSymbol() {
     const selectEl = document.getElementById('cryptoSelect');
     if (!selectEl) return;
     const newSymbol = selectEl.value;
     if (newSymbol === CONFIG.currentSymbol) return;
     debugLog(`Cambio simbolo: ${CONFIG.currentSymbol} -> ${newSymbol}`);
     CONFIG.currentSymbol = newSymbol;
-    if (websocket) websocket.close();
     showLoadingMessage(`📊 Selezionato ${newSymbol.toUpperCase()} (carica un file JSON per i dati)`);
-    // Non carica automaticamente dati, aspetta l'upload JSON
 }
 
-// ================= SCARICA DATI BINANCE =================
+// =================== SCARICA DATI BINANCE ===================
 async function downloadBinanceData() {
     if (!CONFIG.currentSymbol) {
         showStatusMessage('Seleziona prima una criptovaluta!', 'error');
@@ -166,6 +155,7 @@ async function downloadBinanceData() {
             debugLog('logica.js non trovato - dati pronti per il caricamento manuale');
             showStatusMessage('Dati pronti! logica.js non caricato automaticamente.', 'warning');
         }
+
     } catch (error) {
         debugLog(`Errore download: ${error.message}`);
         hideLoadingMessage();
@@ -176,7 +166,7 @@ async function downloadBinanceData() {
     }
 }
 
-// ================= PROCESSA DATI SCARICATI =================
+// =================== PROCESSA DATI SCARICATI ===================
 function processDownloadedData() {
     if (!downloadedData || downloadedData.length === 0) {
         debugLog('Nessun dato da processare');
@@ -200,7 +190,7 @@ function processDownloadedData() {
     }
 }
 
-// ================= HANDLE FILE UPLOAD =================
+// =================== HANDLE FILE UPLOAD ===================
 function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) {
@@ -332,7 +322,7 @@ function handleFileUpload(event) {
     reader.readAsText(file);
 }
 
-// ================= INIZIALIZZAZIONE =================
+// =================== INIZIALIZZAZIONE ===================
 function initApp() {
     populateCryptoSelect();
 
@@ -351,7 +341,6 @@ function initApp() {
     showLoadingMessage('Seleziona una criptovaluta e carica un file JSON per iniziare');
 }
 
-// Esegui initApp appena possibile
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initApp);
 } else {
