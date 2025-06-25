@@ -1,5 +1,5 @@
 // =================== CONFIGURAZIONE MULTI-SIMBOLO ===================
-import { processNewCandle, loadState, getStateInfo, resetState } from './logica.js';
+import { processNewCandle, loadState, getStateInfo, resetState , getLastIndicators } from './logica.js';
 
 const COINS = [
     { id: 'bitcoin', label: 'BTC/USDT', value: 'BTCUSDT', vs_currency: 'usd' },
