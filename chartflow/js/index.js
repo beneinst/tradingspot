@@ -43,6 +43,33 @@ function hideLoadingMessage() {
     const loadingDiv = document.getElementById('loadingMessage');
     if (loadingDiv) loadingDiv.style.display = 'none';
 }
+function showStatusMessage(message, type = 'info') {
+    // Cerca o crea un div per il messaggio di stato
+    let statusDiv = document.getElementById('statusMessage');
+    if (!statusDiv) {
+        statusDiv = document.createElement('div');
+        statusDiv.id = 'statusMessage';
+        statusDiv.style.position = 'fixed';
+        statusDiv.style.bottom = '20px';
+        statusDiv.style.left = '50%';
+        statusDiv.style.transform = 'translateX(-50%)';
+        statusDiv.style.background = type === 'error' ? '#ff4d4d' : type === 'success' ? '#26ff8a' : '#232a34';
+        statusDiv.style.color = type === 'error' ? '#fff' : type === 'success' ? '#222831' : '#ffc200';
+        statusDiv.style.padding = '12px 28px';
+        statusDiv.style.borderRadius = '8px';
+        statusDiv.style.boxShadow = '0 2px 10px rgba(0,0,0,0.18)';
+        statusDiv.style.zIndex = '9999';
+        document.body.appendChild(statusDiv);
+    }
+    statusDiv.textContent = message || '';
+    statusDiv.style.display = 'block';
+
+    // Nasconde il messaggio dopo 4 secondi
+    clearTimeout(statusDiv._timeout);
+    statusDiv._timeout = setTimeout(() => {
+        statusDiv.style.display = 'none';
+    }, 4000);
+}
 
 // ... (come prima, debugLog, debugError, showStatusMessage, showLoadingMessage, hideLoadingMessage) ...
 function debugLog(message, data = null) {
