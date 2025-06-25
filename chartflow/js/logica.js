@@ -1,4 +1,4 @@
-// logica.js - Strategia Multi-Confluenza pulita e aggiornata
+// logica.js - Strategia Multi-Confluenza aggiornata
 
 // ================= CONFIGURAZIONI =================
 const config = {
@@ -185,14 +185,6 @@ function calculateIndicators() {
     const emaValue = ema(state.prices, config.emaLength);
     const smaValue = sma(state.prices, config.smaLength);
 
-    let momentumBullish = false;
-    let momentumBearish = false;
-    if (state.prices.length >= config.momentumLength + 1) {
-        const momentum = currentPrice - state.prices[state.prices.length - config.momentumLength - 1];
-        momentumBullish = momentum > 0;
-        momentumBearish = momentum < 0;
-    }
-
     const stochData = calcStochRsiSimplified();
     const stochK = stochData.k;
     const stochD = stochData.d;
@@ -204,8 +196,6 @@ function calculateIndicators() {
         bbUpper: Number(bbUpper.toFixed(2)),
         bbLower: Number(bbLower.toFixed(2)),
         bbBasis: Number(bbBasis.toFixed(2)),
-        momentumBullish,
-        momentumBearish,
         stochK: Number(stochK.toFixed(2)),
         stochD: Number(stochD.toFixed(2)),
         rsi: Number(rsiValue.toFixed(2)),
@@ -213,6 +203,45 @@ function calculateIndicators() {
         sma: Number(smaValue.toFixed(2)),
         currentPrice: Number(currentPrice.toFixed(2))
     };
+}
+
+// Calcolo LinReg reale (slope)
+function calculateLinReg() {
+    const prices = state.prices.slice(-config.lengthInput);
+    if (prices.length < 2) return 0;
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+    for (let i = 0; i < prices.length; i++) {
+        sumX += i;
+        sumY += prices[i];
+        sumXY += i * prices[i];
+        sumX2 += i * i;
+    }
+    const n = prices.length;
+    const denominator = n * sumX2 - sumX * sumX;
+    if (denominator === 0) return 0;
+    const slope = (n * sumXY - sumX * sumY) / denominator;
+    return slope;
+}
+
+// Calcolo Pearson reale
+function calculatePearson() {
+    const prices = state.prices.slice(-config.lengthInput);
+    if (prices.length < 2) return 0;
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+    for (let i = 0; i < prices.length; i++) {
+        sumX += i;
+        sumY += prices[i];
+        sumXY += i * prices[i];
+        sumX2 += i * i;
+        sumY2 += prices[i] * prices[i];
+    }
+    const n = prices.length;
+    const numerator = n * sumXY - sumX * sumY;
+    const denominator = Math.sqrt(
+        (n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY)
+    );
+    if (denominator === 0) return 0;
+    return numerator / denominator;
 }
 
 // StochRSI semplificato
@@ -280,20 +309,20 @@ function processNewCandle(candle, symbol = 'btcusdt') {
     if (!addTick(open, high, low, close, timestamp, symbol)) return null;
     const indicators = calculateIndicators();
     if (indicators) {
-        // Simulazione linreg e pearson (da sostituire con calcoli reali)
-        const linregFake = (Math.random() * 2 - 1);
-        const pearsonFake = (Math.random() * 2 - 1);
+        const linreg = calculateLinReg();
+        const pearson = calculatePearson();
+        const score = (indicators.bbPosition + indicators.stochK/100 + linreg + pearson) / 4;
         const result = {
             timestamp: timestamp || Date.now(),
-            linreg: Number(linregFake.toFixed(4)),
-            pearson: Number(pearsonFake.toFixed(4)),
+            linreg: Number(linreg.toFixed(4)),
+            pearson: Number(pearson.toFixed(4)),
             bb: indicators.bbPosition,
             stochK: indicators.stochK,
             stochD: indicators.stochD,
             rsi: indicators.rsi,
             ema: indicators.ema,
             sma: indicators.sma,
-            score: Number(((indicators.bbPosition + indicators.stochK/100 + linregFake + pearsonFake) / 4).toFixed(4)),
+            score: Number(score.toFixed(4)),
             candles: state.prices.length,
             isStale: isDataStale()
         };
@@ -312,8 +341,6 @@ function processNewCandle(candle, symbol = 'btcusdt') {
 function getLastIndicators() {
     return lastIndicators;
 }
-
-console.log('DEBUG getLastIndicators', getLastIndicators());
 
 // ================= INFO E VALIDAZIONE =================
 function getStateInfo(symbol = 'btcusdt') {

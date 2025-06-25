@@ -1,5 +1,5 @@
 // =================== CONFIGURAZIONE MULTI-SIMBOLO ===================
-import { processNewCandle, loadState, getStateInfo, resetState , getLastIndicators } from './logica.js';
+import { processNewCandle, loadState, getStateInfo, resetState, getLastIndicators } from './logica.js';
 
 const COINS = [
     { id: 'bitcoin', label: 'BTC/USDT', value: 'BTCUSDT', vs_currency: 'usd' },
@@ -94,6 +94,34 @@ function populateCryptoSelect() {
     select.value = CONFIG.currentSymbol;
 }
 
+// =================== AGGIORNA LA DASHBOARD ===================
+function refreshData() {
+    const info = getLastIndicators();
+    debugLog('refreshData - getLastIndicators:', info);
+
+    // Aggiorna solo se info è valido e non errore
+    if (!info || info.error) return;
+
+    // Segnale principale
+    document.getElementById('confluenceScore').textContent = info.score ?? '0.0';
+
+    // Indicatori principali
+    document.getElementById('linregValue').textContent = info.linreg?.toFixed(4) ?? '0.00';
+    document.getElementById('pearsonValue').textContent = info.pearson?.toFixed(4) ?? '0.00';
+    document.getElementById('bbValue').textContent = info.bb?.toFixed(4) ?? '0.00';
+    document.getElementById('stochValue').textContent = info.stochK?.toFixed(2) ?? '0.00';
+
+    // Timer e altri dati (esempi, da adattare se hai logica specifica)
+    // document.getElementById('timerStatus').textContent = info.timerStatus ?? 'NESSUN OK';
+    // document.getElementById('timerProgress').textContent = info.timerProgress ?? '0/12';
+
+    // Indicatori secondari (se li aggiungi in logica.js)
+    // document.getElementById('macdStatus').textContent = info.macdStatus ?? 'NEUTRO';
+    // document.getElementById('momentumStatus').textContent = info.momentumStatus ?? 'NEUTRO';
+    // document.getElementById('trendStatus').textContent = info.trendStatus ?? 'NEUTRO';
+    // document.getElementById('paStatus').textContent = info.paStatus ?? 'NEUTRO';
+}
+
 // =================== CAMBIO SIMBOLO ===================
 function changeSymbol() {
     const selectEl = document.getElementById('cryptoSelect');
@@ -183,7 +211,7 @@ function processDownloadedData() {
         });
         debugLog('Processing completato');
         showStatusMessage('✅ Dati processati con logica.js!', 'success');
-        if (typeof refreshData === 'function') refreshData();
+        refreshData(); // <--- AGGIORNA LA DASHBOARD QUI
     } catch (error) {
         debugLog(`Errore processing: ${error.message}`);
         showStatusMessage(`❌ Errore processing: ${error.message}`, 'error');
