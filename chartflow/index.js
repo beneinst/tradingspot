@@ -93,7 +93,7 @@ function populateCryptoSelect() {
     select.value = CONFIG.currentSymbol;
 }
 
-// ================= GESTIONE DATI (SOLO UPLOAD JSON) =================
+// ================= GESTIONeE DATI (SOLO UPLOAD JSON) =================
 
 // Funzione per gestire l'upload del file JSON
 function handleFileUpload(event) {
