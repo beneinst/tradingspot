@@ -1,5 +1,5 @@
 // =================== CONFIGURAZIONE MULTI-SIMBOLO ===================
-import { processNewCandle, loadState, saveState, getStateInfo, clearState as resetState, getLastIndicators } from './logica.js';
+import { processNewCandle, loadState, saveState, getStateInfo, resetState, getLastIndicators } from './logica.js';
 
 const COINS = [
     // ... (come prima)
