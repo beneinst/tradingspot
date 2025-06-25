@@ -132,20 +132,6 @@ function updateDashboardUI() {
 }
 
 
-// ================= POPOLAMENTO SELECT =================
-function populateCryptoSelect() {
-    const select = document.getElementById('cryptoSelect');
-    if (!select) return;
-    select.innerHTML = '';
-    COINS.forEach(coin => {
-        const option = document.createElement('option');
-        option.value = coin.value;
-        option.textContent = coin.label;
-        select.appendChild(option);
-    });
-    select.value = CONFIG.currentSymbol;
-}
-
 
 // ================= CAMBIO SIMBOLO =================
 async function changeSymbol() {
