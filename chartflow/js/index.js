@@ -1,3 +1,5 @@
+// ================= CONFIGURAZIONE MULTI-SIMBOLO =================
+import { processNewCandle, loadState, getStateInfo, resetState } from './logica.js';
 
 const CONFIG = {
     interval: '4h',
