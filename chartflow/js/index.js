@@ -248,128 +248,151 @@ if (downloadBtn) downloadBtn.addEventListener('click', downloadBinanceData);
             document.getElementById('fileInput').click();
         }
 
-        // Gestisci upload file
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) {
-                debugLog('Nessun file selezionato');
-                return;
-            }
-
-            debugLog(`File selezionato: ${file.name} (${file.size} bytes)`);
-
-            if (!currentSymbol) {
-                showStatusMessage('Seleziona prima una criptovaluta!', 'error');
-                return;
-            }
-
-            showLoadingMessage('Caricando e processando file...');
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    debugLog('Parsing JSON file...');
-                    const rawData = JSON.parse(e.target.result);
-                    debugLog(`JSON parsato: ${rawData.length} elementi`);
-                    
-                    // Riconosci il formato dei dati
-                    let candles;
-                    if (Array.isArray(rawData) && rawData.length > 0) {
-                        const firstItem = rawData[0];
-                        
-                        // Formato Binance (array di array)
-if (Array.isArray(firstItem) && firstItem.length >= 6) {
-    debugLog('Riconosciuto formato Binance (array di array)');
-    candles = rawData.map(k => ({
-        timestamp: k[0],
-        open: parseFloat(k[1]),
-        high: parseFloat(k[2]),
-        low: parseFloat(k[3]),
-        close: parseFloat(k[4]),
-        volume: parseFloat(k[5]),
-        closed: true
-    }));
-}
-// Formato oggetti (già convertito)
-else if (typeof firstItem === 'object' && firstItem.timestamp) {
-    debugLog('Riconosciuto formato oggetti');
-    candles = rawData.map(k => ({
-        timestamp: k.timestamp,
-        open: parseFloat(k.open),
-        high: parseFloat(k.high),
-        low: parseFloat(k.low),
-        close: parseFloat(k.close),
-        volume: parseFloat(k.volume),
-        closed: k.closed !== undefined ? k.closed : true
-    }));
-}
-// Formato con nomi diversi (es. time invece di timestamp)
-else if (typeof firstItem === 'object' && (firstItem.time || firstItem.date)) {
-    debugLog('Riconosciuto formato con time/date');
-    candles = rawData.map(k => ({
-        timestamp: k.time || k.date,
-        open: parseFloat(k.open || k.o),
-        high: parseFloat(k.high || k.h),
-        low: parseFloat(k.low || k.l),
-        close: parseFloat(k.close || k.c),
-        volume: parseFloat(k.volume || k.v || 0),
-        closed: k.closed !== undefined ? k.closed : true
-    }));
-}
-// Formato sconosciuto - tentativo di auto-rilevamento
-else {
-    debugLog('Formato non riconosciuto, tentativo auto-rilevamento:', firstItem);
-    if (typeof firstItem === 'object') {
-        const keys = Object.keys(firstItem);
-        const timestampKey = keys.find(key => 
-            key.toLowerCase().includes('time') || 
-            key.toLowerCase().includes('date') || 
-            key === 'ts' || key === 't'
-        );
-        const openKey = keys.find(key => key.toLowerCase().includes('open') || key === 'o');
-        const highKey = keys.find(key => key.toLowerCase().includes('high') || key === 'h');
-        const lowKey = keys.find(key => key.toLowerCase().includes('low') || key === 'l');
-        const closeKey = keys.find(key => key.toLowerCase().includes('close') || key === 'c');
-        const volumeKey = keys.find(key => key.toLowerCase().includes('volume') || key === 'v');
-
-        if (timestampKey && openKey && highKey && lowKey && closeKey) {
-            debugLog(`Auto-rilevamento riuscito: ${timestampKey}, ${openKey}, ${highKey}, ${lowKey}, ${closeKey}`);
-            candles = rawData.map(k => ({
-                timestamp: k[timestampKey],
-                open: parseFloat(k[openKey]),
-                high: parseFloat(k[highKey]),
-                low: parseFloat(k[lowKey]),
-                close: parseFloat(k[closeKey]),
-                volume: volumeKey ? parseFloat(k[volumeKey]) : 0,
-                closed: true
-            }));
-        } else {
-            throw new Error('Formato dati non riconosciuto. Chiavi disponibili: ' + keys.join(', '));
-        }
-    } else {
-        throw new Error('Formato dati non supportato: ' + typeof firstItem);
+      function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        debugLog('Nessun file selezionato');
+        return;
     }
-}
 
-// Validazione e ordinamento dei dati
-if (!candles || candles.length === 0) {
-    throw new Error('Nessuna candela valida trovata nei dati');
-}
+    debugLog(`File selezionato: ${file.name} (${file.size} bytes)`);
 
-// Rimuovi candele con dati invalidi
-candles = candles.filter(candle => 
-    candle.timestamp && 
-    !isNaN(candle.open) && 
-    !isNaN(candle.high) && 
-    !isNaN(candle.low) && 
-    !isNaN(candle.close)
-);
+    if (!CONFIG.currentSymbol) {
+        showStatusMessage('Seleziona prima una criptovaluta!', 'error');
+        return;
+    }
 
-// Ordina per timestamp
-candles.sort((a, b) => a.timestamp - b.timestamp);
+    showLoadingMessage('Caricando e processando file...');
 
-debugLog(`Processate ${candles.length} candele valide`);
-return candles;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            debugLog('Parsing JSON file...');
+            const rawData = JSON.parse(e.target.result);
+            debugLog(`JSON parsato: ${rawData.length} elementi`);
+            
+            // Riconosci il formato dei dati
+            let candles;
+            if (Array.isArray(rawData) && rawData.length > 0) {
+                const firstItem = rawData[0];
+                
+                // Formato Binance (array di array)
+                if (Array.isArray(firstItem) && firstItem.length >= 6) {
+                    debugLog('Riconosciuto formato Binance (array di array)');
+                    candles = rawData.map(k => ({
+                        timestamp: k[0],
+                        open: parseFloat(k[1]),
+                        high: parseFloat(k[2]),
+                        low: parseFloat(k[3]),
+                        close: parseFloat(k[4]),
+                        volume: parseFloat(k[5]),
+                        closed: true
+                    }));
+                }
+                // Formato oggetti (già convertito)
+                else if (typeof firstItem === 'object' && firstItem.timestamp) {
+                    debugLog('Riconosciuto formato oggetti');
+                    candles = rawData.map(k => ({
+                        timestamp: k.timestamp,
+                        open: parseFloat(k.open),
+                        high: parseFloat(k.high),
+                        low: parseFloat(k.low),
+                        close: parseFloat(k.close),
+                        volume: parseFloat(k.volume),
+                        closed: k.closed !== undefined ? k.closed : true
+                    }));
+                }
+                // Formato con nomi diversi (es. time invece di timestamp)
+                else if (typeof firstItem === 'object' && (firstItem.time || firstItem.date)) {
+                    debugLog('Riconosciuto formato con time/date');
+                    candles = rawData.map(k => ({
+                        timestamp: k.time || k.date,
+                        open: parseFloat(k.open || k.o),
+                        high: parseFloat(k.high || k.h),
+                        low: parseFloat(k.low || k.l),
+                        close: parseFloat(k.close || k.c),
+                        volume: parseFloat(k.volume || k.v || 0),
+                        closed: k.closed !== undefined ? k.closed : true
+                    }));
+                }
+                // Formato sconosciuto - tentativo di auto-rilevamento
+                else {
+                    debugLog('Formato non riconosciuto, tentativo auto-rilevamento:', firstItem);
+                    if (typeof firstItem === 'object') {
+                        const keys = Object.keys(firstItem);
+                        const timestampKey = keys.find(key => 
+                            key.toLowerCase().includes('time') || 
+                            key.toLowerCase().includes('date') || 
+                            key === 'ts' || key === 't'
+                        );
+                        const openKey = keys.find(key => key.toLowerCase().includes('open') || key === 'o');
+                        const highKey = keys.find(key => key.toLowerCase().includes('high') || key === 'h');
+                        const lowKey = keys.find(key => key.toLowerCase().includes('low') || key === 'l');
+                        const closeKey = keys.find(key => key.toLowerCase().includes('close') || key === 'c');
+                        const volumeKey = keys.find(key => key.toLowerCase().includes('volume') || key === 'v');
+
+                        if (timestampKey && openKey && highKey && lowKey && closeKey) {
+                            debugLog(`Auto-rilevamento riuscito: ${timestampKey}, ${openKey}, ${highKey}, ${lowKey}, ${closeKey}`);
+                            candles = rawData.map(k => ({
+                                timestamp: k[timestampKey],
+                                open: parseFloat(k[openKey]),
+                                high: parseFloat(k[highKey]),
+                                low: parseFloat(k[lowKey]),
+                                close: parseFloat(k[closeKey]),
+                                volume: volumeKey ? parseFloat(k[volumeKey]) : 0,
+                                closed: true
+                            }));
+                        } else {
+                            throw new Error('Formato dati non riconosciuto. Chiavi disponibili: ' + keys.join(', '));
+                        }
+                    } else {
+                        throw new Error('Formato dati non supportato: ' + typeof firstItem);
+                    }
+                }
+            }
+
+            // Validazione e ordinamento dei dati
+            if (!candles || candles.length === 0) {
+                throw new Error('Nessuna candela valida trovata nei dati');
+            }
+
+            // Rimuovi candele con dati invalidi
+            candles = candles.filter(candle => 
+                candle.timestamp && 
+                !isNaN(candle.open) && 
+                !isNaN(candle.high) && 
+                !isNaN(candle.low) && 
+                !isNaN(candle.close)
+            );
+
+            // Ordina per timestamp
+            candles.sort((a, b) => a.timestamp - b.timestamp);
+
+            debugLog(`Processate ${candles.length} candele valide`);
+            
+            // 1. USO EFFETTIVO DEI DATI
+            downloadedData = candles;
+            hideLoadingMessage();
+            showStatusMessage(`✅ File caricato con successo! ${candles.length} candele`, 'success');
+            
+            // 2. PROCESSAMENTO AUTOMATICO SE logica.js È CARICATO
+            if (typeof processNewCandle === 'function') {
+                debugLog('logica.js trovato, processando dati...');
+                processDownloadedData();
+            } else {
+                debugLog('logica.js non trovato - dati pronti per il caricamento manuale');
+                showStatusMessage('Dati pronti! logica.js non caricato automaticamente.', 'warning');
+            }
+            
+        } catch (error) { // AGGIUNTO BLOCCO CATCH
+            debugError('Errore processamento file:', error);
+            hideLoadingMessage();
+            showStatusMessage(`❌ Errore nel processamento del file: ${error.message}`, 'error');
+        }
+    }; // CHIUSURA reader.onload
+
+    reader.readAsText(file);
+} // CHIUSURA handleFileUpload
 
 
 // ================= GESTIONE EVENgTI =================
