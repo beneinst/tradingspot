@@ -99,10 +99,20 @@ function refreshData() {
     const info = getLastIndicators();
     debugLog('refreshData - getLastIndicators:', info);
 
-    // Aggiorna solo se info è valido e non errore
     if (!info || info.error) return;
 
     // Segnale principale
+    document.getElementById('mainSignal').className = `signal-status signal-${info.mainSignal?.toLowerCase() || 'neutral'}`;
+    document.getElementById('mainSignal').children[0].textContent = info.mainSignal || 'IN ATTESA';
+    document.getElementById('signalStrength').textContent = info.signalStrength?.toFixed(2) ?? '0.0';
+
+    // Timer
+    document.getElementById('timerStatus').textContent = info.mainSignal || 'NESSUN OK';
+    document.getElementById('timerProgress').textContent = `${info.barsElapsed ?? '--'}/${info.barsRemaining ?? '--'}`;
+    document.getElementById('timerFill').style.width = info.barsElapsed && info.barsRemaining && info.barsRemaining !== '--'
+        ? `${(info.barsElapsed / (info.barsElapsed + info.barsRemaining)) * 100}%` : '0%';
+
+    // Confluence Score
     document.getElementById('confluenceScore').textContent = info.score ?? '0.0';
 
     // Indicatori principali
@@ -111,15 +121,38 @@ function refreshData() {
     document.getElementById('bbValue').textContent = info.bb?.toFixed(4) ?? '0.00';
     document.getElementById('stochValue').textContent = info.stochK?.toFixed(2) ?? '0.00';
 
-    // Timer e altri dati (esempi, da adattare se hai logica specifica)
-    // document.getElementById('timerStatus').textContent = info.timerStatus ?? 'NESSUN OK';
-    // document.getElementById('timerProgress').textContent = info.timerProgress ?? '0/12';
+    // Indicatori secondari
+    document.getElementById('macdStatus').textContent = info.macdStatus ?? 'NEUTRO';
+    document.getElementById('momentumStatus').textContent = info.momentumStatus ?? 'NEUTRO';
+    document.getElementById('trendStatus').textContent = info.trendStatus ?? 'NEUTRO';
+    document.getElementById('paStatus').textContent = info.paStatus ?? 'NEUTRO';
 
-    // Indicatori secondari (se li aggiungi in logica.js)
-    // document.getElementById('macdStatus').textContent = info.macdStatus ?? 'NEUTRO';
-    // document.getElementById('momentumStatus').textContent = info.momentumStatus ?? 'NEUTRO';
-    // document.getElementById('trendStatus').textContent = info.trendStatus ?? 'NEUTRO';
-    // document.getElementById('paStatus').textContent = info.paStatus ?? 'NEUTRO';
+    // Condizioni base
+    document.getElementById('linregCheck').textContent = info.linregCheck ?? '❌';
+    document.getElementById('pearsonCheck').textContent = info.pearsonCheck ?? '❌';
+    document.getElementById('secondaryCheck').textContent = info.secondaryCheck ?? '0/2';
+
+    // Statistiche Timer
+    document.getElementById('lastSignalTime').textContent = info.lastSignalTime ?? 'Nessuno';
+    document.getElementById('lastSignalType').textContent = info.lastSignalType ?? '--';
+    document.getElementById('barsElapsed').textContent = info.barsElapsed ?? '--';
+    document.getElementById('barsRemaining').textContent = info.barsRemaining ?? '--';
+
+    // Pattern Candele
+    const patternList = document.getElementById('patternList');
+    if (patternList) {
+        patternList.innerHTML = '';
+        if (info.patterns && info.patterns.length) {
+            info.patterns.forEach(pat => {
+                const div = document.createElement('div');
+                div.className = 'pattern-item pattern-' + (pat.type || 'neutral');
+                div.innerHTML = `<span>${pat.name}</span><span>${pat.value}</span>`;
+                patternList.appendChild(div);
+            });
+        } else {
+            patternList.innerHTML = `<div class="pattern-item pattern-neutral"><span>Nessun pattern rilevato</span><span>--</span></div>`;
+        }
+    }
 }
 
 // =================== CAMBIO SIMBOLO ===================
@@ -211,7 +244,7 @@ function processDownloadedData() {
         });
         debugLog('Processing completato');
         showStatusMessage('✅ Dati processati con logica.js!', 'success');
-        refreshData(); // <--- AGGIORNA LA DASHBOARD QUI
+        refreshData();
     } catch (error) {
         debugLog(`Errore processing: ${error.message}`);
         showStatusMessage(`❌ Errore processing: ${error.message}`, 'error');
@@ -293,7 +326,6 @@ function handleFileUpload(event) {
                         const lowKey = keys.find(key => key.toLowerCase().includes('low') || key === 'l');
                         const closeKey = keys.find(key => key.toLowerCase().includes('close') || key === 'c');
                         const volumeKey = keys.find(key => key.toLowerCase().includes('volume') || key === 'v');
-
                         if (timestampKey && openKey && highKey && lowKey && closeKey) {
                             debugLog(`Auto-rilevamento riuscito: ${timestampKey}, ${openKey}, ${highKey}, ${lowKey}, ${closeKey}`);
                             candles = rawData.map(k => ({
