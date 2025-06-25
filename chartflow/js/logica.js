@@ -313,6 +313,8 @@ function getLastIndicators() {
     return lastIndicators;
 }
 
+console.log('DEBUG getLastIndicators', getLastIndicators());
+
 // ================= INFO E VALIDAZIONE =================
 function getStateInfo(symbol = 'btcusdt') {
     return {
