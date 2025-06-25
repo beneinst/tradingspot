@@ -1,23 +1,8 @@
 // =================== CONFIGURAZIONE MULTI-SIMBOLO ===================
-import { processNewCandle, loadState, getStateInfo, resetState, getLastIndicators } from './logica.js';
+import { processNewCandle, loadState, saveState, getStateInfo, resetState, getLastIndicators } from './logica.js';
 
 const COINS = [
-    { id: 'bitcoin', label: 'BTC/USDT', value: 'BTCUSDT', vs_currency: 'usd' },
-    { id: 'cosmos', label: 'ATOM/USDT', value: 'ATOMUSDT', vs_currency: 'usd' },
-    { id: 'ethereum', label: 'ETH/USDT', value: 'ETHUSDT', vs_currency: 'usd' },
-    { id: 'fetch-ai', label: 'FET/USDC', value: 'FETUSDC', vs_currency: 'usd' },
-    { id: 'solana', label: 'SOL/USDC', value: 'SOLUSDC', vs_currency: 'usd' },
-    { id: 'binancecoin', label: 'BNB/USDC', value: 'BNBUSDC', vs_currency: 'usd' },
-    { id: 'cardano', label: 'ADA/EUR', value: 'ADAEUR', vs_currency: 'eur' },
-    { id: 'uniswap', label: 'UNI/USDC', value: 'UNIUSDC', vs_currency: 'usd' },
-    { id: 'decentraland', label: 'MANA/USDT', value: 'MANAUSDT', vs_currency: 'usd' },
-    { id: 'litecoin', label: 'LTC/USDT', value: 'LTCUSDT', vs_currency: 'usd' },
-    { id: 'algorand', label: 'ALGO/USDT', value: 'ALGOUSDT', vs_currency: 'usd' },
-    { id: 'avalanche-2', label: 'AVAX/USDT', value: 'AVAXUSDT', vs_currency: 'usd' },
-    { id: 'avalanche-2', label: 'AVAX/USDC', value: 'AVAXUSDC', vs_currency: 'usd' },
-    { id: 'polkadot', label: 'DOT/USDC', value: 'DOTUSDC', vs_currency: 'usd' },
-    { id: 'near', label: 'NEAR/USDC', value: 'NEARUSDC', vs_currency: 'usd' },
-    { id: 'suicoin', label: 'SUI/USDC', value: 'SUIUSDC', vs_currency: 'usd' }
+    // ... (come prima)
 ];
 
 const CONFIG = {
@@ -32,53 +17,7 @@ const CONFIG = {
 let downloadedData = null;
 
 // =================== DEBUG & UI HELPERS ===================
-function debugLog(message, data = null) {
-    const timestamp = new Date().toISOString();
-    if (data) {
-        console.log(`[${timestamp}] ${message}`, data);
-    } else {
-        console.log(`[${timestamp}] ${message}`);
-    }
-    const debugDiv = document.getElementById('debugInfo');
-    if (debugDiv) {
-        debugDiv.style.display = 'block';
-        const msg = data ? `${message}: ${JSON.stringify(data)}` : message;
-        debugDiv.innerHTML += `<div>${new Date().toTimeString().split(' ')[0]} - ${msg}</div>`;
-        debugDiv.scrollTop = debugDiv.scrollHeight;
-    }
-}
-
-function debugError(message, error = null) {
-    const timestamp = new Date().toISOString();
-    if (error) {
-        console.error(`[${timestamp}] ERROR: ${message}`, error);
-    } else {
-        console.error(`[${timestamp}] ERROR: ${message}`);
-    }
-    showLoadingMessage(`❌ ${message}`, 'error');
-}
-
-function showStatusMessage(message, type = 'info') {
-    const statusDiv = document.getElementById('statusMessage');
-    if (statusDiv) {
-        statusDiv.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
-        debugLog(`Status: ${message}`);
-    }
-}
-
-function showLoadingMessage(message) {
-    const loadingDiv = document.getElementById('loadingMessage');
-    if (loadingDiv) {
-        loadingDiv.textContent = message;
-        loadingDiv.style.display = 'block';
-        debugLog(`Loading: ${message}`);
-    }
-}
-
-function hideLoadingMessage() {
-    const loadingDiv = document.getElementById('loadingMessage');
-    if (loadingDiv) loadingDiv.style.display = 'none';
-}
+// ... (come prima, debugLog, debugError, showStatusMessage, showLoadingMessage, hideLoadingMessage) ...
 
 // =================== POPOLAMENTO SELECT ===================
 function populateCryptoSelect() {
@@ -101,58 +40,8 @@ function refreshData() {
 
     if (!info || info.error) return;
 
-    // Segnale principale
-    document.getElementById('mainSignal').className = `signal-status signal-${info.mainSignal?.toLowerCase() || 'neutral'}`;
-    document.getElementById('mainSignal').children[0].textContent = info.mainSignal || 'IN ATTESA';
-    document.getElementById('signalStrength').textContent = info.signalStrength?.toFixed(2) ?? '0.0';
-
-    // Timer
-    document.getElementById('timerStatus').textContent = info.mainSignal || 'NESSUN OK';
-    document.getElementById('timerProgress').textContent = `${info.barsElapsed ?? '--'}/${info.barsRemaining ?? '--'}`;
-    document.getElementById('timerFill').style.width = info.barsElapsed && info.barsRemaining && info.barsRemaining !== '--'
-        ? `${(info.barsElapsed / (info.barsElapsed + info.barsRemaining)) * 100}%` : '0%';
-
-    // Confluence Score
-    document.getElementById('confluenceScore').textContent = info.score ?? '0.0';
-
-    // Indicatori principali
-    document.getElementById('linregValue').textContent = info.linreg?.toFixed(4) ?? '0.00';
-    document.getElementById('pearsonValue').textContent = info.pearson?.toFixed(4) ?? '0.00';
-    document.getElementById('bbValue').textContent = info.bb?.toFixed(4) ?? '0.00';
-    document.getElementById('stochValue').textContent = info.stochK?.toFixed(2) ?? '0.00';
-
-    // Indicatori secondari
-    document.getElementById('macdStatus').textContent = info.macdStatus ?? 'NEUTRO';
-    document.getElementById('momentumStatus').textContent = info.momentumStatus ?? 'NEUTRO';
-    document.getElementById('trendStatus').textContent = info.trendStatus ?? 'NEUTRO';
-    document.getElementById('paStatus').textContent = info.paStatus ?? 'NEUTRO';
-
-    // Condizioni base
-    document.getElementById('linregCheck').textContent = info.linregCheck ?? '❌';
-    document.getElementById('pearsonCheck').textContent = info.pearsonCheck ?? '❌';
-    document.getElementById('secondaryCheck').textContent = info.secondaryCheck ?? '0/2';
-
-    // Statistiche Timer
-    document.getElementById('lastSignalTime').textContent = info.lastSignalTime ?? 'Nessuno';
-    document.getElementById('lastSignalType').textContent = info.lastSignalType ?? '--';
-    document.getElementById('barsElapsed').textContent = info.barsElapsed ?? '--';
-    document.getElementById('barsRemaining').textContent = info.barsRemaining ?? '--';
-
-    // Pattern Candele
-    const patternList = document.getElementById('patternList');
-    if (patternList) {
-        patternList.innerHTML = '';
-        if (info.patterns && info.patterns.length) {
-            info.patterns.forEach(pat => {
-                const div = document.createElement('div');
-                div.className = 'pattern-item pattern-' + (pat.type || 'neutral');
-                div.innerHTML = `<span>${pat.name}</span><span>${pat.value}</span>`;
-                patternList.appendChild(div);
-            });
-        } else {
-            patternList.innerHTML = `<div class="pattern-item pattern-neutral"><span>Nessun pattern rilevato</span><span>--</span></div>`;
-        }
-    }
+    // ... (tutto come prima: aggiornamento delle card e dei timer) ...
+    // (vedi risposta precedente per i dettagli)
 }
 
 // =================== CAMBIO SIMBOLO ===================
@@ -163,6 +52,17 @@ function changeSymbol() {
     if (newSymbol === CONFIG.currentSymbol) return;
     debugLog(`Cambio simbolo: ${CONFIG.currentSymbol} -> ${newSymbol}`);
     CONFIG.currentSymbol = newSymbol;
+
+    // Carica lo stato persistente per il nuovo simbolo
+    if (loadState(CONFIG.currentSymbol)) {
+        debugLog('Stato caricato da localStorage per', CONFIG.currentSymbol);
+        refreshData();
+    } else {
+        debugLog('Nessuno stato precedente trovato per', CONFIG.currentSymbol);
+        // Puoi opzionalmente azzerare la dashboard qui
+        refreshData();
+    }
+
     showLoadingMessage(`📊 Selezionato ${newSymbol.toUpperCase()} (carica un file JSON per i dati)`);
 }
 
@@ -244,6 +144,7 @@ function processDownloadedData() {
         });
         debugLog('Processing completato');
         showStatusMessage('✅ Dati processati con logica.js!', 'success');
+        saveState(CONFIG.currentSymbol); // <--- SALVA LO STATO DOPO IL PROCESSAMENTO
         refreshData();
     } catch (error) {
         debugLog(`Errore processing: ${error.message}`);
@@ -385,6 +286,12 @@ function handleFileUpload(event) {
 // =================== INIZIALIZZAZIONE ===================
 function initApp() {
     populateCryptoSelect();
+
+    // Carica stato persistente all'avvio
+    if (loadState(CONFIG.currentSymbol)) {
+        debugLog('Stato caricato da localStorage per', CONFIG.currentSymbol);
+        refreshData();
+    }
 
     const cryptoSelect = document.getElementById('cryptoSelect');
     if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);

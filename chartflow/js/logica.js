@@ -339,6 +339,72 @@ function getStateInfo(symbol = 'btcusdt') {
     };
 }
 
+// ================= SALVATAGGIO E RIPRISTINO STATO =================
+function saveState(symbol) {
+    const savedData = {
+        prices: state.prices,
+        highs: state.highs,
+        lows: state.lows,
+        opens: state.opens,
+        timestamps: state.timestamps,
+        lastUpdate: state.lastUpdate,
+        lastSignalTime,     // Salva anche il timer!
+        lastSignalType,
+        barsElapsed,
+        barsRemaining,
+        version: state.version,
+    };
+    try {
+        localStorage.setItem(`savedState_${symbol}`, JSON.stringify(savedData));
+        return true;
+    } catch (error) {
+        console.error('Errore nel salvataggio dello stato:', error);
+        return false;
+    }
+}
+
+function loadState(symbol) {
+    const saved = localStorage.getItem(`savedState_${symbol}`);
+    if (!saved) return false;
+    try {
+        const data = JSON.parse(saved);
+        if (data.version !== state.version) {
+            clearState(symbol);
+            return false;
+        }
+        state.prices = data.prices || [];
+        state.highs = data.highs || [];
+        state.lows = data.lows || [];
+        state.opens = data.opens || [];
+        state.timestamps = data.timestamps || [];
+        state.lastUpdate = data.lastUpdate || null;
+        // Timer e segnali
+        lastSignalTime = data.lastSignalTime || null;
+        lastSignalType = data.lastSignalType || "--";
+        barsElapsed = data.barsElapsed || "--";
+        barsRemaining = data.barsRemaining || "--";
+        return true;
+    } catch (error) {
+        clearState(symbol);
+        return false;
+    }
+}
+
+function clearState(symbol) {
+    localStorage.removeItem(`savedState_${symbol}`);
+    state.prices = [];
+    state.highs = [];
+    state.lows = [];
+    state.opens = [];
+    state.timestamps = [];
+    state.lastUpdate = null;
+    lastSignalTime = null;
+    lastSignalType = "--";
+    barsElapsed = "--";
+    barsRemaining = "--";
+}
+
+
 // ================= EXPORT =================
 export {
     processNewCandle,
@@ -347,5 +413,8 @@ export {
     addTick,
     calculateIndicators,
     state,
-    config
+    config,
+    saveState,
+    loadState,
+    clearState
 };
