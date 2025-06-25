@@ -38,7 +38,7 @@ let autoRefreshInterval = null;
 
    // Variabili globali
         let currentSymbol = '';
-        let autoRefreshInterval = null;
+       
         let isAutoRefreshActive = false;
         let downloadedData = null;
 
