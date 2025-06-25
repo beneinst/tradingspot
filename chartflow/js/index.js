@@ -1,73 +1,52 @@
 // ================= CONFIGURAZIONE MULTI-SIMBOLO =================
 import { processNewCandle, loadState, getStateInfo, resetState } from './js/logica.js';
 
-// =================== CONFIGURAZIONE ===================
+// Configurazione con valori in UPPERCASE (richiesto da Binance API)
 const COINS = [
-    { id: 'bitcoin', label: 'BTC/USDT', value: 'btcusdt', vs_currency: 'usd' },
-    { id: 'cosmos', label: 'ATOM/USDT', value: 'atomusdt', vs_currency: 'usd' },
-    { id: 'ethereum', label: 'ETH/USDT', value: 'ethusdt', vs_currency: 'usd' },
-    { id: 'fetch-ai', label: 'FET/USDC', value: 'fetusdc', vs_currency: 'usd' },
-    { id: 'solana', label: 'SOL/USDC', value: 'solusdc', vs_currency: 'usd' },
-    { id: 'binancecoin', label: 'BNB/USDC', value: 'bnbusdc', vs_currency: 'usd' },
-    { id: 'cardano', label: 'ADA/EUR', value: 'adaeur', vs_currency: 'eur' },
-    { id: 'uniswap', label: 'UNI/USDC', value: 'uniusdc', vs_currency: 'usd' },
-    { id: 'decentraland', label: 'MANA/USDT', value: 'manausdt', vs_currency: 'usd' },
-    { id: 'litecoin', label: 'LTC/USDT', value: 'ltcusdt', vs_currency: 'usd' },
-    { id: 'algorand', label: 'ALGO/USDT', value: 'algousdt', vs_currency: 'usd' },
-    { id: 'avalanche-2', label: 'AVAX/USDT', value: 'avaxusdt', vs_currency: 'usd' },
-    { id: 'avalanche-2', label: 'AVAX/USDC', value: 'avaxusdc', vs_currency: 'usd' },
-    { id: 'polkadot', label: 'DOT/USDC', value: 'dotusdc', vs_currency: 'usd' },
-    { id: 'near', label: 'NEAR/USDC', value: 'nearusdc', vs_currency: 'usd' },
-    { id: 'suicoin', label: 'SUI/USDC', value: 'suiusdc', vs_currency: 'usd' }
+    { id: 'bitcoin', label: 'BTC/USDT', value: 'BTCUSDT', vs_currency: 'usd' },
+    { id: 'cosmos', label: 'ATOM/USDT', value: 'ATOMUSDT', vs_currency: 'usd' },
+    { id: 'ethereum', label: 'ETH/USDT', value: 'ETHUSDT', vs_currency: 'usd' },
+    { id: 'fetch-ai', label: 'FET/USDC', value: 'FETUSDC', vs_currency: 'usd' },
+    { id: 'solana', label: 'SOL/USDC', value: 'SOLUSDC', vs_currency: 'usd' },
+    { id: 'binancecoin', label: 'BNB/USDC', value: 'BNBUSDC', vs_currency: 'usd' },
+    { id: 'cardano', label: 'ADA/EUR', value: 'ADAEUR', vs_currency: 'eur' },
+    { id: 'uniswap', label: 'UNI/USDC', value: 'UNIUSDC', vs_currency: 'usd' },
+    { id: 'decentraland', label: 'MANA/USDT', value: 'MANAUSDT', vs_currency: 'usd' },
+    { id: 'litecoin', label: 'LTC/USDT', value: 'LTCUSDT', vs_currency: 'usd' },
+    { id: 'algorand', label: 'ALGO/USDT', value: 'ALGOUSDT', vs_currency: 'usd' },
+    { id: 'avalanche-2', label: 'AVAX/USDT', value: 'AVAXUSDT', vs_currency: 'usd' },
+    { id: 'avalanche-2', label: 'AVAX/USDC', value: 'AVAXUSDC', vs_currency: 'usd' },
+    { id: 'polkadot', label: 'DOT/USDC', value: 'DOTUSDC', vs_currency: 'usd' },
+    { id: 'near', label: 'NEAR/USDC', value: 'NEARUSDC', vs_currency: 'usd' },
+    { id: 'suicoin', label: 'SUI/USDC', value: 'SUIUSDC', vs_currency: 'usd' }
 ];
 
-// ================= POPOLAMENTO SELECT =================
-function populateCryptoSelect() {
-    const select = document.getElementById('cryptoSelect');
-    if (!select) return;
-    select.innerHTML = '';
-    COINS.forEach(coin => {
-        const option = document.createElement('option');
-        option.value = coin.value;
-        option.textContent = coin.label;
-        select.appendChild(option);
-    });
-    // Imposta il valore selezionato in base alla configurazione corrente
-    select.value = CONFIG.currentSymbol;
-}
-
-
+// Configurazione globale
 const CONFIG = {
+    currentSymbol: 'BTCUSDT', // Valore di default in UPPERCASE
     interval: '4h',
     maxRetries: 3,
     retryDelay: 5000,
     historyLimit: 200,
-    debugMode: true,
-    currentSymbol: 'btcusdt' // default
+    debugMode: true
 };
 
 let websocket = null;
 let reconnectAttempts = 0;
 let connectionStatus = 'DISCONNESSO';
 let isInitialized = false;
-// Funzioni ----- let autoRefreshInterval = null;
 
+let isAutoRefreshActive = false;
+let downloadedData = null;
 
-   // Variabili globali
-        let isAutoRefreshActive = false;
-        let downloadedData = null;
-
-        // Funzioni di debug
-        function debugLog(message, data = null) {
-    // Log su console
+// ================= FUNZIONI DI DEBUG =================
+function debugLog(message, data = null) {
     const timestamp = new Date().toISOString();
     if (data) {
         console.log(`[${timestamp}] ${message}`, data);
     } else {
         console.log(`[${timestamp}] ${message}`);
     }
-
-    // Log su HTML (opzionale)
     const debugDiv = document.getElementById('debugInfo');
     if (debugDiv) {
         debugDiv.style.display = 'block';
@@ -76,7 +55,6 @@ let isInitialized = false;
         debugDiv.scrollTop = debugDiv.scrollHeight;
     }
 }
-
 
 function debugError(message, error = null) {
     const timestamp = new Date().toISOString();
@@ -97,41 +75,33 @@ function showStatusMessage(message, type = 'info') {
     }
 }
 
+function showLoadingMessage(message) {
+    const loadingDiv = document.getElementById('loadingMessage');
+    if (loadingDiv) {
+        loadingDiv.textContent = message;
+        loadingDiv.style.display = 'block';
+        debugLog(`Loading: ${message}`);
+    }
+}
+
 function hideLoadingMessage() {
     const loadingDiv = document.getElementById('loadingMessage');
     if (loadingDiv) loadingDiv.style.display = 'none';
 }
 
-   // Mostra/nascondi messaggi di stato
-       
-        function showLoadingMessage(message) {
-            const loadingDiv = document.getElementById('loadingMessage');
-            loadingDiv.textContent = message;
-            loadingDiv.style.display = 'block';
-            debugLog(`Loading: ${message}`);
-        }
-
-
-// ================= DASHBOARD UI =================
-function updateDashboardUI() {
-    // Aggiorna la dashboard con i dati più recenti
-    // Esempio: mostra l'ultimo prezzo, indicatori, ecc.
-    const priceEl = document.getElementById('currentPrice');
-    const rsiEl = document.getElementById('rsiValue');
-    const smaEl = document.getElementById('smaValue');
-    const emaEl = document.getElementById('emaValue');
-
-    if (priceEl && rsiEl && smaEl && emaEl) {
-        // Qui puoi usare i dati dallo state di logica.js, se necessario
-        // Oppure aggiornare con valori statici di esempio
-        priceEl.textContent = '---';
-        rsiEl.textContent = '---';
-        smaEl.textContent = '---';
-        emaEl.textContent = '---';
-    }
+// ================= POPOLAMENTO SELECT =================
+function populateCryptoSelect() {
+    const select = document.getElementById('cryptoSelect');
+    if (!select) return;
+    select.innerHTML = '<option value="" disabled selected>Seleziona una criptovaluta...</option>';
+    COINS.forEach(coin => {
+        const option = document.createElement('option');
+        option.value = coin.value;
+        option.textContent = coin.label;
+        select.appendChild(option);
+    });
+    select.value = CONFIG.currentSymbol;
 }
-
-
 
 // ================= CAMBIO SIMBOLO =================
 async function changeSymbol() {
@@ -146,14 +116,7 @@ async function changeSymbol() {
     // Non carica automaticamente dati, aspetta l'upload JSON
 }
 
-
-
-// ================= AVVIO =================
-debugLog('🎯 APPLICAZIONE TRADING PRONTA');
-showLoadingMessage('Seleziona una criptovaluta e carica un file JSON per iniziare');
-
-
- // Scarica dati da Binance API
+// ================= SCARICA DATI BINANCE =================
 async function downloadBinanceData() {
     if (!CONFIG.currentSymbol) {
         showStatusMessage('Seleziona prima una criptovaluta!', 'error');
@@ -168,25 +131,18 @@ async function downloadBinanceData() {
     debugLog(`Iniziando download per ${CONFIG.currentSymbol}`);
 
     try {
-        // API Binance per dati storici (500 candele 4h)
         const url = `https://api.binance.com/api/v3/klines?symbol=${CONFIG.currentSymbol}&interval=4h&limit=500`;
         debugLog(`URL API: ${url}`);
 
         const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(`Errore HTTP: ${response.status} - ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error(`Errore HTTP: ${response.status} - ${response.statusText}`);
 
         const data = await response.json();
         debugLog(`Ricevuti ${data.length} record da Binance`);
 
-        if (!data || data.length === 0) {
-            throw new Error('Nessun dato ricevuto da Binance');
-        }
+        if (!data || data.length === 0) throw new Error('Nessun dato ricevuto da Binance');
 
-        // Converti i dati nel formato standard
-        downloadedData = data.map((k, index) => ({
+        downloadedData = data.map(k => ({
             timestamp: k[0],
             open: parseFloat(k[1]),
             high: parseFloat(k[2]),
@@ -201,12 +157,8 @@ async function downloadBinanceData() {
         debugLog(`Ultima candela: ${JSON.stringify(downloadedData[downloadedData.length - 1])}`);
 
         hideLoadingMessage();
-        showStatusMessage(
-            `✅ Dati scaricati con successo! ${downloadedData.length} candele 4h per ${CONFIG.currentSymbol}`,
-            'success'
-        );
+        showStatusMessage(`✅ Dati scaricati con successo! ${downloadedData.length} candele 4h per ${CONFIG.currentSymbol}`, 'success');
 
-        // Prova a passare i dati a logica.js se disponibile
         if (typeof processNewCandle === 'function') {
             debugLog('logica.js trovato, processando dati...');
             processDownloadedData();
@@ -214,7 +166,6 @@ async function downloadBinanceData() {
             debugLog('logica.js non trovato - dati pronti per il caricamento manuale');
             showStatusMessage('Dati pronti! logica.js non caricato automaticamente.', 'warning');
         }
-
     } catch (error) {
         debugLog(`Errore download: ${error.message}`);
         hideLoadingMessage();
@@ -225,52 +176,32 @@ async function downloadBinanceData() {
     }
 }
 
-// Associa l'evento al bottone (una sola volta)
-const downloadBtn = document.getElementById('downloadBtn');
-if (downloadBtn) downloadBtn.addEventListener('click', downloadBinanceData);
+// ================= PROCESSA DATI SCARICATI =================
+function processDownloadedData() {
+    if (!downloadedData || downloadedData.length === 0) {
+        debugLog('Nessun dato da processare');
+        return;
+    }
 
-
-
-        // Processa i dati scaricati con logica.js
-        function processDownloadedData() {
-            if (!downloadedData || downloadedData.length === 0) {
-                debugLog('Nessun dato da processare');
-                return;
+    try {
+        debugLog('Iniziando processing con logica.js...');
+        downloadedData.forEach((candle, index) => {
+            processNewCandle(candle, CONFIG.currentSymbol.toLowerCase());
+            if (index > 0 && index % 100 === 0) {
+                debugLog(`Processate ${index}/${downloadedData.length} candele`);
             }
+        });
+        debugLog('Processing completato');
+        showStatusMessage('✅ Dati processati con logica.js!', 'success');
+        if (typeof refreshData === 'function') refreshData();
+    } catch (error) {
+        debugLog(`Errore processing: ${error.message}`);
+        showStatusMessage(`❌ Errore processing: ${error.message}`, 'error');
+    }
+}
 
-            try {
-                debugLog('Iniziando processing con logica.js...');
-                
-                downloadedData.forEach((candle, index) => {
-                    processNewCandle(candle, currentSymbol.toLowerCase());
-                    
-                    // Log di progresso ogni 100 candele
-                    if (index > 0 && index % 100 === 0) {
-                        debugLog(`Processate ${index}/${downloadedData.length} candele`);
-                    }
-                });
-
-                debugLog('Processing completato');
-                showStatusMessage('✅ Dati processati con logica.js!', 'success');
-                
-                // Aggiorna la UI se possibile
-                if (typeof refreshData === 'function') {
-                    refreshData();
-                }
-
-            } catch (error) {
-                debugLog(`Errore processing: ${error.message}`);
-                showStatusMessage(`❌ Errore processing: ${error.message}`, 'error');
-            }
-        }
-
-        // Trigger file upload
-        function triggerFileUpload() {
-            debugLog('Triggering file upload...');
-            document.getElementById('fileInput').click();
-        }
-
-      function handleFileUpload(event) {
+// ================= HANDLE FILE UPLOAD =================
+function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) {
         debugLog('Nessun file selezionato');
@@ -292,13 +223,11 @@ if (downloadBtn) downloadBtn.addEventListener('click', downloadBinanceData);
             debugLog('Parsing JSON file...');
             const rawData = JSON.parse(e.target.result);
             debugLog(`JSON parsato: ${rawData.length} elementi`);
-            
-            // Riconosci il formato dei dati
+
             let candles;
             if (Array.isArray(rawData) && rawData.length > 0) {
                 const firstItem = rawData[0];
-                
-                // Formato Binance (array di array)
+
                 if (Array.isArray(firstItem) && firstItem.length >= 6) {
                     debugLog('Riconosciuto formato Binance (array di array)');
                     candles = rawData.map(k => ({
@@ -310,9 +239,7 @@ if (downloadBtn) downloadBtn.addEventListener('click', downloadBinanceData);
                         volume: parseFloat(k[5]),
                         closed: true
                     }));
-                }
-                // Formato oggetti (già convertito)
-                else if (typeof firstItem === 'object' && firstItem.timestamp) {
+                } else if (typeof firstItem === 'object' && firstItem.timestamp) {
                     debugLog('Riconosciuto formato oggetti');
                     candles = rawData.map(k => ({
                         timestamp: k.timestamp,
@@ -323,9 +250,7 @@ if (downloadBtn) downloadBtn.addEventListener('click', downloadBinanceData);
                         volume: parseFloat(k.volume),
                         closed: k.closed !== undefined ? k.closed : true
                     }));
-                }
-                // Formato con nomi diversi (es. time invece di timestamp)
-                else if (typeof firstItem === 'object' && (firstItem.time || firstItem.date)) {
+                } else if (typeof firstItem === 'object' && (firstItem.time || firstItem.date)) {
                     debugLog('Riconosciuto formato con time/date');
                     candles = rawData.map(k => ({
                         timestamp: k.time || k.date,
@@ -336,15 +261,13 @@ if (downloadBtn) downloadBtn.addEventListener('click', downloadBinanceData);
                         volume: parseFloat(k.volume || k.v || 0),
                         closed: k.closed !== undefined ? k.closed : true
                     }));
-                }
-                // Formato sconosciuto - tentativo di auto-rilevamento
-                else {
+                } else {
                     debugLog('Formato non riconosciuto, tentativo auto-rilevamento:', firstItem);
                     if (typeof firstItem === 'object') {
                         const keys = Object.keys(firstItem);
-                        const timestampKey = keys.find(key => 
-                            key.toLowerCase().includes('time') || 
-                            key.toLowerCase().includes('date') || 
+                        const timestampKey = keys.find(key =>
+                            key.toLowerCase().includes('time') ||
+                            key.toLowerCase().includes('date') ||
                             key === 'ts' || key === 't'
                         );
                         const openKey = keys.find(key => key.toLowerCase().includes('open') || key === 'o');
@@ -373,31 +296,26 @@ if (downloadBtn) downloadBtn.addEventListener('click', downloadBinanceData);
                 }
             }
 
-            // Validazione e ordinamento dei dati
             if (!candles || candles.length === 0) {
                 throw new Error('Nessuna candela valida trovata nei dati');
             }
 
-            // Rimuovi candele con dati invalidi
-            candles = candles.filter(candle => 
-                candle.timestamp && 
-                !isNaN(candle.open) && 
-                !isNaN(candle.high) && 
-                !isNaN(candle.low) && 
+            candles = candles.filter(candle =>
+                candle.timestamp &&
+                !isNaN(candle.open) &&
+                !isNaN(candle.high) &&
+                !isNaN(candle.low) &&
                 !isNaN(candle.close)
             );
 
-            // Ordina per timestamp
             candles.sort((a, b) => a.timestamp - b.timestamp);
 
             debugLog(`Processate ${candles.length} candele valide`);
-            
-            // 1. USO EFFETTIVO DEI DATI
+
             downloadedData = candles;
             hideLoadingMessage();
             showStatusMessage(`✅ File caricato con successo! ${candles.length} candele`, 'success');
-            
-            // 2. PROCESSAMENTO AUTOMATICO SE logica.js È CARICATO
+
             if (typeof processNewCandle === 'function') {
                 debugLog('logica.js trovato, processando dati...');
                 processDownloadedData();
@@ -405,23 +323,37 @@ if (downloadBtn) downloadBtn.addEventListener('click', downloadBinanceData);
                 debugLog('logica.js non trovato - dati pronti per il caricamento manuale');
                 showStatusMessage('Dati pronti! logica.js non caricato automaticamente.', 'warning');
             }
-            
-        } catch (error) { // AGGIUNTO BLOCCO CATCH
+        } catch (error) {
             debugError('Errore processamento file:', error);
             hideLoadingMessage();
             showStatusMessage(`❌ Errore nel processamento del file: ${error.message}`, 'error');
         }
-    }; // CHIUSURA reader.onload
-
+    };
     reader.readAsText(file);
-} // CHIUSURA handleFileUpload
+}
 
+// ================= INIZIALIZZAZIONE =================
+function initApp() {
+    populateCryptoSelect();
 
-// ================= GESTIONE EVENgTI =================
-document.addEventListener('DOMContentLoaded', populateCryptoSelect);
-const cryptoSelect = document.getElementById('cryptoSelect');
-if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);
-const uploadBtn = document.getElementById('uploadBtn');
-const fileInput = document.getElementById('fileInput');
-if (uploadBtn) uploadBtn.addEventListener('click', () => fileInput.click());
-if (fileInput) fileInput.addEventListener('change', handleFileUpload);
+    const cryptoSelect = document.getElementById('cryptoSelect');
+    if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);
+
+    const downloadBtn = document.getElementById('downloadBtn');
+    if (downloadBtn) downloadBtn.addEventListener('click', downloadBinanceData);
+
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
+    if (uploadBtn && fileInput) uploadBtn.addEventListener('click', () => fileInput.click());
+    if (fileInput) fileInput.addEventListener('change', handleFileUpload);
+
+    debugLog('🎯 APPLICAZIONE TRADING PRONTA');
+    showLoadingMessage('Seleziona una criptovaluta e carica un file JSON per iniziare');
+}
+
+// Esegui initApp appena possibile
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
