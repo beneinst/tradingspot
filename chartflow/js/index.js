@@ -71,6 +71,15 @@ function hideLoadingMessage() {
     if (loadingDiv) loadingDiv.style.display = 'none';
 }
 
+   // Mostra/nascondi messaggi di stato
+       
+        function showLoadingMessage(message) {
+            const loadingDiv = document.getElementById('loadingMessage');
+            loadingDiv.textContent = message;
+            loadingDiv.style.display = 'block';
+            debugLog(`Loading: ${message}`);
+        }
+
 
 // ================= DASHBOARD UI =================
 function updateDashboardUI() {
