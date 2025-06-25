@@ -17,6 +17,33 @@ const CONFIG = {
 let downloadedData = null;
 
 // =================== DEBUG & UI HELPERS ===================
+function showLoadingMessage(message) {
+    // Cerca o crea un div per il messaggio di loading
+    let loadingDiv = document.getElementById('loadingMessage');
+    if (!loadingDiv) {
+        loadingDiv = document.createElement('div');
+        loadingDiv.id = 'loadingMessage';
+        loadingDiv.style.position = 'fixed';
+        loadingDiv.style.top = '20px';
+        loadingDiv.style.left = '50%';
+        loadingDiv.style.transform = 'translateX(-50%)';
+        loadingDiv.style.background = '#232a34';
+        loadingDiv.style.color = '#ffc200';
+        loadingDiv.style.padding = '12px 28px';
+        loadingDiv.style.borderRadius = '8px';
+        loadingDiv.style.boxShadow = '0 2px 10px rgba(0,0,0,0.18)';
+        loadingDiv.style.zIndex = '9999';
+        document.body.appendChild(loadingDiv);
+    }
+    loadingDiv.textContent = message || 'Caricamento...';
+    loadingDiv.style.display = 'block';
+}
+
+function hideLoadingMessage() {
+    const loadingDiv = document.getElementById('loadingMessage');
+    if (loadingDiv) loadingDiv.style.display = 'none';
+}
+
 // ... (come prima, debugLog, debugError, showStatusMessage, showLoadingMessage, hideLoadingMessage) ...
 function debugLog(message, data = null) {
     const timestamp = new Date().toISOString();
