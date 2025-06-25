@@ -12,7 +12,7 @@ let websocket = null;
 let reconnectAttempts = 0;
 let connectionStatus = 'DISCONNESSO';
 let isInitialized = false;
-let autoRefreshInterval = null;
+// Funzioni ----- let autoRefreshInterval = null;
 
 
    // Variabili globali
