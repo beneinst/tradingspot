@@ -79,6 +79,26 @@ function updateLastUpdate() {
     }
 }
 
+// ================= DASHBOARD UI =================
+function updateDashboardUI() {
+    // Aggiorna la dashboard con i dati più recenti
+    // Esempio: mostra l'ultimo prezzo, indicatori, ecc.
+    const priceEl = document.getElementById('currentPrice');
+    const rsiEl = document.getElementById('rsiValue');
+    const smaEl = document.getElementById('smaValue');
+    const emaEl = document.getElementById('emaValue');
+
+    if (priceEl && rsiEl && smaEl && emaEl) {
+        // Qui puoi usare i dati dallo state di logica.js, se necessario
+        // Oppure aggiornare con valori statici di esempio
+        priceEl.textContent = '---';
+        rsiEl.textContent = '---';
+        smaEl.textContent = '---';
+        emaEl.textContent = '---';
+    }
+}
+
+
 // ================= POPOLAMENTO SELECT =================
 function populateCryptoSelect() {
     const select = document.getElementById('cryptoSelect');
