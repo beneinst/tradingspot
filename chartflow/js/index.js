@@ -18,6 +18,22 @@ let downloadedData = null;
 
 // =================== DEBUG & UI HELPERS ===================
 // ... (come prima, debugLog, debugError, showStatusMessage, showLoadingMessage, hideLoadingMessage) ...
+function debugLog(message, data = null) {
+    const timestamp = new Date().toISOString();
+    if (data) {
+        console.log(`[${timestamp}] ${message}`, data);
+    } else {
+        console.log(`[${timestamp}] ${message}`);
+    }
+    const debugDiv = document.getElementById('debugInfo');
+    if (debugDiv) {
+        debugDiv.style.display = 'block';
+        const msg = data ? `${message}: ${JSON.stringify(data)}` : message;
+        debugDiv.innerHTML += `<div>${new Date().toTimeString().split(' ')[0]} - ${msg}</div>`;
+        debugDiv.scrollTop = debugDiv.scrollHeight;
+    }
+}
+
 
 // =================== POPOLAMENTO SELECT ===================
 function populateCryptoSelect() {
