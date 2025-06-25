@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Trading Avanzata</title>
+	<link rel="icon" type="image/png" href="https://beneinst.github.io/tradingspot/favicon.png">
+	<script type="module" src="index.js"></script>
+    <style>
+       /* Reset e base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e1e1e 0%, #232a34 100%);
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Dashboard grid */
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+/* Card */
+.card {
+    background: #2c2c2c;
+    border-radius: 12px;
+    padding: 22px;
+    border: 1px solid #353535;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+    transition: all 0.3s;
+}
+.card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.65);
+}
+
+.card-title {
+    font-size: 1.25em;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #739bf2;
+    border-bottom: 2px solid #3a3a3a;
+    padding-bottom: 7px;
+    letter-spacing: -0.1px;
+}
+
+/* Signal status */
+.signal-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 18px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 1.08em;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.18);
+}
+.signal-buy {
+    background: linear-gradient(135deg, #388e3c, #4caf50 80%);
+    color: #fff;
+}
+.signal-sell {
+    background: linear-gradient(135deg, #b71c1c, #f44336 80%);
+    color: #fff;
+}
+.signal-neutral {
+    background: linear-gradient(135deg, #424242, #757575 80%);
+    color: #fff;
+}
+
+/* Timer */
+.timer-container {
+    background: #232a34;
+    border-radius: 9px;
+    padding: 14px;
+    margin-top: 10px;
+}
+.timer-bar {
+    width: 100%;
+    height: 8px;
+    background: #222;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+.timer-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #ffe58f);
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+
+/* Indicator grid */
+.indicator-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+.indicator-item {
+   background-color: #222831; /* come header-stat-item */
+  border: 1px solid #222831; /* bordo uguale allo sfondo per effetto "flat" */
+  color: #fff; /* testo chiaro */
+  border-radius: 10px; /* arrotondamento come header-stat-item */
+  padding: 10px 20px; /* padding come header-stat-item */
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.7); /* stessa ombra */
+  margin-bottom: 10px; /* opzionale, se vuoi distanziare i bottoni */
+  box-sizing: border-box;
+  text-align: center;
+  min-width: 140px; /* opzionale, per uniformità */
+}
+.indicator-value {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #ffe58f;
+}
+.indicator-label {
+    font-size: 0.92em;
+    opacity: 0.8;
+    color: #aaa;
+}
+
+/* Confluence Score */
+.confluence-score {
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+    padding: 19px;
+    border-radius: 13px;
+    margin: 12px 0;
+}
+.score-positive {
+    background: linear-gradient(135deg, #388e3c, #4caf50 80%);
+    color: #fff;
+}
+.score-negative {
+    background: linear-gradient(135deg, #b71c1c, #f44336 80%);
+    color: #fff;
+}
+.score-neutral {
+    background: linear-gradient(135deg, #424242, #757575 80%);
+    color: #fff;
+}
+
+/* Stats Table */
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: #232a34;
+    color: #e0e0e0;
+}
+.stats-table th,
+.stats-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #353535;
+}
+.stats-table th {
+    background: #2c2c2c;
+    font-weight: 600;
+}
+
+/* Status Indicator */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+.status-active { background: #4caf50; }
+.status-warning { background: #ff9800; }
+.status-danger { background: #f44336; }
+.status-inactive { background: #757575; }
+
+/* Refresh Button */
+.refresh-btn {
+    background: linear-gradient(135deg, #2196f3, #21cbf3 80%);
+    border: none;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s;
+    margin-top: 10px;
+    box-shadow: 0 2px 10px rgba(33, 150, 243, 0.18);
+}
+.refresh-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(33, 150, 243, 0.32);
+}
+
+/* Pattern List */
+.pattern-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+.pattern-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    margin: 5px 0;
+    background: #232a34;
+    border-radius: 5px;
+}
+.pattern-bullish { border-left: 4px solid #4caf50; }
+.pattern-bearish { border-left: 4px solid #f44336; }
+.pattern-neutral { border-left: 4px solid #ff9800; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 10px;
+    }
+    body {
+        padding: 10px;
+    }
+}
+
+/* Titoli */
+h2 {
+    color: #739bf2 !important;
+    font-weight: bold !important;
+    letter-spacing: -0.1px !important;
+}
+
+.cryptoSelect {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border-radius: 6px !important;
+    background: linear-gradient(135deg, #232a34 60%, #2c2c2c 100%) !important;
+    color: #ffe58f !important;
+    border: 1.5px solid #353535 !important;
+    font-size: 1em !important;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.18) !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    outline: none !important;
+    margin-bottom: 12px !important;
+    appearance: none !important;
+    cursor: pointer !important;
+}
+
+.cryptoSelect:focus, .cryptoSelect:hover {
+    border-color: #739bf2 !important;
+    box-shadow: 0 4px 18px rgba(115, 155, 242, 0.18) !important;
+    background: linear-gradient(135deg, #232a34 60%, #293a54 100%) !important;
+    color: #fff !important;
+}
+
+.cryptoSelect option {
+    background: #232a34 !important;
+    color: #ffe58f !important;
+    font-family: inherit !important;
+}
+
+
+    </style>
+</head>
+<body>
+
+ <div class="dashboard-container">
+    <!-- Card: Seleziona Cripto -->
+    <div class="card">
+        <div class="crypto-select-box">
+            <label for="cryptoSelect">
+                <h3 class="card-title">🎯 Seleziona Cripto</h3>
+            </label>
+            <select id="cryptoSelect" class="cryptoSelect" onchange="changeSymbol()"></select>
+        </div>
+    </div>
+
+    <!-- Card: Segnale Principale -->
+    <div class="card">
+        <h3 class="card-title"><br>🎯 Segnale Principale</h3>
+        <div id="mainSignal" class="signal-status signal-neutral">
+            <span>IN ATTESA</span>
+            <span id="signalStrength">0.0</span>
+        </div>
+        <div class="timer-container">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span>Timer Status:</span>
+                <span id="timerStatus">NESSUN OK</span>
+            </div>
+            <div class="timer-bar">
+                <div id="timerFill" class="timer-fill" style="width: 0%"></div>
+            </div>
+            <div style="text-align: center; font-size: 0.9em; opacity: 0.8;">
+                <span id="timerProgress">0/6</span>
+            </div>
+        </div>
+    </div>
+        <!-- Confluence Score -->
+        <div class="card">
+            <h3 class="card-title">⚖️ Confluence Score</h3>
+            <div id="confluenceScore" class="confluence-score score-neutral">
+                0.0
+            </div>
+            <div style="text-align: center; font-size: 0.9em; opacity: 0.8;">
+                Soglia: ±0.5 per segnale valido
+            </div>
+        </div>
+
+        <!-- Indicatori Principali -->
+        <div class="card">
+            <h3 class="card-title">📊 Indicatori Principali</h3>
+            <div class="indicator-grid">
+                <div class="indicator-item">
+                    <div id="linregValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">LinReg Position</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="pearsonValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">Pearson R</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="bbValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">BB Position</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="stochValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">Stoch K</div>
+                </div>
+            </div>
+        </div>
+
+               <!-- Indicatori Secondari -->
+        <div class="card">
+            <h3 class="card-title">🔧 Indicatori Secondari</h3>
+            <div class="indicator-grid">
+                <div class="indicator-item">
+                    <div id="macdStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">MACD</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="momentumStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">Momentum</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="trendStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">Trend</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="paStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">Price Action</div>
+                </div>
+            </div>
+        </div>
+		
+		 <!-- Condizioni Base -->
+        <div class="card">
+            <h3 class="card-title">✅ Condizioni Base</h3>
+            <table class="stats-table">
+                <tr>
+                    <td><span id="linregStatus" class="status-indicator status-inactive"></span>LinReg in Zona</td>
+                    <td id="linregCheck">❌</td>
+                </tr>
+                <tr>
+                    <td><span id="pearsonStatus" class="status-indicator status-inactive"></span>Pearson Valido</td>
+                    <td id="pearsonCheck">❌</td>
+                </tr>
+                <tr>
+                    <td><span id="secondaryStatus" class="status-indicator status-inactive"></span>Indicatori Secondari</td>
+                    <td id="secondaryCheck">0/2</td>
+                </tr>
+            </table>
+        </div>
+		
+		 <!-- Statistiche Timer -->
+        <div class="card">
+            <h3 class="card-title">⏱️ Statistiche Timer</h3>
+            <table class="stats-table">
+                <tr>
+                    <td>Ultimo Segnale OK:</td>
+                    <td id="lastSignalTime">Nessuno</td>
+                </tr>
+                <tr>
+                    <td>Tipo Ultimo Segnale:</td>
+                    <td id="lastSignalType">--</td>
+                </tr>
+                <tr>
+                    <td>Barre Trascorse:</td>
+                    <td id="barsElapsed">--</td>
+                </tr>
+                <tr>
+                    <td>Barre Rimanenti:</td>
+                    <td id="barsRemaining">--</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Pattern Candele -->
+        <div class="card">
+            <h3 class="card-title">🕯️ Pattern Candele</h3>
+            <div class="pattern-list" id="patternList">
+                <div class="pattern-item pattern-neutral">
+                    <span>Nessun pattern rilevato</span>
+                    <span>--</span>
+                </div>
+            </div>
+        </div>
+
+               <!-- Controlli -->
+        <div class="card">
+            <h3 class="card-title">🎮 Controlli</h3>
+			<button class="refresh-btn" onclick="window.open('index-grafici.html')">
+            📈 Grafico
+        </button>
+            <button class="refresh-btn" onclick="refreshData()">
+                🔄 Aggiorna Dati
+            </button>
+            <button class="refresh-btn" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
+                ⏰ Auto Refresh: OFF
+            </button>
+            <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                Ultimo aggiornamento: <span id="lastUpdate">--</span>
+            </div>
+			<div id="loadingMessage" style="display:none; font-weight:bold; margin-bottom:10px;"></div>
+
+        </div>
+    </div>
+
+   
+</body>
+</html>
