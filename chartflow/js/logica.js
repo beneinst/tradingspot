@@ -416,5 +416,5 @@ export {
     config,
     saveState,
     loadState,
-    clearState
+    clearState as resetState
 };
