@@ -124,16 +124,7 @@ async function changeSymbol() {
     // Non carica automaticamente dati, aspetta l'upload JSON
 }
 
-// ================= GESTIONE EVENTI =================
-document.addEventListener('DOMContentLoaded', populateCryptoSelect);
-const cryptoSelect = document.getElementById('cryptoSelect');
-if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);
-const uploadBtn = document.getElementById('uploadBtn');
-const fileInput = document.getElementById('fileInput');
 
-if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);
-if (uploadBtn) uploadBtn.addEventListener('click', () => fileInput.click());
-if (fileInput) fileInput.addEventListener('change', handleFileUpload);
 
 // ================= AVVIO =================
 debugLog('🎯 APPLICAZIONE TRADING PRONTA');
@@ -377,3 +368,15 @@ candles.sort((a, b) => a.timestamp - b.timestamp);
 
 debugLog(`Processate ${candles.length} candele valide`);
 return candles;
+
+
+// ================= GESTIONE EVENTI =================
+document.addEventListener('DOMContentLoaded', populateCryptoSelect);
+const cryptoSelect = document.getElementById('cryptoSelect');
+if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);
+const uploadBtn = document.getElementById('uploadBtn');
+const fileInput = document.getElementById('fileInput');
+
+if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);
+if (uploadBtn) uploadBtn.addEventListener('click', () => fileInput.click());
+if (fileInput) fileInput.addEventListener('change', handleFileUpload);
