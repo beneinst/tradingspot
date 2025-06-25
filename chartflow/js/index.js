@@ -1,5 +1,41 @@
 // ================= CONFIGURAZIONE MULTI-SIMBOLO =================
-import { processNewCandle, loadState, getStateInfo, resetState } from './logica.js';
+import { processNewCandle, loadState, getStateInfo, resetState } from './js/logica.js';
+
+// =================== CONFIGURAZIONE ===================
+const COINS = [
+    { id: 'bitcoin', label: 'BTC/USDT', value: 'btcusdt', vs_currency: 'usd' },
+    { id: 'cosmos', label: 'ATOM/USDT', value: 'atomusdt', vs_currency: 'usd' },
+    { id: 'ethereum', label: 'ETH/USDT', value: 'ethusdt', vs_currency: 'usd' },
+    { id: 'fetch-ai', label: 'FET/USDC', value: 'fetusdc', vs_currency: 'usd' },
+    { id: 'solana', label: 'SOL/USDC', value: 'solusdc', vs_currency: 'usd' },
+    { id: 'binancecoin', label: 'BNB/USDC', value: 'bnbusdc', vs_currency: 'usd' },
+    { id: 'cardano', label: 'ADA/EUR', value: 'adaeur', vs_currency: 'eur' },
+    { id: 'uniswap', label: 'UNI/USDC', value: 'uniusdc', vs_currency: 'usd' },
+    { id: 'decentraland', label: 'MANA/USDT', value: 'manausdt', vs_currency: 'usd' },
+    { id: 'litecoin', label: 'LTC/USDT', value: 'ltcusdt', vs_currency: 'usd' },
+    { id: 'algorand', label: 'ALGO/USDT', value: 'algousdt', vs_currency: 'usd' },
+    { id: 'avalanche-2', label: 'AVAX/USDT', value: 'avaxusdt', vs_currency: 'usd' },
+    { id: 'avalanche-2', label: 'AVAX/USDC', value: 'avaxusdc', vs_currency: 'usd' },
+    { id: 'polkadot', label: 'DOT/USDC', value: 'dotusdc', vs_currency: 'usd' },
+    { id: 'near', label: 'NEAR/USDC', value: 'nearusdc', vs_currency: 'usd' },
+    { id: 'suicoin', label: 'SUI/USDC', value: 'suiusdc', vs_currency: 'usd' }
+];
+
+// ================= POPOLAMENTO SELECT =================
+function populateCryptoSelect() {
+    const select = document.getElementById('cryptoSelect');
+    if (!select) return;
+    select.innerHTML = '';
+    COINS.forEach(coin => {
+        const option = document.createElement('option');
+        option.value = coin.value;
+        option.textContent = coin.label;
+        select.appendChild(option);
+    });
+    // Imposta il valore selezionato in base alla configurazione corrente
+    select.value = CONFIG.currentSymbol;
+}
+
 
 const CONFIG = {
     interval: '4h',
