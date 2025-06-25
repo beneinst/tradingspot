@@ -58,26 +58,19 @@ function debugError(message, error = null) {
 }
 
 // ================= UI HELPERS =================
-function showLoadingMessage(message, type = 'info') {
-    const loadingEl = document.getElementById('loadingMessage');
-    if (loadingEl) {
-        loadingEl.style.display = 'block';
-        loadingEl.textContent = message;
-        loadingEl.style.color = type === 'error' ? '#f44336' : '#4caf50';
-        if (type !== 'error') {
-            setTimeout(() => {
-                loadingEl.style0.display = 'none';
-            }, 3000);
-        }
+function showStatusMessage(message, type = 'info') {
+    const statusDiv = document.getElementById('statusMessage');
+    if (statusDiv) {
+        statusDiv.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
+        debugLog(`Status: ${message}`);
     }
 }
 
-function updateLastUpdate() {
-    const lastUpdateEl = document.getElementById('lastUpdate');
-    if (lastUpdateEl) {
-        lastUpdateEl.textContent = new Date().toLocaleTimeString();
-    }
+function hideLoadingMessage() {
+    const loadingDiv = document.getElementById('loadingMessage');
+    if (loadingDiv) loadingDiv.style.display = 'none';
 }
+
 
 // ================= DASHBOARD UI =================
 function updateDashboardUI() {
@@ -157,8 +150,8 @@ async function changeSymbol() {
 
 // ================= GESTIONE EVENTI =================
 document.addEventListener('DOMContentLoaded', populateCryptoSelect);
-
 const cryptoSelect = document.getElementById('cryptoSelect');
+if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);
 const uploadBtn = document.getElementById('uploadBtn');
 const fileInput = document.getElementById('fileInput');
 

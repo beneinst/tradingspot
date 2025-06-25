@@ -541,7 +541,7 @@
 
         <!-- Controlli -->
         <div class="card">
-            <h3 class="card-title">🎮 Contr2olli</h3>
+            <h3 class="card-title">🎮 Contr4olli</h3>
             <button class="refresh-btn" onclick="window.open('index-grafici.html', '_blank')">
                 📈 Grafico
             </button>
@@ -555,7 +555,10 @@
                 Ultimo aggiornamento: <span id="lastUpdate">--</span>
             </div>
             <div id="loadingMessage" class="loading-message" style="display:none;"></div>
+			
+			<div id="loadingMessage" class="status-message"></div>
 			<div id="status" class="status-message"></div>
+
 
         </div>
     </div>
@@ -580,12 +583,7 @@
         }
 
         // Mostra/nascondi messaggi di stato
-        function showStatusMessage(message, type = 'info') {
-            const statusDiv = document.getElementById('statusMessage');
-            statusDiv.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
-            debugLog(`Status: ${message}`);
-        }
-
+       
         function showLoadingMessage(message) {
             const loadingDiv = document.getElementById('loadingMessage');
             loadingDiv.textContent = message;
@@ -593,10 +591,7 @@
             debugLog(`Loading: ${message}`);
         }
 
-        function hideLoadingMessage() {
-            const loadingDiv = document.getElementById('loadingMessage');
-            loadingDiv.style.display = 'none';
-        }
+      
 
         // Cambia simbolo selezionato
         function changeSymbol() {
