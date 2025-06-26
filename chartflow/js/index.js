@@ -128,7 +128,7 @@ function refreshData() {
     debugLog('refreshData - getLastIndicators:', info);
     if (!info || info.error) return;
 
-    // Aggiorna tutti gli indicatori, timer e pattern
+    // Mappa tutti gli indicatori agli elementi HTML
     const elementsToUpdate = {
         'bbPosition': info.bbPosition,
         'bbUpper': info.bbUpper,
@@ -144,7 +144,6 @@ function refreshData() {
         'pearson': info.pearson,
         'score': info.score,
         'candles': info.candles,
-        'isStale': info.isStale,
         'macdStatus': info.macdStatus,
         'momentumStatus': info.momentumStatus,
         'trendStatus': info.trendStatus,
@@ -156,33 +155,27 @@ function refreshData() {
         'lastSignalType': info.lastSignalType,
         'barsElapsed': info.barsElapsed,
         'barsRemaining': info.barsRemaining,
-        'patterns': info.patterns,
+        'patterns': info.patterns.join(', ') || 'Nessun pattern',
         'mainSignal': info.mainSignal,
         'signalStrength': info.signalStrength
     };
 
+    // Aggiorna gli elementi e registra eventuali problemi
     for (const [elementId, value] of Object.entries(elementsToUpdate)) {
         const el = document.getElementById(elementId);
         if (el) {
-            // Per array (es. patterns), puoi decidere come visualizzarli (es. join(', '))
-            if (elementId === 'patterns' && Array.isArray(value)) {
-                el.textContent = value.join(', ') || 'Nessun pattern rilevato';
-            } else if (elementId === 'isStale') {
-                // Esempio: mostra un badge di stato
-                el.textContent = value ? 'STALE' : 'FRESCO';
-                el.style.color = value ? '#ff4d4d' : '#26ff8a';
-            } else {
-                el.textContent = value;
-            }
+            el.textContent = value;
+            debugLog(`✅ Aggiornato ${elementId}: ${value}`);
+        } else {
+            debugLog(`❌ Elemento non trovato: ${elementId}`);
         }
     }
 
-    // Esempio: aggiorna il timer (se hai un elemento timer separato)
-    const timerEl = document.getElementById('timer');
-    if (timerEl && info.lastSignalTime) {
-        // Qui puoi calcolare il tempo trascorso dall'ultimo segnale
-        // Esempio semplificato:
-        timerEl.textContent = info.lastSignalTime ? `Ultimo segnale: ${info.lastSignalTime}` : 'Nessun segnale';
+    // Aggiornamento speciale per lo stato "isStale"
+    const staleEl = document.getElementById('isStale');
+    if (staleEl) {
+        staleEl.textContent = info.isStale ? 'STALE' : 'FRESCO';
+        staleEl.style.color = info.isStale ? '#ff4d4d' : '#26ff8a';
     }
 }
 
