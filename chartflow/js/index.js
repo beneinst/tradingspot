@@ -127,7 +127,63 @@ function refreshData() {
     const info = getLastIndicators();
     debugLog('refreshData - getLastIndicators:', info);
     if (!info || info.error) return;
-    // ... (aggiornamento delle card e dei timer come in precedenza) ...
+
+    // Aggiorna tutti gli indicatori, timer e pattern
+    const elementsToUpdate = {
+        'bbPosition': info.bbPosition,
+        'bbUpper': info.bbUpper,
+        'bbLower': info.bbLower,
+        'bbBasis': info.bbBasis,
+        'stochK': info.stochK,
+        'stochD': info.stochD,
+        'rsi': info.rsi,
+        'ema': info.ema,
+        'sma': info.sma,
+        'currentPrice': info.currentPrice,
+        'linreg': info.linreg,
+        'pearson': info.pearson,
+        'score': info.score,
+        'candles': info.candles,
+        'isStale': info.isStale,
+        'macdStatus': info.macdStatus,
+        'momentumStatus': info.momentumStatus,
+        'trendStatus': info.trendStatus,
+        'paStatus': info.paStatus,
+        'linregCheck': info.linregCheck,
+        'pearsonCheck': info.pearsonCheck,
+        'secondaryCheck': info.secondaryCheck,
+        'lastSignalTime': info.lastSignalTime,
+        'lastSignalType': info.lastSignalType,
+        'barsElapsed': info.barsElapsed,
+        'barsRemaining': info.barsRemaining,
+        'patterns': info.patterns,
+        'mainSignal': info.mainSignal,
+        'signalStrength': info.signalStrength
+    };
+
+    for (const [elementId, value] of Object.entries(elementsToUpdate)) {
+        const el = document.getElementById(elementId);
+        if (el) {
+            // Per array (es. patterns), puoi decidere come visualizzarli (es. join(', '))
+            if (elementId === 'patterns' && Array.isArray(value)) {
+                el.textContent = value.join(', ') || 'Nessun pattern rilevato';
+            } else if (elementId === 'isStale') {
+                // Esempio: mostra un badge di stato
+                el.textContent = value ? 'STALE' : 'FRESCO';
+                el.style.color = value ? '#ff4d4d' : '#26ff8a';
+            } else {
+                el.textContent = value;
+            }
+        }
+    }
+
+    // Esempio: aggiorna il timer (se hai un elemento timer separato)
+    const timerEl = document.getElementById('timer');
+    if (timerEl && info.lastSignalTime) {
+        // Qui puoi calcolare il tempo trascorso dall'ultimo segnale
+        // Esempio semplificato:
+        timerEl.textContent = info.lastSignalTime ? `Ultimo segnale: ${info.lastSignalTime}` : 'Nessun segnale';
+    }
 }
 
 // =================== CAMBIO SIMBOLO ===================
