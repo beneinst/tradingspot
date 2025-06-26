@@ -160,19 +160,19 @@ function updateDownloadButton() {
     const copyLinkBtn = document.getElementById('copyLinkBtn');
     const currentCoin = getCurrentCoin();
 
-    if (currentCoin && currentCoin.dataUrl) {
+    if (currentCoin) {
+        const binanceUrl = `https://api.binance.com/api/v3/klines?symbol=${currentCoin.value}&interval=4h&limit=500`;
         if (downloadBtn) {
             downloadBtn.disabled = false;
             downloadBtn.textContent = `📥 Scarica ${currentCoin.label}`;
-            downloadBtn.title = `Scarica dati da: ${currentCoin.dataUrl}`;
+            downloadBtn.title = `Scarica dati da Binance: ${binanceUrl}`;
             downloadBtn.onclick = () => {
-                // Apre il link in una nuova finestra
-                window.open(currentCoin.dataUrl, '_blank');
+                window.open(binanceUrl, '_blank');
                 showStatusMessage(`Link di ${currentCoin.label} aperto in una nuova finestra`, 'success');
             };
         }
         if (downloadLinkField) {
-            downloadLinkField.value = currentCoin.dataUrl;
+            downloadLinkField.value = binanceUrl;
             downloadLinkField.style.display = 'block';
         }
         if (copyLinkBtn) {
@@ -182,7 +182,7 @@ function updateDownloadButton() {
         if (downloadBtn) {
             downloadBtn.disabled = true;
             downloadBtn.textContent = '📥 Link non disponibile';
-            downloadBtn.title = 'Nessun link statico configurato per questa criptovaluta';
+            downloadBtn.title = 'Nessun link configurato per questa criptovaluta';
         }
         if (downloadLinkField) {
             downloadLinkField.style.display = 'none';
