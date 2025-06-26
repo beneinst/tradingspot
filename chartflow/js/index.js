@@ -1,5 +1,6 @@
 // =================== CONFIGURAZIONE MULTI-SIMBOLO ===================
-import { processNewCandle, loadState, saveState, resetState, getCurrentState } from './logica.js';
+import { getCurrentState, resetState } from './logica.js';
+
 
 const COINS = [
     { id: 'bitcoin', label: 'BTC/USDT', value: 'btcusdt', vs_currency: 'usd', dataUrl: 'https://tuosito.com/data/btcusdt_4h.json' },
@@ -216,14 +217,10 @@ function changeSymbol() {
     debugLog(`Cambio simbolo: ${CONFIG.currentSymbol} -> ${newSymbol}`);
     CONFIG.currentSymbol = newSymbol;
 
-    // Carica lo stato persistente per il nuovo simbolo
-    if (loadState(CONFIG.currentSymbol)) {
-        debugLog('Stato caricato da localStorage per', CONFIG.currentSymbol);
-        refreshData();
-    } else {
-        debugLog('Nessuno stato precedente trovato per', CONFIG.currentSymbol);
-        refreshData();
-    }
+    // Ora non carichiamo più lo stato da localStorage, ma aggiorniamo semplicemente la dashboard
+    debugLog('Simbolo cambiato:', CONFIG.currentSymbol);
+    refreshData();
+}
 
     // Aggiorna il pulsante e il link di download
     updateDownloadButton();
@@ -446,11 +443,10 @@ function initApp() {
     updateDownloadButton();
     setupCopyLinkButton();
 
-    // Carica stato persistente all'avvio
-    if (loadState(CONFIG.currentSymbol)) {
-        debugLog('Stato caricato da localStorage per', CONFIG.currentSymbol);
-        refreshData();
-    }
+    // Inizia con stato vuoto
+    resetState(); // Opzionale, se vuoi resettare lo stato
+    debugLog('Stato inizializzato');
+    refreshData();
 
     // Event listeners
     const cryptoSelect = document.getElementById('cryptoSelect');
