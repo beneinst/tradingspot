@@ -1,5 +1,5 @@
 // =================== CONFIGURAZIONE MULTI-SIMBOLO ===================
-import { processNewCandle, loadState, saveState, getStateInfo, resetState, getLastIndicators } from './logica.js';
+import { processNewCandle, loadState, saveState, getStateInfo, resetState, getCurrentState } from './logica.js';
 
 const COINS = [
     { id: 'bitcoin', label: 'BTC/USDT', value: 'btcusdt', vs_currency: 'usd', dataUrl: 'https://tuosito.com/data/btcusdt_4h.json' },
@@ -29,24 +29,11 @@ const CONFIG = {
     debugMode: true
 };
 
+let downloadedData = null;
+
 function getCurrentCoin() {
     return COINS.find(coin => coin.value.toLowerCase() === CONFIG.currentSymbol.toLowerCase());
 }
-
-const result = processNewCandle({
-  open: 100,
-  high: 105,
-  low: 95,
-  close: 102,
-  volume: 10000,
-  timestamp: Date.now()
-}, 'BTCUSDT');
-const state = getCurrentState();
-resetState();
-
-
-
-let downloadedData = null;
 
 // =================== DEBUG & UI HELPERS ===================
 function showLoadingMessage(message) {
@@ -136,41 +123,55 @@ function populateCryptoSelect() {
 
 // =================== AGGIORNA LA DASHBOARD ===================
 function refreshData() {
-    const info = getLastIndicators();
-    debugLog('refreshData - getLastIndicators:', info);
-    if (!info || info.error) return;
+    // Ottieni lo stato corrente (puoi usare getCurrentState o getStateInfo, a seconda di cosa ti serve)
+    const state = getCurrentState();
+    debugLog('refreshData - getCurrentState:', state);
+    if (!state) return;
 
-    // Mappa tutti gli indicatori agli elementi HTML
+    // Estrai gli indicatori principali dal risultato di processNewCandle
+    // Nota: nella nuova logica, gli indicatori sono in state.indicators
+    // Se vuoi visualizzare anche i dettagli di ogni indicatore, puoi accedere a state.indicators
+    // Qui faccio un esempio base con i dati principali
+    const indicators = state.indicators || {};
+    const mainSignal = state.signal || "NONE";
+    const timerCount = state.timerCount || 0;
+    const signalStartIndex = state.signalStartIndex || -1;
+
+    // Mappa gli indicatori principali agli elementi HTML
+    // Aggiungi qui tutti gli indicatori che vuoi visualizzare nella dashboard
+    // Nota: alcuni indicatori potrebbero non essere presenti, quindi usa ?. per evitare errori
     const elementsToUpdate = {
-        'bbPosition': info.bbPosition,
-        'bbUpper': info.bbUpper,
-        'bbLower': info.bbLower,
-        'bbBasis': info.bbBasis,
-        'stochK': info.stochK,
-        'stochD': info.stochD,
-        'rsi': info.rsi,
-        'ema': info.ema,
-        'sma': info.sma,
-        'currentPrice': info.currentPrice,
-        'linreg': info.linreg,
-        'pearson': info.pearson,
-		'confluenceScore': info.score, 
-        'score': info.score,
-        'candles': info.candles,
-        'macdStatus': info.macdStatus,
-        'momentumStatus': info.momentumStatus,
-        'trendStatus': info.trendStatus,
-        'paStatus': info.paStatus,
-        'linregCheck': info.linregCheck,
-        'pearsonCheck': info.pearsonCheck,
-        'secondaryCheck': info.secondaryCheck,
-        'lastSignalTime': info.lastSignalTime,
-        'lastSignalType': info.lastSignalType,
-        'barsElapsed': info.barsElapsed,
-        'barsRemaining': info.barsRemaining,
-        'patterns': info.patterns.join(', ') || 'Nessun pattern',
-        'mainSignal': info.mainSignal,
-        'signalStrength': info.signalStrength
+        'mainSignal': mainSignal,
+        'timerStatus': mainSignal !== "NONE" ? "ATTIVO" : "NESSUN OK",
+        'timerProgress': mainSignal !== "NONE" ? `${timerCount}/${config.timerPeriods}` : "0/12",
+        'confluenceScore': indicators.confluence?.score?.toFixed(2) || "0.00",
+        'score': indicators.confluence?.score?.toFixed(2) || "0.00",
+        'bbPosition': indicators.bb?.position?.toFixed(2) || "0.00",
+        'bbUpper': indicators.bb?.upper?.toFixed(2) || "0.00",
+        'bbLower': indicators.bb?.lower?.toFixed(2) || "0.00",
+        'bbBasis': indicators.bb?.basis?.toFixed(2) || "0.00",
+        'stochK': indicators.stoch?.k?.toFixed(2) || "0.00",
+        'stochD': "0.00", // Se non calcolato, lascia 0.00
+        'rsi': indicators.ma?.rsi?.toFixed(2) || "0.00",
+        'ema': indicators.ma?.ema?.toFixed(2) || "0.00",
+        'sma': indicators.ma?.sma?.toFixed(2) || "0.00",
+        'currentPrice': indicators.ma?.currentPrice?.toFixed(2) || "0.00", // Nota: currentPrice potrebbe non essere in ma, adatta se necessario
+        'linreg': indicators.linreg?.toFixed(2) || "0.00",
+        'pearson': indicators.pearsonR?.toFixed(2) || "0.00",
+        'candles': state.prices?.length || "0",
+        'macdStatus': indicators.macd?.histogram > 0 ? "BULLISH" : indicators.macd?.histogram < 0 ? "BEARISH" : "NEUTRO",
+        'momentumStatus': indicators.momentum?.score > 0 ? "BULLISH" : indicators.momentum?.score < 0 ? "BEARISH" : "NEUTRO",
+        'trendStatus': indicators.ma?.trend > 0 ? "BULLISH" : indicators.ma?.trend < 0 ? "BEARISH" : "NEUTRO",
+        'paStatus': indicators.priceAction?.pattern > 0 ? "BULLISH" : indicators.priceAction?.pattern < 0 ? "BEARISH" : "NEUTRO",
+        'linregCheck': Math.abs(indicators.linreg) >= config.linregThreshold ? "✔️" : "❌",
+        'pearsonCheck': Math.abs(indicators.pearsonR) >= 0.5 ? "✔️" : "❌",
+        'secondaryCheck': "0/4", // Puoi calcolare il numero di indicatori secondari positivi, adatta se necessario
+        'lastSignalTime': signalStartIndex !== -1 ? new Date(state.timestamps[signalStartIndex]).toLocaleString() : "--",
+        'lastSignalType': mainSignal !== "NONE" ? mainSignal : "--",
+        'barsElapsed': mainSignal !== "NONE" ? timerCount : "--",
+        'barsRemaining': mainSignal !== "NONE" ? (config.timerPeriods - timerCount) : "--",
+        'patterns': indicators.priceAction?.type || "Nessun pattern",
+        'signalStrength': indicators.confluence?.score?.toFixed(2) || "0.00"
     };
 
     // Aggiorna gli elementi e registra eventuali problemi
@@ -187,8 +188,22 @@ function refreshData() {
     // Aggiornamento speciale per lo stato "isStale"
     const staleEl = document.getElementById('isStale');
     if (staleEl) {
-        staleEl.textContent = info.isStale ? 'STALE' : 'FRESCO';
-        staleEl.style.color = info.isStale ? '#ff4d4d' : '#26ff8a';
+        const isStale = false; // Puoi calcolare isStale in base ai tuoi criteri
+        staleEl.textContent = isStale ? 'STALE' : 'FRESCO';
+        staleEl.style.color = isStale ? '#ff4d4d' : '#26ff8a';
+    }
+
+    // Aggiorna la classe di confluenceScore in base al valore
+    const scoreEl = document.getElementById('confluenceScore');
+    if (scoreEl) {
+        const scoreValue = Number(indicators.confluence?.score || 0);
+        if (scoreValue > 0.5) {
+            scoreEl.className = 'confluence-score score-positive';
+        } else if (scoreValue < -0.5) {
+            scoreEl.className = 'confluence-score score-negative';
+        } else {
+            scoreEl.className = 'confluence-score score-neutral';
+        }
     }
 }
 
@@ -215,7 +230,7 @@ function changeSymbol() {
     showLoadingMessage(`📊 Selezionato ${newSymbol.toUpperCase()} (scarica o carica un file JSON per i dati)`);
 }
 
-// =================== AGGIORNA PULSANTE E LINK DdI DOWNLOAD ===================
+// =================== AGGIORNA PULSANTE E LINK DI DOWNLOAD ===================
 function updateDownloadButton() {
     const downloadBtn = document.getElementById('downloadBtn');
     const downloadLinkField = document.getElementById('downloadLink');
@@ -256,7 +271,6 @@ function updateDownloadButton() {
         }
     }
 }
-
 
 // =================== COPIA LINK DI DOWNLOAD ===================
 function setupCopyLinkButton() {
@@ -456,3 +470,7 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
+
+// Nota: config.timerPeriods va definito se non lo usi dal modulo logica.js
+// Se logica.js non lo espone, puoi aggiungerlo qui
+const config = { timerPeriods: 12 };

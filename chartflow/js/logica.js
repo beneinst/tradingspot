@@ -522,3 +522,4 @@ export function resetState() {
     timerCount = 0;
     signalStartIndex = -1;
 }
+
