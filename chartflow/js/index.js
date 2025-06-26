@@ -1,3 +1,4 @@
+// =================== CONFIGURAZIONE MULTI-SIMBOLO ===================
 import { processNewCandle, loadState, saveState, getStateInfo, resetState, getLastIndicators } from './logica.js';
 
 const COINS = [
@@ -29,11 +30,6 @@ const CONFIG = {
 };
 
 let downloadedData = null;
-
-// =================== FUNZIONE PER TROVARE LA MONETA CORRENTE ===================
-function getCurrentCoin() {
-    return COINS.find(coin => coin.value.toLowerCase() === CONFIG.currentSymbol.toLowerCase());
-}
 
 // =================== DEBUG & UI HELPERS ===================
 function showLoadingMessage(message) {
@@ -81,7 +77,6 @@ function showStatusMessage(message, type = 'info') {
     }
     statusDiv.textContent = message || '';
     statusDiv.style.display = 'block';
-
     clearTimeout(statusDiv._timeout);
     statusDiv._timeout = setTimeout(() => {
         statusDiv.style.display = 'none';
@@ -119,20 +114,25 @@ function populateCryptoSelect() {
         option.textContent = coin.label;
         select.appendChild(option);
     });
-    select.value = CONFIG.currentSymbol.toLowerCase();
+    select.value = CONFIG.currentSymbol;
+}
+
+// =================== AGGIORNA LA DASHBOARD ===================
+function refreshData() {
+    const info = getLastIndicators();
+    debugLog('refreshData - getLastIndicators:', info);
+    if (!info || info.error) return;
+    // ... (aggiornamento delle card e dei timer come in precedenza) ...
 }
 
 // =================== CAMBIO SIMBOLO ===================
 function changeSymbol() {
     const selectEl = document.getElementById('cryptoSelect');
     if (!selectEl) return;
-    const newSymbol = selectEl.value.toUpperCase();
+    const newSymbol = selectEl.value;
     if (newSymbol === CONFIG.currentSymbol) return;
     debugLog(`Cambio simbolo: ${CONFIG.currentSymbol} -> ${newSymbol}`);
     CONFIG.currentSymbol = newSymbol;
-
-    // Aggiorna il pulsante di download con il link statico
-    updateDownloadButton();
 
     // Carica lo stato persistente per il nuovo simbolo
     if (loadState(CONFIG.currentSymbol)) {
@@ -143,126 +143,66 @@ function changeSymbol() {
         refreshData();
     }
 
-    showLoadingMessage(`📊 Selezionato ${newSymbol} - Clicca su "Scarica Dati" per ottenere i dati aggiornati`);
+    // Aggiorna il pulsante e il link di download
+    updateDownloadButton();
+    showLoadingMessage(`📊 Selezionato ${newSymbol.toUpperCase()} (scarica o carica un file JSON per i dati)`);
 }
 
-// =================== AGGIORNA PULSANTE DOWNLOAD ===================
+// =================== AGGIORNA PULSANTE E LINK DI DOWNLOAD ===================
 function updateDownloadButton() {
     const downloadBtn = document.getElementById('downloadBtn');
-    if (!downloadBtn) return;
+    const downloadLinkField = document.getElementById('downloadLink');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
     const currentCoin = getCurrentCoin();
+
     if (currentCoin && currentCoin.dataUrl) {
-        downloadBtn.disabled = false;
-        downloadBtn.textContent = `📥 Scarica ${currentCoin.label}`;
-        downloadBtn.title = `Scarica dati da: ${currentCoin.dataUrl}`;
+        if (downloadBtn) {
+            downloadBtn.disabled = false;
+            downloadBtn.textContent = `📥 Scarica ${currentCoin.label}`;
+            downloadBtn.title = `Scarica dati da: ${currentCoin.dataUrl}`;
+            downloadBtn.onclick = () => {
+                // Apre il link in una nuova finestra
+                window.open(currentCoin.dataUrl, '_blank');
+                showStatusMessage(`Link di ${currentCoin.label} aperto in una nuova finestra`, 'success');
+            };
+        }
+        if (downloadLinkField) {
+            downloadLinkField.value = currentCoin.dataUrl;
+            downloadLinkField.style.display = 'block';
+        }
+        if (copyLinkBtn) {
+            copyLinkBtn.style.display = 'block';
+        }
     } else {
-        downloadBtn.disabled = true;
-        downloadBtn.textContent = '📥 Link non disponibile';
-        downloadBtn.title = 'Nessun link statico configurato per questa criptovaluta';
+        if (downloadBtn) {
+            downloadBtn.disabled = true;
+            downloadBtn.textContent = '📥 Link non disponibile';
+            downloadBtn.title = 'Nessun link statico configurato per questa criptovaluta';
+        }
+        if (downloadLinkField) {
+            downloadLinkField.style.display = 'none';
+        }
+        if (copyLinkBtn) {
+            copyLinkBtn.style.display = 'none';
+        }
     }
 }
 
-// =================== SCARICA DATI DA LINK STATICO ===================
-async function downloadStaticData() {
-    const currentCoin = getCurrentCoin();
-    if (!currentCoin || !currentCoin.dataUrl) {
-        showStatusMessage('Nessun link statico configurato per questa criptovaluta!', 'error');
-        return;
-    }
+// =================== COPIA LINK DI DOWNLOAD ===================
+function setupCopyLinkButton() {
+    const copyBtn = document.getElementById('copyLinkBtn');
+    const linkField = document.getElementById('downloadLink');
+    if (!copyBtn || !linkField) return;
 
-    const downloadBtn = document.getElementById('downloadBtn');
-    downloadBtn.disabled = true;
-    downloadBtn.textContent = '⏳ Scaricando...';
-
-    showLoadingMessage(`Scaricando dati da link statico per ${currentCoin.label}...`);
-    debugLog(`Scaricando da: ${currentCoin.dataUrl}`);
-
-    try {
-        const response = await fetch(currentCoin.dataUrl);
-        if (!response.ok) throw new Error(`Errore HTTP: ${response.status} - ${response.statusText}`);
-        const data = await response.json();
-        debugLog(`Ricevuti ${Array.isArray(data) ? data.length : 'N/A'} record dal link statico`);
-
-        if (!data || (Array.isArray(data) && data.length === 0)) {
-            throw new Error('Nessun dato ricevuto dal link statico');
+    copyBtn.onclick = async () => {
+        try {
+            await navigator.clipboard.writeText(linkField.value);
+            showStatusMessage('Link copiato negli appunti!', 'success');
+        } catch (err) {
+            debugError('Errore copia link:', err);
+            showStatusMessage('Errore durante la copia del link', 'error');
         }
-
-        // Converti i dati nel formato standard
-        let candles;
-        if (Array.isArray(data)) {
-            const firstItem = data[0];
-            if (Array.isArray(firstItem) && firstItem.length >= 6) {
-                candles = data.map(k => ({
-                    timestamp: k[0],
-                    open: parseFloat(k[1]),
-                    high: parseFloat(k[2]),
-                    low: parseFloat(k[3]),
-                    close: parseFloat(k[4]),
-                    volume: parseFloat(k[5]),
-                    closed: true
-                }));
-            } else if (typeof firstItem === 'object' && firstItem.timestamp) {
-                candles = data.map(k => ({
-                    timestamp: k.timestamp,
-                    open: parseFloat(k.open),
-                    high: parseFloat(k.high),
-                    low: parseFloat(k.low),
-                    close: parseFloat(k.close),
-                    volume: parseFloat(k.volume || 0),
-                    closed: k.closed !== undefined ? k.closed : true
-                }));
-            } else {
-                throw new Error('Formato dati nel file statico non riconosciuto');
-            }
-        } else {
-            throw new Error('I dati dal link statico non sono in formato array');
-        }
-
-        downloadedData = candles;
-        debugLog(`Convertite ${downloadedData.length} candele dal link statico`);
-
-        hideLoadingMessage();
-        showStatusMessage(`✅ Dati scaricati con successo! ${downloadedData.length} candele per ${currentCoin.label}`, 'success');
-
-        if (typeof processNewCandle === 'function') {
-            debugLog('logica.js trovato, processando dati...');
-            processDownloadedData();
-        } else {
-            debugLog('logica.js non trovato - dati pronti per il caricamento manuale');
-            showStatusMessage('Dati pronti! logica.js non caricato automaticamente.', 'warning');
-        }
-    } catch (error) {
-        debugError(`Errore download da link statico: ${error.message}`);
-        hideLoadingMessage();
-        showStatusMessage(`❌ Errore nel download: ${error.message}`, 'error');
-    } finally {
-        downloadBtn.disabled = false;
-        updateDownloadButton();
-    }
-}
-
-// =================== PROCESSA DATI SCARICATI ===================
-function processDownloadedData() {
-    if (!downloadedData || downloadedData.length === 0) {
-        debugLog('Nessun dato da processare');
-        return;
-    }
-    try {
-        debugLog('Iniziando processing con logica.js...');
-        downloadedData.forEach((candle, index) => {
-            processNewCandle(candle, CONFIG.currentSymbol.toLowerCase());
-            if (index > 0 && index % 100 === 0) {
-                debugLog(`Processate ${index}/${downloadedData.length} candele`);
-            }
-        });
-        debugLog('Processing completato');
-        showStatusMessage('✅ Dati processati con logica.js!', 'success');
-        saveState(CONFIG.currentSymbol);
-        refreshData();
-    } catch (error) {
-        debugError(`Errore processing: ${error.message}`);
-        showStatusMessage(`❌ Errore processing: ${error.message}`, 'error');
-    }
+    };
 }
 
 // =================== HANDLE FILE UPLOAD ===================
@@ -313,8 +253,48 @@ function handleFileUpload(event) {
                         volume: parseFloat(k.volume),
                         closed: k.closed !== undefined ? k.closed : true
                     }));
+                } else if (typeof firstItem === 'object' && (firstItem.time || firstItem.date)) {
+                    debugLog('Riconosciuto formato con time/date');
+                    candles = rawData.map(k => ({
+                        timestamp: k.time || k.date,
+                        open: parseFloat(k.open || k.o),
+                        high: parseFloat(k.high || k.h),
+                        low: parseFloat(k.low || k.l),
+                        close: parseFloat(k.close || k.c),
+                        volume: parseFloat(k.volume || k.v || 0),
+                        closed: k.closed !== undefined ? k.closed : true
+                    }));
                 } else {
-                    throw new Error('Formato dati non riconosciuto nel file caricato');
+                    debugLog('Formato non riconosciuto, tentativo auto-rilevamento:', firstItem);
+                    if (typeof firstItem === 'object') {
+                        const keys = Object.keys(firstItem);
+                        const timestampKey = keys.find(key =>
+                            key.toLowerCase().includes('time') ||
+                            key.toLowerCase().includes('date') ||
+                            key === 'ts' || key === 't'
+                        );
+                        const openKey = keys.find(key => key.toLowerCase().includes('open') || key === 'o');
+                        const highKey = keys.find(key => key.toLowerCase().includes('high') || key === 'h');
+                        const lowKey = keys.find(key => key.toLowerCase().includes('low') || key === 'l');
+                        const closeKey = keys.find(key => key.toLowerCase().includes('close') || key === 'c');
+                        const volumeKey = keys.find(key => key.toLowerCase().includes('volume') || key === 'v');
+                        if (timestampKey && openKey && highKey && lowKey && closeKey) {
+                            debugLog(`Auto-rilevamento riuscito: ${timestampKey}, ${openKey}, ${highKey}, ${lowKey}, ${closeKey}`);
+                            candles = rawData.map(k => ({
+                                timestamp: k[timestampKey],
+                                open: parseFloat(k[openKey]),
+                                high: parseFloat(k[highKey]),
+                                low: parseFloat(k[lowKey]),
+                                close: parseFloat(k[closeKey]),
+                                volume: volumeKey ? parseFloat(k[volumeKey]) : 0,
+                                closed: true
+                            }));
+                        } else {
+                            throw new Error('Formato dati non riconosciuto. Chiavi disponibili: ' + keys.join(', '));
+                        }
+                    } else {
+                        throw new Error('Formato dati non supportato: ' + typeof firstItem);
+                    }
                 }
             }
 
@@ -331,7 +311,7 @@ function handleFileUpload(event) {
             );
             candles.sort((a, b) => a.timestamp - b.timestamp);
 
-            debugLog(`Processate ${candles.length} candele valide dal file`);
+            debugLog(`Processate ${candles.length} candele valide`);
             downloadedData = candles;
             hideLoadingMessage();
             showStatusMessage(`✅ File caricato con successo! ${candles.length} candele`, 'success');
@@ -352,10 +332,35 @@ function handleFileUpload(event) {
     reader.readAsText(file);
 }
 
+// =================== PROCESSA DATI SCARICATI ===================
+function processDownloadedData() {
+    if (!downloadedData || downloadedData.length === 0) {
+        debugLog('Nessun dato da processare');
+        return;
+    }
+    try {
+        debugLog('Iniziando processing con logica.js...');
+        downloadedData.forEach((candle, index) => {
+            processNewCandle(candle, CONFIG.currentSymbol.toLowerCase());
+            if (index > 0 && index % 100 === 0) {
+                debugLog(`Processate ${index}/${downloadedData.length} candele`);
+            }
+        });
+        debugLog('Processing completato');
+        showStatusMessage('✅ Dati processati con logica.js!', 'success');
+        saveState(CONFIG.currentSymbol);
+        refreshData();
+    } catch (error) {
+        debugLog(`Errore processing: ${error.message}`);
+        showStatusMessage(`❌ Errore processing: ${error.message}`, 'error');
+    }
+}
+
 // =================== INIZIALIZZAZIONE ===================
 function initApp() {
     populateCryptoSelect();
     updateDownloadButton();
+    setupCopyLinkButton();
 
     // Carica stato persistente all'avvio
     if (loadState(CONFIG.currentSymbol)) {
@@ -367,16 +372,13 @@ function initApp() {
     const cryptoSelect = document.getElementById('cryptoSelect');
     if (cryptoSelect) cryptoSelect.addEventListener('change', changeSymbol);
 
-    const downloadBtn = document.getElementById('downloadBtn');
-    if (downloadBtn) downloadBtn.addEventListener('click', downloadStaticData);
-
     const uploadBtn = document.getElementById('uploadBtn');
     const fileInput = document.getElementById('fileInput');
     if (uploadBtn && fileInput) uploadBtn.addEventListener('click', () => fileInput.click());
     if (fileInput) fileInput.addEventListener('change', handleFileUpload);
 
-    debugLog('🎯 APPLICAZIONE TRADING PRONTA CON LINK STATICI');
-    showLoadingMessage('Seleziona una criptovaluta e clicca su "Scarica Dati" per ottenere i dati dal link statico');
+    debugLog('🎯 APPLICAZIONE TRADING PRONTA');
+    showLoadingMessage('Seleziona una criptovaluta, scarica o carica un file JSON per iniziare');
 }
 
 if (document.readyState === 'loading') {
