@@ -72,30 +72,88 @@
             gap: 10px;
             margin-top: 10px;
         }
-        .action-btn {
-            flex: 1;
-            background: linear-gradient(135deg, #2196f3, #21cbf3 80%);
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 2px 10px rgba(33, 150, 243, 0.18);
-            font-size: 0.9em;
-        }
-        .action-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.32);
-        }
-        .action-btn.download {
-            background: linear-gradient(135deg, #4caf50, #66bb6a 80%);
-            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.18);
-        }
-        .action-btn.download:hover:not(:disabled) {
-            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.32);
-        }
+       .action-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #2196f3, #21cbf3 80%);
+    border: none;
+    color: white;
+    padding: 14px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.25);
+    font-size: 0.95em;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(3px);
+}
+
+.action-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(33, 150, 243, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Effetto "pressione" al click */
+.action-btn:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+/* Pulsante download (verde) */
+.action-btn.download {
+    background: linear-gradient(135deg, #4caf50, #66bb6a 80%);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-btn.download:hover:not(:disabled) {
+    box-shadow: 0 8px 24px rgba(76, 175, 80, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px) scale(1.02);
+}
+
+.action-btn.download:active:not(:disabled) {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Effetto "ripple" opzionale (per un tocco extra) */
+.action-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.4);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%, -50%);
+    transform-origin: 50% 50%;
+}
+
+.action-btn:focus:not(:active)::after {
+    animation: ripple 0.7s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.4;
+    }
+    20% {
+        transform: scale(25, 25);
+        opacity: 0.2;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(40, 40);
+    }
+}
+
         .file-input {
             display: none;
         }
@@ -113,45 +171,70 @@
         .signal-buy { background: linear-gradient(135deg, #388e3c, #4caf50 80%); color: #fff; }
         .signal-sell { background: linear-gradient(135deg, #b71c1c, #f44336 80%); color: #fff; }
         .signal-neutral { background: linear-gradient(135deg, #424242, #757575 80%); color: #fff; }
-        .timer-container {
-            background: #232a34;
-            border-radius: 9px;
-            padding: 14px;
-            margin-top: 10px;
-        }
-        .timer-bar {
-            width: 100%;
-            height: 8px;
-            background: #222;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        .timer-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4caf50, #ffe58f);
-            border-radius: 4px;
-            transition: width 0.3s;
-        }
+      /* Stile timer-container (come una card moderna) */
+.timer-container {
+    background: rgba(40, 45, 54, 0.85);
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(6px);
+}
+
+.timer-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Timer bar e fill (come prima) */
+.timer-bar {
+    width: 100%;
+    height: 8px;
+    background: #222;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 12px 0;
+}
+
+.timer-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #ffe58f);
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+
         .indicator-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
         }
         .indicator-item {
-            background-color: #222831;
-            border: 1px solid #222831;
-            color: #fff;
-            border-radius: 10px;
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.7);
-            margin-bottom: 10px;
-            box-sizing: border-box;
-            text-align: center;
-            min-width: 140px;
-        }
+    background-color: #222831;
+    border: 1px solid #222831;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: box-shadow 0.18s, transform 0.18s, background 0.18s, border 0.18s;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    text-align: center;
+    min-width: 140px;
+}
+
+.indicator-item:hover {
+    background: #232831;
+    border: 1px solid #3a3a3a;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.85);
+    transform: translateY(-2px) scale(1.01);
+}
+
         .indicator-value {
             font-size: 1.2em;
             font-weight: 600;
@@ -163,29 +246,44 @@
             opacity: 0.8;
             color: #aaa;
         }
-        .confluence-score {
-            font-size: 2em;
-            font-weight: bold;
-            text-align: center;
-            padding: 19px;
-            border-radius: 13px;
-            margin: 12px 0;
-        }
-        .score-positive { background: linear-gradient(135deg, #388e3c, #4caf50 80%); color: #fff; }
-        .score-negative { background: linear-gradient(135deg, #b71c1c, #f44336 80%); color: #fff; }
-        .score-neutral { background: linear-gradient(135deg, #424242, #757575 80%); color: #fff; }
-        .stats-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background: #232a34;
-            color: #e0e0e0;
-            border: 1px solid #222831;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.7);
-            transition: box-shadow 0.2s, transform 0.2s;
-            overflow: hidden;
-        }
+        /* Confluence score (come una card moderna) */
+.confluence-score {
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+    padding: 19px;
+    border-radius: 13px;
+    margin: 12px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(3px);
+}
+
+.confluence-score:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Colori per segnali (come già definito) */
+.score-positive { background: linear-gradient(135deg, #388e3c, #4caf50 80%); color: #fff; }
+.score-negative { background: linear-gradient(135deg, #b71c1c, #f44336 80%); color: #fff; }
+.score-neutral { background: linear-gradient(135deg, #424242, #757575 80%); color: #fff; }
+
+/* Stats table (come già definito) */
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: #232a34;
+    color: #e0e0e0;
+    border: 1px solid #222831;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    transition: box-shadow 0.2s, transform 0.2s;
+    overflow: hidden;
+}
         .stats-table th, .stats-table td {
             padding: 8px 12px;
             text-align: left;
@@ -673,12 +771,12 @@
 
     <!-- Controlli -->
     <div class="card">
-        <h3 class="card-title">🎮 Control33li</h3>
+        <h3 class="card-title">🎮 Controlli</h3>
         <button class="action-btn" onclick="window.open('index-grafici.html', '_blank')">
             📈 Grafico
         </button>
         <button class="action-btn" onclick="refreshData()">
-            🔄 Aggiorna Dati
+            🔄 Aggiorna
         </button>
         <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
             Ultimo aggiornamento: <span id="lastUpdate">--</span>
