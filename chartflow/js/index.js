@@ -167,7 +167,7 @@ async function downloadBinanceData() {
     debugLog(`Iniziando download per ${CONFIG.currentSymbol}`);
 
     try {
-        const url = `https://api.binance.com/api/v3/klines?symbol=${CONFIG.currentSymbol}&interval=4h&limit=500`;
+        const url = `./php/binance_proxy.php?symbol=${CONFIG.currentSymbol}&interval=4h&limit=500`;
         debugLog(`URL API: ${url}`);
 
         const response = await fetch(url);
