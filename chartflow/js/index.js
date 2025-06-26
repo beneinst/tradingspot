@@ -1,7 +1,8 @@
 // =================== CONFIGURAZIONE MULTI-SIMBOLO ===================
 const config = { timerPeriods: 12 }; // Deve essere prima di ogni suo utilizzo
 
-import { getCurrentState, resetState } from './logica.js';
+import { processNewCandle, getCurrentState, resetState } from './logica.js';
+
 
 const COINS = [
     { id: 'bitcoin', label: 'BTC/USDT', value: 'btcusdt', vs_currency: 'usd', dataUrl: 'https://tuosito.com/data/btcusdt_4h.json' },
