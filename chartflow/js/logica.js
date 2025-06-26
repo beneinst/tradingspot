@@ -1,4 +1,4 @@
-// logica.js - Versione semplificata e robusta
+// logica.js - Versione definitiva con gestione errori avanzata
 
 // =================== CONFIGURAZIONE ===================
 const config = {
@@ -10,6 +10,7 @@ const config = {
     timerPeriods: 12
 };
 
+// Stato globale con valori predefiniti
 const state = {
     prices: [],
     highs: [],
@@ -20,39 +21,64 @@ const state = {
     lastUpdate: null
 };
 
+// Stato del segnale
 let currentSignal = "NONE";
 let timerCount = 0;
-let signalStartIndex = -1;
+let signalStartTimestamp = null;  // Memorizziamo il timestamp invece dell'indice
 
-// =================== FUNZIONI INDICATORI ===================
-
-function sma(period) {
-    if (state.prices.length < period) return null;
-    return state.prices.slice(-period).reduce((sum, val) => sum + val, 0) / period;
+// =================== FUNZIONI SICURE PER INDICATORI ===================
+function getSafeArrayValue(array, index) {
+    return array && array.length > index ? array[index] : null;
 }
 
-function ema(period) {
+function safeSMA(period) {
     if (state.prices.length < period) return null;
-    let emaValue = sma(period);
+    const prices = state.prices.slice(-period);
+    return prices.reduce((sum, val) => sum + val, 0) / period;
+}
+
+function safeEMA(period) {
+    if (state.prices.length < period) return null;
+    
+    let ema = safeSMA(period);
     const alpha = 2 / (period + 1);
+    
     for (let i = period; i < state.prices.length; i++) {
-        emaValue = (state.prices[i] - emaValue) * alpha + emaValue;
+        const price = getSafeArrayValue(state.prices, i);
+        if (price === null) break;
+        ema = (price - ema) * alpha + ema;
     }
-    return emaValue;
+    
+    return ema;
 }
 
-function rsi(period) {
+function safeRSI(period) {
     if (state.prices.length < period + 1) return 50;
-    let gains = 0, losses = 0;
+    
+    let gains = 0;
+    let losses = 0;
+    
+    // Calcola guadagni/perdite iniziali
     for (let i = 1; i <= period; i++) {
-        const change = state.prices[i] - state.prices[i - 1];
+        const prev = getSafeArrayValue(state.prices, i - 1);
+        const curr = getSafeArrayValue(state.prices, i);
+        if (prev === null || curr === null) return 50;
+        
+        const change = curr - prev;
         if (change > 0) gains += change;
         else losses += Math.abs(change);
     }
+    
     let avgGain = gains / period;
     let avgLoss = losses / period;
+    
+    // Calcola RSI scorrevole
     for (let i = period + 1; i < state.prices.length; i++) {
-        const change = state.prices[i] - state.prices[i - 1];
+        const prev = getSafeArrayValue(state.prices, i - 1);
+        const curr = getSafeArrayValue(state.prices, i);
+        if (prev === null || curr === null) break;
+        
+        const change = curr - prev;
         if (change > 0) {
             avgGain = (avgGain * (period - 1) + change) / period;
             avgLoss = (avgLoss * (period - 1)) / period;
@@ -61,87 +87,101 @@ function rsi(period) {
             avgLoss = (avgLoss * (period - 1) + Math.abs(change)) / period;
         }
     }
+    
     if (avgLoss === 0) return 100;
     const rs = avgGain / avgLoss;
     return 100 - (100 / (1 + rs));
 }
 
-function calculateLinReg() {
+function safeLinReg() {
     if (state.prices.length < config.linregLength) return 0;
+    
     const prices = state.prices.slice(-config.linregLength);
     let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+    
     for (let i = 0; i < prices.length; i++) {
         sumX += i;
         sumY += prices[i];
         sumXY += i * prices[i];
         sumX2 += i * i;
     }
+    
     const n = prices.length;
     const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
     return slope;
 }
 
-function calculateBollingerBands() {
+function safeBollingerBands() {
     if (state.prices.length < config.bbLength) return { position: 0 };
+    
     const prices = state.prices.slice(-config.bbLength);
     const basis = prices.reduce((sum, val) => sum + val, 0) / config.bbLength;
-    const stdDev = Math.sqrt(prices.map(p => Math.pow(p - basis, 2)).reduce((sum, val) => sum + val, 0) / config.bbLength);
+    
+    const deviations = prices.map(p => Math.pow(p - basis, 2));
+    const stdDev = Math.sqrt(deviations.reduce((sum, val) => sum + val, 0) / config.bbLength);
+    
     const upper = basis + 2 * stdDev;
     const lower = basis - 2 * stdDev;
-    const currentPrice = state.prices[state.prices.length - 1];
+    const currentPrice = state.prices[state.prices.length - 1] || 0;
     const position = (currentPrice - lower) / (upper - lower);
+    
     return { position, upper, lower, basis, currentPrice };
 }
 
-function calculateMACD() {
+function safeMACD() {
     if (state.prices.length < config.emaLength + 1) return { histogram: 0 };
-    const emaFast = ema(config.emaLength);
-    const emaSlow = ema(config.smaLength);
+    
+    const emaFast = safeEMA(config.emaLength);
+    const emaSlow = safeEMA(config.smaLength);
+    
     if (emaFast === null || emaSlow === null) return { histogram: 0 };
-    const macdLine = emaFast - emaSlow;
-    return { histogram: macdLine };
+    return { histogram: emaFast - emaSlow };
 }
 
-// =================== GESTIONE SEGNALI E TIMER ===================
-
-function checkSignal() {
-    const emaValue = ema(config.emaLength);
-    const smaValue = sma(config.smaLength);
-    const rsiValue = rsi(config.rsiLength);
-    if (emaValue === null || smaValue === null) return "NONE";
-    if (emaValue > smaValue && rsiValue > 50) return "BUY";
-    if (emaValue < smaValue && rsiValue < 50) return "SELL";
-    return "NONE";
+// =================== GESTIONE SEGNALI SICURA ===================
+function safeCheckSignal() {
+    try {
+        const emaValue = safeEMA(config.emaLength);
+        const smaValue = safeSMA(config.smaLength);
+        const rsiValue = safeRSI(config.rsiLength);
+        
+        if (emaValue === null || smaValue === null) return "NONE";
+        
+        if (emaValue > smaValue && rsiValue > 50) return "BUY";
+        if (emaValue < smaValue && rsiValue < 50) return "SELL";
+        return "NONE";
+    } catch {
+        return "NONE";
+    }
 }
 
-function updateTimer(newSignal) {
+function safeUpdateTimer(newSignal, candleTimestamp) {
     if (newSignal === "NONE") {
         timerCount = 0;
         currentSignal = "NONE";
-        signalStartIndex = -1;
+        signalStartTimestamp = null;
     } else if (currentSignal === "NONE") {
         currentSignal = newSignal;
         timerCount = 1;
-        signalStartIndex = state.prices.length - 1;
+        signalStartTimestamp = candleTimestamp;
     } else if (newSignal !== currentSignal) {
         currentSignal = newSignal;
         timerCount = 1;
-        signalStartIndex = state.prices.length - 1;
+        signalStartTimestamp = candleTimestamp;
     } else {
         if (timerCount < config.timerPeriods) timerCount++;
         else {
             currentSignal = "NONE";
             timerCount = 0;
-            signalStartIndex = -1;
+            signalStartTimestamp = null;
         }
     }
 }
 
-// =================== PROCESSAMENTO CANDELA ===================
-
-export function processNewCandle(candle, symbol = 'btcusdt') {
+// =================== CORE: PROCESSAMENTO CANDELA ===================
+export function processNewCandle(candle) {
     try {
-        // Aggiungi candela allo stato
+        // Aggiunta sicura dei valori
         state.opens.push(candle.open);
         state.highs.push(candle.high);
         state.lows.push(candle.low);
@@ -150,8 +190,13 @@ export function processNewCandle(candle, symbol = 'btcusdt') {
         state.timestamps.push(candle.timestamp);
         state.lastUpdate = Date.now();
 
-        // Mantieni dimensioni massime
-        const maxSize = Math.max(config.linregLength, config.bbLength, config.smaLength) + 100;
+        // Mantenimento dimensione ottimale
+        const maxSize = Math.max(
+            config.linregLength, 
+            config.bbLength, 
+            config.smaLength
+        ) + 100;
+        
         if (state.prices.length > maxSize) {
             state.opens.shift();
             state.highs.shift();
@@ -161,42 +206,35 @@ export function processNewCandle(candle, symbol = 'btcusdt') {
             state.timestamps.shift();
         }
 
-        // Verifica regole di trading
-        const newSignal = checkSignal();
-
-        // Aggiorna timer e segnali
-        updateTimer(newSignal);
-
-        // Calcola indicatori per report
-        const indicators = {
-            linreg: calculateLinReg(),
-            bb: calculateBollingerBands(),
-            macd: calculateMACD(),
-            ema: ema(config.emaLength),
-            sma: sma(config.smaLength),
-            rsi: rsi(config.rsiLength),
-            currentPrice: state.prices[state.prices.length - 1],
-            candles: state.prices.length
-        };
+        // Calcolo segnale e timer
+        const newSignal = safeCheckSignal();
+        safeUpdateTimer(newSignal, candle.timestamp);
 
         return {
             signal: currentSignal,
-            signalStartIndex,
-            indicators,
-            timer: {
-                current: timerCount,
-                max: config.timerPeriods,
-                active: currentSignal !== "NONE"
+            signalStartTimestamp,
+            timerCount,
+            indicators: {
+                linreg: safeLinReg(),
+                bb: safeBollingerBands(),
+                macd: safeMACD(),
+                ema: safeEMA(config.emaLength),
+                sma: safeSMA(config.smaLength),
+                rsi: safeRSI(config.rsiLength),
+                currentPrice: candle.close,
+                candles: state.prices.length
             }
         };
     } catch (error) {
-        console.error("Errore in processNewCandle:", error);
-        return null;
+        console.error("Errore critico in processNewCandle:", error);
+        return {
+            signal: "NONE",
+            indicators: {}
+        };
     }
 }
 
 // =================== FUNZIONI AUSILIARIE ===================
-
 export function getCurrentState() {
     const lastCandle = state.prices.length > 0 ? {
         open: state.opens[state.opens.length - 1],
@@ -210,16 +248,16 @@ export function getCurrentState() {
     return {
         signal: currentSignal,
         timerCount,
-        signalStartIndex,
+        signalStartTimestamp,
         lastCandle,
         indicators: {
-            linreg: calculateLinReg(),
-            bb: calculateBollingerBands(),
-            macd: calculateMACD(),
-            ema: ema(config.emaLength),
-            sma: sma(config.smaLength),
-            rsi: rsi(config.rsiLength),
-            currentPrice: state.prices.length > 0 ? state.prices[state.prices.length - 1] : null,
+            linreg: safeLinReg(),
+            bb: safeBollingerBands(),
+            macd: safeMACD(),
+            ema: safeEMA(config.emaLength),
+            sma: safeSMA(config.smaLength),
+            rsi: safeRSI(config.rsiLength),
+            currentPrice: state.prices[state.prices.length - 1] || 0,
             candles: state.prices.length
         }
     };
@@ -234,6 +272,6 @@ export function resetState() {
     state.timestamps = [];
     currentSignal = "NONE";
     timerCount = 0;
-    signalStartIndex = -1;
+    signalStartTimestamp = null;
     state.lastUpdate = null;
 }

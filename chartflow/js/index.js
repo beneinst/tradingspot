@@ -427,6 +427,7 @@ function processDownloadedData() {
         debugLog('Iniziando processing con logica.js...');
         downloadedData.forEach((candle, index) => {
             processNewCandle(candle, CONFIG.currentSymbol.toLowerCase());
+			console.log(`Candela ${index} processata:`, candle.close); // <-- Aggiungi
             if (index > 0 && index % 100 === 0) {
                 debugLog(`Processate ${index}/${downloadedData.length} candele`);
             }
