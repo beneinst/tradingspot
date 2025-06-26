@@ -1,6 +1,7 @@
 // =================== CONFIGURAZIONE MULTI-SIMBOLO ===================
-import { getCurrentState, resetState } from './logica.js';
+const config = { timerPeriods: 12 }; // Deve essere prima di ogni suo utilizzo
 
+import { getCurrentState, resetState } from './logica.js';
 
 const COINS = [
     { id: 'bitcoin', label: 'BTC/USDT', value: 'btcusdt', vs_currency: 'usd', dataUrl: 'https://tuosito.com/data/btcusdt_4h.json' },
@@ -124,23 +125,20 @@ function populateCryptoSelect() {
 
 // =================== AGGIORNA LA DASHBOARD ===================
 function refreshData() {
-    // Ottieni lo stato corrente (puoi usare getCurrentState o getStateInfo, a seconda di cosa ti serve)
+    // Ottieni lo stato corrente
     const state = getCurrentState();
     debugLog('refreshData - getCurrentState:', state);
     if (!state) return;
 
     // Estrai gli indicatori principali dal risultato di processNewCandle
     // Nota: nella nuova logica, gli indicatori sono in state.indicators
-    // Se vuoi visualizzare anche i dettagli di ogni indicatore, puoi accedere a state.indicators
-    // Qui faccio un esempio base con i dati principali
     const indicators = state.indicators || {};
     const mainSignal = state.signal || "NONE";
     const timerCount = state.timerCount || 0;
     const signalStartIndex = state.signalStartIndex || -1;
 
     // Mappa gli indicatori principali agli elementi HTML
-    // Aggiungi qui tutti gli indicatori che vuoi visualizzare nella dashboard
-    // Nota: alcuni indicatori potrebbero non essere presenti, quindi usa ?. per evitare errori
+    // Adatta i nomi degli indicatori in base a ciò che restituisce getCurrentState()
     const elementsToUpdate = {
         'mainSignal': mainSignal,
         'timerStatus': mainSignal !== "NONE" ? "ATTIVO" : "NESSUN OK",
@@ -156,7 +154,7 @@ function refreshData() {
         'rsi': indicators.ma?.rsi?.toFixed(2) || "0.00",
         'ema': indicators.ma?.ema?.toFixed(2) || "0.00",
         'sma': indicators.ma?.sma?.toFixed(2) || "0.00",
-        'currentPrice': indicators.ma?.currentPrice?.toFixed(2) || "0.00", // Nota: currentPrice potrebbe non essere in ma, adatta se necessario
+        'currentPrice': indicators.ma?.currentPrice?.toFixed(2) || "0.00",
         'linreg': indicators.linreg?.toFixed(2) || "0.00",
         'pearson': indicators.pearsonR?.toFixed(2) || "0.00",
         'candles': state.prices?.length || "0",
@@ -164,7 +162,7 @@ function refreshData() {
         'momentumStatus': indicators.momentum?.score > 0 ? "BULLISH" : indicators.momentum?.score < 0 ? "BEARISH" : "NEUTRO",
         'trendStatus': indicators.ma?.trend > 0 ? "BULLISH" : indicators.ma?.trend < 0 ? "BEARISH" : "NEUTRO",
         'paStatus': indicators.priceAction?.pattern > 0 ? "BULLISH" : indicators.priceAction?.pattern < 0 ? "BEARISH" : "NEUTRO",
-        'linregCheck': Math.abs(indicators.linreg) >= config.linregThreshold ? "✔️" : "❌",
+        'linregCheck': Math.abs(indicators.linreg) >= (config.linregThreshold || 0.1) ? "✔️" : "❌", // Se non definito, usa 0.1
         'pearsonCheck': Math.abs(indicators.pearsonR) >= 0.5 ? "✔️" : "❌",
         'secondaryCheck': "0/4", // Puoi calcolare il numero di indicatori secondari positivi, adatta se necessario
         'lastSignalTime': signalStartIndex !== -1 ? new Date(state.timestamps[signalStartIndex]).toLocaleString() : "--",
@@ -225,7 +223,6 @@ function changeSymbol() {
     updateDownloadButton();
     showLoadingMessage(`📊 Selezionato ${newSymbol.toUpperCase()} (scarica o carica un file JSON per i dati)`);
 }
-
 
 // =================== AGGIORNA PULSANTE E LINK DI DOWNLOAD ===================
 function updateDownloadButton() {
@@ -429,7 +426,7 @@ function processDownloadedData() {
         });
         debugLog('Processing completato');
         showStatusMessage('✅ Dati processati con logica.js!', 'success');
-        saveState(CONFIG.currentSymbol);
+        // Ho rimosso saveState(), che non esiste più
         refreshData();
     } catch (error) {
         debugLog(`Errore processing: ${error.message}`);
@@ -466,7 +463,3 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
-
-// Nota: config.timerPeriods va definito se non lo usi dal modulo logica.js
-// Se logica.js non lo espone, puoi aggiungerlo qui
-const config = { timerPeriods: 12 };
