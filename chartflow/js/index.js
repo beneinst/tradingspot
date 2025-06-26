@@ -153,7 +153,7 @@ function changeSymbol() {
     showLoadingMessage(`📊 Selezionato ${newSymbol.toUpperCase()} (scarica o carica un file JSON per i dati)`);
 }
 
-// =================== AGGIORNA PULSANTE E LINK DI DOWNLOAD ===================
+// =================== AGGIORNA PULSANTE E LINK DdI DOWNLOAD ===================
 function updateDownloadButton() {
     const downloadBtn = document.getElementById('downloadBtn');
     const downloadLinkField = document.getElementById('downloadLink');
