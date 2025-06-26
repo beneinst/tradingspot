@@ -1,6 +1,5 @@
-// logica.js - Strategia Multi-Confluenza aggiornata con indicatori secondari e timer
+// logica.js - Strategia Multi-Confluenza avanzata
 
-// ================= CONFIGURAZIONI =================
 const config = {
     lengthInput: 100,
     bbLength: 20,
@@ -19,7 +18,6 @@ const config = {
     maxDataAge: 24 * 60 * 60 * 1000
 };
 
-// ================= VARIABILI DI STATO =================
 const state = {
     prices: [],
     highs: [],
@@ -27,10 +25,18 @@ const state = {
     opens: [],
     timestamps: [],
     lastUpdate: null,
-    version: '1.1'
+    version: '1.2'
 };
 
+// Variabili di stato per timer e segnali
+let lastSignalTime = null;
+let lastSignalType = "--";
+let barsElapsed = "--";
+let barsRemaining = "--";
+let lastSignalCandleIndex = null; // Indice della candela in cui è stato confermato l'ultimo segnale
+
 // ================= UTILS =================
+
 function sma(values, period) {
     if (values.length < period) return 0;
     let sum = 0;
@@ -82,12 +88,13 @@ function rsi(values, period) {
 }
 
 // ================= INDICATORI PRINCIPALI =================
+
 function calculateIndicators() {
     const minRequiredCandles = Math.max(
-        config.lengthInput, 
-        config.bbLength, 
-        config.emaLength, 
-        config.smaLength, 
+        config.lengthInput,
+        config.bbLength,
+        config.emaLength,
+        config.smaLength,
         config.momentumLength + 1,
         config.stochRsiRsiLength + config.stochRsiLength
     );
@@ -98,7 +105,7 @@ function calculateIndicators() {
     const bbDev = config.bbMult * stdev(state.prices, config.bbLength);
     const bbUpper = bbBasis + bbDev;
     const bbLower = bbBasis - bbDev;
-    const bbPosition = bbUpper !== bbLower ? 
+    const bbPosition = bbUpper !== bbLower ?
         ((currentPrice - bbLower) / (bbUpper - bbLower)) * 2 - 1 : 0;
 
     const emaValue = ema(state.prices, config.emaLength);
@@ -123,6 +130,7 @@ function calculateIndicators() {
 }
 
 // ================= INDICATORI SECONDARI =================
+
 function calculateMACD() {
     if (state.prices.length < config.macdSlowLength) return { status: "NEUTRO" };
     const fast = ema(state.prices, config.macdFastLength);
@@ -152,7 +160,6 @@ function calculateTrend() {
 }
 
 function calculatePriceAction() {
-    // Semplificato: se ultima candela verde -> BULLISH, rossa -> BEARISH, altro -> NEUTRO
     if (state.opens.length < 1 || state.prices.length < 1) return { status: "NEUTRO" };
     const open = state.opens[state.opens.length - 1];
     const close = state.prices[state.prices.length - 1];
@@ -162,38 +169,96 @@ function calculatePriceAction() {
 }
 
 // ================= CONDIZIONI BASE =================
+
 function getConditionChecks(indicators, macd, momentum, trend, pa) {
     return {
         linregCheck: Math.abs(indicators.linreg) > 0.1 ? "✔️" : "❌",
         pearsonCheck: Math.abs(indicators.pearson) > 0.2 ? "✔️" : "❌",
-        secondaryCheck: 
+        secondaryCheck:
             [macd.status, momentum.status, trend.status, pa.status]
                 .filter(s => s === "BULLISH" || s === "BEARISH").length + "/4"
     };
 }
 
-// ================= TIMER E PATTERN (ESEMPI) =================
-let lastSignalTime = null;
-let lastSignalType = "--";
-let barsElapsed = "--";
-let barsRemaining = "--";
+// ================= VERIFICA CONFERMA SEGNALE =================
 
-function updateTimerAndSignals(result) {
-    // Esempio: aggiorna timer e segnali in base al segnale principale
-    if (result.mainSignal && result.mainSignal !== "IN ATTESA") {
-        lastSignalTime = new Date(result.timestamp).toLocaleString();
-        lastSignalType = result.mainSignal;
-        barsElapsed = 0;
-        barsRemaining = 12; // esempio
-    } else {
+function isSignalConfirmed(indicators, macd, momentum, trend, pa, cond) {
+    // 1. LinReg e Pearson devono essere OK
+    if (cond.linregCheck !== "✔️" || cond.pearsonCheck !== "✔️") return false;
+
+    // 2. Almeno due indicatori secondari o primari devono essere in linea
+    const secondaryIndicators = [macd.status, momentum.status, trend.status, pa.status];
+    const bullishCount = secondaryIndicators.filter(s => s === "BULLISH").length;
+    const bearishCount = secondaryIndicators.filter(s => s === "BEARISH").length;
+
+    // Aggiungi indicatori primari (es. StochK, BB, ecc.) se vuoi
+    // Esempio: const stochBullish = indicators.stochK > 50;
+    // const stochBearish = indicators.stochK < 50;
+    // bullishCount += stochBullish ? 1 : 0;
+    // bearishCount += stochBearish ? 1 : 0;
+
+    // Per ora solo indicatori secondari
+    return bullishCount >= 2 || bearishCount >= 2;
+}
+
+// ================= TIMER E SEGNALI =================
+
+function updateTimerAndSignals(result, currentCandleIndex) {
+    if (!isSignalConfirmed(result, result.macdStatus, result.momentumStatus, result.trendStatus, result.paStatus, {
+        linregCheck: result.linregCheck,
+        pearsonCheck: result.pearsonCheck
+    })) {
+        // Se non c'è conferma, resetta il timer se non è già scaduto
+        if (lastSignalCandleIndex !== null && currentCandleIndex - lastSignalCandleIndex >= 12) {
+            lastSignalTime = null;
+            lastSignalType = "--";
+            barsElapsed = "--";
+            barsRemaining = "--";
+            lastSignalCandleIndex = null;
+        }
+        return;
+    }
+
+    // Determina la direzione del segnale confermato
+    const secondaryIndicators = [result.macdStatus, result.momentumStatus, result.trendStatus, result.paStatus];
+    const bullishCount = secondaryIndicators.filter(s => s === "BULLISH").length;
+    const bearishCount = secondaryIndicators.filter(s => s === "BEARISH").length;
+    const signalType = bullishCount >= 2 ? "BUY" : bearishCount >= 2 ? "SELL" : "--";
+
+    if (signalType === "--") return;
+
+    // Se il segnale è confermato, aggiorna il timer
+    lastSignalTime = new Date().toLocaleString();
+    lastSignalType = signalType;
+    lastSignalCandleIndex = currentCandleIndex;
+    barsElapsed = 0;
+    barsRemaining = 12;
+}
+
+function updateTimer(currentCandleIndex) {
+    if (lastSignalCandleIndex === null) {
         barsElapsed = "--";
         barsRemaining = "--";
+        return;
+    }
+
+    const elapsed = currentCandleIndex - lastSignalCandleIndex;
+    if (elapsed >= 12) {
+        lastSignalTime = null;
+        lastSignalType = "--";
+        barsElapsed = "--";
+        barsRemaining = "--";
+        lastSignalCandleIndex = null;
+    } else {
+        barsElapsed = elapsed;
+        barsRemaining = 12 - elapsed;
     }
 }
 
 // ================= AGGIUNTA DATI =================
+
 function addTick(open, high, low, close, timestamp = null, symbol = 'btcusdt') {
-    if (typeof open !== 'number' || typeof high !== 'number' || 
+    if (typeof open !== 'number' || typeof high !== 'number' ||
         typeof low !== 'number' || typeof close !== 'number') return false;
     if (high < low || close < low || close > high || open < low || open > high) return false;
     state.opens.push(open);
@@ -214,6 +279,7 @@ function addTick(open, high, low, close, timestamp = null, symbol = 'btcusdt') {
 }
 
 // ================= PROCESSAMENTO =================
+
 let lastIndicators = null;
 
 function processNewCandle(candle, symbol = 'btcusdt') {
@@ -252,31 +318,39 @@ function processNewCandle(candle, symbol = 'btcusdt') {
         signalStrength = indicators.score;
     }
 
-    // Statistiche timer
-    updateTimerAndSignals({ mainSignal, timestamp });
+    // Score (esempio)
+    indicators.score = Number(((indicators.bbPosition + indicators.stochK/100 + linreg + pearson) / 4).toFixed(4));
 
-    const result = {
+    // Aggiorna timer e segnali
+    const currentCandleIndex = state.prices.length - 1;
+    updateTimerAndSignals({
         ...indicators,
-        score: Number(((indicators.bbPosition + indicators.stochK/100 + linreg + pearson) / 4).toFixed(4)),
-        candles: state.prices.length,
-        isStale: false,
-        // Indicatori secondari
         macdStatus: macd.status,
         momentumStatus: momentum.status,
         trendStatus: trend.status,
         paStatus: pa.status,
-        // Condizioni base
+        linregCheck: cond.linregCheck,
+        pearsonCheck: cond.pearsonCheck
+    }, currentCandleIndex);
+    updateTimer(currentCandleIndex);
+
+    const result = {
+        ...indicators,
+        score: indicators.score,
+        candles: state.prices.length,
+        isStale: false,
+        macdStatus: macd.status,
+        momentumStatus: momentum.status,
+        trendStatus: trend.status,
+        paStatus: pa.status,
         linregCheck: cond.linregCheck,
         pearsonCheck: cond.pearsonCheck,
         secondaryCheck: cond.secondaryCheck,
-        // Statistiche timer
         lastSignalTime,
         lastSignalType,
         barsElapsed,
         barsRemaining,
-        // Pattern candele
         patterns,
-        // Segnale principale
         mainSignal,
         signalStrength
     };
@@ -285,6 +359,7 @@ function processNewCandle(candle, symbol = 'btcusdt') {
 }
 
 // ================= CALCOLI LINREG E PEARSON =================
+
 function calculateLinReg() {
     const prices = state.prices.slice(-config.lengthInput);
     if (prices.length < 2) return 0;
@@ -323,6 +398,7 @@ function calculatePearson() {
 }
 
 // ================= INFO E VALIDAZIONE =================
+
 function getLastIndicators() {
     return lastIndicators;
 }
@@ -340,6 +416,7 @@ function getStateInfo(symbol = 'btcusdt') {
 }
 
 // ================= SALVATAGGIO E RIPRISTINO STATO =================
+
 function saveState(symbol) {
     const savedData = {
         prices: state.prices,
@@ -348,10 +425,11 @@ function saveState(symbol) {
         opens: state.opens,
         timestamps: state.timestamps,
         lastUpdate: state.lastUpdate,
-        lastSignalTime,     // Salva anche il timer!
+        lastSignalTime,
         lastSignalType,
         barsElapsed,
         barsRemaining,
+        lastSignalCandleIndex,
         version: state.version,
     };
     try {
@@ -378,11 +456,27 @@ function loadState(symbol) {
         state.opens = data.opens || [];
         state.timestamps = data.timestamps || [];
         state.lastUpdate = data.lastUpdate || null;
-        // Timer e segnali
         lastSignalTime = data.lastSignalTime || null;
         lastSignalType = data.lastSignalType || "--";
         barsElapsed = data.barsElapsed || "--";
         barsRemaining = data.barsRemaining || "--";
+        lastSignalCandleIndex = data.lastSignalCandleIndex || null;
+
+        // Se c'è un timer attivo, aggiorna il conteggio in base alle candele caricate
+        if (lastSignalCandleIndex !== null) {
+            const currentCandleIndex = state.prices.length - 1;
+            const elapsed = currentCandleIndex - lastSignalCandleIndex;
+            if (elapsed >= 12) {
+                lastSignalTime = null;
+                lastSignalType = "--";
+                barsElapsed = "--";
+                barsRemaining = "--";
+                lastSignalCandleIndex = null;
+            } else {
+                barsElapsed = elapsed;
+                barsRemaining = 12 - elapsed;
+            }
+        }
         return true;
     } catch (error) {
         clearState(symbol);
@@ -402,10 +496,11 @@ function clearState(symbol) {
     lastSignalType = "--";
     barsElapsed = "--";
     barsRemaining = "--";
+    lastSignalCandleIndex = null;
 }
 
-
 // ================= EXPORT =================
+
 export {
     processNewCandle,
     getLastIndicators,
