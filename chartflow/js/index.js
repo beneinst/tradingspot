@@ -142,6 +142,7 @@ function refreshData() {
         'currentPrice': info.currentPrice,
         'linreg': info.linreg,
         'pearson': info.pearson,
+		'confluenceScore': info.score, 
         'score': info.score,
         'candles': info.candles,
         'macdStatus': info.macdStatus,
