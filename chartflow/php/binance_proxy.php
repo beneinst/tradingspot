@@ -1,6 +1,10 @@
 <?php
+// Non ci devono essere spazi o output prima di <?php
+
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *'); // Consente richieste da qualsiasi dominio (adatta in produzione!)
+header('Access-Control-Allow-Origin: https://beneinst.github.io'); // oppure '*' per test
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
 $symbol = isset($_GET['symbol']) ? strtoupper($_GET['symbol']) : 'BTCUSDT';
 $interval = isset($_GET['interval']) ? $_GET['interval'] : '4h';
@@ -23,3 +27,4 @@ if ($response === false) {
 
 echo $response;
 ?>
+
