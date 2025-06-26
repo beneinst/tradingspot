@@ -220,12 +220,12 @@ function changeSymbol() {
     // Ora non carichiamo più lo stato da localStorage, ma aggiorniamo semplicemente la dashboard
     debugLog('Simbolo cambiato:', CONFIG.currentSymbol);
     refreshData();
-}
 
     // Aggiorna il pulsante e il link di download
     updateDownloadButton();
     showLoadingMessage(`📊 Selezionato ${newSymbol.toUpperCase()} (scarica o carica un file JSON per i dati)`);
 }
+
 
 // =================== AGGIORNA PULSANTE E LINK DI DOWNLOAD ===================
 function updateDownloadButton() {
