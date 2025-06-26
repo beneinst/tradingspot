@@ -33,6 +33,18 @@ function getCurrentCoin() {
     return COINS.find(coin => coin.value.toLowerCase() === CONFIG.currentSymbol.toLowerCase());
 }
 
+const result = processNewCandle({
+  open: 100,
+  high: 105,
+  low: 95,
+  close: 102,
+  volume: 10000,
+  timestamp: Date.now()
+}, 'BTCUSDT');
+const state = getCurrentState();
+resetState();
+
+
 
 let downloadedData = null;
 
