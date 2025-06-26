@@ -1,277 +1,402 @@
-// logica.js - Versione definitiva con gestione errori avanzata
+ // === CONFIGURAZIONI E VARIABILI GLOBALI ===
+        const CONFIG = {
+            updateInterval: 5000, // 5 secondi
+            dataPoints: 50,
+            apiEndpoint: '/api/indicators', // Placeholder per API reale
+            symbols: ['BTCUSDT', 'ETHUSDT', 'ADAUSDT'] // Esempio simboli
+        };
 
-// =================== CONFIGURAZIONE ===================
-const config = {
-    linregLength: 100,
-    bbLength: 20,
-    emaLength: 21,
-    smaLength: 50,
-    rsiLength: 14,
-    timerPeriods: 12
-};
+        let currentSymbol = 'BTCUSDT';
+        let indicators = {};
+        let priceData = [];
+        let updateTimer = null;
 
-// Stato globale con valori predefiniti
-const state = {
-    prices: [],
-    highs: [],
-    lows: [],
-    opens: [],
-    volumes: [],
-    timestamps: [],
-    lastUpdate: null
-};
+        // === SIMULAZIONE DATI (da sostituire con API reale) ===
+        function generateMockPriceData(length = 50) {
+            const data = [];
+            let price = 50000 + Math.random() * 10000;
+            
+            for (let i = 0; i < length; i++) {
+                price += (Math.random() - 0.5) * 1000;
+                price = Math.max(price, 30000); // Prezzo minimo
+                
+                data.push({
+                    timestamp: Date.now() - (length - i) * 60000,
+                    open: price + (Math.random() - 0.5) * 500,
+                    high: price + Math.random() * 1000,
+                    low: price - Math.random() * 1000,
+                    close: price,
+                    volume: 1000000 + Math.random() * 5000000
+                });
+            }
+            return data;
+        }
 
-// Stato del segnale
-let currentSignal = "NONE";
-let timerCount = 0;
-let signalStartTimestamp = null;  // Memorizziamo il timestamp invece dell'indice
+        // === CALCOLI INDICATORI TECNICI ===
+        class TechnicalIndicators {
+            static calculateRSI(prices, period = 14) {
+                if (prices.length < period + 1) return null;
+                
+                let gains = 0;
+                let losses = 0;
+                
+                // Primo calcolo
+                for (let i = 1; i <= period; i++) {
+                    const change = prices[i] - prices[i - 1];
+                    if (change >= 0) {
+                        gains += change;
+                    } else {
+                        losses -= change;
+                    }
+                }
+                
+                let avgGain = gains / period;
+                let avgLoss = losses / period;
+                
+                // Calcolo RSI
+                if (avgLoss === 0) return 100;
+                const rs = avgGain / avgLoss;
+                const rsi = 100 - (100 / (1 + rs));
+                
+                return {
+                    value: rsi,
+                    level: rsi > 70 ? 'Ipercomprato' : rsi < 30 ? 'Ipervenduto' : 'Neutrale',
+                    trend: rsi > 50 ? 'Rialzista' : 'Ribassista',
+                    signal: rsi > 70 ? 'SELL' : rsi < 30 ? 'BUY' : 'HOLD'
+                };
+            }
 
-// =================== FUNZIONI SICURE PER INDICATORI ===================
-function getSafeArrayValue(array, index) {
-    return array && array.length > index ? array[index] : null;
+            static calculateMACD(prices, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9) {
+                if (prices.length < slowPeriod) return null;
+                
+                const emaFast = this.calculateEMA(prices, fastPeriod);
+                const emaSlow = this.calculateEMA(prices, slowPeriod);
+                
+                if (!emaFast || !emaSlow) return null;
+                
+                const macdLine = emaFast - emaSlow;
+                const signalLine = this.calculateEMA([macdLine], signalPeriod) || 0;
+                const histogram = macdLine - signalLine;
+                
+                return {
+                    macd: macdLine,
+                    signal: signalLine,
+                    histogram: histogram,
+                    trend: macdLine > signalLine ? 'Rialzista' : 'Ribassista',
+                    signalType: histogram > 0 && macdLine > signalLine ? 'BUY' : 
+                               histogram < 0 && macdLine < signalLine ? 'SELL' : 'HOLD'
+                };
+            }
+
+            static calculateEMA(prices, period) {
+                if (prices.length < period) return null;
+                
+                const multiplier = 2 / (period + 1);
+                let ema = prices[0];
+                
+                for (let i = 1; i < prices.length; i++) {
+                    ema = (prices[i] * multiplier) + (ema * (1 - multiplier));
+                }
+                
+                return ema;
+            }
+
+            static calculateSMA(prices, period) {
+                if (prices.length < period) return null;
+                
+                const sum = prices.slice(-period).reduce((a, b) => a + b, 0);
+                return sum / period;
+            }
+
+            static calculateBollingerBands(prices, period = 20, stdDev = 2) {
+                if (prices.length < period) return null;
+                
+                const sma = this.calculateSMA(prices, period);
+                const recentPrices = prices.slice(-period);
+                
+                // Calcolo deviazione standard
+                const variance = recentPrices.reduce((acc, price) => {
+                    return acc + Math.pow(price - sma, 2);
+                }, 0) / period;
+                
+                const standardDeviation = Math.sqrt(variance);
+                
+                const upperBand = sma + (standardDeviation * stdDev);
+                const lowerBand = sma - (standardDeviation * stdDev);
+                const currentPrice = prices[prices.length - 1];
+                
+                let signal = 'HOLD';
+                if (currentPrice > upperBand) signal = 'SELL';
+                if (currentPrice < lowerBand) signal = 'BUY';
+                
+                return {
+                    upper: upperBand,
+                    middle: sma,
+                    lower: lowerBand,
+                    position: currentPrice > sma ? 'Sopra' : 'Sotto',
+                    signal: signal
+                };
+            }
+
+            static calculateStochastic(highs, lows, closes, kPeriod = 14, dPeriod = 3) {
+                if (closes.length < kPeriod) return null;
+                
+                const recentHighs = highs.slice(-kPeriod);
+                const recentLows = lows.slice(-kPeriod);
+                const currentClose = closes[closes.length - 1];
+                
+                const highestHigh = Math.max(...recentHighs);
+                const lowestLow = Math.min(...recentLows);
+                
+                const kPercent = ((currentClose - lowestLow) / (highestHigh - lowestLow)) * 100;
+                
+                // Semplificazione per %D (normalmente è una SMA di %K)
+                const dPercent = kPercent * 0.9; // Approssimazione
+                
+                let signal = 'HOLD';
+                if (kPercent > 80) signal = 'SELL';
+                if (kPercent < 20) signal = 'BUY';
+                
+                return {
+                    k: kPercent,
+                    d: dPercent,
+                    level: kPercent > 80 ? 'Ipercomprato' : kPercent < 20 ? 'Ipervenduto' : 'Neutrale',
+                    signal: signal
+                };
+            }
+        }
+
+        // === FUNZIONI DI AGGIORNAMENTO UI ===
+        function updateIndicatorCard(indicatorId, data) {
+            const card = document.getElementById(`${indicatorId}-card`);
+            if (!card) return;
+            
+            card.classList.remove('loading');
+            
+            // Aggiorna valore principale
+            const valueElement = document.getElementById(`${indicatorId}-value`);
+            if (valueElement && data.value !== undefined) {
+                valueElement.textContent = typeof data.value === 'number' ? 
+                    data.value.toFixed(2) : data.value;
+                    
+                // Aggiorna classe CSS per colore
+                valueElement.className = `indicator-value ${getSignalClass(data.signal || 'HOLD')}`;
+            }
+            
+            // Aggiorna dettagli specifici per ogni indicatore
+            updateIndicatorDetails(indicatorId, data);
+            
+            // Aggiorna segnale
+            updateSignalIndicator(indicatorId, data.signal || 'HOLD');
+        }
+
+        function updateIndicatorDetails(indicatorId, data) {
+            switch (indicatorId) {
+                case 'rsi':
+                    updateElementText('rsi-level', data.level || '--');
+                    updateElementText('rsi-trend', data.trend || '--');
+                    break;
+                    
+                case 'macd':
+                    updateElementText('macd-signal-value', data.signal?.toFixed(4) || '--');
+                    updateElementText('macd-histogram', data.histogram?.toFixed(4) || '--');
+                    break;
+                    
+                case 'ma':
+                    updateElementText('ma20-value', data.ma20?.toFixed(2) || '--');
+                    updateElementText('ma50-value', data.ma50?.toFixed(2) || '--');
+                    break;
+                    
+                case 'bb':
+                    updateElementText('bb-upper', data.upper?.toFixed(2) || '--');
+                    updateElementText('bb-lower', data.lower?.toFixed(2) || '--');
+                    break;
+                    
+                case 'stoch':
+                    updateElementText('stoch-k', data.k?.toFixed(2) || '--');
+                    updateElementText('stoch-d', data.d?.toFixed(2) || '--');
+                    break;
+                    
+                case 'volume':
+                    updateElementText('volume-avg', formatVolume(data.average) || '--');
+                    updateElementText('volume-change', `${data.change?.toFixed(1) || '--'}%`);
+                    break;
+            }
+        }
+
+        function updateSignalIndicator(indicatorId, signal) {
+            const signalElement = document.getElementById(`${indicatorId}-signal`);
+            if (!signalElement) return;
+            
+            const signalConfig = {
+                'BUY': { class: 'signal-buy', icon: '📈', text: 'Segnale BUY' },
+                'STRONG_BUY': { class: 'signal-strong-buy', icon: '🚀', text: 'STRONG BUY' },
+                'SELL': { class: 'signal-sell', icon: '📉', text: 'Segnale SELL' },
+                'STRONG_SELL': { class: 'signal-strong-sell', icon: '🔻', text: 'STRONG SELL' },
+                'HOLD': { class: 'signal-hold', icon: '⏸️', text: 'HOLD' }
+            };
+            
+            const config = signalConfig[signal] || signalConfig['HOLD'];
+            signalElement.className = `signal-indicator ${config.class}`;
+            signalElement.innerHTML = `<span>${config.icon}</span> ${config.text}`;
+        }
+
+        function updateElementText(elementId, text) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = text;
+            }
+        }
+
+        function getSignalClass(signal) {
+    switch (signal) {
+        case 'BUY':
+        case 'STRONG_BUY':
+            return 'bullish';
+        case 'SELL':
+        case 'STRONG_SELL':
+            return 'bearish';
+        default:
+            return 'neutral';
+    }
 }
 
-function safeSMA(period) {
-    if (state.prices.length < period) return null;
-    const prices = state.prices.slice(-period);
-    return prices.reduce((sum, val) => sum + val, 0) / period;
+function formatVolume(volume) {
+    if (!volume) return '--';
+    if (volume >= 1e9) return (volume / 1e9).toFixed(2) + 'B';
+    if (volume >= 1e6) return (volume / 1e6).toFixed(2) + 'M';
+    if (volume >= 1e3) return (volume / 1e3).toFixed(2) + 'K';
+    return volume.toString();
 }
 
-function safeEMA(period) {
-    if (state.prices.length < period) return null;
+function formatPrice(price) {
+    if (!price) return '--';
+    return parseFloat(price).toFixed(2);
+}
+
+function formatPercentage(value) {
+    if (!value && value !== 0) return '--';
+    const num = parseFloat(value);
+    const sign = num >= 0 ? '+' : '';
+    return sign + num.toFixed(2) + '%';
+}
+
+function calculatePriceChange(currentPrice, previousPrice) {
+    if (!currentPrice || !previousPrice) return null;
+    return ((currentPrice - previousPrice) / previousPrice) * 100;
+}
+
+function getMarketStatus(timestamp) {
+    const now = new Date();
+    const marketTime = new Date(timestamp);
+    const timeDiff = now - marketTime;
     
-    let ema = safeSMA(period);
-    const alpha = 2 / (period + 1);
-    
-    for (let i = period; i < state.prices.length; i++) {
-        const price = getSafeArrayValue(state.prices, i);
-        if (price === null) break;
-        ema = (price - ema) * alpha + ema;
+    // Se i dati sono più vecchi di 30 minuti, considera il mercato chiuso
+    if (timeDiff > 30 * 60 * 1000) {
+        return 'closed';
     }
     
-    return ema;
+    // Controlla se è in orario di mercato (9:30-16:00 EST nei giorni feriali)
+    const hour = marketTime.getHours();
+    const day = marketTime.getDay();
+    
+    if (day === 0 || day === 6) return 'closed'; // Weekend
+    if (hour < 9 || (hour === 9 && marketTime.getMinutes() < 30)) return 'premarket';
+    if (hour >= 16) return 'afterhours';
+    
+    return 'open';
 }
 
-function safeRSI(period) {
-    if (state.prices.length < period + 1) return 50;
+function formatTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now - date;
+    
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+    
+    return date.toLocaleDateString();
+}
+
+function validateSymbol(symbol) {
+    if (!symbol || typeof symbol !== 'string') return false;
+    // Simboli azionari tipici: 1-5 caratteri, solo lettere
+    return /^[A-Z]{1,5}$/.test(symbol.toUpperCase());
+}
+
+function calculateRSI(prices, period = 14) {
+    if (prices.length < period + 1) return null;
     
     let gains = 0;
     let losses = 0;
     
-    // Calcola guadagni/perdite iniziali
+    // Calcola i guadagni e le perdite iniziali
     for (let i = 1; i <= period; i++) {
-        const prev = getSafeArrayValue(state.prices, i - 1);
-        const curr = getSafeArrayValue(state.prices, i);
-        if (prev === null || curr === null) return 50;
-        
-        const change = curr - prev;
-        if (change > 0) gains += change;
-        else losses += Math.abs(change);
-    }
-    
-    let avgGain = gains / period;
-    let avgLoss = losses / period;
-    
-    // Calcola RSI scorrevole
-    for (let i = period + 1; i < state.prices.length; i++) {
-        const prev = getSafeArrayValue(state.prices, i - 1);
-        const curr = getSafeArrayValue(state.prices, i);
-        if (prev === null || curr === null) break;
-        
-        const change = curr - prev;
+        const change = prices[i] - prices[i - 1];
         if (change > 0) {
-            avgGain = (avgGain * (period - 1) + change) / period;
-            avgLoss = (avgLoss * (period - 1)) / period;
+            gains += change;
         } else {
-            avgGain = (avgGain * (period - 1)) / period;
-            avgLoss = (avgLoss * (period - 1) + Math.abs(change)) / period;
+            losses += Math.abs(change);
         }
     }
     
+    const avgGain = gains / period;
+    const avgLoss = losses / period;
+    
     if (avgLoss === 0) return 100;
+    
     const rs = avgGain / avgLoss;
     return 100 - (100 / (1 + rs));
 }
 
-function safeLinReg() {
-    if (state.prices.length < config.linregLength) return 0;
+function getSignalStrength(rsi, volume, priceChange) {
+    let strength = 'NEUTRAL';
     
-    const prices = state.prices.slice(-config.linregLength);
-    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-    
-    for (let i = 0; i < prices.length; i++) {
-        sumX += i;
-        sumY += prices[i];
-        sumXY += i * prices[i];
-        sumX2 += i * i;
+    if (rsi > 70 && priceChange > 5) {
+        strength = volume > 1000000 ? 'STRONG_SELL' : 'SELL';
+    } else if (rsi < 30 && priceChange < -5) {
+        strength = volume > 1000000 ? 'STRONG_BUY' : 'BUY';
+    } else if (priceChange > 3) {
+        strength = 'BUY';
+    } else if (priceChange < -3) {
+        strength = 'SELL';
     }
     
-    const n = prices.length;
-    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-    return slope;
+    return strength;
 }
 
-function safeBollingerBands() {
-    if (state.prices.length < config.bbLength) return { position: 0 };
-    
-    const prices = state.prices.slice(-config.bbLength);
-    const basis = prices.reduce((sum, val) => sum + val, 0) / config.bbLength;
-    
-    const deviations = prices.map(p => Math.pow(p - basis, 2));
-    const stdDev = Math.sqrt(deviations.reduce((sum, val) => sum + val, 0) / config.bbLength);
-    
-    const upper = basis + 2 * stdDev;
-    const lower = basis - 2 * stdDev;
-    const currentPrice = state.prices[state.prices.length - 1] || 0;
-    const position = (currentPrice - lower) / (upper - lower);
-    
-    return { position, upper, lower, basis, currentPrice };
+function formatMarketCap(marketCap) {
+    if (!marketCap) return '--';
+    if (marketCap >= 1e12) return (marketCap / 1e12).toFixed(2) + 'T';
+    if (marketCap >= 1e9) return (marketCap / 1e9).toFixed(2) + 'B';
+    if (marketCap >= 1e6) return (marketCap / 1e6).toFixed(2) + 'M';
+    return marketCap.toString();
 }
 
-function safeMACD() {
-    if (state.prices.length < config.emaLength + 1) return { histogram: 0 };
+function isVolatile(priceHistory) {
+    if (!priceHistory || priceHistory.length < 5) return false;
     
-    const emaFast = safeEMA(config.emaLength);
-    const emaSlow = safeEMA(config.smaLength);
-    
-    if (emaFast === null || emaSlow === null) return { histogram: 0 };
-    return { histogram: emaFast - emaSlow };
-}
-
-// =================== GESTIONE SEGNALI SICURA ===================
-function safeCheckSignal() {
-    try {
-        const emaValue = safeEMA(config.emaLength);
-        const smaValue = safeSMA(config.smaLength);
-        const rsiValue = safeRSI(config.rsiLength);
-        
-        if (emaValue === null || smaValue === null) return "NONE";
-        
-        if (emaValue > smaValue && rsiValue > 50) return "BUY";
-        if (emaValue < smaValue && rsiValue < 50) return "SELL";
-        return "NONE";
-    } catch {
-        return "NONE";
+    const changes = [];
+    for (let i = 1; i < priceHistory.length; i++) {
+        const change = Math.abs((priceHistory[i] - priceHistory[i-1]) / priceHistory[i-1]);
+        changes.push(change);
     }
+    
+    const avgChange = changes.reduce((a, b) => a + b, 0) / changes.length;
+    return avgChange > 0.05; // 5% di volatilità media
 }
 
-function safeUpdateTimer(newSignal, candleTimestamp) {
-    if (newSignal === "NONE") {
-        timerCount = 0;
-        currentSignal = "NONE";
-        signalStartTimestamp = null;
-    } else if (currentSignal === "NONE") {
-        currentSignal = newSignal;
-        timerCount = 1;
-        signalStartTimestamp = candleTimestamp;
-    } else if (newSignal !== currentSignal) {
-        currentSignal = newSignal;
-        timerCount = 1;
-        signalStartTimestamp = candleTimestamp;
-    } else {
-        if (timerCount < config.timerPeriods) timerCount++;
-        else {
-            currentSignal = "NONE";
-            timerCount = 0;
-            signalStartTimestamp = null;
-        }
-    }
-}
-
-// =================== CORE: PROCESSAMENTO CANDELA ===================
-export function processNewCandle(candle) {
-    try {
-        // Aggiunta sicura dei valori
-        state.opens.push(candle.open);
-        state.highs.push(candle.high);
-        state.lows.push(candle.low);
-        state.prices.push(candle.close);
-        state.volumes.push(candle.volume);
-        state.timestamps.push(candle.timestamp);
-        state.lastUpdate = Date.now();
-
-        // Mantenimento dimensione ottimale
-        const maxSize = Math.max(
-            config.linregLength, 
-            config.bbLength, 
-            config.smaLength
-        ) + 100;
-        
-        if (state.prices.length > maxSize) {
-            state.opens.shift();
-            state.highs.shift();
-            state.lows.shift();
-            state.prices.shift();
-            state.volumes.shift();
-            state.timestamps.shift();
-        }
-
-        // Calcolo segnale e timer
-        const newSignal = safeCheckSignal();
-        safeUpdateTimer(newSignal, candle.timestamp);
-
-        return {
-            signal: currentSignal,
-            signalStartTimestamp,
-            timerCount,
-            indicators: {
-                linreg: safeLinReg(),
-                bb: safeBollingerBands(),
-                macd: safeMACD(),
-                ema: safeEMA(config.emaLength),
-                sma: safeSMA(config.smaLength),
-                rsi: safeRSI(config.rsiLength),
-                currentPrice: candle.close,
-                candles: state.prices.length
-            }
-        };
-    } catch (error) {
-        console.error("Errore critico in processNewCandle:", error);
-        return {
-            signal: "NONE",
-            indicators: {}
-        };
-    }
-}
-
-// =================== FUNZIONI AUSILIARIE ===================
-export function getCurrentState() {
-    const lastCandle = state.prices.length > 0 ? {
-        open: state.opens[state.opens.length - 1],
-        high: state.highs[state.highs.length - 1],
-        low: state.lows[state.lows.length - 1],
-        close: state.prices[state.prices.length - 1],
-        volume: state.volumes[state.volumes.length - 1],
-        timestamp: state.timestamps[state.timestamps.length - 1]
-    } : {};
-
-    return {
-        signal: currentSignal,
-        timerCount,
-        signalStartTimestamp,
-        lastCandle,
-        indicators: {
-            linreg: safeLinReg(),
-            bb: safeBollingerBands(),
-            macd: safeMACD(),
-            ema: safeEMA(config.emaLength),
-            sma: safeSMA(config.smaLength),
-            rsi: safeRSI(config.rsiLength),
-            currentPrice: state.prices[state.prices.length - 1] || 0,
-            candles: state.prices.length
-        }
-    };
-}
-
-export function resetState() {
-    state.opens = [];
-    state.highs = [];
-    state.lows = [];
-    state.prices = [];
-    state.volumes = [];
-    state.timestamps = [];
-    currentSignal = "NONE";
-    timerCount = 0;
-    signalStartTimestamp = null;
-    state.lastUpdate = null;
+function getTrendDirection(prices) {
+    if (!prices || prices.length < 3) return 'UNKNOWN';
+    
+    const recent = prices.slice(-5);
+    const first = recent[0];
+    const last = recent[recent.length - 1];
+    
+    const change = (last - first) / first;
+    
+    if (change > 0.02) return 'UPTREND';
+    if (change < -0.02) return 'DOWNTREND';
+    return 'SIDEWAYS';
 }

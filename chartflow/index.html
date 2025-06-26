@@ -11,518 +11,512 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e1e1e 0%, #232a34 100%);
-            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
             min-height: 100vh;
             padding: 20px;
         }
-        .dashboard-container {
+
+        .indicators-section {
             max-width: 1400px;
             margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .indicators-section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #00d4ff, #5865f2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .indicators-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
-        .card {
-            background: #2c2c2c;
-            border-radius: 12px;
-            padding: 22px;
-            border: 1px solid #353535;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.45);
-            transition: all 0.3s;
+
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .card:hover {
-            transform: translateY(-6px) scale(1.01);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.65);
+
+        .indicator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #5865f2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .card-title {
-            font-size: 1.25em;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: #739bf2;
-            border-bottom: 2px solid #3a3a3a;
-            padding-bottom: 7px;
-            letter-spacing: -0.1px;
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
         }
-        .cryptoSelect {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 6px;
-            background: linear-gradient(135deg, #232a34 60%, #2c2c2c 100%);
-            color: #ffe58f;
-            border: 1.5px solid #353535;
-            font-size: 1em;
-            font-family: inherit;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.18);
-            outline: none;
-            margin-bottom: 12px;
-            appearance: none;
-            cursor: pointer;
+
+        .indicator-card:hover::before {
+            opacity: 1;
         }
-        .cryptoSelect:focus, .cryptoSelect:hover {
-            border-color: #739bf3;
-            box-shadow: 0 4px 18px rgba(115, 155, 242, 0.18);
-            background: linear-gradient(135deg, #232a34 60%, #293a54 100%);
-            color: #fff;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .action-btn {
-            flex: 1;
-            background: linear-gradient(135deg, #2196f3, #21cbf3 80%);
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 2px 10px rgba(33, 150, 243, 0.18);
-            font-size: 0.9em;
-        }
-        .action-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.32);
-        }
-        .action-btn.download {
-            background: linear-gradient(135deg, #4caf50, #66bb6a 80%);
-            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.18);
-        }
-        .action-btn.download:hover:not(:disabled) {
-            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.32);
-        }
-        .file-input {
-            display: none;
-        }
-        .signal-status {
+
+        .indicator-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 13px 18px;
-            border-radius: 8px;
-            margin-bottom: 6px;
+            margin-bottom: 20px;
+        }
+
+        .indicator-title {
+            font-size: 1.3rem;
             font-weight: 600;
-            font-size: 1.08em;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.18);
-        }
-        .signal-buy { background: linear-gradient(135deg, #388e3c, #4caf50 80%); color: #fff; }
-        .signal-sell { background: linear-gradient(135deg, #b71c1c, #f44336 80%); color: #fff; }
-        .signal-neutral { background: linear-gradient(135deg, #424242, #757575 80%); color: #fff; }
-        .timer-container {
-            background: #232a34;
-            border-radius: 9px;
-            padding: 14px;
-            margin-top: 10px;
-        }
-        .timer-bar {
-            width: 100%;
-            height: 8px;
-            background: #222;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        .timer-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4caf50, #ffe58f);
-            border-radius: 4px;
-            transition: width 0.3s;
-        }
-        .indicator-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            display: flex;
+            align-items: center;
             gap: 10px;
         }
-        .indicator-item {
-            background-color: #222831;
-            border: 1px solid #222831;
-            color: #fff;
-            border-radius: 10px;
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.7);
-            margin-bottom: 10px;
-            box-sizing: border-box;
-            text-align: center;
-            min-width: 140px;
-        }
+
         .indicator-value {
-            font-size: 1.2em;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #ffe58f;
-        }
-        .indicator-label {
-            font-size: 0.92em;
-            opacity: 0.8;
-            color: #aaa;
-        }
-        .confluence-score {
-            font-size: 2em;
+            font-size: 1.8rem;
             font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 8px;
+            min-width: 80px;
             text-align: center;
-            padding: 19px;
-            border-radius: 13px;
-            margin: 12px 0;
         }
-        .score-positive { background: linear-gradient(135deg, #388e3c, #4caf50 80%); color: #fff; }
-        .score-negative { background: linear-gradient(135deg, #b71c1c, #f44336 80%); color: #fff; }
-        .score-neutral { background: linear-gradient(135deg, #424242, #757575 80%); color: #fff; }
-        .stats-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background: #232a34;
-            color: #e0e0e0;
-            border: 1px solid #222831;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.7);
-            transition: box-shadow 0.2s, transform 0.2s;
-            overflow: hidden;
+
+        .bullish {
+            background: linear-gradient(135deg, #00c851, #007e33);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 200, 81, 0.4);
         }
-        .stats-table th, .stats-table td {
-            padding: 8px 12px;
-            text-align: left;
-            border-bottom: 1px solid #353535;
+
+        .bearish {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
         }
-        .stats-table th {
-            background: #2c2c2c;
+
+        .neutral {
+            background: linear-gradient(135deg, #ffbb33, #ff8800);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 187, 51, 0.4);
+        }
+
+        .indicator-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 1.2rem;
             font-weight: 600;
-            color: #ffc200;
         }
-        .stats-table tbody tr:hover {
-            background: #232831;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.85);
-            transform: translateY(-2px) scale(1.01);
-            transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
         }
-        .pattern-list {
-            max-height: 200px;
-            overflow-y: auto;
-            background: #232a34;
-            color: #e0e0e0;
-            border: 1px solid #222831;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.7);
-            padding: 10px 0;
-            margin: 16px 0;
-        }
-        .pattern-item {
+
+        .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 16px;
-            margin: 6px 12px;
-            background: #232a34;
-            border-radius: 7px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.13);
-            transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
-            border-left: 4px solid #ffc200;
+            margin-bottom: 20px;
         }
-        .pattern-item:first-child { margin-top: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; }
-        .pattern-item:last-child { margin-bottom: 0; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
-        .pattern-item:hover {
-            background: #232831;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.22);
-            transform: translateY(-2px) scale(1.01);
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
         }
-        .pattern-bullish { border-left: 4px solid #4caf50 !important; }
-        .pattern-bearish { border-left: 4px solid #f44336 !important; }
-        .pattern-neutral { border-left: 4px solid #ff9800 !important; }
-        .loading-message {
-            background: #232a34;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            text-align: center;
-            font-weight: bold;
-            color: #ffe58f;
+
+        .chart-controls {
+            display: flex;
+            gap: 10px;
         }
-        .status-message {
-            padding: 8px 12px;
-            border-radius: 5px;
-            margin: 5px 0;
-            font-size: 0.9em;
+
+        .chart-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .status-success {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-            border: 1px solid #4caf50;
+
+        .chart-btn:hover, .chart-btn.active {
+            background: linear-gradient(135deg, #00d4ff, #5865f2);
+            transform: translateY(-2px);
         }
-        .status-error {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            border: 1px solid #f44336;
+
+        .mini-chart {
+            height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
         }
-        .debug-info {
-            background: #1a1a2e;
-            border: 1px solid #16213e;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 10px 0;
-            font-family: monospace;
-            font-size: 0.85em;
-            color: #0f4c75;
-            max-height: 200px;
-            overflow-y: auto;
+
+        .chart-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(0, 212, 255, 0.3), transparent);
         }
-        @media (max-width: 768px) {
-            .dashboard-container {
-                grid-template-columns: 1fr;
-                gap: 15px;
-                padding: 10px;
-            }
-            body {
-                padding: 10px;
-            }
-            .btn-group {
-                flex-direction: column;
-            }
+
+        .signal-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 10px;
         }
-		
-		 .footer {
+
+        .signal-strong-buy {
+            background: rgba(0, 200, 81, 0.2);
+            border: 1px solid #00c851;
+            color: #00c851;
+        }
+
+        .signal-buy {
+            background: rgba(0, 200, 81, 0.1);
+            border: 1px solid rgba(0, 200, 81, 0.5);
+            color: #4dd577;
+        }
+
+        .signal-sell {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.5);
+            color: #ff6b6b;
+        }
+
+        .signal-strong-sell {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+
+        .signal-hold {
+            background: rgba(255, 187, 51, 0.1);
+            border: 1px solid rgba(255, 187, 51, 0.5);
+            color: #ffbb33;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .summary-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
             margin-top: 30px;
-            margin-bottom: 10px;
+        }
+
+        .summary-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
             text-align: center;
-            font-size: 16px;
-            color: #f2bb66;
-            font-weight: normal;
         }
 
-        .footer a {
-            color: #ffe;
-            text-decoration: none;
-            margin: 0 8px;
-            transition: color 0.3s ease;
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
         }
 
-        .footer a:hover {
-            color: #ffdb58;
+        .summary-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .summary-count {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .indicators-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .indicator-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-   <div class="dashboard-container">
-    <!-- Card: Seleziona Cripto e Controlli -->
-    <div class="card">
-        <h3 class="card-title">🎯 Seleziona Cripto</h3>
-        <select id="cryptoSelect" class="cryptoSelect">
-            <option value="" disabled selected>Seleziona una criptovaluta...</option>
-        </select>
-        <div class="btn-group">
-            <button id="downloadBtn" class="action-btn download">📥 Scarica Dati</button>
-            <button id="uploadBtn" class="action-btn">📂 Carica File</button>
-        </div>
-        <input type="file" id="fileInput" class="file-input" accept=".json">
-        <div id="statusMessage" style="margin-top: 10px;"></div>
-        <div id="debugInfo" class="debug-info" style="display: none;"></div>
-    </div>
+    <!-- Indicatori Tecnici -->
+    <section class="indicators-section">
+        <h2>📈 Indicatori Tecnici</h2>
+        
+        <div class="indicators-grid">
+            <!-- RSI -->
+            <div class="indicator-card" id="rsi-card">
+                <div class="indicator-header">
+                    <div class="indicator-title">
+                        <span>📊</span> RSI (14)
+                    </div>
+                    <div class="indicator-value neutral" id="rsi-value">--</div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Livello</div>
+                        <div class="detail-value" id="rsi-level">--</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Trend</div>
+                        <div class="detail-value" id="rsi-trend">--</div>
+                    </div>
+                </div>
+                <div class="mini-chart">
+                    <div class="chart-line"></div>
+                </div>
+                <div class="signal-indicator signal-hold" id="rsi-signal">
+                    <span>⏸️</span> Analisi in corso...
+                </div>
+            </div>
 
-    <!-- Card: Segnale Principale -->
-    <div class="card">
-        <h3 class="card-title">🎯 Segnale Princ5ipale</h3>
-        <div id="mainSignal" class="signal-status signal-neutral">IN ATTESA</div>
-        <div id="signalStrength" style="text-align: center; margin: 6px 0; font-size: 1.2em; font-weight: bold;">0.0</div>
-        <div class="timer-container">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                <span>Timer Status:</span>
-                <span id="timerStatus">NESSUN OK</span>
+            <!-- MACD -->
+            <div class="indicator-card" id="macd-card">
+                <div class="indicator-header">
+                    <div class="indicator-title">
+                        <span>📈</span> MACD
+                    </div>
+                    <div class="indicator-value neutral" id="macd-value">--</div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Segnale</div>
+                        <div class="detail-value" id="macd-signal-value">--</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Istogramma</div>
+                        <div class="detail-value" id="macd-histogram">--</div>
+                    </div>
+                </div>
+                <div class="mini-chart">
+                    <div class="chart-line"></div>
+                </div>
+                <div class="signal-indicator signal-hold" id="macd-signal">
+                    <span>⏸️</span> Analisi in corso...
+                </div>
             </div>
-            <div class="timer-bar">
-                <div id="timerFill" class="timer-fill" style="width: 0%"></div>
-            </div>
-            <div style="text-align: center; font-size: 0.9em; opacity: 0.8;">
-                <span id="timerProgress">0/12</span>
-            </div>
-        </div>
-        <h3 class="card-title" style="padding-top: 25px;">⚖️ Confluence Score</h3>
-        <div id="confluenceScore" class="confluence-score score-neutral">0.0</div>
-        <div style="text-align: center; font-size: 0.9em; opacity: 0.8;">
-            Soglia: ±0.5 per segnale valido
-        </div>
-    </div>
 
-    <!-- Indicatori Principali -->
-    <div class="card">
-        <h3 class="card-title">📊 Indicatori Principali</h3>
-        <div class="indicator-grid">
-            <div class="indicator-item">
-                <div id="linreg" class="indicator-value">0.00</div>
-                <div class="indicator-label">LinReg Position</div>
+            <!-- Media Mobile -->
+            <div class="indicator-card" id="ma-card">
+                <div class="indicator-header">
+                    <div class="indicator-title">
+                        <span>📉</span> Media Mobile
+                    </div>
+                    <div class="indicator-value neutral" id="ma-value">--</div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-label">MA 20</div>
+                        <div class="detail-value" id="ma20-value">--</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">MA 50</div>
+                        <div class="detail-value" id="ma50-value">--</div>
+                    </div>
+                </div>
+                <div class="mini-chart">
+                    <div class="chart-line"></div>
+                </div>
+                <div class="signal-indicator signal-hold" id="ma-signal">
+                    <span>⏸️</span> Analisi in corso...
+                </div>
             </div>
-            <div class="indicator-item">
-                <div id="pearson" class="indicator-value">0.00</div>
-                <div class="indicator-label">Pearson R</div>
-            </div>
-            <div class="indicator-item">
-                <div id="bbPosition" class="indicator-value">0.00</div>
-                <div class="indicator-label">BB Position</div>
-            </div>
-            <div class="indicator-item">
-                <div id="stochK" class="indicator-value">0.00</div>
-                <div class="indicator-label">Stoch K</div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Indicatori Secondari -->
-    <div class="card">
-        <h3 class="card-title">🔧 Indicatori Secondari</h3>
-        <div class="indicator-grid">
-            <div class="indicator-item">
-                <div id="macdStatus" class="indicator-value">NEUTRO</div>
-                <div class="indicator-label">MACD</div>
+            <!-- Bollinger Bands -->
+            <div class="indicator-card" id="bb-card">
+                <div class="indicator-header">
+                    <div class="indicator-title">
+                        <span>📏</span> Bollinger Bands
+                    </div>
+                    <div class="indicator-value neutral" id="bb-value">--</div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Banda Sup.</div>
+                        <div class="detail-value" id="bb-upper">--</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Banda Inf.</div>
+                        <div class="detail-value" id="bb-lower">--</div>
+                    </div>
+                </div>
+                <div class="mini-chart">
+                    <div class="chart-line"></div>
+                </div>
+                <div class="signal-indicator signal-hold" id="bb-signal">
+                    <span>⏸️</span> Analisi in corso...
+                </div>
             </div>
-            <div class="indicator-item">
-                <div id="momentumStatus" class="indicator-value">NEUTRO</div>
-                <div class="indicator-label">Momentum</div>
-            </div>
-            <div class="indicator-item">
-                <div id="trendStatus" class="indicator-value">NEUTRO</div>
-                <div class="indicator-label">Trend</div>
-            </div>
-            <div class="indicator-item">
-                <div id="paStatus" class="indicator-value">NEUTRO</div>
-                <div class="indicator-label">Price Action</div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Dettagli Bollinger Bands -->
-    <div class="card">
-        <h3 class="card-title">📈 Bollinger Bands</h3>
-        <div class="indicator-grid">
-            <div class="indicator-item">
-                <div id="bbUpper" class="indicator-value">0.00</div>
-                <div class="indicator-label">BB Upper</div>
+            <!-- Stochastic -->
+            <div class="indicator-card" id="stoch-card">
+                <div class="indicator-header">
+                    <div class="indicator-title">
+                        <span>🎯</span> Stochastic
+                    </div>
+                    <div class="indicator-value neutral" id="stoch-value">--</div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-label">%K</div>
+                        <div class="detail-value" id="stoch-k">--</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">%D</div>
+                        <div class="detail-value" id="stoch-d">--</div>
+                    </div>
+                </div>
+                <div class="mini-chart">
+                    <div class="chart-line"></div>
+                </div>
+                <div class="signal-indicator signal-hold" id="stoch-signal">
+                    <span>⏸️</span> Analisi in corso...
+                </div>
             </div>
-            <div class="indicator-item">
-                <div id="bbLower" class="indicator-value">0.00</div>
-                <div class="indicator-label">BB Lower</div>
-            </div>
-            <div class="indicator-item">
-                <div id="bbBasis" class="indicator-value">0.00</div>
-                <div class="indicator-label">BB Basis</div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Dettagli Stoch/RSI/EMA/SMA -->
-    <div class="card">
-        <h3 class="card-title">📉 Dettagli Stoch/RSI/EMA/SMA</h3>
-        <div class="indicator-grid">
-            <div class="indicator-item">
-                <div id="stochD" class="indicator-value">0.00</div>
-                <div class="indicator-label">Stoch D</div>
-            </div>
-            <div class="indicator-item">
-                <div id="rsi" class="indicator-value">0.00</div>
-                <div class="indicator-label">RSI</div>
-            </div>
-            <div class="indicator-item">
-                <div id="ema" class="indicator-value">0.00</div>
-                <div class="indicator-label">EMA</div>
-            </div>
-            <div class="indicator-item">
-                <div id="sma" class="indicator-value">0.00</div>
-                <div class="indicator-label">SMA</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Prezzo e Candele -->
-    <div class="card">
-        <h3 class="card-title">💲 Prezzo e Candelle</h3>
-        <div class="indicator-grid">
-            <div class="indicator-item">
-                <div id="currentPrice" class="indicator-value">0.00</div>
-                <div class="indicator-label">Prezzo</div>
-            </div>
-            <div class="indicator-item">
-                <div id="candles" class="indicator-value">0</div>
-                <div class="indicator-label">Candele</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Condizioni Base -->
-    <div class="card">
-        <h3 class="card-title">✅ Condizioni Base</h3>
-        <table class="stats-table">
-            <tr>
-                <td><span class="status-indicator status-inactive"></span>LinReg in Zona</td>
-                <td id="linregCheck">❌</td>
-            </tr>
-            <tr>
-                <td><span class="status-indicator status-inactive"></span>Pearson Valido</td>
-                <td id="pearsonCheck">❌</td>
-            </tr>
-            <tr>
-                <td><span class="status-indicator status-inactive"></span>Indicatori Secondari</td>
-                <td id="secondaryCheck">0/2</td>
-            </tr>
-            <tr>
-                <td><span class="status-indicator status-inactive"></span>Score</td>
-                <td id="score">0.0</td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- Statistiche Timer -->
-    <div class="card">
-        <h3 class="card-title">⏱️ Statistiche Timer</h3>
-        <table class="stats-table">
-            <tr>
-                <td>Ultimo Segnale OK:</td>
-                <td id="lastSignalTime">Nessuno</td>
-            </tr>
-            <tr>
-                <td>Tipo Ultimo Segnale:</td>
-                <td id="lastSignalType">--</td>
-            </tr>
-            <tr>
-                <td>Barre Trascorse:</td>
-                <td id="barsElapsed">--</td>
-            </tr>
-            <tr>
-                <td>Barre Rimanenti:</td>
-                <td id="barsRemaining">--</td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- Pattern Candele -->
-    <div class="card">
-        <h3 class="card-title">🕯️ Pattern Candele</h3>
-        <div class="pattern-list" id="patternList">
-            <div class="pattern-item pattern-neutral">
-                <span>Nessun pattern rilevato</span>
-                <span>--</span>
+            <!-- Volume -->
+            <div class="indicator-card" id="volume-card">
+                <div class="indicator-header">
+                    <div class="indicator-title">
+                        <span>📊</span> Volume
+                    </div>
+                    <div class="indicator-value neutral" id="volume-value">--</div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Media Vol.</div>
+                        <div class="detail-value" id="volume-avg">--</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Variazione</div>
+                        <div class="detail-value" id="volume-change">--</div>
+                    </div>
+                </div>
+                <div class="mini-chart">
+                    <div class="chart-line"></div>
+                </div>
+                <div class="signal-indicator signal-hold" id="volume-signal">
+                    <span>⏸️</span> Analisi in corso...
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Controlli -->
-    <div class="card">
-        <h3 class="card-title">🎮 Controlli</h3>
-        <button class="action-btn" onclick="window.open('index-grafici.html', '_blank')">
-            📈 Grafico
-        </button>
-        <button class="action-btn" onclick="refreshData()">
-            🔄 Aggiorna Dati
-        </button>
-        <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
-            Ultimo aggiornamento: <span id="lastUpdate">--</span>
+        <!-- Riepilogo Analisi -->
+        <div class="summary-panel">
+            <div class="summary-title">📋 Riepilogo Segnali</div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-count bullish" id="buy-count">0</div>
+                    <div>Segnali BUY</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-count bearish" id="sell-count">0</div>
+                    <div>Segnali SELL</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-count neutral" id="hold-count">6</div>
+                    <div>Segnali HOLD</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-count" id="overall-signal">NEUTRALE</div>
+                    <div>Segnale Generale</div>
+                </div>
+            </div>
         </div>
-        <div id="loadingMessage" class="loading-message" style="display:none;"></div>
-    </div>
-   </div>
+
+        <!-- Controlli Grafici -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">📈 Grafici Indicatori</div>
+                <div class="chart-controls">
+                    <button class="chart-btn active" onclick="showChart('all')">Tutti</button>
+                    <button class="chart-btn" onclick="showChart('rsi')">RSI</button>
+                    <button class="chart-btn" onclick="showChart('macd')">MACD</button>
+                    <button class="chart-btn" onclick="showChart('ma')">MA</button>
+                </div>
+            </div>
+            <div id="main-chart" style="height: 300px; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <span style="opacity: 0.7; font-size: 1.2rem;">📊 Grafici in caricamento...</span>
+            </div>
+        </div>
+    </section>
    
     <div class="footer">
         Trading Spot Manager v1.1 | 

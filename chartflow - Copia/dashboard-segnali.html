@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Trading Avanzata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4fc3f7;
+            border-bottom: 2px solid rgba(79, 195, 247, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .signal-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .signal-buy {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+        }
+
+        .signal-sell {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+        }
+
+        .signal-neutral {
+            background: linear-gradient(135deg, #757575, #9e9e9e);
+            color: white;
+        }
+
+        .timer-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .indicator-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .indicator-value {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .indicator-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .confluence-score {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 10px 0;
+        }
+
+        .score-positive {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+        }
+
+        .score-negative {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+        }
+
+        .score-neutral {
+            background: linear-gradient(135deg, #757575, #9e9e9e);
+            color: white;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stats-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active { background: #4caf50; }
+        .status-warning { background: #ff9800; }
+        .status-danger { background: #f44336; }
+        .status-inactive { background: #757575; }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #2196f3, #21cbf3);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .pattern-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .pattern-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            margin: 5px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .pattern-bullish { border-left: 4px solid #4caf50; }
+        .pattern-bearish { border-left: 4px solid #f44336; }
+        .pattern-neutral { border-left: 4px solid #ff9800; }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 10px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Segnale Principale -->
+        <div class="card">
+            <h3 class="card-title">🎯 Segnale Principale</h3>
+            <div id="mainSignal" class="signal-status signal-neutral">
+                <span>IN ATTESA</span>
+                <span id="signalStrength">0.0</span>
+            </div>
+            <div class="timer-container">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Timer Status:</span>
+                    <span id="timerStatus">NESSUN OK</span>
+                </div>
+                <div class="timer-bar">
+                    <div id="timerFill" class="timer-fill" style="width: 0%"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.9em; opacity: 0.8;">
+                    <span id="timerProgress">0/6</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confluence Score -->
+        <div class="card">
+            <h3 class="card-title">⚖️ Confluence Score</h3>
+            <div id="confluenceScore" class="confluence-score score-neutral">
+                0.0
+            </div>
+            <div style="text-align: center; font-size: 0.9em; opacity: 0.8;">
+                Soglia: ±0.5 per segnale valido
+            </div>
+        </div>
+
+        <!-- Indicatori Principali -->
+        <div class="card">
+            <h3 class="card-title">📊 Indicatori Principali</h3>
+            <div class="indicator-grid">
+                <div class="indicator-item">
+                    <div id="linregValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">LinReg Position</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="pearsonValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">Pearson R</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="bbValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">BB Position</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="stochValue" class="indicator-value">0.00</div>
+                    <div class="indicator-label">Stoch K</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Condizioni Base -->
+        <div class="card">
+            <h3 class="card-title">✅ Condizioni Base</h3>
+            <table class="stats-table">
+                <tr>
+                    <td><span id="linregStatus" class="status-indicator status-inactive"></span>LinReg in Zona</td>
+                    <td id="linregCheck">❌</td>
+                </tr>
+                <tr>
+                    <td><span id="pearsonStatus" class="status-indicator status-inactive"></span>Pearson Valido</td>
+                    <td id="pearsonCheck">❌</td>
+                </tr>
+                <tr>
+                    <td><span id="secondaryStatus" class="status-indicator status-inactive"></span>Indicatori Secondari</td>
+                    <td id="secondaryCheck">0/2</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Indicatori Secondari -->
+        <div class="card">
+            <h3 class="card-title">🔧 Indicatori Secondari</h3>
+            <div class="indicator-grid">
+                <div class="indicator-item">
+                    <div id="macdStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">MACD</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="momentumStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">Momentum</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="trendStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">Trend</div>
+                </div>
+                <div class="indicator-item">
+                    <div id="paStatus" class="indicator-value">NEUTRO</div>
+                    <div class="indicator-label">Price Action</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pattern Candele -->
+        <div class="card">
+            <h3 class="card-title">🕯️ Pattern Candele</h3>
+            <div class="pattern-list" id="patternList">
+                <div class="pattern-item pattern-neutral">
+                    <span>Nessun pattern rilevato</span>
+                    <span>--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiche Timer -->
+        <div class="card">
+            <h3 class="card-title">⏱️ Statistiche Timer</h3>
+            <table class="stats-table">
+                <tr>
+                    <td>Ultimo Segnale OK:</td>
+                    <td id="lastSignalTime">Nessuno</td>
+                </tr>
+                <tr>
+                    <td>Tipo Ultimo Segnale:</td>
+                    <td id="lastSignalType">--</td>
+                </tr>
+                <tr>
+                    <td>Barre Trascorse:</td>
+                    <td id="barsElapsed">--</td>
+                </tr>
+                <tr>
+                    <td>Barre Rimanenti:</td>
+                    <td id="barsRemaining">--</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Controlli -->
+        <div class="card">
+            <h3 class="card-title">🎮 Controlli</h3>
+            <button class="refresh-btn" onclick="refreshData()">
+                🔄 Aggiorna Dati
+            </button>
+            <button class="refresh-btn" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
+                ⏰ Auto Refresh: OFF
+            </button>
+            <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                Ultimo aggiornamento: <span id="lastUpdate">--</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulazione dati (in implementazione reale questi verrebbero da TradingView)
+        let autoRefreshInterval = null;
+        let isAutoRefresh = false;
+
+        // Dati simulati per la demo
+        const simulatedData = {
+            linregPosition: -0.75,
+            pearsonR: 0.82,
+            bbPosition: -0.65,
+            stochK: 25,
+            confluenceScore: 1.5,
+            timerActive: true,
+            timerProgress: 3,
+            timerTotal: 6,
+            lastSignalType: 'COMPRA',
+            lastSignalTime: '2024-06-23 14:30',
+            signalStrength: 2.1,
+            macdBullish: true,
+            momentumBullish: true,
+            trendBullish: false,
+            priceActionBullish: true,
+            patterns: [
+                { name: 'MARTELLO', type: 'bullish', time: '14:25' },
+                { name: 'ENG RIALZ', type: 'bullish', time: '14:15' }
+            ]
+        };
+
+        function updateDashboard(data = simulatedData) {
+            // Aggiorna segnale principale
+            const mainSignal = document.getElementById('mainSignal');
+            if (data.confluenceScore >= 0.5) {
+                mainSignal.className = 'signal-status signal-buy';
+                mainSignal.innerHTML = '<span>🟢 COMPRA</span><span>' + data.signalStrength.toFixed(1) + '</span>';
+            } else if (data.confluenceScore <= -0.5) {
+                mainSignal.className = 'signal-status signal-sell';
+                mainSignal.innerHTML = '<span>🔴 VENDI</span><span>' + data.signalStrength.toFixed(1) + '</span>';
+            } else {
+                mainSignal.className = 'signal-status signal-neutral';
+                mainSignal.innerHTML = '<span>⚪ IN ATTESA</span><span>' + data.signalStrength.toFixed(1) + '</span>';
+            }
+
+            // Aggiorna confluence score
+            const confluenceScore = document.getElementById('confluenceScore');
+            confluenceScore.textContent = data.confluenceScore.toFixed(1);
+            if (data.confluenceScore > 0.5) {
+                confluenceScore.className = 'confluence-score score-positive';
+            } else if (data.confluenceScore < -0.5) {
+                confluenceScore.className = 'confluence-score score-negative';
+            } else {
+                confluenceScore.className = 'confluence-score score-neutral';
+            }
+
+            // Aggiorna indicatori principali
+            document.getElementById('linregValue').textContent = data.linregPosition.toFixed(2);
+            document.getElementById('pearsonValue').textContent = data.pearsonR.toFixed(2);
+            document.getElementById('bbValue').textContent = data.bbPosition.toFixed(2);
+            document.getElementById('stochValue').textContent = data.stochK.toFixed(0);
+
+            // Aggiorna condizioni base
+            updateCondition('linreg', Math.abs(data.linregPosition) >= 0.7);
+            updateCondition('pearson', Math.abs(data.pearsonR) >= 0.75);
+            
+            // Conta indicatori secondari favorevoli
+            let favorableCount = 0;
+            if (data.macdBullish) favorableCount++;
+            if (data.momentumBullish) favorableCount++;
+            if (data.trendBullish) favorableCount++;
+            if (data.priceActionBullish) favorableCount++;
+            
+            updateCondition('secondary', favorableCount >= 2);
+            document.getElementById('secondaryCheck').textContent = favorableCount + '/2';
+
+            // Aggiorna indicatori secondari
+            document.getElementById('macdStatus').textContent = data.macdBullish ? 'RIALZ' : 'RIBAS';
+            document.getElementById('momentumStatus').textContent = data.momentumBullish ? 'RIALZ' : 'RIBAS';
+            document.getElementById('trendStatus').textContent = data.trendBullish ? 'RIALZ' : 'RIBAS';
+            document.getElementById('paStatus').textContent = data.priceActionBullish ? 'RIALZ' : 'RIBAS';
+
+            // Aggiorna timer
+            if (data.timerActive) {
+                const progress = (data.timerProgress / data.timerTotal) * 100;
+                document.getElementById('timerFill').style.width = progress + '%';
+                document.getElementById('timerStatus').textContent = 'ATTIVO - ' + data.lastSignalType;
+                document.getElementById('timerProgress').textContent = data.timerProgress + '/' + data.timerTotal;
+            } else {
+                document.getElementById('timerFill').style.width = '0%';
+                document.getElementById('timerStatus').textContent = 'SCADUTO';
+                document.getElementById('timerProgress').textContent = '0/' + data.timerTotal;
+            }
+
+            // Aggiorna statistiche timer
+            document.getElementById('lastSignalTime').textContent = data.lastSignalTime;
+            document.getElementById('lastSignalType').textContent = data.lastSignalType;
+            document.getElementById('barsElapsed').textContent = data.timerProgress;
+            document.getElementById('barsRemaining').textContent = data.timerTotal - data.timerProgress;
+
+            // Aggiorna pattern
+            updatePatterns(data.patterns);
+
+            // Aggiorna timestamp
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+        }
+
+        function updateCondition(type, isValid) {
+            const statusEl = document.getElementById(type + 'Status');
+            const checkEl = document.getElementById(type + 'Check');
+            
+            if (isValid) {
+                statusEl.className = 'status-indicator status-active';
+                checkEl.textContent = '✅';
+            } else {
+                statusEl.className = 'status-indicator status-inactive';
+                checkEl.textContent = '❌';
+            }
+        }
+
+        function updatePatterns(patterns) {
+            const patternList = document.getElementById('patternList');
+            patternList.innerHTML = '';
+            
+            if (patterns.length === 0) {
+                patternList.innerHTML = '<div class="pattern-item pattern-neutral"><span>Nessun pattern rilevato</span><span>--</span></div>';
+                return;
+            }
+
+            patterns.forEach(pattern => {
+                const patternEl = document.createElement('div');
+                patternEl.className = 'pattern-item pattern-' + pattern.type;
+                patternEl.innerHTML = `<span>${pattern.name}</span><span>${pattern.time}</span>`;
+                patternList.appendChild(patternEl);
+            });
+        }
+
+        function refreshData() {
+            // Simula variazione dei dati per demo
+            simulatedData.linregPosition += (Math.random() - 0.5) * 0.2;
+            simulatedData.confluenceScore += (Math.random() - 0.5) * 0.5;
+            simulatedData.stochK += (Math.random() - 0.5) * 10;
+            simulatedData.timerProgress = Math.min(simulatedData.timerProgress + 1, 6);
+            
+            updateDashboard(simulatedData);
+        }
+
+        function toggleAutoRefresh() {
+            const btn = document.getElementById('autoRefreshBtn');
+            
+            if (isAutoRefresh) {
+                clearInterval(autoRefreshInterval);
+                btn.textContent = '⏰ Auto Refresh: OFF';
+                isAutoRefresh = false;
+            } else {
+                autoRefreshInterval = setInterval(refreshData, 2000);
+                btn.textContent = '⏰ Auto Refresh: ON';
+                isAutoRefresh = true;
+            }
+        }
+
+        // Inizializza dashboard
+        updateDashboard();
+        
+        // Auto refresh ogni 5 secondi per demo
+        setInterval(() => {
+            if (isAutoRefresh) {
+                refreshData();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
