@@ -112,8 +112,12 @@ function debugError(message, error = null) {
 
 // =================== POPOLAMENTO SELECT ===================
 function populateCryptoSelect() {
+    console.log('populateCryptoSelect chiamata');
     const select = document.getElementById('cryptoSelect');
-    if (!select) return;
+    if (!select) {
+        console.log('Elemento cryptoSelect non trovato');
+        return;
+    }
     select.innerHTML = '<option value="" disabled selected>Seleziona una criptovaluta...</option>';
     COINS.forEach(coin => {
         const option = document.createElement('option');
@@ -123,6 +127,7 @@ function populateCryptoSelect() {
     });
     select.value = CONFIG.currentSymbol;
 }
+
 
 
 // =================== AGGIORNA LA DASHBOARD ===================
