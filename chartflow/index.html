@@ -305,6 +305,169 @@
         .footer a:hover {
             color: #ffdb58;
         }
+		
+	/* ===== STILI INDICATORI TECNICI (versione ottimizzata) ===== */
+
+/* Card principale (effetto trasparenza, bordi, ombre) */
+.card-indicator {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 18px 22px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* Bordo superiore colorato (opzionale, solo hover) */
+.card-indicator::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #00d4ff, #5865f2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Effetto hover: alza la card e mostra il bordo */
+.card-indicator:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+.card-indicator:hover::before {
+    opacity: 1;
+}
+
+/* Titolo e header */
+.card-indicator-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #739bf2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.card-indicator-title span {
+    font-size: 1.3rem;
+}
+
+/* Valore principale */
+.card-indicator-value {
+    font-size: 1.6rem;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 12px;
+    min-width: 100px;
+    text-align: center;
+    color: white;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+/* Colori per stato (bullish, bearish, neutral) */
+.card-indicator-value.bullish {
+    background: linear-gradient(135deg, #00c851, #007e33);
+    box-shadow: 0 4px 15px rgba(0, 200, 81, 0.4);
+}
+.card-indicator-value.bearish {
+    background: linear-gradient(135deg, #ff4444, #cc0000);
+    box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
+}
+.card-indicator-value.neutral {
+    background: linear-gradient(135deg, #ffbb33, #ff8800);
+    box-shadow: 0 4px 15px rgba(255, 187, 51, 0.4);
+}
+
+/* Dettagli (righe sotto il valore) */
+.card-indicator-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+}
+.card-indicator-detail {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.card-indicator-detail-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 4px;
+    color: #aaa;
+}
+.card-indicator-detail-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Segnale (etichetta sotto i dettagli) */
+.card-indicator-signal {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-top: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffc200;
+}
+.card-indicator-signal.buy {
+    background: rgba(0, 200, 81, 0.1);
+    border: 1px solid rgba(0, 200, 81, 0.5);
+    color: #4dd577;
+}
+.card-indicator-signal.sell {
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid rgba(255, 68, 68, 0.5);
+    color: #ff6b6b;
+}
+.card-indicator-signal.hold {
+    background: rgba(255, 187, 51, 0.1);
+    border: 1px solid rgba(255, 187, 51, 0.5);
+    color: #ffbb33;
+}
+.cryptoSelect {
+    background: #181c22 !important;
+    color: #fff !important;
+    border: 1.5px solid #353535;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 1em;
+    font-family: inherit;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+.cryptoSelect:focus, .cryptoSelect:hover {
+    border-color: #739bf3;
+    background: #232a34 !important;
+    color: #fff !important;
+}
+.cryptoSelect option {
+    background: #232a34;
+    color: #fff;
+}
+
+
     </style>
 </head>
 <body>
@@ -415,7 +578,7 @@
 
     <!-- Dettagli Stoch/RSI/EMA/SMA -->
     <div class="card">
-        <h3 class="card-title">📉 Dettagli Stoch/RSI/EMA/SMA</h3>
+        <h3 class="card-title">📉 Stoch/RSI/EMA/SMA</h3>
         <div class="indicator-grid">
             <div class="indicator-item">
                 <div id="stochD" class="indicator-value">0.00</div>
