@@ -123,6 +123,7 @@ function populateCryptoSelect() {
     select.value = CONFIG.currentSymbol;
 }
 
+
 // =================== AGGIORNA LA DASHBOARD ===================
 function refreshData() {
     // Ottieni lo stato corrente

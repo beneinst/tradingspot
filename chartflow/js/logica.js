@@ -313,6 +313,32 @@ function calculatePearsonR() {
     return denominator !== 0 ? numerator / denominator : 0;
 }
 
+// 10. RSI
+function calculateRSI(period) {
+    if (state.prices.length < period + 1) return 50;
+    let gains = 0, losses = 0;
+    for (let i = 1; i <= period; i++) {
+        const change = state.prices[i] - state.prices[i - 1];
+        if (change > 0) gains += change;
+        else losses += Math.abs(change);
+    }
+    let avgGain = gains / period;
+    let avgLoss = losses / period;
+    for (let i = period + 1; i < state.prices.length; i++) {
+        const change = state.prices[i] - state.prices[i - 1];
+        if (change > 0) {
+            avgGain = (avgGain * (period - 1) + change) / period;
+            avgLoss = (avgLoss * (period - 1)) / period;
+        } else {
+            avgGain = (avgGain * (period - 1)) / period;
+            avgLoss = (avgLoss * (period - 1) + Math.abs(change)) / period;
+        }
+    }
+    if (avgLoss === 0) return 100;
+    const rs = avgGain / avgLoss;
+    return 100 - (100 / (1 + rs));
+}
+
 // =================== CALCOLO CONFLUENCE SCORE ===================
 function calculateConfluenceScore() {
     // 1. Bollinger Bands
