@@ -1,0 +1,118 @@
+{
+  "currentMonthEntries": [
+    {
+      "data": "02.06.25",
+      "importo": 0.77
+    },
+    {
+      "data": "02.06.25",
+      "importo": 1.07
+    },
+    {
+      "data": "03.06.25",
+      "importo": 0.3
+    },
+    {
+      "data": "03.06.25",
+      "importo": 0.24
+    },
+    {
+      "data": "06.06.25",
+      "importo": 0.15
+    },
+    {
+      "data": "06.06.25",
+      "importo": 0.39
+    },
+    {
+      "data": "07.06.25",
+      "importo": 1.69
+    },
+    {
+      "data": "09.06.25",
+      "importo": 0.16
+    },
+    {
+      "data": "09.06.25",
+      "importo": 0.18
+    },
+    {
+      "data": "09.06.25",
+      "importo": 0.5
+    },
+    {
+      "data": "09.06.25",
+      "importo": 0.7
+    },
+    {
+      "data": "09.06.25",
+      "importo": 1.9
+    },
+    {
+      "data": "09.06.25",
+      "importo": 2.66
+    },
+    {
+      "data": "10.06.25",
+      "importo": 0.76
+    },
+    {
+      "data": "10.06.25",
+      "importo": 0.7
+    },
+    {
+      "data": "12.06.25",
+      "importo": 0.54
+    },
+    {
+      "data": "16.06.25",
+      "importo": 0.6
+    },
+    {
+      "data": "19.06.25",
+      "importo": 1.63
+    },
+    {
+      "data": "23.06.25",
+      "importo": 2.6
+    },
+    {
+      "data": "23.06.25",
+      "importo": 2.95
+    },
+    {
+      "data": "23.06.25",
+      "importo": 3.34
+    },
+    {
+      "data": "23.06.25",
+      "importo": 2.92
+    },
+    {
+      "data": "23.06.25",
+      "importo": 1.67
+    },
+    {
+      "data": "24.06.25",
+      "importo": 0.28
+    }
+  ],
+  "historicalEntries": [
+    {
+      "periodo": "dal 26.01.25 al 26.02.25",
+      "importo": 43.77
+    },
+    {
+      "periodo": "dal 27.02.25 al 26.03.25",
+      "importo": 39.36
+    },
+    {
+      "periodo": "dal 27.03.25 al 26.04.25",
+      "importo": 12.3
+    },
+    {
+      "periodo": "dal 27.04.25 al 26.05.25",
+      "importo": 50.25
+    }
+  ]
+}
