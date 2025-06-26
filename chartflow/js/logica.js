@@ -1,21 +1,42 @@
-// logica.js - Strategia Multi-Confluenza avanzata
+// logica.js - Implementazione Sistema Multi-Confluence
 
+// =================== CONFIGURAZIONE ===================
 const config = {
-    lengthInput: 100,
+    // Regressione Lineare (Filtro Primario)
+    linregLength: 100,
+    linregThreshold: 0.8,
+    
+    // Bollinger Bands
     bbLength: 20,
     bbMult: 2.0,
+    
+    // Stochastic RSI
+    stochRsiLength: 14,
+    stochOverbought: 70,
+    stochOversold: 30,
+    
+    // Medie Mobili
     emaLength: 21,
     smaLength: 50,
-    rsiMomentumLength: 14,
-    momentumLength: 10,
-    macdFastLength: 12,
-    macdSlowLength: 26,
-    macdSignalLength: 9,
-    stochRsiLength: 14,
-    stochRsiRsiLength: 14,
-    stochRsiD: 2,
-    dataTimeout: 5 * 60 * 1000,
-    maxDataAge: 24 * 60 * 60 * 1000
+    rsiLength: 14,
+    
+    // Momentum (4 componenti)
+    momentumPeriods: [10, 12, 14, 20], // Momentum, ROC, Williams %R, CCI
+    
+    // Price Action
+    atrLength: 14,
+    
+    // MACD
+    macdFast: 12,
+    macdSlow: 26,
+    macdSignal: 9,
+    
+    // Pivot Points
+    pivotLookback: 9,
+    pivotDistance: 0.03, // 3%
+    
+    // Timer
+    timerPeriods: 12
 };
 
 const state = {
@@ -23,364 +44,260 @@ const state = {
     highs: [],
     lows: [],
     opens: [],
+    volumes: [],
     timestamps: [],
-    lastUpdate: null,
-    version: '1.2'
+    lastUpdate: null
 };
 
-// Variabili di stato per timer e segnali
-let lastSignalTime = null;
-let lastSignalType = "--";
-let barsElapsed = "--";
-let barsRemaining = "--";
-let lastSignalCandleIndex = null; // Indice della candela in cui è stato confermato l'ultimo segnale
+// Stato del segnale e timer
+let currentSignal = "NONE";  // "BUY", "SELL", "NONE"
+let signalStartIndex = -1;   // Indice candela di inizio segnale
+let timerCount = 0;          // Conteggio corrente del timer
 
-// ================= UTILS =================
+// =================== FUNZIONI INDICATORI ===================
 
-function sma(values, period) {
-    if (values.length < period) return 0;
-    let sum = 0;
-    for (let i = values.length - period; i < values.length; i++) sum += values[i];
-    return sum / period;
-}
-
-function ema(values, period) {
-    if (values.length < period) return 0;
-    const multiplier = 2 / (period + 1);
-    let emaValue = sma(values.slice(0, period), period);
-    for (let i = period; i < values.length; i++) {
-        emaValue = (values[i] - emaValue) * multiplier + emaValue;
-    }
-    return emaValue;
-}
-
-function stdev(values, period) {
-    if (values.length < period) return 0;
-    const subset = values.slice(-period);
-    const mean = subset.reduce((a, b) => a + b, 0) / period;
-    const variance = subset.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / period;
-    return Math.sqrt(variance);
-}
-
-function rsi(values, period) {
-    if (values.length < period + 1) return 50;
-    let gains = 0, losses = 0;
-    for (let i = 1; i <= period; i++) {
-        const change = values[i] - values[i - 1];
-        if (change > 0) gains += change;
-        else losses += Math.abs(change);
-    }
-    let avgGain = gains / period;
-    let avgLoss = losses / period;
-    for (let i = period + 1; i < values.length; i++) {
-        const change = values[i] - values[i - 1];
-        if (change > 0) {
-            avgGain = (avgGain * (period - 1) + change) / period;
-            avgLoss = (avgLoss * (period - 1)) / period;
-        } else {
-            avgGain = (avgGain * (period - 1)) / period;
-            avgLoss = (avgLoss * (period - 1) + Math.abs(change)) / period;
-        }
-    }
-    if (avgLoss === 0) return 100;
-    const rs = avgGain / avgLoss;
-    return 100 - (100 / (1 + rs));
-}
-
-// ================= INDICATORI PRINCIPALI =================
-
-function calculateIndicators() {
-    const minRequiredCandles = Math.max(
-        config.lengthInput,
-        config.bbLength,
-        config.emaLength,
-        config.smaLength,
-        config.momentumLength + 1,
-        config.stochRsiRsiLength + config.stochRsiLength
-    );
-    if (state.prices.length < minRequiredCandles) return null;
-
-    const currentPrice = state.prices[state.prices.length - 1];
-    const bbBasis = sma(state.prices, config.bbLength);
-    const bbDev = config.bbMult * stdev(state.prices, config.bbLength);
-    const bbUpper = bbBasis + bbDev;
-    const bbLower = bbBasis - bbDev;
-    const bbPosition = bbUpper !== bbLower ?
-        ((currentPrice - bbLower) / (bbUpper - bbLower)) * 2 - 1 : 0;
-
-    const emaValue = ema(state.prices, config.emaLength);
-    const smaValue = sma(state.prices, config.smaLength);
-
-    const stochK = 50; // semplificato per esempio
-    const stochD = 50;
-    const rsiValue = rsi(state.prices, config.rsiMomentumLength);
-
-    return {
-        bbPosition: Number(bbPosition.toFixed(4)),
-        bbUpper: Number(bbUpper.toFixed(2)),
-        bbLower: Number(bbLower.toFixed(2)),
-        bbBasis: Number(bbBasis.toFixed(2)),
-        stochK: Number(stochK.toFixed(2)),
-        stochD: Number(stochD.toFixed(2)),
-        rsi: Number(rsiValue.toFixed(2)),
-        ema: Number(emaValue.toFixed(2)),
-        sma: Number(smaValue.toFixed(2)),
-        currentPrice: Number(currentPrice.toFixed(2))
-    };
-}
-
-// ================= INDICATORI SECONDARI =================
-
-function calculateMACD() {
-    if (state.prices.length < config.macdSlowLength) return { status: "NEUTRO" };
-    const fast = ema(state.prices, config.macdFastLength);
-    const slow = ema(state.prices, config.macdSlowLength);
-    const macdLine = fast - slow;
-    const signalLine = ema([...state.prices.slice(-config.macdSlowLength), macdLine], config.macdSignalLength);
-    return {
-        status: macdLine > signalLine ? "BULLISH" : macdLine < signalLine ? "BEARISH" : "NEUTRO"
-    };
-}
-
-function calculateMomentum() {
-    if (state.prices.length < config.momentumLength + 1) return { status: "NEUTRO" };
-    const momentum = state.prices[state.prices.length - 1] - state.prices[state.prices.length - 1 - config.momentumLength];
-    return {
-        status: momentum > 0 ? "BULLISH" : momentum < 0 ? "BEARISH" : "NEUTRO"
-    };
-}
-
-function calculateTrend() {
-    if (state.prices.length < config.smaLength) return { status: "NEUTRO" };
-    const emaValue = ema(state.prices, config.emaLength);
-    const smaValue = sma(state.prices, config.smaLength);
-    return {
-        status: emaValue > smaValue ? "BULLISH" : emaValue < smaValue ? "BEARISH" : "NEUTRO"
-    };
-}
-
-function calculatePriceAction() {
-    if (state.opens.length < 1 || state.prices.length < 1) return { status: "NEUTRO" };
-    const open = state.opens[state.opens.length - 1];
-    const close = state.prices[state.prices.length - 1];
-    return {
-        status: close > open ? "BULLISH" : close < open ? "BEARISH" : "NEUTRO"
-    };
-}
-
-// ================= CONDIZIONI BASE =================
-
-function getConditionChecks(indicators, macd, momentum, trend, pa) {
-    return {
-        linregCheck: Math.abs(indicators.linreg) > 0.1 ? "✔️" : "❌",
-        pearsonCheck: Math.abs(indicators.pearson) > 0.2 ? "✔️" : "❌",
-        secondaryCheck:
-            [macd.status, momentum.status, trend.status, pa.status]
-                .filter(s => s === "BULLISH" || s === "BEARISH").length + "/4"
-    };
-}
-
-// ================= VERIFICA CONFERMA SEGNALE =================
-
-function isSignalConfirmed(indicators, macd, momentum, trend, pa, cond) {
-    // 1. LinReg e Pearson devono essere OK
-    if (cond.linregCheck !== "✔️" || cond.pearsonCheck !== "✔️") return false;
-
-    // 2. Almeno due indicatori secondari o primari devono essere in linea
-    const secondaryIndicators = [macd.status, momentum.status, trend.status, pa.status];
-    const bullishCount = secondaryIndicators.filter(s => s === "BULLISH").length;
-    const bearishCount = secondaryIndicators.filter(s => s === "BEARISH").length;
-
-    // Aggiungi indicatori primari (es. StochK, BB, ecc.) se vuoi
-    // Esempio: const stochBullish = indicators.stochK > 50;
-    // const stochBearish = indicators.stochK < 50;
-    // bullishCount += stochBullish ? 1 : 0;
-    // bearishCount += stochBearish ? 1 : 0;
-
-    // Per ora solo indicatori secondari
-    return bullishCount >= 2 || bearishCount >= 2;
-}
-
-// ================= TIMER E SEGNALI =================
-
-function updateTimerAndSignals(result, currentCandleIndex) {
-    if (!isSignalConfirmed(result, result.macdStatus, result.momentumStatus, result.trendStatus, result.paStatus, {
-        linregCheck: result.linregCheck,
-        pearsonCheck: result.pearsonCheck
-    })) {
-        // Se non c'è conferma, resetta il timer se non è già scaduto
-        if (lastSignalCandleIndex !== null && currentCandleIndex - lastSignalCandleIndex >= 12) {
-            lastSignalTime = null;
-            lastSignalType = "--";
-            barsElapsed = "--";
-            barsRemaining = "--";
-            lastSignalCandleIndex = null;
-        }
-        return;
-    }
-
-    // Determina la direzione del segnale confermato
-    const secondaryIndicators = [result.macdStatus, result.momentumStatus, result.trendStatus, result.paStatus];
-    const bullishCount = secondaryIndicators.filter(s => s === "BULLISH").length;
-    const bearishCount = secondaryIndicators.filter(s => s === "BEARISH").length;
-    const signalType = bullishCount >= 2 ? "BUY" : bearishCount >= 2 ? "SELL" : "--";
-
-    if (signalType === "--") return;
-
-    // Se il segnale è confermato, aggiorna il timer
-    lastSignalTime = new Date().toLocaleString();
-    lastSignalType = signalType;
-    lastSignalCandleIndex = currentCandleIndex;
-    barsElapsed = 0;
-    barsRemaining = 12;
-}
-
-function updateTimer(currentCandleIndex) {
-    if (lastSignalCandleIndex === null) {
-        barsElapsed = "--";
-        barsRemaining = "--";
-        return;
-    }
-
-    const elapsed = currentCandleIndex - lastSignalCandleIndex;
-    if (elapsed >= 12) {
-        lastSignalTime = null;
-        lastSignalType = "--";
-        barsElapsed = "--";
-        barsRemaining = "--";
-        lastSignalCandleIndex = null;
-    } else {
-        barsElapsed = elapsed;
-        barsRemaining = 12 - elapsed;
-    }
-}
-
-// ================= AGGIUNTA DATI =================
-
-function addTick(open, high, low, close, timestamp = null, symbol = 'btcusdt') {
-    if (typeof open !== 'number' || typeof high !== 'number' ||
-        typeof low !== 'number' || typeof close !== 'number') return false;
-    if (high < low || close < low || close > high || open < low || open > high) return false;
-    state.opens.push(open);
-    state.highs.push(high);
-    state.lows.push(low);
-    state.prices.push(close);
-    state.timestamps.push(timestamp || Date.now());
-    state.lastUpdate = Date.now();
-    const maxSize = config.lengthInput + 50;
-    if (state.prices.length > maxSize) {
-        state.opens.shift();
-        state.highs.shift();
-        state.lows.shift();
-        state.prices.shift();
-        state.timestamps.shift();
-    }
-    return true;
-}
-
-// ================= PROCESSAMENTO =================
-
-let lastIndicators = null;
-
-function processNewCandle(candle, symbol = 'btcusdt') {
-    if (!candle || typeof candle !== 'object') return null;
-    const { open, high, low, close, timestamp } = candle;
-    if (!addTick(open, high, low, close, timestamp, symbol)) return null;
-    const indicators = calculateIndicators();
-    if (!indicators) return null;
-
-    // Calcoli reali
-    const linreg = calculateLinReg();
-    const pearson = calculatePearson();
-    indicators.linreg = linreg;
-    indicators.pearson = pearson;
-
-    // Indicatori secondari
-    const macd = calculateMACD();
-    const momentum = calculateMomentum();
-    const trend = calculateTrend();
-    const pa = calculatePriceAction();
-
-    // Condizioni base
-    const cond = getConditionChecks(indicators, macd, momentum, trend, pa);
-
-    // Pattern (esempio fittizio)
-    const patterns = [];
-
-    // Segnale principale (esempio)
-    let mainSignal = "IN ATTESA";
-    let signalStrength = 0.0;
-    if (indicators.score > 0.5) {
-        mainSignal = "BUY";
-        signalStrength = indicators.score;
-    } else if (indicators.score < -0.5) {
-        mainSignal = "SELL";
-        signalStrength = indicators.score;
-    }
-
-    // Score (esempio)
-    indicators.score = Number(((indicators.bbPosition + indicators.stochK/100 + linreg + pearson) / 4).toFixed(4));
-
-    // Aggiorna timer e segnali
-    const currentCandleIndex = state.prices.length - 1;
-    updateTimerAndSignals({
-        ...indicators,
-        macdStatus: macd.status,
-        momentumStatus: momentum.status,
-        trendStatus: trend.status,
-        paStatus: pa.status,
-        linregCheck: cond.linregCheck,
-        pearsonCheck: cond.pearsonCheck
-    }, currentCandleIndex);
-    updateTimer(currentCandleIndex);
-
-    const result = {
-        ...indicators,
-        score: indicators.score,
-        candles: state.prices.length,
-        isStale: false,
-        macdStatus: macd.status,
-        momentumStatus: momentum.status,
-        trendStatus: trend.status,
-        paStatus: pa.status,
-        linregCheck: cond.linregCheck,
-        pearsonCheck: cond.pearsonCheck,
-        secondaryCheck: cond.secondaryCheck,
-        lastSignalTime,
-        lastSignalType,
-        barsElapsed,
-        barsRemaining,
-        patterns,
-        mainSignal,
-        signalStrength
-    };
-    lastIndicators = result;
-    return result;
-}
-
-// ================= CALCOLI LINREG E PEARSON =================
-
+// 1. Regressione Lineare (Filtro Primario)
 function calculateLinReg() {
-    const prices = state.prices.slice(-config.lengthInput);
-    if (prices.length < 2) return 0;
+    if (state.prices.length < config.linregLength) return 0;
+    const prices = state.prices.slice(-config.linregLength);
     let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+    
     for (let i = 0; i < prices.length; i++) {
         sumX += i;
         sumY += prices[i];
         sumXY += i * prices[i];
         sumX2 += i * i;
     }
+    
     const n = prices.length;
-    const denominator = n * sumX2 - sumX * sumX;
-    if (denominator === 0) return 0;
-    const slope = (n * sumXY - sumX * sumY) / denominator;
+    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
     return slope;
 }
 
-function calculatePearson() {
-    const prices = state.prices.slice(-config.lengthInput);
-    if (prices.length < 2) return 0;
+// 2. Bande di Bollinger
+function calculateBollingerBands() {
+    if (state.prices.length < config.bbLength) return { position: 0 };
+    const prices = state.prices.slice(-config.bbLength);
+    const basis = prices.reduce((sum, val) => sum + val, 0) / config.bbLength;
+    
+    const deviations = prices.map(p => Math.pow(p - basis, 2));
+    const stdDev = Math.sqrt(deviations.reduce((sum, val) => sum + val, 0) / config.bbLength);
+    
+    const upper = basis + config.bbMult * stdDev;
+    const lower = basis - config.bbMult * stdDev;
+    const currentPrice = state.prices[state.prices.length - 1];
+    
+    const position = (currentPrice - lower) / (upper - lower);
+    return { position, upper, lower, basis };
+}
+
+// 3. Stochastic RSI
+function calculateStochRSI() {
+    if (state.prices.length < config.stochRsiLength) return { k: 50 };
+    
+    // Calcola RSI
+    const rsiValues = [];
+    for (let i = 1; i <= config.stochRsiLength; i++) {
+        const gains = [];
+        const losses = [];
+        
+        for (let j = state.prices.length - i; j > state.prices.length - i - config.stochRsiLength; j--) {
+            if (j <= 0) break;
+            const change = state.prices[j] - state.prices[j - 1];
+            gains.push(Math.max(change, 0));
+            losses.push(Math.max(-change, 0));
+        }
+        
+        const avgGain = gains.reduce((a, b) => a + b, 0) / gains.length;
+        const avgLoss = losses.reduce((a, b) => a + b, 0) / losses.length;
+        const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+        rsiValues.push(100 - (100 / (1 + rs)));
+    }
+    
+    // Calcola Stochastic
+    const currentRsi = rsiValues[rsiValues.length - 1];
+    const lowestRsi = Math.min(...rsiValues);
+    const highestRsi = Math.max(...rsiValues);
+    
+    const k = ((currentRsi - lowestRsi) / (highestRsi - lowestRsi)) * 100;
+    return { k };
+}
+
+// 4. Medie Mobili e Trend
+function calculateMATrend() {
+    if (state.prices.length < config.smaLength) return { trend: 0 };
+    
+    // EMA 21
+    const emaValues = [state.prices[0]];
+    const emaAlpha = 2 / (config.emaLength + 1);
+    for (let i = 1; i < state.prices.length; i++) {
+        emaValues.push(emaAlpha * state.prices[i] + (1 - emaAlpha) * emaValues[i - 1]);
+    }
+    const ema = emaValues[emaValues.length - 1];
+    
+    // SMA 50
+    const sma = state.prices.slice(-config.smaLength).reduce((a, b) => a + b, 0) / config.smaLength;
+    
+    // RSI
+    const rsi = calculateRSI(config.rsiLength);
+    
+    // Trend
+    const trend = ema > sma && rsi > 50 ? 1 : ema < sma && rsi < 55 ? -1 : 0;
+    return { trend, ema, sma, rsi };
+}
+
+// 5. Momentum (4 componenti)
+function calculateMomentum() {
+    if (state.prices.length < Math.max(...config.momentumPeriods) + 1) return { score: 0 };
+    
+    // Momentum (10 periodi)
+    const momentum = state.prices[state.prices.length - 1] - state.prices[state.prices.length - 11];
+    
+    // ROC (12 periodi)
+    const roc = ((state.prices[state.prices.length - 1] - state.prices[state.prices.length - 13]) / 
+                 state.prices[state.prices.length - 13]) * 100;
+    
+    // Williams %R (14 periodi)
+    const high14 = Math.max(...state.highs.slice(-14));
+    const low14 = Math.min(...state.lows.slice(-14));
+    const williams = ((high14 - state.prices[state.prices.length - 1]) / (high14 - low14)) * -100;
+    
+    // CCI (20 periodi)
+    const typicalPrices = [];
+    for (let i = state.prices.length - 20; i < state.prices.length; i++) {
+        typicalPrices.push((state.highs[i] + state.lows[i] + state.prices[i]) / 3);
+    }
+    const smaTP = typicalPrices.reduce((a, b) => a + b, 0) / 20;
+    const meanDev = typicalPrices.map(tp => Math.abs(tp - smaTP)).reduce((a, b) => a + b, 0) / 20;
+    const cci = (typicalPrices[19] - smaTP) / (0.015 * meanDev);
+    
+    // Punteggio complessivo
+    const momentumScore = (momentum > 0 ? 1 : -1) + (roc > 0 ? 1 : -1) + 
+                         (williams > -50 ? 1 : -1) + (cci > 0 ? 1 : -1);
+    
+    return { score: Math.sign(momentumScore), momentum, roc, williams, cci };
+}
+
+// 6. Price Action Patterns
+function detectPriceAction() {
+    if (state.opens.length < 3) return { pattern: 0 };
+    
+    const current = {
+        open: state.opens[state.opens.length - 1],
+        high: state.highs[state.highs.length - 1],
+        low: state.lows[state.lows.length - 1],
+        close: state.prices[state.prices.length - 1]
+    };
+    
+    const prev1 = {
+        open: state.opens[state.opens.length - 2],
+        high: state.highs[state.highs.length - 2],
+        low: state.lows[state.lows.length - 2],
+        close: state.prices[state.prices.length - 2]
+    };
+    
+    const prev2 = {
+        open: state.opens[state.opens.length - 3],
+        high: state.highs[state.highs.length - 3],
+        low: state.lows[state.lows.length - 3],
+        close: state.prices[state.prices.length - 3]
+    };
+    
+    // Engulfing pattern
+    if (current.close > current.open && prev1.close < prev1.open && 
+        current.close > prev1.open && current.open < prev1.close) {
+        return { pattern: 1, type: "Bullish Engulfing" };
+    }
+    
+    if (current.close < current.open && prev1.close > prev1.open && 
+        current.close < prev1.open && current.open > prev1.close) {
+        return { pattern: -1, type: "Bearish Engulfing" };
+    }
+    
+    // Hammer/Shooting Star
+    const currentBody = Math.abs(current.close - current.open);
+    const currentRange = current.high - current.low;
+    const lowerShadow = current.open > current.close ? 
+        current.close - current.low : current.open - current.low;
+    
+    if (lowerShadow >= 2 * currentBody && (current.high - Math.max(current.open, current.close)) <= currentBody) {
+        return { pattern: 1, type: "Hammer" };
+    }
+    
+    const upperShadow = current.open > current.close ? 
+        current.high - current.open : current.high - current.close;
+    
+    if (upperShadow >= 2 * currentBody && (Math.min(current.open, current.close) - current.low) <= currentBody) {
+        return { pattern: -1, type: "Shooting Star" };
+    }
+    
+    return { pattern: 0, type: "No Pattern" };
+}
+
+// 7. MACD
+function calculateMACD() {
+    if (state.prices.length < config.macdSlow) return { histogram: 0 };
+    
+    // EMA veloce
+    let emaFast = state.prices[0];
+    const alphaFast = 2 / (config.macdFast + 1);
+    for (let i = 1; i < state.prices.length; i++) {
+        emaFast = alphaFast * state.prices[i] + (1 - alphaFast) * emaFast;
+    }
+    
+    // EMA lenta
+    let emaSlow = state.prices[0];
+    const alphaSlow = 2 / (config.macdSlow + 1);
+    for (let i = 1; i < state.prices.length; i++) {
+        emaSlow = alphaSlow * state.prices[i] + (1 - alphaSlow) * emaSlow;
+    }
+    
+    const macdLine = emaFast - emaSlow;
+    
+    // Segnale
+    let signalLine = macdLine;
+    const alphaSignal = 2 / (config.macdSignal + 1);
+    for (let i = 1; i < state.prices.length; i++) {
+        signalLine = alphaSignal * macdLine + (1 - alphaSignal) * signalLine;
+    }
+    
+    return { histogram: macdLine - signalLine, macdLine, signalLine };
+}
+
+// 8. Punti Pivot
+function calculatePivotPoints() {
+    if (state.prices.length < config.pivotLookback) return { position: 0 };
+    
+    const highs = state.highs.slice(-config.pivotLookback);
+    const lows = state.lows.slice(-config.pivotLookback);
+    const closes = state.prices.slice(-config.pivotLookback);
+    
+    const high = Math.max(...highs);
+    const low = Math.min(...lows);
+    const close = closes[closes.length - 1];
+    
+    const pivot = (high + low + close) / 3;
+    const support1 = (2 * pivot) - high;
+    const resistance1 = (2 * pivot) - low;
+    
+    const currentPrice = state.prices[state.prices.length - 1];
+    const distToSupport = Math.abs(currentPrice - support1) / currentPrice;
+    const distToResistance = Math.abs(currentPrice - resistance1) / currentPrice;
+    
+    let position = 0;
+    if (distToSupport <= config.pivotDistance) position = 1;
+    else if (distToResistance <= config.pivotDistance) position = -1;
+    
+    return { position, pivot, support1, resistance1 };
+}
+
+// 9. Pearson R
+function calculatePearsonR() {
+    if (state.prices.length < config.linregLength) return 0;
+    
+    const prices = state.prices.slice(-config.linregLength);
     let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+    
     for (let i = 0; i < prices.length; i++) {
         sumX += i;
         sumY += prices[i];
@@ -388,128 +305,220 @@ function calculatePearson() {
         sumX2 += i * i;
         sumY2 += prices[i] * prices[i];
     }
+    
     const n = prices.length;
     const numerator = n * sumXY - sumX * sumY;
-    const denominator = Math.sqrt(
-        (n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY)
-    );
-    if (denominator === 0) return 0;
-    return numerator / denominator;
+    const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+    
+    return denominator !== 0 ? numerator / denominator : 0;
 }
 
-// ================= INFO E VALIDAZIONE =================
-
-function getLastIndicators() {
-    return lastIndicators;
-}
-
-function getStateInfo(symbol = 'btcusdt') {
+// =================== CALCOLO CONFLUENCE SCORE ===================
+function calculateConfluenceScore() {
+    // 1. Bollinger Bands
+    const bb = calculateBollingerBands();
+    const bbContribution = bb.position <= -0.7 ? 1 : bb.position >= 0.7 ? -1 : 0;
+    
+    // 2. Pivot Points
+    const pivot = calculatePivotPoints();
+    const pivotContribution = pivot.position;
+    
+    // 3. Stochastic RSI
+    const stoch = calculateStochRSI();
+    const stochContribution = stoch.k <= config.stochOversold ? 1 : 
+                             stoch.k >= config.stochOverbought ? -1 : 0;
+    
+    // 4. Medie Mobili e Trend
+    const ma = calculateMATrend();
+    const maContribution = ma.trend * 0.5; // +0.5 o -0.5
+    
+    // 5. Momentum
+    const momentum = calculateMomentum();
+    const momentumContribution = momentum.score;
+    
+    // 6. Price Action
+    const priceAction = detectPriceAction();
+    const priceActionContribution = priceAction.pattern;
+    
+    // 7. MACD
+    const macd = calculateMACD();
+    const macdContribution = macd.histogram > 0 ? 1 : macd.histogram < 0 ? -1 : 0;
+    
+    // Calcolo punteggio totale
+    const score = bbContribution + pivotContribution + stochContribution + 
+                  maContribution + momentumContribution + priceActionContribution + 
+                  macdContribution;
+    
     return {
-        symbol,
-        candles: state.prices.length,
-        lastUpdate: state.lastUpdate,
-        isStale: false,
-        dataAge: state.lastUpdate ? Date.now() - state.lastUpdate : null,
-        memoryUsage: JSON.stringify(state).length,
-        version: state.version
+        score,
+        components: {
+            bb: bbContribution,
+            pivot: pivotContribution,
+            stoch: stochContribution,
+            ma: maContribution,
+            momentum: momentumContribution,
+            priceAction: priceActionContribution,
+            macd: macdContribution
+        }
     };
 }
 
-// ================= SALVATAGGIO E RIPRISTINO STATO =================
+// =================== REGOLE DI TRADING ===================
+function checkTradingRules() {
+    const linreg = calculateLinReg();
+    const pearson = Math.abs(calculatePearsonR());
+    const confluence = calculateConfluenceScore();
+    const price = state.prices[state.prices.length - 1];
+    
+    // Condizioni obbligatorie per BUY
+    if (linreg <= -config.linregThreshold && 
+        confluence.score >= 0.5 && 
+        pearson >= 0.5) {
+        return "BUY";
+    }
+    
+    // Condizioni obbligatorie per SELL
+    if (linreg >= config.linregThreshold && 
+        confluence.score <= -0.5 && 
+        pearson >= 0.5) {
+        return "SELL";
+    }
+    
+    return "NONE";
+}
 
-function saveState(symbol) {
-    const savedData = {
-        prices: state.prices,
-        highs: state.highs,
-        lows: state.lows,
-        opens: state.opens,
-        timestamps: state.timestamps,
-        lastUpdate: state.lastUpdate,
-        lastSignalTime,
-        lastSignalType,
-        barsElapsed,
-        barsRemaining,
-        lastSignalCandleIndex,
-        version: state.version,
+// =================== GESTIONE TIMER ===================
+function updateTimer() {
+    // Reset timer se non c'è segnale attivo
+    if (currentSignal === "NONE") {
+        timerCount = 0;
+        return;
+    }
+    
+    // Incrementa timer
+    timerCount++;
+    
+    // Disattiva timer dopo 12 candele
+    if (timerCount >= config.timerPeriods) {
+        currentSignal = "NONE";
+        timerCount = 0;
+        signalStartIndex = -1;
+    }
+}
+
+function handleOppositeSignal(newSignal) {
+    if ((currentSignal === "BUY" && newSignal === "SELL") || 
+        (currentSignal === "SELL" && newSignal === "BUY")) {
+        // Reset timer e inizia nuovo segnale
+        timerCount = 1;
+        currentSignal = newSignal;
+        signalStartIndex = state.prices.length - 1;
+    }
+}
+
+// =================== PROCESSAMENTO CANDELA ===================
+export function processNewCandle(candle, symbol = 'btcusdt') {
+    // Aggiungi candela allo stato
+    state.opens.push(candle.open);
+    state.highs.push(candle.high);
+    state.lows.push(candle.low);
+    state.prices.push(candle.close);
+    state.volumes.push(candle.volume);
+    state.timestamps.push(candle.timestamp);
+    
+    // Mantieni dimensioni massime
+    const maxSize = Math.max(
+        config.linregLength,
+        config.bbLength,
+        config.stochRsiLength,
+        config.smaLength,
+        ...config.momentumPeriods
+    ) + 50;
+    
+    if (state.prices.length > maxSize) {
+        state.opens.shift();
+        state.highs.shift();
+        state.lows.shift();
+        state.prices.shift();
+        state.volumes.shift();
+        state.timestamps.shift();
+    }
+    
+    // Verifica regole di trading
+    const newSignal = checkTradingRules();
+    
+    // Gestione segnali e timer
+    if (newSignal !== "NONE") {
+        if (currentSignal === "NONE") {
+            // Nuovo segnale
+            currentSignal = newSignal;
+            signalStartIndex = state.prices.length - 1;
+            timerCount = 1;
+        } else if (newSignal !== currentSignal) {
+            // Segnale opposto
+            handleOppositeSignal(newSignal);
+        }
+        // Ignora stesso segnale
+    } else {
+        // Aggiorna timer se segnale attivo
+        if (currentSignal !== "NONE") {
+            updateTimer();
+        }
+    }
+    
+    // Calcola indicatori per report
+    const indicators = {
+        linreg,
+        pearsonR: calculatePearsonR(),
+        confluence: calculateConfluenceScore(),
+        bb: calculateBollingerBands(),
+        stoch: calculateStochRSI(),
+        ma: calculateMATrend(),
+        momentum: calculateMomentum(),
+        priceAction: detectPriceAction(),
+        macd: calculateMACD(),
+        pivot: calculatePivotPoints(),
+        timer: {
+            current: timerCount,
+            max: config.timerPeriods,
+            active: currentSignal !== "NONE"
+        }
     };
-    try {
-        localStorage.setItem(`savedState_${symbol}`, JSON.stringify(savedData));
-        return true;
-    } catch (error) {
-        console.error('Errore nel salvataggio dello stato:', error);
-        return false;
-    }
+    
+    return {
+        signal: currentSignal,
+        signalStartIndex,
+        indicators,
+        timestamp: candle.timestamp,
+        price: candle.close
+    };
 }
 
-function loadState(symbol) {
-    const saved = localStorage.getItem(`savedState_${symbol}`);
-    if (!saved) return false;
-    try {
-        const data = JSON.parse(saved);
-        if (data.version !== state.version) {
-            clearState(symbol);
-            return false;
+// =================== FUNZIONI AUSILIARIE ===================
+export function getCurrentState() {
+    return {
+        signal: currentSignal,
+        timerCount,
+        signalStartIndex,
+        lastCandle: {
+            open: state.opens[state.opens.length - 1],
+            high: state.highs[state.highs.length - 1],
+            low: state.lows[state.lows.length - 1],
+            close: state.prices[state.prices.length - 1],
+            volume: state.volumes[state.volumes.length - 1],
+            timestamp: state.timestamps[state.timestamps.length - 1]
         }
-        state.prices = data.prices || [];
-        state.highs = data.highs || [];
-        state.lows = data.lows || [];
-        state.opens = data.opens || [];
-        state.timestamps = data.timestamps || [];
-        state.lastUpdate = data.lastUpdate || null;
-        lastSignalTime = data.lastSignalTime || null;
-        lastSignalType = data.lastSignalType || "--";
-        barsElapsed = data.barsElapsed || "--";
-        barsRemaining = data.barsRemaining || "--";
-        lastSignalCandleIndex = data.lastSignalCandleIndex || null;
-
-        // Se c'è un timer attivo, aggiorna il conteggio in base alle candele caricate
-        if (lastSignalCandleIndex !== null) {
-            const currentCandleIndex = state.prices.length - 1;
-            const elapsed = currentCandleIndex - lastSignalCandleIndex;
-            if (elapsed >= 12) {
-                lastSignalTime = null;
-                lastSignalType = "--";
-                barsElapsed = "--";
-                barsRemaining = "--";
-                lastSignalCandleIndex = null;
-            } else {
-                barsElapsed = elapsed;
-                barsRemaining = 12 - elapsed;
-            }
-        }
-        return true;
-    } catch (error) {
-        clearState(symbol);
-        return false;
-    }
+    };
 }
 
-function clearState(symbol) {
-    localStorage.removeItem(`savedState_${symbol}`);
-    state.prices = [];
+export function resetState() {
+    state.opens = [];
     state.highs = [];
     state.lows = [];
-    state.opens = [];
+    state.prices = [];
+    state.volumes = [];
     state.timestamps = [];
-    state.lastUpdate = null;
-    lastSignalTime = null;
-    lastSignalType = "--";
-    barsElapsed = "--";
-    barsRemaining = "--";
-    lastSignalCandleIndex = null;
+    currentSignal = "NONE";
+    timerCount = 0;
+    signalStartIndex = -1;
 }
-
-// ================= EXPORT =================
-
-export {
-    processNewCandle,
-    getLastIndicators,
-    getStateInfo,
-    addTick,
-    calculateIndicators,
-    state,
-    config,
-    saveState,
-    loadState,
-    clearState as resetState
-};
