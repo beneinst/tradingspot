@@ -29,6 +29,11 @@ const CONFIG = {
     debugMode: true
 };
 
+function getCurrentCoin() {
+    return COINS.find(coin => coin.value.toLowerCase() === CONFIG.currentSymbol.toLowerCase());
+}
+
+
 let downloadedData = null;
 
 // =================== DEBUG & UI HELPERS ===================
