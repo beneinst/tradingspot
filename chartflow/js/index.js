@@ -161,7 +161,9 @@ function updateDownloadButton() {
     const currentCoin = getCurrentCoin();
 
     if (currentCoin) {
-        const binanceUrl = `https://api.binance.com/api/v3/klines?symbol=${currentCoin.value}&interval=4h&limit=500`;
+        // Converti il simbolo in maiuscolo
+        const symbol = currentCoin.value.toUpperCase();
+        const binanceUrl = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=4h&limit=500`;
         if (downloadBtn) {
             downloadBtn.disabled = false;
             downloadBtn.textContent = `📥 Scarica ${currentCoin.label}`;
@@ -192,6 +194,7 @@ function updateDownloadButton() {
         }
     }
 }
+
 
 // =================== COPIA LINK DI DOWNLOAD ===================
 function setupCopyLinkButton() {
