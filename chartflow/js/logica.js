@@ -444,7 +444,8 @@ function handleOppositeSignal(newSignal) {
 
 // =================== PROCESSAMENTO CANDELA ===================
 export function processNewCandle(candle, symbol = 'btcusdt') {
-    // Aggiungi candela allo stato
+    console.log('Aggiungendo candela:', candle.close); // <-- Aggiungi
+	// Aggiungi candela allo stato
     state.opens.push(candle.open);
     state.highs.push(candle.high);
     state.lows.push(candle.low);
@@ -522,7 +523,8 @@ export function processNewCandle(candle, symbol = 'btcusdt') {
 
 // =================== FUNZIONI AUSILIARIE ===================
 export function getCurrentState() {
-    return {
+    console.log('Stato corrente:', state.prices.length); // <-- Aggiungi
+	return {
         signal: currentSignal,
         timerCount,
         signalStartIndex,

@@ -176,7 +176,7 @@ function refreshData() {
         'lastSignalType': mainSignal !== "NONE" ? mainSignal : "--",
         'barsElapsed': mainSignal !== "NONE" ? timerCount : "--",
         'barsRemaining': mainSignal !== "NONE" ? (config.timerPeriods - timerCount) : "--",
-        'patterns': indicators.priceAction?.type || "Nessun pattern",
+ //       'patterns': indicators.priceAction?.type || "Nessun pattern",
         'signalStrength': indicators.confluence?.score?.toFixed(2) || "0.00"
     };
 
