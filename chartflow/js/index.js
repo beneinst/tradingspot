@@ -21,7 +21,7 @@ const COINS = [
 ];
 
 const CONFIG = {
-    currentSymbol: 'btcusdt', // Cambiato in minuscolo per coerenza
+    currentSymbol: 'btcusdt', // minuscolo per coerenza
     interval: '4h',
     maxRetries: 3,
     retryDelay: 5000,
@@ -31,11 +31,12 @@ const CONFIG = {
 
 let downloadedData = null;
 
+// =================== FUNZIONI UTILITY ===================
+
 function getCurrentCoin() {
     return COINS.find(coin => coin.value.toLowerCase() === CONFIG.currentSymbol.toLowerCase());
 }
 
-// =================== DEBUG & UI HELPERS ===================
 function showLoadingMessage(message) {
     let loadingDiv = document.getElementById('loadingMessage');
     if (!loadingDiv) {
@@ -104,7 +105,6 @@ function debugLog(message, data = null) {
     } else {
         console.log(`[${timestamp}] ${message}`);
     }
-    
     const debugDiv = document.getElementById('debugInfo');
     if (debugDiv) {
         debugDiv.style.display = 'block';
@@ -120,6 +120,7 @@ function debugError(message, error = null) {
 }
 
 // =================== POPOLAMENTO SELECT ===================
+
 function populateCryptoSelect() {
     console.log('🔄 populateCryptoSelect chiamata');
     const select = document.getElementById('cryptoSelect');
@@ -128,11 +129,8 @@ function populateCryptoSelect() {
         debugError('Elemento cryptoSelect non trovato nel DOM');
         return false;
     }
-    
     try {
-        // Pulisci e popola la select
         select.innerHTML = '<option value="" disabled selected>Seleziona una criptovaluta...</option>';
-        
         COINS.forEach((coin, index) => {
             const option = document.createElement('option');
             option.value = coin.value;
@@ -140,8 +138,6 @@ function populateCryptoSelect() {
             select.appendChild(option);
             console.log(`➕ Aggiunta opzione ${index + 1}: ${coin.label} (${coin.value})`);
         });
-        
-        // Imposta il valore corrente
         select.value = CONFIG.currentSymbol;
         console.log(`✅ Select popolata con ${COINS.length} elementi, valore corrente: ${CONFIG.currentSymbol}`);
         return true;
@@ -152,116 +148,79 @@ function populateCryptoSelect() {
     }
 }
 
-// =================== AGGIORNA LA DASHBOARD ===================
+// =================== AGGIORNAMENTO DASHBOARD ===================
+
 function refreshData() {
     console.log('🔄 refreshData chiamata');
-    
     try {
-        // Ottieni lo stato corrente dalla logica
         const state = getCurrentState();
         debugLog('refreshData - getCurrentState:', state);
-        
         if (!state) {
             console.warn('⚠️ Nessuno stato disponibile');
             return;
         }
-
-        // Estrai i dati dal nuovo formato
         const indicators = state.indicators || {};
         const mainSignal = state.signal || "NONE";
         const timerCount = state.timerCount || 0;
-        const timerMax = 12; // Usa il valore fisso dal config di logica.js
+        const timerMax = 12; // fisso, come in logica.js
 
-        console.log('📊 Dati estratti:', {
-            signal: mainSignal,
-            timerCount,
-            indicators: Object.keys(indicators)
-        });
-
-        // Mappa corretta degli elementi basata su logica.js
+        // Mappa elementi da aggiornare
         const elementsToUpdate = {
-            // Segnale principale
             'mainSignal': mainSignal,
             'timerStatus': mainSignal !== "NONE" ? "ATTIVO" : "NESSUN OK",
             'timerProgress': mainSignal !== "NONE" ? `${timerCount}/${timerMax}` : `0/${timerMax}`,
-            
-            // Indicatori tecnici (basati su logica.js)
             'currentPrice': indicators.currentPrice?.toFixed(2) || "0.00",
             'ema': indicators.ema?.toFixed(2) || "0.00",
             'sma': indicators.sma?.toFixed(2) || "0.00",
             'rsi': indicators.rsi?.toFixed(2) || "50.00",
             'candles': indicators.candles?.toString() || "0",
-            
-            // Bollinger Bands
             'bbPosition': indicators.bb?.position?.toFixed(4) || "0.0000",
             'bbUpper': indicators.bb?.upper?.toFixed(2) || "0.00",
             'bbLower': indicators.bb?.lower?.toFixed(2) || "0.00",
             'bbBasis': indicators.bb?.basis?.toFixed(2) || "0.00",
-            
-            // Linear Regression e MACD
             'linreg': indicators.linreg?.toFixed(6) || "0.000000",
-            'macdStatus': indicators.macd?.histogram > 0 ? "BULLISH" : 
-                         indicators.macd?.histogram < 0 ? "BEARISH" : "NEUTRO",
-            
-            // Trend status basato su EMA vs SMA
-            'trendStatus': indicators.ema && indicators.sma ? 
-                          (indicators.ema > indicators.sma ? "BULLISH" : "BEARISH") : "NEUTRO",
-            
-            // Timer info
+            'macdStatus': indicators.macd?.histogram > 0 ? "BULLISH" : indicators.macd?.histogram < 0 ? "BEARISH" : "NEUTRO",
+            'trendStatus': indicators.ema && indicators.sma ? (indicators.ema > indicators.sma ? "BULLISH" : "BEARISH") : "NEUTRO",
             'barsElapsed': mainSignal !== "NONE" ? timerCount.toString() : "--",
             'barsRemaining': mainSignal !== "NONE" ? (timerMax - timerCount).toString() : "--",
-            
-            // Signal info
             'lastSignalType': mainSignal !== "NONE" ? mainSignal : "--",
             'signalStrength': mainSignal !== "NONE" ? "ATTIVO" : "NESSUNO"
         };
 
-        // Aggiorna gli elementi HTML
+        // Aggiorna elementi HTML
         let updatedCount = 0;
         let notFoundCount = 0;
-        
         for (const [elementId, value] of Object.entries(elementsToUpdate)) {
             const el = document.getElementById(elementId);
             if (el) {
                 el.textContent = value;
                 updatedCount++;
-                if (CONFIG.debugMode) {
-                    console.log(`✅ ${elementId}: ${value}`);
-                }
+                if (CONFIG.debugMode) console.log(`✅ ${elementId}: ${value}`);
             } else {
                 notFoundCount++;
-                if (CONFIG.debugMode) {
-                    console.warn(`❌ Elemento non trovato: ${elementId}`);
-                }
+                if (CONFIG.debugMode) console.warn(`❌ Elemento non trovato: ${elementId}`);
             }
         }
 
-        // Aggiornamenti speciali con colori
+        // Aggiorna colori segnale e timer
         updateSignalColors(mainSignal);
         updateTimerColors(timerCount, timerMax);
-        
+
         console.log(`📈 Dashboard aggiornata: ${updatedCount} elementi aggiornati, ${notFoundCount} non trovati`);
-        
     } catch (error) {
         console.error('❌ Errore in refreshData:', error);
         debugError('Errore in refreshData', error);
     }
 }
 
-// =================== AGGIORNAMENTI CON COLORI ===================
 function updateSignalColors(signal) {
     const signalEl = document.getElementById('mainSignal');
     if (signalEl) {
         signalEl.className = `signal-${signal.toLowerCase()}`;
         switch(signal) {
-            case 'BUY':
-                signalEl.style.color = '#26ff8a';
-                break;
-            case 'SELL':
-                signalEl.style.color = '#ff4d4d';
-                break;
-            default:
-                signalEl.style.color = '#ffc200';
+            case 'BUY': signalEl.style.color = '#26ff8a'; break;
+            case 'SELL': signalEl.style.color = '#ff4d4d'; break;
+            default: signalEl.style.color = '#ffc200';
         }
     }
 }
@@ -270,49 +229,39 @@ function updateTimerColors(current, max) {
     const timerEl = document.getElementById('timerProgress');
     if (timerEl) {
         const percentage = (current / max) * 100;
-        if (percentage > 80) {
-            timerEl.style.color = '#ff4d4d';
-        } else if (percentage > 50) {
-            timerEl.style.color = '#ffc200';
-        } else {
-            timerEl.style.color = '#26ff8a';
-        }
+        if (percentage > 80) timerEl.style.color = '#ff4d4d';
+        else if (percentage > 50) timerEl.style.color = '#ffc200';
+        else timerEl.style.color = '#26ff8a';
     }
 }
 
 // =================== CAMBIO SIMBOLO ===================
+
 function changeSymbol() {
     const selectEl = document.getElementById('cryptoSelect');
     if (!selectEl) {
         debugError('Elemento cryptoSelect non trovato per cambio simbolo');
         return;
     }
-    
     const newSymbol = selectEl.value;
     if (!newSymbol) {
         console.warn('⚠️ Nessun simbolo selezionato');
         return;
     }
-    
     if (newSymbol === CONFIG.currentSymbol) {
         console.log('ℹ️ Simbolo già selezionato:', newSymbol);
         return;
     }
-    
     debugLog(`🔄 Cambio simbolo: ${CONFIG.currentSymbol} -> ${newSymbol}`);
     CONFIG.currentSymbol = newSymbol;
-    
-    // Reset stato per nuovo simbolo
     resetState();
-    
-    // Aggiorna UI
     refreshData();
     updateDownloadButton();
-    
     showStatusMessage(`📊 Selezionato ${newSymbol.toUpperCase()}`, 'success');
 }
 
-// =================== AGGIORNA PULSANTE E LINK DI DOWNLOAD ===================
+// =================== DOWNLOAD E UPLOAD ===================
+
 function updateDownloadButton() {
     const downloadBtn = document.getElementById('downloadBtn');
     const downloadLinkField = document.getElementById('downloadLink');
@@ -322,7 +271,6 @@ function updateDownloadButton() {
     if (currentCoin && downloadBtn) {
         const symbol = currentCoin.value.toUpperCase();
         const binanceUrl = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=4h&limit=500`;
-        
         downloadBtn.disabled = false;
         downloadBtn.textContent = `📥 Scarica ${currentCoin.label}`;
         downloadBtn.title = `Scarica dati da Binance: ${binanceUrl}`;
@@ -330,7 +278,6 @@ function updateDownloadButton() {
             window.open(binanceUrl, '_blank');
             showStatusMessage(`Link di ${currentCoin.label} aperto in una nuova finestra`, 'success');
         };
-        
         if (downloadLinkField) {
             downloadLinkField.value = binanceUrl;
             downloadLinkField.style.display = 'block';
@@ -342,18 +289,15 @@ function updateDownloadButton() {
         downloadBtn.disabled = true;
         downloadBtn.textContent = '📥 Link non disponibile';
         downloadBtn.title = 'Nessun link configurato per questa criptovaluta';
-        
         if (downloadLinkField) downloadLinkField.style.display = 'none';
         if (copyLinkBtn) copyLinkBtn.style.display = 'none';
     }
 }
 
-// =================== COPIA LINK DI DOWNLOAD ===================
 function setupCopyLinkButton() {
     const copyBtn = document.getElementById('copyLinkBtn');
     const linkField = document.getElementById('downloadLink');
     if (!copyBtn || !linkField) return;
-
     copyBtn.onclick = async () => {
         try {
             await navigator.clipboard.writeText(linkField.value);
@@ -365,69 +309,12 @@ function setupCopyLinkButton() {
     };
 }
 
-// =================== HANDLE FILE UPLOAD ===================
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) {
-        debugLog('Nessun file selezionato');
-        return;
-    }
-    
-    console.log(`📁 File selezionato: ${file.name} (${file.size} bytes)`);
-
-    if (!CONFIG.currentSymbol) {
-        showStatusMessage('Seleziona prima una criptovaluta!', 'error');
-        return;
-    }
-
-    showLoadingMessage('Caricando e processando file...');
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            debugLog('📊 Parsing JSON file...');
-            const rawData = JSON.parse(e.target.result);
-            console.log(`✅ JSON parsato: ${rawData.length} elementi`);
-
-            const candles = parseKlineData(rawData);
-            
-            if (!candles || candles.length === 0) {
-                throw new Error('Nessuna candela valida trovata nei dati');
-            }
-
-            console.log(`📈 Processate ${candles.length} candele valide`);
-            downloadedData = candles;
-            hideLoadingMessage();
-            showStatusMessage(`✅ File caricato con successo! ${candles.length} candele`, 'success');
-
-            // Processa i dati
-            processDownloadedData();
-            
-        } catch (error) {
-            debugError('Errore processamento file:', error);
-            hideLoadingMessage();
-            showStatusMessage(`❌ Errore nel processamento del file: ${error.message}`, 'error');
-        }
-    };
-    
-    reader.onerror = function() {
-        debugError('Errore lettura file');
-        hideLoadingMessage();
-        showStatusMessage('❌ Errore nella lettura del file', 'error');
-    };
-    
-    reader.readAsText(file);
-}
-
-// =================== PARSING DATI KLINE ===================
 function parseKlineData(rawData) {
     if (!Array.isArray(rawData) || rawData.length === 0) {
         throw new Error('Dati non validi: deve essere un array non vuoto');
     }
-
     const firstItem = rawData[0];
     let candles = [];
-
     if (Array.isArray(firstItem) && firstItem.length >= 6) {
         // Formato Binance (array di array)
         console.log('📊 Riconosciuto formato Binance (array di array)');
@@ -455,7 +342,6 @@ function parseKlineData(rawData) {
     } else {
         throw new Error('Formato dati non riconosciuto');
     }
-
     // Filtra e ordina
     candles = candles.filter(candle =>
         candle.timestamp &&
@@ -467,28 +353,62 @@ function parseKlineData(rawData) {
         candle.high >= Math.max(candle.open, candle.close) &&
         candle.low <= Math.min(candle.open, candle.close)
     );
-    
     candles.sort((a, b) => a.timestamp - b.timestamp);
     return candles;
 }
 
-// =================== PROCESSA DATI SCARICATI ===================
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        debugLog('Nessun file selezionato');
+        return;
+    }
+    console.log(`📁 File selezionato: ${file.name} (${file.size} bytes)`);
+    if (!CONFIG.currentSymbol) {
+        showStatusMessage('Seleziona prima una criptovaluta!', 'error');
+        return;
+    }
+    showLoadingMessage('Caricando e processando file...');
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            debugLog('📊 Parsing JSON file...');
+            const rawData = JSON.parse(e.target.result);
+            console.log(`✅ JSON parsato: ${rawData.length} elementi`);
+            const candles = parseKlineData(rawData);
+            if (!candles || candles.length === 0) {
+                throw new Error('Nessuna candela valida trovata nei dati');
+            }
+            console.log(`📈 Processate ${candles.length} candele valide`);
+            downloadedData = candles;
+            hideLoadingMessage();
+            showStatusMessage(`✅ File caricato con successo! ${candles.length} candele`, 'success');
+            processDownloadedData();
+        } catch (error) {
+            debugError('Errore processamento file:', error);
+            hideLoadingMessage();
+            showStatusMessage(`❌ Errore nel processamento del file: ${error.message}`, 'error');
+        }
+    };
+    reader.onerror = function() {
+        debugError('Errore lettura file');
+        hideLoadingMessage();
+        showStatusMessage('❌ Errore nella lettura del file', 'error');
+    };
+    reader.readAsText(file);
+}
+
 function processDownloadedData() {
     if (!downloadedData || downloadedData.length === 0) {
         debugLog('❌ Nessun dato da processare');
         return;
     }
-    
     try {
         console.log(`🔄 Iniziando processing di ${downloadedData.length} candele con logica.js...`);
         showLoadingMessage('Processing candele...');
-        
-        // Reset stato prima del processing
         resetState();
-        
         let processedCount = 0;
         let errorCount = 0;
-        
         downloadedData.forEach((candle, index) => {
             try {
                 const result = processNewCandle(candle, CONFIG.currentSymbol.toLowerCase());
@@ -500,28 +420,22 @@ function processDownloadedData() {
                 } else {
                     errorCount++;
                 }
-                
                 if (index > 0 && index % 100 === 0) {
                     debugLog(`Processing: ${index}/${downloadedData.length} candele`);
                 }
             } catch (error) {
                 errorCount++;
-                if (errorCount < 5) { // Mostra solo i primi errori
-                    console.error(`❌ Errore processing candela ${index}:`, error);
-                }
+                if (errorCount < 5) console.error(`❌ Errore processing candela ${index}:`, error);
             }
         });
-        
         hideLoadingMessage();
         console.log(`✅ Processing completato: ${processedCount} successi, ${errorCount} errori`);
-        
         if (processedCount > 0) {
             showStatusMessage(`✅ ${processedCount} candele processate!`, 'success');
             refreshData();
         } else {
             showStatusMessage(`❌ Nessuna candela processata correttamente`, 'error');
         }
-        
     } catch (error) {
         hideLoadingMessage();
         debugError('Errore processing generale:', error);
@@ -529,40 +443,9 @@ function processDownloadedData() {
     }
 }
 
-// =================== INIZIALIZZAZIONE ===================
-function initApp() {
-    console.log('🚀 Inizializzazione applicazione...');
-    
-    try {
-        // Popola la select
-        const selectPopulated = populateCryptoSelect();
-        if (!selectPopulated) {
-            showStatusMessage('❌ Errore inizializzazione select', 'error');
-            return;
-        }
-        
-        // Configura pulsanti
-        updateDownloadButton();
-        setupCopyLinkButton();
-        
-        // Inizializza stato
-        resetState();
-        refreshData();
-        
-        // Event listeners
-        setupEventListeners();
-        
-        console.log('✅ Applicazione inizializzata correttamente');
-        showStatusMessage('✅ Dashboard pronta! Seleziona una crypto e carica un file JSON', 'success');
-        
-    } catch (error) {
-        console.error('❌ Errore inizializzazione:', error);
-        showStatusMessage('❌ Errore inizializzazione applicazione', 'error');
-    }
-}
+// =================== SETUP EVENTI ===================
 
 function setupEventListeners() {
-    // Select crypto
     const cryptoSelect = document.getElementById('cryptoSelect');
     if (cryptoSelect) {
         cryptoSelect.addEventListener('change', changeSymbol);
@@ -570,11 +453,8 @@ function setupEventListeners() {
     } else {
         console.warn('⚠️ cryptoSelect non trovato per event listener');
     }
-
-    // Upload button e file input
     const uploadBtn = document.getElementById('uploadBtn');
     const fileInput = document.getElementById('fileInput');
-    
     if (uploadBtn && fileInput) {
         uploadBtn.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', handleFileUpload);
@@ -584,7 +464,30 @@ function setupEventListeners() {
     }
 }
 
-// =================== AVVIO APPLICAZIONE ===================
+// =================== INIZIALIZZAZIONE ===================
+
+function initApp() {
+    console.log('🚀 Inizializzazione applicazione...');
+    try {
+        const selectPopulated = populateCryptoSelect();
+        if (!selectPopulated) {
+            showStatusMessage('❌ Errore inizializzazione select', 'error');
+            return;
+        }
+        updateDownloadButton();
+        setupCopyLinkButton();
+        resetState();
+        refreshData();
+        setupEventListeners();
+        console.log('✅ Applicazione inizializzata correttamente');
+        showStatusMessage('✅ Dashboard pronta! Seleziona una crypto e carica un file JSON', 'success');
+    } catch (error) {
+        console.error('❌ Errore inizializzazione:', error);
+        showStatusMessage('❌ Errore inizializzazione applicazione', 'error');
+    }
+}
+
+// Avvio app
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initApp);
 } else {
