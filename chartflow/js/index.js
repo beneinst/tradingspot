@@ -1,5 +1,5 @@
 // =================== CONFIGURAZIONE MULTI-SIMBOLO ===================
-import { processNewCandle, loadState, saveState, getStateInfo, resetState, getCurrentState } from './logica.js';
+import { processNewCandle, loadState, saveState, resetState, getCurrentState } from './logica.js';
 
 const COINS = [
     { id: 'bitcoin', label: 'BTC/USDT', value: 'btcusdt', vs_currency: 'usd', dataUrl: 'https://tuosito.com/data/btcusdt_4h.json' },
