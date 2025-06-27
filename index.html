@@ -360,7 +360,24 @@ h2 {
             </div>
         </div>
         
-        <div class="backup-container">
+     
+		
+    
+	
+	 <div class="backup-container">
+        
+        <h2>Grafico Storico Mensile</h2>
+    <canvas id="monthlyChart" width="800" height="400"></canvas>
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+	
+        <button id="downloadChartBtn" class="btn-secondary">Scarica Grafico</button>
+        <button id="downloadTableBtn" class="btn-secondary">Scarica Tabella</button>
+    </div>
+	</div>
+	
+
+
+   <div class="backup-container">
             <button id="scaricaDatiBtn" class="btn-secondary">Scarica Dati (JSON)</button>
             <input type="file" id="fileInput" class="file-input" accept=".json">
             <label for="fileInput" class="btn-secondary" style="cursor: pointer;">Seleziona File</label>
@@ -368,17 +385,9 @@ h2 {
         </div>
         
         <div id="message"></div>
+		</div>
 		
-    
-	
-	 <div class="backup-container">
-        <div class="header">
-        <h2>Grafico Storico Mensile</h2>
-    <canvas id="monthlyChart" width="800" height="400"></canvas>
-    <div style="display: flex; gap: 10px; margin-top: 15px;">
-        <button id="downloadChartBtn" class="btn-secondary">Scarica Grafico</button>
-        <button id="downloadTableBtn" class="btn-secondary">Scarica Tabella Storico</button>
-    </div></div></div>
+		</div>
 	
 	
 	
@@ -654,7 +663,7 @@ function fixDatabase() {
     }
 }
 
-function downloadTable() {
+function downloadTableBtn() {
     if (!chartData || chartData.length === 0) {
         showMessage('Nessun dato disponibile per la tabella!', 'error');
         return;
@@ -902,7 +911,7 @@ function createChart() {
     
     if (historicalEntries.length === 0) {
         // Messaggio se non ci sono dati
-        ctx.fillStyle = '#aaa';
+        ctx.fillStyle = '#fff';
         ctx.font = '16px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('Nessun dato storico disponibile', canvas.width / 2, canvas.height / 2);
@@ -951,7 +960,7 @@ function createChart() {
     }
     
     // Disegnare i punti
-    ctx.fillStyle = '#4caf50';
+    ctx.fillStyle = '#fff';
     values.forEach((value, index) => {
         const x = padding + (index * chartWidth) / Math.max(values.length - 1, 1);
         const y = canvas.height - padding - ((value - minValue) / range) * chartHeight;
@@ -961,7 +970,7 @@ function createChart() {
         ctx.fill();
         
         // Etichetta del valore
-        ctx.fillStyle = '#333';
+        ctx.fillStyle = '#fff';
         ctx.font = '12px Arial';
         ctx.textAlign = 'center';
         ctx.fillText(formatImport(value), x, y - 10);
@@ -969,7 +978,7 @@ function createChart() {
     });
     
     // Etichette sull'asse X
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = '#fff';
     ctx.font = '10px Arial';
     ctx.textAlign = 'center';
     labels.forEach((label, index) => {
@@ -1136,6 +1145,103 @@ function downloadHistoricalTable() {
     showMessage('Tabella HTML editabile scaricata con successo!', 'success');
 }
 
+// Scarica sia la tabella Importi Mese Corrente sia la tabella Storico Mensile in un unico file HTML
+function downloadCombinedTablesHTML() {
+    if (currentMonthEntries.length === 0 && historicalEntries.length === 0) {
+        showMessage('Non ci sono dati da scaricare!', 'error');
+        return;
+    }
+
+    // Tabella Importi Mese Corrente
+    let currentMonthTableHTML = `
+        <h3>Importi Mese Corrente</h3>
+        <div style="overflow-x: auto;">
+            <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Importo (€)</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    currentMonthEntries.forEach(entry => {
+        currentMonthTableHTML += `
+            <tr>
+                <td>${entry.data}</td>
+                <td>${formatImport(entry.importo)}</td>
+            </tr>
+        `;
+    });
+    currentMonthTableHTML += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    // Tabella Storico Mensile
+    let historicalTableHTML = `
+        <h3>Storico Mensile</h3>
+        <div style="overflow-x: auto;">
+            <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Periodo</th>
+                        <th>Importo (€)</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    historicalEntries.forEach(entry => {
+        historicalTableHTML += `
+            <tr>
+                <td>${entry.periodo}</td>
+                <td>${formatImport(entry.importo)}</td>
+            </tr>
+        `;
+    });
+    // Calcola il totale storico
+    const total = historicalEntries.reduce((sum, entry) => sum + parseFloat(entry.importo), 0);
+    historicalTableHTML += `
+            <tr style="font-weight:bold; background:#eef;">
+                <td>TOTALE</td>
+                <td>${formatImport(total)}</td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+    `;
+
+    // Unisci le due tabelle in un unico HTML
+    const combinedHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Storico e Importi Mese Corrente</title>
+</head>
+<body>
+    ${currentMonthTableHTML}
+    <br><br>
+    ${historicalTableHTML}
+</body>
+</html>
+    `;
+
+    // Download
+    const blob = new Blob([combinedHTML], { type: 'text/html;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `importi_e_storico_${getCurrentDate().replace(/\./g, '-')}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+
+    showMessage('Tabelle HTML scaricate con successo!', 'success');
+}
+
+
 
 // Event listener per cancellare l'ultimo dato
 document.getElementById('deleteLastButton').addEventListener('click', deleteLastEntry);
@@ -1169,7 +1275,10 @@ updateAll();
 document.getElementById('downloadChartBtn').addEventListener('click', downloadChart);
 
 // Event listener per scaricare la tabella storico
-document.getElementById('downloadTableBtn').addEventListener('click', downloadHistoricalTable);
+document.getElementById('downloadTableBtn').addEventListener('click', downloadCombinedTablesHTML);
+
+
+
 
 // Aggiornare la funzione updateAll esistente per includere il grafico
 function updateAll() {
@@ -1178,6 +1287,8 @@ function updateAll() {
     updateDashboard();
     createChart(); // Aggiungi questa riga
 }
+
+
     </script>
 </body>
 </html>
