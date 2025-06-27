@@ -273,6 +273,16 @@ h2 {
     letter-spacing: -0.1px !important;
 }
 
+#monthlyChart {
+ 
+  height: 100%; /* oppure: height: 100%; se vuoi adattare anche l'altezza */
+  color: #ff6b6b;
+  display: block;
+  
+  box-sizing: border-box;
+}
+
+
 
     </style>
 </head>
@@ -359,7 +369,20 @@ h2 {
         
         <div id="message"></div>
 		
-    </div>
+    
+	
+	 <div class="backup-container">
+        <div class="header">
+        <h2>Grafico Storico Mensile</h2>
+    <canvas id="monthlyChart" width="800" height="400"></canvas>
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button id="downloadChartBtn" class="btn-secondary">Scarica Grafico</button>
+        <button id="downloadTableBtn" class="btn-secondary">Scarica Tabella Storico</button>
+    </div></div></div>
+	
+	
+	
+
 	 <div class="footer">
         Trading Spot Manager v1.1 | 
         <a href="https://beneinst.github.io/tradingspot/index.html">Operatività</a> | 
@@ -371,7 +394,7 @@ h2 {
         <a href="https://beneinst.github.io/tradingspot/candlestick.html">Candlestick</a> | 
         <a href="https://beneinst.github.io/tradingspot/cheat-sheet.html">Patterns</a>
    </div>
-
+</div>
 
     <script>
         // Inizializzazione delle variabili
@@ -630,6 +653,55 @@ function fixDatabase() {
         };
     }
 }
+
+function downloadTable() {
+    if (!chartData || chartData.length === 0) {
+        showMessage('Nessun dato disponibile per la tabella!', 'error');
+        return;
+    }
+
+    // Determina l'etichetta della prima colonna
+    let firstColumnLabel = "Giorno";
+    modeRadios.forEach(radio => {
+        if (radio.checked) {
+            if (radio.value === "giorno") {
+                firstColumnLabel = "Giorno";
+            } else if (radio.value === "area") {
+                firstColumnLabel = "Area";
+            } else if (radio.value === "custom") {
+                firstColumnLabel = customLabelInput.value || "Codice";
+            }
+        }
+    });
+
+    // Prepara i dati CSV
+    let csv = `${firstColumnLabel},Media Giornaliera (Fks),Valore (Fk Polo 18),Fk / Valore\n`;
+    let sumFk = 0, sumValore = 0;
+
+    chartData.forEach(item => {
+        csv += `${item.identifier},${item.fk.toFixed(3)},${item.valore.toFixed(2)},${item.fk.toFixed(3)} / ${item.valore.toFixed(2)}\n`;
+        sumFk += item.fk;
+        sumValore += item.valore;
+    });
+
+    // Riga media
+    const avgFk = sumFk / chartData.length;
+    const avgValore = sumValore / chartData.length;
+    csv += `Media,${avgFk.toFixed(3)},${avgValore.toFixed(2)},${avgFk.toFixed(3)} / ${avgValore.toFixed(2)}\n`;
+
+    // Download CSV
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `tabella_valori_${getCurrentDate().replace(/\./g, '-')}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+
+    showMessage('Tabella CSV scaricata con successo!', 'success');
+}
+
         
 // Funzione modificata per chiudere il mese
 function closeMonth() {
@@ -820,6 +892,251 @@ document.getElementById('importInput').addEventListener('keypress', function(eve
     }
 });
 
+// Funzione per creare il grafico
+function createChart() {
+    const canvas = document.getElementById('monthlyChart');
+    const ctx = canvas.getContext('2d');
+    
+    // Pulire il canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    if (historicalEntries.length === 0) {
+        // Messaggio se non ci sono dati
+        ctx.fillStyle = '#aaa';
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Nessun dato storico disponibile', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+    
+    // Preparare i dati
+    const values = historicalEntries.map(entry => parseFloat(entry.importo));
+    const labels = historicalEntries.map(entry => entry.periodo.split('al ')[1].trim());
+    
+    const maxValue = Math.max(...values);
+    const minValue = Math.min(...values);
+    const range = maxValue - minValue || 1;
+    
+    // Configurazione del grafico
+    const padding = 50;
+    const chartWidth = canvas.width - (padding * 2);
+    const chartHeight = canvas.height - (padding * 2);
+    
+    // Disegnare gli assi
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, canvas.height - padding);
+    ctx.lineTo(canvas.width - padding, canvas.height - padding);
+    ctx.stroke();
+    
+    // Disegnare il grafico a linee
+    if (values.length > 1) {
+        ctx.strokeStyle = '#4caf50';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        
+        values.forEach((value, index) => {
+            const x = padding + (index * chartWidth) / (values.length - 1);
+            const y = canvas.height - padding - ((value - minValue) / range) * chartHeight;
+            
+            if (index === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        });
+        ctx.stroke();
+    }
+    
+    // Disegnare i punti
+    ctx.fillStyle = '#4caf50';
+    values.forEach((value, index) => {
+        const x = padding + (index * chartWidth) / Math.max(values.length - 1, 1);
+        const y = canvas.height - padding - ((value - minValue) / range) * chartHeight;
+        
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Etichetta del valore
+        ctx.fillStyle = '#333';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(formatImport(value), x, y - 10);
+        ctx.fillStyle = '#4caf50';
+    });
+    
+    // Etichette sull'asse X
+    ctx.fillStyle = '#333';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    labels.forEach((label, index) => {
+        const x = padding + (index * chartWidth) / Math.max(labels.length - 1, 1);
+        ctx.fillText(label, x, canvas.height - 20);
+    });
+}
+
+function createHighResChart() {
+    // Creare un canvas temporaneo ad alta risoluzione
+    const highResCanvas = document.createElement('canvas');
+    const highResCtx = highResCanvas.getContext('2d');
+    
+    // Impostare le dimensioni ad alta risoluzione
+    const width = 7680; // 1920 * 4
+    const height = 4320; // 1080 * 4
+    highResCanvas.width = width;
+    highResCanvas.height = height;
+    
+    // Sfondo bianco
+    highResCtx.fillStyle = '#ffffff';
+    highResCtx.fillRect(0, 0, width, height);
+    
+    if (historicalEntries.length === 0) {
+        // Messaggio se non ci sono dati
+        highResCtx.fillStyle = '#666';
+        highResCtx.font = 'bold 120px Arial';
+        highResCtx.textAlign = 'center';
+        highResCtx.fillText('Nessun dato storico disponibile', width / 2, height / 2);
+        return highResCanvas;
+    }
+    
+    // Preparare i dati
+    const values = historicalEntries.map(entry => parseFloat(entry.importo));
+    const labels = historicalEntries.map(entry => entry.periodo.split('al ')[1].trim());
+    
+    const maxValue = Math.max(...values);
+    const minValue = Math.min(...values);
+    const range = maxValue - minValue || 1;
+    
+    // Configurazione del grafico ad alta risoluzione
+    const padding = 400;
+    const chartWidth = width - (padding * 2);
+    const chartHeight = height - (padding * 2);
+    
+    // Titolo
+    highResCtx.fillStyle = '#333';
+    highResCtx.font = 'bold 180px Arial';
+    highResCtx.textAlign = 'center';
+    highResCtx.fillText('Storico Mensile Trading', width / 2, 250);
+    
+    // Disegnare gli assi
+    highResCtx.strokeStyle = '#333';
+    highResCtx.lineWidth = 8;
+    highResCtx.beginPath();
+    highResCtx.moveTo(padding, padding);
+    highResCtx.lineTo(padding, height - padding);
+    highResCtx.lineTo(width - padding, height - padding);
+    highResCtx.stroke();
+    
+    // Griglia
+    highResCtx.strokeStyle = '#e0e0e0';
+    highResCtx.lineWidth = 2;
+    for (let i = 1; i < 10; i++) {
+        const y = padding + (i * chartHeight) / 10;
+        highResCtx.beginPath();
+        highResCtx.moveTo(padding, y);
+        highResCtx.lineTo(width - padding, y);
+        highResCtx.stroke();
+    }
+    
+    // Disegnare il grafico a linee
+    if (values.length > 1) {
+        highResCtx.strokeStyle = '#4caf50';
+        highResCtx.lineWidth = 12;
+        highResCtx.beginPath();
+        
+        values.forEach((value, index) => {
+            const x = padding + (index * chartWidth) / (values.length - 1);
+            const y = height - padding - ((value - minValue) / range) * chartHeight;
+            
+            if (index === 0) {
+                highResCtx.moveTo(x, y);
+            } else {
+                highResCtx.lineTo(x, y);
+            }
+        });
+        highResCtx.stroke();
+    }
+    
+    // Disegnare i punti
+    highResCtx.fillStyle = '#2e7d32';
+    values.forEach((value, index) => {
+        const x = padding + (index * chartWidth) / Math.max(values.length - 1, 1);
+        const y = height - padding - ((value - minValue) / range) * chartHeight;
+        
+        highResCtx.beginPath();
+        highResCtx.arc(x, y, 20, 0, 2 * Math.PI);
+        highResCtx.fill();
+        
+        // Bordo bianco per i punti
+        highResCtx.strokeStyle = '#fff';
+        highResCtx.lineWidth = 6;
+        highResCtx.stroke();
+        
+        // Etichetta del valore
+        highResCtx.fillStyle = '#333';
+        highResCtx.font = 'bold 60px Arial';
+        highResCtx.textAlign = 'center';
+        highResCtx.fillText(formatImport(value), x, y - 60);
+    });
+    
+    // Etichette sull'asse X
+    highResCtx.fillStyle = '#333';
+    highResCtx.font = 'bold 50px Arial';
+    highResCtx.textAlign = 'center';
+    labels.forEach((label, index) => {
+        const x = padding + (index * chartWidth) / Math.max(labels.length - 1, 1);
+        highResCtx.fillText(label, x, height - 150);
+    });
+    
+    // Etichette sull'asse Y
+    highResCtx.textAlign = 'right';
+    for (let i = 0; i <= 10; i++) {
+        const value = minValue + (range * i) / 10;
+        const y = height - padding - (i * chartHeight) / 10;
+        highResCtx.fillText(formatImport(value), padding - 50, y + 20);
+    }
+    
+    return highResCanvas;
+}
+
+
+
+
+// Funzione per scaricare il grafico
+function downloadChart() {
+    const highResCanvas = createHighResChart();
+    const link = document.createElement('a');
+    link.download = `grafico_storico_HR_${getCurrentDate().replace(/\./g, '-')}.png`;
+    link.href = highResCanvas.toDataURL('image/png');
+    link.click();
+    showMessage('Grafico ad alta risoluzione scaricato con successo!', 'success');
+}
+
+
+// Funzione per scaricare la tabella storico in CSV
+function downloadHistoricalTable() {
+    if (historicalEntries.length === 0) {
+        showMessage('Non ci sono dati storici da scaricare!', 'error');
+        return;
+    }
+    const htmlContent = generateEditableTableHTML();
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `storico_mensile_editabile_${getCurrentDate().replace(/\./g, '-')}.html`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showMessage('Tabella HTML editabile scaricata con successo!', 'success');
+}
+
+
 // Event listener per cancellare l'ultimo dato
 document.getElementById('deleteLastButton').addEventListener('click', deleteLastEntry);
 
@@ -847,6 +1164,20 @@ loadFromLocalStorage();
 
 // Inizializzazione dell'applicazione
 updateAll();
+
+// Event listener per scaricare il grafico
+document.getElementById('downloadChartBtn').addEventListener('click', downloadChart);
+
+// Event listener per scaricare la tabella storico
+document.getElementById('downloadTableBtn').addEventListener('click', downloadHistoricalTable);
+
+// Aggiornare la funzione updateAll esistente per includere il grafico
+function updateAll() {
+    updateCurrentMonthTable();
+    updateHistoricalTable();
+    updateDashboard();
+    createChart(); // Aggiungi questa riga
+}
     </script>
 </body>
 </html>
