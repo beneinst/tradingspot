@@ -793,7 +793,7 @@ priceActionLookback = input.int(48, minval=1, title="Lookback Pattern & Pivot")
 
 // ========== IMPOSTAZIONI E VALORI ==========
 
-min_pearson = input.float(0.45, 'Pearson R Minimo per Segnali', minval=0.1, maxval=1.0, step=0.01, group='Impostazioni Segnale')
+min_pearson = input.float(0.41, 'Pearson R Minimo per Segnali', minval=0.1, maxval=1.0, step=0.01, group='Impostazioni Segnale')
 
 // Impostazioni Regressione Lineare 
 lengthInput = input.int(100, title = 'LinReg Lunghezza', minval = 10, maxval = 200, group = 'Regressione Lineare')
@@ -854,6 +854,7 @@ doji_threshold = input.float(0.1, 'Soglia Doji (%)', minval = 0.01, maxval = 1.0
 
 
 // ========== CALCOLI OPERATIVI ==========
+
 // Calcolo STOCHASTIC RSI 
 rsi_source = ta.rsi(close, stoch_rsi_rsi_length)
 stoch_rsi = ta.stoch(rsi_source, rsi_source, rsi_source, stoch_rsi_length)
@@ -1258,46 +1259,6 @@ signal_at_close_sell = sell_signal and barstate.isconfirmed
 // Calcolo Intensità Segnale
 signal_strength = confluence_score + (linreg_buy_primary ? 1 : linreg_sell_primary ? -1 : 0)
 
-// ========== LOGICA SEGNALI LIVE E CONFERMATI ==========
-
-// Condizioni base (come nel tuo script)
-base_conditions_buy = checkBaseConditions(true)
-base_conditions_sell = checkBaseConditions(false)
-
-// Segnali live: appaiono sulla candela in corso appena si verifica la condizione base
-var bool live_buy_pending = false
-var bool live_sell_pending = false
-
-if base_conditions_buy and not barstate.isconfirmed
-    live_buy_pending := true
-    label.new(bar_index, low - atr * 0.5, 'COMPRA LIVE', color=color.new(color.green, 2), style=label.style_label_up, size=size.small, yloc=yloc.price)
-else
-    live_buy_pending := false
-
-if base_conditions_sell and not barstate.isconfirmed
-    live_sell_pending := true
-    label.new(bar_index, high + atr * 0.5, 'VENDI LIVE', color=color.new(color.red, 2), style=label.style_label_down, size=size.small, yloc=yloc.price)
-else
-    live_sell_pending := false
-
-// Segnali confermati: appaiono sulla prima candela successiva se la condizione è confermata
-var bool confirm_buy_pending = false
-var bool confirm_sell_pending = false
-
-if base_conditions_buy and barstate.isconfirmed
-    confirm_buy_pending := true
-if base_conditions_sell and barstate.isconfirmed
-    confirm_sell_pending := true
-
-if confirm_buy_pending and barstate.isconfirmed
-    label.new(bar_index, low - atr * 0.5, 'COMPRA ✓', color=color.green, style=label.style_label_up, size=size.small, yloc=yloc.price)
-    label.new(bar_index, low, "OK BUY", color=color.green, style=label.style_label_up, size=size.small, yloc=yloc.belowbar)
-    confirm_buy_pending := false
-
-if confirm_sell_pending and barstate.isconfirmed
-    label.new(bar_index, high + atr * 0.5, 'VENDI ✓', color=color.red, style=label.style_label_down, size=size.small, yloc=yloc.price)
-    label.new(bar_index, high, "OK SELL", color=color.red, style=label.style_label_down, size=size.small, yloc=yloc.abovebar)
-    confirm_sell_pending := false
 
 // ============= TIMER MIGLIORATO =============
 
@@ -1356,19 +1317,30 @@ createPriceActionLabel(cond, x, y, txt, clr, sty, sz, yloc_param) =>
 
 // ========== VISUALIZZAZIONE SEGNALI DI TRADING (SEMPRE VISIBILI) ==========
 
-if showSignals
-    if buy_signal and not barstate.isconfirmed
-        label.new(bar_index, low - atr * 0.5, 'COMPRA LIVE\n' + str.tostring(signal_strength, '#.#'), color=color.new(color.green, 2), style=label.style_label_up, size=size.small, yloc=yloc.price)
-    if sell_signal and not barstate.isconfirmed
-        label.new(bar_index, high + atr * 0.5, 'VENDI LIVE\n' + str.tostring(signal_strength, '#.#'), color=color.new(color.red, 2), style=label.style_label_down, size=size.small, yloc=yloc.price)
-    if signal_at_close_buy
-        label.new(bar_index, low - atr * 0.5, 'COMPRA ✓\n' + str.tostring(signal_strength, '#.#'), color=color.green, style=label.style_label_up, size=size.small, yloc=yloc.price)
-    if signal_at_close_sell
-        label.new(bar_index, high + atr * 0.5, 'VENDI ✓\n' + str.tostring(signal_strength, '#.#'), color=color.red, style=label.style_label_down, size=size.small, yloc=yloc.price)
-    if signal_at_close_buy
-        label.new(bar_index, low, "OK BUY", color=color.green, style=label.style_label_up, size=size.small, yloc=yloc.belowbar)
-    if signal_at_close_sell
-        label.new(bar_index, high, "OK SELL", color=color.red, style=label.style_label_down, size=size.small, yloc=yloc.abovebar)
+// Condizioni base (come nel tuo script)
+base_conditions_buy = checkBaseConditions(true)
+base_conditions_sell = checkBaseConditions(false)
+
+// ========== LIVE SIGNALS (non confermati) ==========
+if showSignals and base_conditions_buy and not barstate.isconfirmed
+    label.new(bar_index, low - atr * 0.3, 'COMPRA LIVE\n📈 ' + str.tostring(signal_strength, '#.#'), color=color.new(color.green, 30), style=label.style_label_up, size=size.normal, yloc=yloc.price)
+
+if showSignals and base_conditions_sell and not barstate.isconfirmed
+    label.new(bar_index, high + atr * 0.3, 'VENDI LIVE\n📉 ' + str.tostring(signal_strength, '#.#'), color=color.new(color.red, 30), style=label.style_label_down, size=size.normal, yloc=yloc.price)
+
+// ========== SEGNALI CONFERMATI ==========
+if showSignals and signal_at_close_buy
+    label.new(bar_index, low - atr * 0.75, 'OK COMPRA ✓\n🔼 ' + str.tostring(signal_strength, '#.#'), color=color.new(#059c1e, 1), style=label.style_label_up, size=size.normal, yloc=yloc.price)
+
+if showSignals and signal_at_close_sell
+    label.new(bar_index, high + atr * 0.65, 'OK VENDI ✓\n📉🔽 ' + str.tostring(signal_strength, '#.#'), color=color.new(#cc0000, 1), style=label.style_label_down, size=size.normal, yloc=yloc.price)
+
+// ========== OPZIONALI (solo se vuoi attivare manualmente emoji extra) ==========
+// Commentati per evitare doppioni, attivabili se preferisci
+// label.new(bar_index, low, "OK 👆📈", color=color.new(#358069, 80), style=label.style_label_up, size=size.small, yloc=yloc.belowbar)
+// label.new(bar_index, high, "OK 👇📉", color=color.new(#b92222, 80), style=label.style_label_down, size=size.small, yloc=yloc.abovebar)
+
+
 
 // ========== PATTERN PRICE ACTION SUL GRAFICO (SOLO LOOKBACK) ==========
 if showCandlestickPatterns
