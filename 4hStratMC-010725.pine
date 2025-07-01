@@ -5,19 +5,28 @@
 indicator('4H | Strategia Multi-Confluenza', shorttitle = '4H StratMC', overlay = true, max_labels_count = 500, max_lines_count = 500, max_bars_back = 500)
 
 // ========== INIZIALIZZA VARIABILI ==========
-var float confluence_score = 0.0
-var float conflu = na
-extendLeftInput = false   // Fisso: non estendere a sinistra
-extendRightInput = true   // Fisso: estendere a destra
 
 var label[] pivot_labels = array.new<label>()
+var label[] priceaction_labels = array.new<label>()
+
+var float confluence_score = 0.0
+
+extendRightInput = input.bool(true, "Estendi a destra", group="Visualizzazione")
+extendLeftInput  = input.bool(false, "Estendi a sinistra", group="Visualizzazione")
+
 
 showSignals = input.bool(true, 'Mostra Segnali di Trading', group='Visualizzazione Segnali')
 showCandlestickPatterns = input.bool(true, 'Mostra Pattern Candlestick', group='Visualizzazione Segnali')
 show_reg1 = input.bool(true, 'Mostra Pivot Points', group='Visualizzazione Segnali')
 
+// ========== PARAMETRI LOOKBACK ==========
+
+pivotLookback = input.int(48, "Lookback Etichette Pivot", group='Punti Pivot')
+priceActionLookback = input.int(48, minval=1, title="Lookback Pattern & Pivot")
 
 // ========== IMPOSTAZIONI E VALORI ==========
+
+min_pearson = input.float(0.45, 'Pearson R Minimo per Segnali', minval=0.1, maxval=1.0, step=0.01, group='Impostazioni Segnale')
 
 // Impostazioni Regressione Lineare 
 lengthInput = input.int(100, title = 'LinReg Lunghezza', minval = 10, maxval = 200, group = 'Regressione Lineare')
@@ -39,7 +48,6 @@ use_stoch_rsi_filter = input.bool(true, 'Usa Filtro Stochastic RSI', group = gro
 use_ma_cross_filter = input.bool(true, 'Usa Filtro Incrocio Medie', group = group_signals)
 use_momentum_filter = input.bool(true, 'Usa Filtro Momentum', group = group_signals)
 use_price_action_filter = input.bool(true, 'Usa Filtro Price Action', group = group_signals)
-min_pearson = input.float(0.5, 'Pearson R Minimo per Segnali', minval = 0.1, maxval = 1.0, step = 0.1, group = group_signals)
 use_macd_filter = input.bool(true, 'Usa Filtro MACD', group = group_signals)
 
 // Impostazioni Stochastic RSI
@@ -313,13 +321,13 @@ if bool(pl)
     recent_pl_bar := bar_index - length
 
 // --- LOOKBACK PER LE ETICHETTE ---
-pivotLookback = input.int(72, "Lookback Etichette Pivot", group = 'Punti Pivot')
+// pivotLookback = input.int(72, "Lookback Etichette Pivot", group = 'Punti Pivot')
 minPivotBar = bar_index - pivotLookback + 1
 
 
 // --- FUNZIONE LABEL PIVOT ---
 createPivotLabel(cond, x, y, txt, clr, sty, sz, yloc_param) =>
-    if cond
+    if cond and (bar_index - x) <= pivotLookback
         lbl = label.new(x, y, txt, color=clr, style=sty, size=sz, yloc=yloc_param)
         array.unshift(pivot_labels, lbl)
         if array.size(pivot_labels) > pivotLookback
@@ -471,20 +479,58 @@ if buy_signal_improved or sell_signal_improved
     linreg_buy_stored := false
     linreg_sell_stored := false
 
-// Sostituisci i segnali principali
-buy_signal = buy_signal_improved  
-sell_signal = sell_signal_improved
+
+// ========== SCEGLI QUALE LOGICA USARE  ==========
+useImprovedSignals = input.bool(true, "Usa segnali migliorati")
+buy_signal  = useImprovedSignals ? buy_signal_improved  : checkBaseConditions(true)
+sell_signal = useImprovedSignals ? sell_signal_improved : checkBaseConditions(false)
+
+signal_at_close_buy  = buy_signal  and barstate.isconfirmed
+signal_at_close_sell = sell_signal and barstate.isconfirmed
 
 // Calcolo Intensità Segnale
 signal_strength = confluence_score + (linreg_buy_primary ? 1 : linreg_sell_primary ? -1 : 0)
 
-// Verifica condizioni base per BUY e SELL
+// ========== LOGICA SEGNALI LIVE E CONFERMATI ==========
+
+// Condizioni base (come nel tuo script)
 base_conditions_buy = checkBaseConditions(true)
 base_conditions_sell = checkBaseConditions(false)
 
-// Segnali CONFERMATI alla chiusura candela
-signal_at_close_buy = buy_signal and barstate.isconfirmed
-signal_at_close_sell = sell_signal and barstate.isconfirmed
+// Segnali live: appaiono sulla candela in corso appena si verifica la condizione base
+var bool live_buy_pending = false
+var bool live_sell_pending = false
+
+if base_conditions_buy and not barstate.isconfirmed
+    live_buy_pending := true
+    label.new(bar_index, low - atr * 0.5, 'COMPRA LIVE', color=color.new(color.green, 2), style=label.style_label_up, size=size.small, yloc=yloc.price)
+else
+    live_buy_pending := false
+
+if base_conditions_sell and not barstate.isconfirmed
+    live_sell_pending := true
+    label.new(bar_index, high + atr * 0.5, 'VENDI LIVE', color=color.new(color.red, 2), style=label.style_label_down, size=size.small, yloc=yloc.price)
+else
+    live_sell_pending := false
+
+// Segnali confermati: appaiono sulla prima candela successiva se la condizione è confermata
+var bool confirm_buy_pending = false
+var bool confirm_sell_pending = false
+
+if base_conditions_buy and barstate.isconfirmed
+    confirm_buy_pending := true
+if base_conditions_sell and barstate.isconfirmed
+    confirm_sell_pending := true
+
+if confirm_buy_pending and barstate.isconfirmed
+    label.new(bar_index, low - atr * 0.5, 'COMPRA ✓', color=color.green, style=label.style_label_up, size=size.small, yloc=yloc.price)
+    label.new(bar_index, low, "OK BUY", color=color.green, style=label.style_label_up, size=size.small, yloc=yloc.belowbar)
+    confirm_buy_pending := false
+
+if confirm_sell_pending and barstate.isconfirmed
+    label.new(bar_index, high + atr * 0.5, 'VENDI ✓', color=color.red, style=label.style_label_down, size=size.small, yloc=yloc.price)
+    label.new(bar_index, high, "OK SELL", color=color.red, style=label.style_label_down, size=size.small, yloc=yloc.abovebar)
+    confirm_sell_pending := false
 
 // ============= TIMER MIGLIORATO =============
 
@@ -516,12 +562,6 @@ timer_status_new = timer_active_new ? "OK (" + str.tostring(bars_since) + "/6)" 
 	
 // ========== VISUALIZZAZIONE SEGNALI & PATTERN PRICE ACTION ==========
 
-// ========== PARAMETRI LOOKBACK ==========
-
-priceActionLookback = input.int(72, minval=1, title="Lookback Pattern & Pivot")
-var label[] priceaction_labels = array.new<label>()
-
-
 // ========== FUNZIONI DI GESTIONE LABEL ==========
 
 // Price Action
@@ -552,14 +592,11 @@ if showSignals
         label.new(bar_index, high, "OK SELL", color=color.red, style=label.style_label_down, size=size.small, yloc=yloc.abovebar)
 
 // ========== PATTERN PRICE ACTION SUL GRAFICO (SOLO LOOKBACK) ==========
-
 if showCandlestickPatterns
     if bullish_engulfing
         createPriceActionLabel(true, bar_index, low - atr * 0.5, 'ENG RIALZ', color.new(color.green, 20), label.style_label_up, size.tiny, yloc.price)
-    if hammer
-        createPriceActionLabel(true, bar_index, low - atr * 0.3, 'MARTELLO', color.new(color.lime, 20), label.style_label_up, size.tiny, yloc.price)
 
-    // Stella del Mattino (pattern rialzista a 3 candele)
+    // Stella del Mattino
     morning_star = false
     if bar_index >= 2
         candle1_bearish = close[2] < open[2] and (open[2] - close[2]) > atr[2] * 0.5
@@ -569,7 +606,6 @@ if showCandlestickPatterns
     if morning_star
         createPriceActionLabel(true, bar_index, low - atr * 0.4, 'STELLA DI MATT 🌆', color.new(color.blue, 20), label.style_label_up, size.tiny, yloc.price)
 
-    // Pattern ribassisti (sopra la candela)
     if is_doji
         createPriceActionLabel(true, bar_index, high + atr * 0.5, 'DOJI', color.new(color.yellow, 20), label.style_label_down, size.tiny, yloc.abovebar)
     if bearish_engulfing
@@ -577,7 +613,7 @@ if showCandlestickPatterns
     if shooting_star
         createPriceActionLabel(true, bar_index, high + atr * 0.3, 'STELLA CAD', color.new(color.orange, 20), label.style_label_down, size.tiny, yloc.abovebar)
 
-    // Stella della Sera (pattern ribassista a 3 candele)
+    // Stella della Sera
     evening_star = false
     if bar_index >= 2
         candle1_bullish = close[2] > open[2] and (close[2] - open[2]) > atr[2] * 0.5
@@ -587,16 +623,12 @@ if showCandlestickPatterns
     if evening_star
         createPriceActionLabel(true, bar_index, high + atr * 0.4, 'STELLA DI SERA 🌆', color.new(color.purple, 20), label.style_label_down, size.tiny, yloc.abovebar)
 
-// ========== VISUALIZZAZIONE PIVOT POINTS (SOLO LOOKBACK) ==========
 
 // ========== VISUALIZZAZIONE PIVOT POINTS (SOLO LOOKBACK) ==========
-
-if show_reg
-    // Etichetta MASSIMO
-    if not na(ph) and (bar_index - length) >= minPivotBar
+if show_reg1
+    if not na(ph) and (bar_index - length) <= pivotLookback
         createPivotLabel(true, bar_index - length, ph, 'MA', reg_ph_css, label.style_label_down, size.tiny, yloc.abovebar)
-    // Etichetta MINIMO
-    if not na(pl) and (bar_index - length) >= minPivotBar
+    if not na(pl) and (bar_index - length) <= pivotLookback
         createPivotLabel(true, bar_index - length, pl, 'MI', reg_pl_css, label.style_label_up, size.tiny, yloc.price)
 
 
@@ -742,4 +774,3 @@ alertcondition(timer_active_new and bars_since >= 6 and not last_signal_buy and 
 // - La persistenza dei segnali (OK BUY/SELL) è mantenuta.
 // - Se le label o i plotshape generano errori di visualizzazione per eccesso di elementi, commentare le relative righe.
 // - Tutte le altre funzionalità e filtri restano invariati rispetto al tuo script originale.
-
