@@ -780,6 +780,12 @@ showSignals = input.bool(true, 'Mostra Segnali di Trading', group='Visualizzazio
 showCandlestickPatterns = input.bool(true, 'Mostra Pattern Candlestick', group='Visualizzazione Segnali')
 show_reg1 = input.bool(true, 'Mostra Pivot Points', group='Visualizzazione Segnali')
 
+var bool last_signal_buy = false
+var bool   timer_active_new  = false
+var string timer_status_new  = "Inattivo"
+var bool timer_expired_new = false
+
+
 // ========== PARAMETRI LOOKBACK ==========
 
 pivotLookback = input.int(48, "Lookback Etichette Pivot", group='Punti Pivot')
@@ -1297,7 +1303,6 @@ if confirm_sell_pending and barstate.isconfirmed
 
 // Timer semplificato
 var int last_signal_bar = na
-var bool last_signal_buy = false
 var int last_signal_time = na
 
 
@@ -1315,11 +1320,24 @@ ultimo_ok_str = na(last_signal_time) ? "Nessun segnale" : str.format_time(last_s
 
 
 bars_since = not na(last_signal_bar) ? bar_index - last_signal_bar : na
-timer_active_new = not na(bars_since) and bars_since > 0 and bars_since <= 6
-timer_expired_new = not na(bars_since) and bars_since > 6
+if not na(bars_since) and bars_since > 0 and bars_since <= 6
+    timer_active_new := true
+else
+    timer_active_new := false
 
-timer_status_new = timer_active_new ? "OK (" + str.tostring(bars_since) + "/6)" + (last_signal_buy ? " BUY" : " SELL") : timer_expired_new ? "SCADUTO" : "ASPETTA"
-	
+if not na(bars_since) and bars_since > 6
+    timer_expired_new := true
+else
+    timer_expired_new := false
+
+
+if timer_active_new
+    timer_status_new := "OK (" + str.tostring(bars_since) + "/6)" + (last_signal_buy ? " BUY" : " SELL")
+else if timer_expired_new
+    timer_status_new := "SCADUTO"
+else
+    timer_status_new := "ASPETTA"
+
 	
 // ========== VISUALIZZAZIONE SEGNALI & PATTERN PRICE ACTION ==========
 
