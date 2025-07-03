@@ -254,7 +254,7 @@ p {
         <h2>🚀 PANORAMICA SISTEMA MULTI-CONFLUENCE</h2>
         <h3>Sistema Avanzato con Filtro Primario</h3>
         <ul>
-            <li><b>Regressione Lineare (Filtro Primario):</b> Trend principale, lunghezza 100, sensibilità 0.8. Obbligatorio per ogni segnale.</li>
+            <li><b>Regressione Lineare (Filtro Primario):</b> Trend principale, lunghezza 100, sensibilità 0.7. Obbligatorio per ogni segnale.</li>
             <li><b>Bande di Bollinger:</b> Periodo 20, deviazione standard 2.0. Contribuisce alla confluenza in zone estreme (≥0.7 o ≤-0.7).</li>
             <li><b>Stochastic RSI:</b> RSI 14, Stoch 14, smoothing K=1, D=2. Attivo in ipervenduto (≤20) e ipercomprato (≥80).</li>
             <li><b>Medie Mobili e Trend:</b> EMA 21, SMA 50, RSI 14. Trend rialzista se EMA21>SMA50 e RSI>50, ribassista se EMA21<SMA50 e RSI<50.</li>
@@ -264,11 +264,11 @@ p {
             <li><b>Punti Pivot:</b> Lookback 9, distanza 3% da supporto/resistenza.</li>
         </ul>
         <h3>Sistema di Confluence Scoring</h3>
-        <p class="note">Il sistema calcola il punteggio di confluenza sommando i contributi di tutti gli indicatori:</p>
+        <p class="note">Il sistema calcola il punteggio di confluenza sommando i contributi di tutti gli indicatori attivi:</p>
         <ul>
             <li><b>Confluence Score = BB + Pivot + Stoch RSI + MA + Momentum + Price Action + MACD</b></li>
-            <li><b>Range Operativo:</b> Da -6 a +6. Segnali validi: ≥ +0.5 (buy), ≤ -0.5 (sell)</li>
-            <li><b>Validazione Pearson R:</b> |R| ≥ 0.5 per garantire qualità statistica del segnale</li>
+            <li><b>Range Operativo:</b> Da -6 a +6. Segnali validi: ≥ 0 (buy), ≤ 0 (sell)</li>
+            <li><b>Validazione Pearson R:</b> |R| ≥ 0.41 per garantire qualità statistica del segnale</li>
         </ul>
     </div>
 
@@ -278,9 +278,9 @@ p {
         <ul>
             <li><b>Condizioni Obbligatorie (TUTTE):</b>
                 <ul>
-                    <li><b>Regressione Lineare ≤ -0.8:</b> Zona ipervenduto estremo</li>
-                    <li><b>Confluence Score ≥ +0.5:</b> Almeno due indicatori secondari favorevoli</li>
-                    <li><b>Pearson R |R| ≥ 0.5:</b> Correlazione significativa</li>
+                    <li><b>Regressione Lineare ≤ -0.7:</b> Zona ipervenduto critica</li>
+                    <li><b>Confluence Score ≥ 0:</b> Almeno due indicatori secondari favorevoli</li>
+                    <li><b>Pearson R |R| ≥ 0.41:</b> Correlazione significativa</li>
                 </ul>
             </li>
             <li><b>Confluenze Positive (+1 ciascuna):</b>
@@ -299,9 +299,9 @@ p {
         <ul>
             <li><b>Condizioni Obbligatorie (TUTTE):</b>
                 <ul>
-                    <li><b>Regressione Lineare ≥ +0.8:</b> Zona ipercomprato estremo</li>
-                    <li><b>Confluence Score ≤ -0.5:</b> Almeno due indicatori secondari favorevoli</li>
-                    <li><b>Pearson R |R| ≥ 0.5:</b> Correlazione significativa</li>
+                    <li><b>Regressione Lineare ≥ +0.7:</b> Zona ipercomprato critica</li>
+                    <li><b>Confluence Score ≤ 0:</b> Almeno due indicatori secondari favorevoli</li>
+                    <li><b>Pearson R |R| ≥ 0.41:</b> Correlazione significativa</li>
                 </ul>
             </li>
             <li><b>Confluenze Negative (-1 ciascuna):</b>
@@ -330,7 +330,7 @@ p {
             <tr>
                 <td><b>Regressione Lineare</b></td>
                 <td>Filtro primario per trend e segnali base</td>
-                <td>Lunghezza 100, Sensibilità 0.8, Posizione -1 a +1</td>
+                <td>Lunghezza 100, Sensibilità 0.7, Posizione -1 a +1</td>
                 <td>Obbligatorio, non punteggio</td>
             </tr>
             <tr>
@@ -378,7 +378,7 @@ p {
             <tr>
                 <td><b>Pearson R</b></td>
                 <td>Validazione statistica</td>
-                <td>Regressione lineare, soglia ≥0.5</td>
+                <td>Regressione lineare, soglia ≥0.41</td>
                 <td>Filtro qualità, non punteggio</td>
             </tr>
         </table>
@@ -402,19 +402,19 @@ p {
                 <th>Funzione</th>
             </tr>
             <tr>
-                <td><code>signal_timer</code></td>
+                <td><code>last_signal_bar</code></td>
                 <td>int</td>
-                <td>0-6</td>
+                <td>Bar index ultimo segnale</td>
                 <td>Contatore periodi dal segnale</td>
             </tr>
             <tr>
-                <td><code>timer_active</code></td>
+                <td><code>timer_active_new</code></td>
                 <td>bool</td>
                 <td>true/false</td>
                 <td>Stato attivo timer</td>
             </tr>
             <tr>
-                <td><code>last_signal_was_buy</code></td>
+                <td><code>last_signal_buy</code></td>
                 <td>bool</td>
                 <td>true/false</td>
                 <td>Ultima direzione segnale</td>
@@ -441,9 +441,9 @@ p {
                 <td>🎯 Regressione Lineare</td>
                 <td>-1 a +1</td>
                 <td>
-                    <span class="green">🟢 BUY: ≤ -0.8</span><br>
-                    <span class="red">🔴 SELL: ≥ +0.8</span><br>
-                    <span class="white">⚪ NEUTRO: -0.8 &lt; x &lt; +0.8</span>
+                    <span class="green">🟢 BUY: ≤ -0.7</span><br>
+                    <span class="red">🔴 SELL: ≥ +0.7</span><br>
+                    <span class="white">⚪ NEUTRO: -0.7 &lt; x &lt; +0.7</span>
                 </td>
             </tr>
             <tr>
@@ -486,16 +486,16 @@ p {
                 <td>🎯 Pearson R</td>
                 <td>|R|</td>
                 <td>
-                    <span class="green">💪 ≥ 0.5</span><br>
-                    <span class="orange">⚠️ &lt; 0.5</span>
+                    <span class="green">💪 ≥ 0.41</span><br>
+                    <span class="orange">⚠️ &lt; 0.41</span>
                 </td>
             </tr>
             <tr>
                 <td>🔗 Confluence Score</td>
                 <td>-6 a +6</td>
                 <td>
-                    <span class="green">🚀 BUY: ≥ +1</span><br>
-                    <span class="red">📉 SELL: ≤ -1</span><br>
+                    <span class="green">🚀 BUY: ≥ 0</span><br>
+                    <span class="red">📉 SELL: ≤ 0</span><br>
                     <span class="gray">➖ NO SIGNAL: -1 &lt; Score &lt; +1</span>
                 </td>
             </tr>
@@ -532,7 +532,7 @@ p {
             <tr>
                 <td>Regressione Lineare</td>
                 <td>Sensibilità</td>
-                <td>0.8</td>
+                <td>0.7</td>
                 <td>Soglia filtro segnali</td>
             </tr>
             <tr>
@@ -580,7 +580,7 @@ p {
             <tr>
                 <td>Validazione</td>
                 <td>Pearson R</td>
-                <td>0.5</td>
+                <td>0.41</td>
                 <td>Correlazione minima</td>
             </tr>
         </table>
@@ -597,12 +597,12 @@ p {
             <tr>
                 <td>1. Pre-Analisi</td>
                 <td>Verifica Pearson R</td>
-                <td>🎯 |R| ≥ 0.5</td>
+                <td>🎯 |R| ≥ 0.41</td>
             </tr>
             <tr>
                 <td>2. Filtro Primario</td>
                 <td>Controllo Regressione Lineare</td>
-                <td>≤ -0.8 (BUY) o ≥ +0.8 (SELL)</td>
+                <td>≤ -0.7 (BUY) o ≥ +0.7 (SELL)</td>
             </tr>
             <tr>
                 <td>3. Calcolo Confluence</td>
@@ -612,7 +612,7 @@ p {
             <tr>
                 <td>4. Validazione Score</td>
                 <td>Verifica Confluence Score</td>
-                <td>≥ +0.5 (BUY) o ≤ -0.5 (SELL)</td>
+                <td>≥ 0 (BUY) o ≤ 0 (SELL)</td>
             </tr>
             <tr>
                 <td>5. Controllo Intensità</td>
@@ -672,7 +672,7 @@ p {
                 <li><b>Momentum Reversal:</b> Cambio direzione momentum</li>
                 <li><b>Confluence Score Reversal:</b> Inversione punteggio</li>
                 <li><b>Pattern Contrario:</b> Pattern candlestick contrari</li>
-                <li><b>Pearson R Deterioration:</b> Sotto 0.5 durante il trade</li>
+                <li><b>Pearson R Deterioration:</b> Sotto 0.41 durante il trade</li>
             </ul>
         </div>
     </div>
@@ -723,13 +723,9 @@ p {
         </div>
     </div>
 
-
-	
-
-
     <div class="indicator-info-box">
-        <h2>Strategia "Multi-Confluence Ver. 10" (Advanced System) creata da gerardo_dorrico</h2>
-        <p>Sistema avanzato che combina 6 categorie di indicatori con regressione lineare per segnali di alta qualità.</p>
+        <h2>Strategia "Multi-Confluence" creata da gerardo_dorrico</h2>
+        <p>Sistema avanzato che combina 7 categorie di indicatori con regressione lineare per segnali di alta qualità.</p>
         <p>Visita il mio profilo su TradingView per scoprire altri strumenti e strategie:</p>
         <a href="https://it.tradingview.com/u/gerardo_dorrico/" target="_blank" rel="noopener noreferrer" class="profile-link">
             Profilo TradingView di gerardo_dorrico
