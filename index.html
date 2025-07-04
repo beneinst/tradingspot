@@ -700,90 +700,94 @@ h2 {
 		</div>
 		
 		<div style="height: 28px;"></div>
-	
 	<div class="container">
-        <h1>🚀 Sistema di Soglie Incrementale Trading</h1>
+    <h1>🚀 Sistema di Soglie Incrementale Trading</h1>
+    
+    <div class="threshold-inputs">
+        <div class="input-group1">
+            <label for="initialCapital">Capitale Iniziale ($)</label>
+            <input type="number" id="initialCapital" value="6720" min="1000" step="100">
+        </div>
         
-        <div class="threshold-inputs">
-            <div class="input-group1">
-                <label for="initialCapital">Capitale Iniziale ($)</label>
-                <input type="number" id="initialCapital" value="6720" min="1000" step="100">
-            </div>
-            
-            <div class="input-group1">
-                <label for="currentEarnings">Guadagni Attuali ($)</label>
-                <input type="number" id="currentEarnings" readonly style="background: #e9ecef; color: #111; cursor: not-allowed;" placeholder="Auto-calcolato">
-            </div>
-            
-            <div class="input-group1">
-                <label for="tradesCompleted">Trade Completati</label>
-                <input type="number" id="tradesCompleted" readonly style="background: #e9ecef; color: #111; cursor: not-allowed;" placeholder="Auto-calcolato">
+        <div class="input-group1">
+            <label for="currentEarnings">Guadagni Attuali ($)</label>
+            <input type="number" id="currentEarnings" readonly style="background: #e9ecef; color: #111; cursor: not-allowed;" placeholder="Auto-calcolato">
+        </div>
+        
+        <div class="input-group1">
+            <label for="tradesCompleted">Trade Completati</label>
+            <input type="number" id="tradesCompleted" readonly style="background: #e9ecef; color: #111; cursor: not-allowed;" placeholder="Auto-calcolato">
+        </div>
+        
+        <button id="calculateBtn" class="btn-primary">Aggiorna Sistema</button>
+    </div>
 
+    <div id="alertContainer"></div>
+    
+    <div id="resultsContainer" class="hidden">
+        <div class="current-status">
+            <div class="status-card">
+                <h3>Capitale Attuale</h3>
+                <div class="value" id="currentCapital">$0</div>
             </div>
-            
-            <button id="calculateBtn" class="btn-primary">Aggiorna Sistema</button>
+            <div class="status-card">
+                <h3>Soglia Attuale</h3>
+                <div class="value" id="currentThreshold">Soglia 1</div>
+            </div>
+            <div class="status-card">
+                <h3>Progresso</h3>
+                <div class="value" id="progressPercent">0%</div>
+            </div>
+            <div class="status-card">
+                <h3>% Total Earn</h3>
+                <div class="value" id="totalEarnPercent">0%</div>
+            </div>
         </div>
 
-        <div id="alertContainer"></div>
-        
-        <div id="resultsContainer" class="hidden">
-            <div class="current-status">
-                <div class="status-card">
-                    <h3>Capitale Attuale</h3>
-                    <div class="value" id="currentCapital">$0</div>
-                </div>
-                <div class="status-card">
-                    <h3>Soglia Attuale</h3>
-                    <div class="value" id="currentThreshold">Soglia 1</div>
-                </div>
-                <div class="status-card">
-                    <h3>Progresso</h3>
-                    <div class="value" id="progressPercent">0%</div>
-                </div>
-                <div class="status-card">
-                    <h3>% Total Earn</h3>
-                    <div class="value" id="totalEarnPercent">0%</div>
-                </div>
+        <div class="progress-section">
+            <h3>Progresso verso Prossima Soglia</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                <div class="progress-text" id="progressText">0%</div>
             </div>
+        </div>
 
-            <div class="progress-section">
-                <h3>Progresso verso Prossima Soglia</h3>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-                    <div class="progress-text" id="progressText">0%</div>
+        <div class="trade-limits">
+            <h3>Limiti di Trading</h3>
+            <div class="limits-grid">
+                <div class="limit-item">
+                    <div class="label">Trade Rimanenti</div>
+                    <div class="value" id="remainingTrades">56</div>
+                </div>
+                <div class="limit-item">
+                    <div class="label">Valore per Trade</div>
+                    <div class="value" id="tradeValue">$0</div>
+                </div>
+                <div class="limit-item">
+                    <div class="label">Capitale Target</div>
+                    <div class="value" id="targetCapital">$0</div>
+                </div>
+                <div class="limit-item">
+                    <div class="label">% Guadagno Richiesto</div>
+                    <div class="value" id="requiredGainPercent">0%</div>
                 </div>
             </div>
+        </div>
 
-            <div class="trade-limits">
-                <h3>Limiti di Trading</h3>
-                <div class="limits-grid">
-                    <div class="limit-item">
-                        <div class="label">Trade Rimanenti</div>
-                        <div class="value" id="remainingTrades">56</div>
-                    </div>
-                    <div class="limit-item">
-                        <div class="label">Valore per Trade</div>
-                        <div class="value" id="tradeValue">$0</div>
-                    </div>
-                    <div class="limit-item">
-                        <div class="label">Capitale Target</div>
-                        <div class="value" id="targetCapital">$0</div>
-                    </div>
-                    <div class="limit-item">
-                        <div class="label">% Guadagno Richiesto</div>
-                        <div class="value" id="requiredGainPercent">0%</div>
-                    </div>
-                </div>
+        <div class="threshold-levels">
+            <h3>📊 Soglie di Crescita</h3>
+            <div class="threshold-grid" id="thresholdGrid">
+                <!-- Le soglie verranno generate dinamicamente -->
             </div>
-
-            <div class="threshold-levels">
-                <h3>📊 Soglie di Crescita</h3>
-                <div class="threshold-grid" id="thresholdGrid">
-                    <!-- Le soglie verranno generate dinamicamente -->
-                </div>
-            </div>
+        </div>
+        <div class="threshold-levels">
+            <h3>💸 Storico Ritiro e Reinvestimento</h3>
+            <div id="withdrawalHistory"></div>
+            <div id="reinvestedHistory"></div>
         </div>
     </div>
+</div>
+
 
 	
 	
@@ -802,273 +806,330 @@ h2 {
 </div>
 
 <script>
-        // Moltiplicatori fissi per le soglie basate sul capitale iniziale
-        const THRESHOLD_MULTIPLIERS = [
-            { level: 1, multiplier: 1.19, description: "Soglia Base - Crescita del 19%" },
-            { level: 2, multiplier: 1.49, description: "Soglia Intermedia - Crescita del 49%" },
-            { level: 3, multiplier: 1.86, description: "Soglia Avanzata - Crescita del 86%" },
-            { level: 4, multiplier: 2.23, description: "Soglia Professionale - Crescita del 123%" },
-            { level: 5, multiplier: 2.98, description: "Soglia Elite - Crescita del 198%" }
-        ];
+       // Moltiplicatori fissi per le soglie basate sul capitale iniziale
+const THRESHOLD_MULTIPLIERS = [
+    { level: 1, multiplier: 1.19, description: "Soglia Base - Crescita del 19%" },
+    { level: 2, multiplier: 1.49, description: "Soglia Intermedia - Crescita del 49%" },
+    { level: 3, multiplier: 1.86, description: "Soglia Avanzata - Crescita del 86%" },
+    { level: 4, multiplier: 2.23, description: "Soglia Professionale - Crescita del 123%" },
+    { level: 5, multiplier: 2.98, description: "Soglia Elite - Crescita del 198%" }
+];
 
-        const MAX_TRADES = 56;
+const MAX_TRADES = 56;
 
-        // Funzioni per integrare con il sistema esistente
-        function calculateTotalEarned() {
-            if (typeof historicalEntries !== 'undefined' && typeof currentMonthEntries !== 'undefined') {
-                const historicalSum = historicalEntries.reduce((acc, entry) => acc + parseFloat(entry.importo), 0);
-                const currentSum = currentMonthEntries.reduce((acc, entry) => acc + parseFloat(entry.importo), 0);
-                return historicalSum + currentSum;
+// Storico dei ritiri e dei reinvestimenti
+let withdrawalHistory = [];
+let reinvestedHistory = [];
+
+// Funzioni per integrare con il sistema esistente
+function calculateTotalEarned() {
+    if (typeof historicalEntries !== 'undefined' && typeof currentMonthEntries !== 'undefined') {
+        const historicalSum = historicalEntries.reduce((acc, entry) => acc + parseFloat(entry.importo), 0);
+        const currentSum = currentMonthEntries.reduce((acc, entry) => acc + parseFloat(entry.importo), 0);
+        return historicalSum + currentSum;
+    }
+    return 0;
+}
+
+function getTotalTradesCount() {
+    if (typeof window.tradeClickCount !== 'undefined') {
+        return window.tradeClickCount;
+    }
+    if (typeof currentMonthEntries !== 'undefined' && typeof historicalEntries !== 'undefined') {
+        return currentMonthEntries.length + historicalEntries.length;
+    }
+    return 0;
+}
+
+// Inizializza il contatore dei trade se non esiste
+if (typeof window.tradeClickCount === 'undefined') {
+    window.tradeClickCount = 0;
+}
+
+// Intercetta i click del pulsante addButton se esiste
+function setupTradeCounter() {
+    const addButton = document.getElementById('addButton');
+    if (addButton) {
+        addButton.addEventListener('click', function() {
+            window.tradeClickCount++;
+            if (!document.getElementById('resultsContainer').classList.contains('hidden')) {
+                setTimeout(calculateThresholds, 500);
             }
-            return 0;
+        });
+    }
+}
+
+let currentData = {
+    initialCapital: 6720,
+    currentEarnings: 0,
+    tradesCompleted: 0,
+    currentCapital: 6720,
+    currentThresholdIndex: 0
+};
+
+function showAlert(message, type = 'success') {
+    const alertContainer = document.getElementById('alertContainer');
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = message;
+    alertContainer.innerHTML = '';
+    alertContainer.appendChild(alert);
+    setTimeout(() => {
+        alert.remove();
+    }, 5000);
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount);
+}
+
+function generateThresholdConfig(initialCapital) {
+    return THRESHOLD_MULTIPLIERS.map(config => ({
+        level: config.level,
+        baseCapital: config.level === 1 ? initialCapital : initialCapital * THRESHOLD_MULTIPLIERS[config.level - 2].multiplier,
+        targetCapital: initialCapital * config.multiplier,
+        tradeValue: Math.round(initialCapital / MAX_TRADES),
+        maxTrades: MAX_TRADES,
+        description: config.description
+    }));
+}
+
+function getCurrentThreshold() {
+    const capital = currentData.currentCapital;
+    const thresholds = generateThresholdConfig(currentData.initialCapital);
+    for (let i = 0; i < thresholds.length; i++) {
+        if (capital < thresholds[i].targetCapital) {
+            return i;
         }
+    }
+    return thresholds.length - 1;
+}
 
-        function getTotalTradesCount() {
-            // Conta i click del pulsante addButton
-            if (typeof window.tradeClickCount !== 'undefined') {
-                return window.tradeClickCount;
-            }
-            if (typeof currentMonthEntries !== 'undefined' && typeof historicalEntries !== 'undefined') {
-                return currentMonthEntries.length + historicalEntries.length;
-            }
-            return 0;
-        }
+function calculateProgress() {
+    const thresholdIndex = getCurrentThreshold();
+    const thresholds = generateThresholdConfig(currentData.initialCapital);
+    const currentThreshold = thresholds[thresholdIndex];
+    const capital = currentData.currentCapital;
+    if (thresholdIndex === 0) {
+        const progress = ((capital - currentThreshold.baseCapital) / (currentThreshold.targetCapital - currentThreshold.baseCapital)) * 100;
+        return Math.max(0, Math.min(100, progress));
+    } else {
+        const prevThreshold = thresholds[thresholdIndex - 1];
+        const progress = ((capital - prevThreshold.targetCapital) / (currentThreshold.targetCapital - prevThreshold.targetCapital)) * 100;
+        return Math.max(0, Math.min(100, progress));
+    }
+}
 
-        // Inizializza il contatore dei trade se non esiste
-        if (typeof window.tradeClickCount === 'undefined') {
-            window.tradeClickCount = 0;
-        }
+function calculateTotalEarnPercent() {
+    const earnPercent = (currentData.currentEarnings / currentData.initialCapital) * 100;
+    return Math.max(0, earnPercent);
+}
 
-        // Intercetta i click del pulsante addButton se esiste
-        function setupTradeCounter() {
-            const addButton = document.getElementById('addButton');
-            if (addButton) {
-                addButton.addEventListener('click', function() {
-                    window.tradeClickCount++;
-                    // Aggiorna automaticamente il sistema se è visibile
-                    if (!document.getElementById('resultsContainer').classList.contains('hidden')) {
-                        setTimeout(calculateThresholds, 500); // Piccolo delay per permettere l'aggiornamento dei dati
-                    }
-                });
-            }
-        }
+// Funzione per gestire ritiro e reinvestimento alla soglia
+function handleThresholdReached(thresholdIndex) {
+    const thresholds = generateThresholdConfig(currentData.initialCapital);
+    const currentThreshold = thresholds[thresholdIndex];
+    const baseCapital = currentThreshold.baseCapital;
+    const targetCapital = currentThreshold.targetCapital;
+    const actualCapital = currentData.currentCapital;
 
-        let currentData = {
-            initialCapital: 6720,
-            currentEarnings: 0,
-            tradesCompleted: 0,
-            currentCapital: 6720,
-            currentThresholdIndex: 0
-        };
+    // Calcola profitto realizzato
+    const profit = Math.max(0, actualCapital - baseCapital);
 
-        function showAlert(message, type = 'success') {
-            const alertContainer = document.getElementById('alertContainer');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            
-            alertContainer.innerHTML = '';
-            alertContainer.appendChild(alert);
-            
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
-        }
+    // Calcola quota reinvestibile (max 50%)
+    const maxReinvest = profit * 0.5;
+    const toWithdraw = profit - maxReinvest;
 
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(amount);
-        }
+    // Aggiorna storico
+    withdrawalHistory.push({
+        level: currentThreshold.level,
+        amount: toWithdraw,
+        date: new Date().toLocaleDateString()
+    });
+    reinvestedHistory.push({
+        level: currentThreshold.level,
+        amount: maxReinvest,
+        date: new Date().toLocaleDateString()
+    });
 
-        function generateThresholdConfig(initialCapital) {
-            return THRESHOLD_MULTIPLIERS.map(config => ({
-                level: config.level,
-                baseCapital: config.level === 1 ? initialCapital : initialCapital * THRESHOLD_MULTIPLIERS[config.level - 2].multiplier,
-                targetCapital: initialCapital * config.multiplier,
-                tradeValue: Math.round(initialCapital / MAX_TRADES),
-                maxTrades: MAX_TRADES,
-                description: config.description
-            }));
-        }
+    // Aggiorna capitale operativo per la soglia successiva
+    currentData.initialCapital = baseCapital + maxReinvest;
+    currentData.currentEarnings = actualCapital - currentData.initialCapital;
+    currentData.currentCapital = actualCapital;
 
-        function getCurrentThreshold() {
-            const capital = currentData.currentCapital;
-            const thresholds = generateThresholdConfig(currentData.initialCapital);
-            
-            for (let i = 0; i < thresholds.length; i++) {
-                if (capital < thresholds[i].targetCapital) {
-                    return i;
-                }
-            }
-            
-            return thresholds.length - 1;
-        }
+    // Mostra alert
+    showAlert(
+        `Soglia ${currentThreshold.level} raggiunta! Profitto: ${formatCurrency(profit)}. 
+        <br>Ritirato: <b>${formatCurrency(toWithdraw)}</b> | Reinvestito: <b>${formatCurrency(maxReinvest)}</b>.<br>
+        Il nuovo capitale operativo per la prossima soglia è ${formatCurrency(currentData.initialCapital)}.`,
+        'success'
+    );
+    updateHistoryDisplay();
+}
 
-        function calculateProgress() {
-            const thresholdIndex = getCurrentThreshold();
-            const thresholds = generateThresholdConfig(currentData.initialCapital);
-            const currentThreshold = thresholds[thresholdIndex];
-            const capital = currentData.currentCapital;
-            
-            if (thresholdIndex === 0) {
-                const progress = ((capital - currentThreshold.baseCapital) / (currentThreshold.targetCapital - currentThreshold.baseCapital)) * 100;
-                return Math.max(0, Math.min(100, progress));
-            } else {
-                const prevThreshold = thresholds[thresholdIndex - 1];
-                const progress = ((capital - prevThreshold.targetCapital) / (currentThreshold.targetCapital - prevThreshold.targetCapital)) * 100;
-                return Math.max(0, Math.min(100, progress));
-            }
-        }
+function updateDisplay() {
+    const thresholdIndex = getCurrentThreshold();
+    const thresholds = generateThresholdConfig(currentData.initialCapital);
+    const currentThreshold = thresholds[thresholdIndex];
+    const progress = calculateProgress();
+    const totalEarnPercent = calculateTotalEarnPercent();
+    const remainingTrades = Math.max(0, currentThreshold.maxTrades - currentData.tradesCompleted);
+    const requiredGainPercent = ((currentThreshold.targetCapital - currentData.initialCapital) / currentData.initialCapital) * 100;
 
-        function calculateTotalEarnPercent() {
-            const earnPercent = (currentData.currentEarnings / currentData.initialCapital) * 100;
-            return Math.max(0, earnPercent);
-        }
+    // Aggiorna status cards
+    document.getElementById('currentCapital').textContent = formatCurrency(currentData.currentCapital);
+    document.getElementById('currentThreshold').textContent = `Soglia ${currentThreshold.level}`;
+    document.getElementById('progressPercent').textContent = `${progress.toFixed(1)}%`;
+    document.getElementById('totalEarnPercent').textContent = `${totalEarnPercent.toFixed(1)}%`;
 
-        function updateDisplay() {
-            const thresholdIndex = getCurrentThreshold();
-            const thresholds = generateThresholdConfig(currentData.initialCapital);
-            const currentThreshold = thresholds[thresholdIndex];
-            const progress = calculateProgress();
-            const totalEarnPercent = calculateTotalEarnPercent();
-            const remainingTrades = Math.max(0, currentThreshold.maxTrades - currentData.tradesCompleted);
-            const requiredGainPercent = ((currentThreshold.targetCapital - currentData.initialCapital) / currentData.initialCapital) * 100;
-            
-            // Aggiorna status cards
-            document.getElementById('currentCapital').textContent = formatCurrency(currentData.currentCapital);
-            document.getElementById('currentThreshold').textContent = `Soglia ${currentThreshold.level}`;
-            document.getElementById('progressPercent').textContent = `${progress.toFixed(1)}%`;
-            document.getElementById('totalEarnPercent').textContent = `${totalEarnPercent.toFixed(1)}%`;
-            
-            // Aggiorna progress bar
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            progressFill.style.width = `${progress}%`;
-            progressText.textContent = `${progress.toFixed(1)}%`;
-            
-            // Aggiorna limiti di trading
-            document.getElementById('remainingTrades').textContent = remainingTrades;
-            document.getElementById('tradeValue').textContent = formatCurrency(currentThreshold.tradeValue);
-            document.getElementById('targetCapital').textContent = formatCurrency(currentThreshold.targetCapital);
-            document.getElementById('requiredGainPercent').textContent = `${requiredGainPercent.toFixed(1)}%`;
-            
-            // Aggiorna griglia soglie
-            updateThresholdGrid();
-            
-            // Controlli e avvisi
-            if (remainingTrades <= 0) {
-                showAlert('⚠️ Limite di trade raggiunto per questa soglia! Considera di passare alla soglia successiva.', 'warning');
-            }
-            
-            if (progress >= 100) {
-                if (thresholdIndex < thresholds.length - 1) {
-                    showAlert('🎉 Congratulazioni! Hai raggiunto la soglia corrente. Puoi passare alla soglia successiva!', 'success');
-                } else {
-                    showAlert('🏆 Eccellente! Hai raggiunto la soglia massima del sistema!', 'success');
-                }
-            }
-        }
+    // Aggiorna progress bar
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    progressFill.style.width = `${progress}%`;
+    progressText.textContent = `${progress.toFixed(1)}%`;
 
-        function updateThresholdGrid() {
-            const grid = document.getElementById('thresholdGrid');
-            const currentThresholdIndex = getCurrentThreshold();
-            const thresholds = generateThresholdConfig(currentData.initialCapital);
-            
-            grid.innerHTML = '';
-            
-            thresholds.forEach((threshold, index) => {
-                const item = document.createElement('div');
-                item.className = 'threshold-item';
-                
-                if (index < currentThresholdIndex) {
-                    item.classList.add('completed');
-                } else if (index === currentThresholdIndex) {
-                    item.classList.add('current');
-                } else {
-                    item.classList.add('future');
-                }
-                
-                const progress = index === currentThresholdIndex ? calculateProgress() : 0;
-                const earnPercent = ((threshold.targetCapital - currentData.initialCapital) / currentData.initialCapital) * 100;
-                const status = index < currentThresholdIndex ? '✅ Completata' : 
-                              index === currentThresholdIndex ? `🎯 Attuale (${progress.toFixed(1)}%)` : 
-                              '⏳ Futura';
-                
-                item.innerHTML = `
-                    <div class="threshold-info">
-                        <div class="threshold-number">Soglia ${threshold.level}</div>
-                        <div class="threshold-amount">${formatCurrency(threshold.targetCapital)}</div>
-                    </div>
-                    <div class="threshold-details">
-                        <div><strong>Capitale Base:</strong> ${formatCurrency(threshold.baseCapital)}</div>
-                        <div><strong>Guadagno Richiesto:</strong> ${earnPercent.toFixed(1)}%</div>
-                        <div><strong>Valore Trade:</strong> ${formatCurrency(threshold.tradeValue)}</div>
-                        <div><strong>Max Trade:</strong> ${threshold.maxTrades}</div>
-                        <div><strong>Status:</strong> ${status}</div>
-                        <div style="margin-top: 10px; font-style: italic; color: #666;">${threshold.description}</div>
-                    </div>
-                `;
-                
-                grid.appendChild(item);
-            });
-        }
+    // Aggiorna limiti di trading
+    document.getElementById('remainingTrades').textContent = remainingTrades;
+    document.getElementById('tradeValue').textContent = formatCurrency(currentThreshold.tradeValue);
+    document.getElementById('targetCapital').textContent = formatCurrency(currentThreshold.targetCapital);
+    document.getElementById('requiredGainPercent').textContent = `${requiredGainPercent.toFixed(1)}%`;
 
-        function calculateThresholds() {
-            const initialCapital = parseFloat(document.getElementById('initialCapital').value) || 6720;
-            const currentEarnings = calculateTotalEarned();
-            const tradesCompleted = getTotalTradesCount();
-            
-            // Aggiorna i campi di input
-            document.getElementById('initialCapital').value = initialCapital;
-            document.getElementById('currentEarnings').value = currentEarnings.toFixed(2);
-            document.getElementById('tradesCompleted').value = tradesCompleted;
-            
-            // Aggiorna i dati correnti
-            currentData.initialCapital = initialCapital;
-            currentData.currentEarnings = currentEarnings;
-            currentData.tradesCompleted = tradesCompleted;
-            currentData.currentCapital = initialCapital + currentEarnings;
-            
-            // Mostra i risultati
-            document.getElementById('resultsContainer').classList.remove('hidden');
-            
-            // Aggiorna il display
-            updateDisplay();
-            
-            showAlert('✅ Sistema di soglie aggiornato con successo!', 'success');
-        }
+    // Aggiorna griglia soglie
+    updateThresholdGrid();
 
-        // Funzione per aggiornare automaticamente
-        function updateThresholdSystem() {
-            calculateThresholds();
-        }
+    // Controlli e avvisi
+    if (remainingTrades <= 0) {
+        showAlert('⚠️ Limite di trade raggiunto per questa soglia! Considera di passare alla soglia successiva.', 'warning');
+    }
 
-        // Auto-aggiorna al caricamento
-        function autoUpdateOnLoad() {
-            setTimeout(() => {
-                setupTradeCounter();
-                calculateThresholds();
-            }, 1000);
-        }
-
-        // Event listeners
-        document.getElementById('calculateBtn').addEventListener('click', calculateThresholds);
-        document.getElementById('initialCapital').addEventListener('input', calculateThresholds);
-        
-        // Auto-carica al caricamento della pagina
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', autoUpdateOnLoad);
+    if (progress >= 100) {
+        if (thresholdIndex < thresholds.length - 1) {
+            handleThresholdReached(thresholdIndex);
+            showAlert('🎉 Congratulazioni! Hai raggiunto la soglia corrente. Puoi passare alla soglia successiva!', 'success');
         } else {
-            autoUpdateOnLoad();
+            handleThresholdReached(thresholdIndex);
+            showAlert('🏆 Eccellente! Hai raggiunto la soglia massima del sistema!', 'success');
         }
-        
-        // Espone le funzioni per l'integrazione esterna
-        window.updateThresholdSystem = updateThresholdSystem;
-        window.setupTradeCounter = setupTradeCounter;
+    }
+}
+
+function updateThresholdGrid() {
+    const grid = document.getElementById('thresholdGrid');
+    const currentThresholdIndex = getCurrentThreshold();
+    const thresholds = generateThresholdConfig(currentData.initialCapital);
+
+    grid.innerHTML = '';
+
+    thresholds.forEach((threshold, index) => {
+        const item = document.createElement('div');
+        item.className = 'threshold-item';
+
+        if (index < currentThresholdIndex) {
+            item.classList.add('completed');
+        } else if (index === currentThresholdIndex) {
+            item.classList.add('current');
+        } else {
+            item.classList.add('future');
+        }
+
+        const progress = index === currentThresholdIndex ? calculateProgress() : 0;
+        const earnPercent = ((threshold.targetCapital - currentData.initialCapital) / currentData.initialCapital) * 100;
+        const status = index < currentThresholdIndex ? '✅ Completata' :
+            index === currentThresholdIndex ? `🎯 Attuale (${progress.toFixed(1)}%)` :
+                '⏳ Futura';
+
+        item.innerHTML = `
+            <div class="threshold-info">
+                <div class="threshold-number">Soglia ${threshold.level}</div>
+                <div class="threshold-amount">${formatCurrency(threshold.targetCapital)}</div>
+            </div>
+            <div class="threshold-details">
+                <div><strong>Capitale Base:</strong> ${formatCurrency(threshold.baseCapital)}</div>
+                <div><strong>Guadagno Richiesto:</strong> ${earnPercent.toFixed(1)}%</div>
+                <div><strong>Valore Trade:</strong> ${formatCurrency(threshold.tradeValue)}</div>
+                <div><strong>Max Trade:</strong> ${threshold.maxTrades}</div>
+                <div><strong>Status:</strong> ${status}</div>
+                <div style="margin-top: 10px; font-style: italic; color: #666;">${threshold.description}</div>
+            </div>
+        `;
+
+        grid.appendChild(item);
+    });
+}
+
+function updateHistoryDisplay() {
+    const withdrawalDiv = document.getElementById('withdrawalHistory');
+    const reinvestedDiv = document.getElementById('reinvestedHistory');
+    if (withdrawalDiv) {
+        withdrawalDiv.innerHTML = '<b>Ritiri:</b><br>' + withdrawalHistory.map(w =>
+            `Soglia ${w.level}: ${formatCurrency(w.amount)} (${w.date})`
+        ).join('<br>');
+    }
+    if (reinvestedDiv) {
+        reinvestedDiv.innerHTML = '<b>Reinvestiti:</b><br>' + reinvestedHistory.map(r =>
+            `Soglia ${r.level}: ${formatCurrency(r.amount)} (${r.date})`
+        ).join('<br>');
+    }
+}
+
+function calculateThresholds() {
+    const initialCapital = parseFloat(document.getElementById('initialCapital').value) || 6720;
+    const currentEarnings = calculateTotalEarned();
+    const tradesCompleted = getTotalTradesCount();
+
+    // Aggiorna i campi di input
+    document.getElementById('initialCapital').value = initialCapital;
+    document.getElementById('currentEarnings').value = currentEarnings.toFixed(2);
+    document.getElementById('tradesCompleted').value = tradesCompleted;
+
+    // Aggiorna i dati correnti
+    currentData.initialCapital = initialCapital;
+    currentData.currentEarnings = currentEarnings;
+    currentData.tradesCompleted = tradesCompleted;
+    currentData.currentCapital = initialCapital + currentEarnings;
+
+    // Mostra i risultati
+    document.getElementById('resultsContainer').classList.remove('hidden');
+
+    // Aggiorna il display
+    updateDisplay();
+
+    showAlert('✅ Sistema di soglie aggiornato con successo!', 'success');
+}
+
+// Funzione per aggiornare automaticamente
+function updateThresholdSystem() {
+    calculateThresholds();
+}
+
+// Auto-aggiorna al caricamento
+function autoUpdateOnLoad() {
+    setTimeout(() => {
+        setupTradeCounter();
+        calculateThresholds();
+    }, 1000);
+}
+
+// Event listeners
+document.getElementById('calculateBtn').addEventListener('click', calculateThresholds);
+document.getElementById('initialCapital').addEventListener('input', calculateThresholds);
+
+// Auto-carica al caricamento della pagina
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoUpdateOnLoad);
+} else {
+    autoUpdateOnLoad();
+}
+
+// Espone le funzioni per l'integrazione esterna
+window.updateThresholdSystem = updateThresholdSystem;
+window.setupTradeCounter = setupTradeCounter;
+
     </script>
 
     <script>
