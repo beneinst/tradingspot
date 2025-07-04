@@ -593,6 +593,11 @@ h2 {
         width: 100%;
         display: block;
     }
+	
+	.threshold-amount {
+    color: #fff;
+}
+
 </style>
 
 </head>
@@ -711,12 +716,12 @@ h2 {
         
         <div class="input-group1">
             <label for="currentEarnings">Guadagni Attuali ($)</label>
-            <input type="number" id="currentEarnings" readonly style="background: #e9ecef; color: #111; cursor: not-allowed;" placeholder="Auto-calcolato">
+            <input type="number" id="currentEarnings" readonly style="background: #323b45; color: #e9ecef; cursor: not-allowed;" placeholder="Auto-calcolato">
         </div>
         
         <div class="input-group1">
             <label for="tradesCompleted">Trade Completati</label>
-            <input type="number" id="tradesCompleted" readonly style="background: #e9ecef; color: #111; cursor: not-allowed;" placeholder="Auto-calcolato">
+            <input type="number" id="tradesCompleted" readonly style="background: #323b45; color: #e9ecef; cursor: not-allowed;" placeholder="Auto-calcolato">
         </div>
         
         <button id="calculateBtn" class="btn-primary">Aggiorna Sistema</button>
@@ -806,13 +811,14 @@ h2 {
 </div>
 
 <script>
-       // Moltiplicatori fissi per le soglie basate sul capitale iniziale
-const THRESHOLD_MULTIPLIERS = [
-    { level: 1, multiplier: 1.19, description: "Soglia Base - Crescita del 19%" },
-    { level: 2, multiplier: 1.49, description: "Soglia Intermedia - Crescita del 49%" },
-    { level: 3, multiplier: 1.86, description: "Soglia Avanzata - Crescita del 86%" },
-    { level: 4, multiplier: 2.23, description: "Soglia Professionale - Crescita del 123%" },
-    { level: 5, multiplier: 2.98, description: "Soglia Elite - Crescita del 198%" }
+// --- CONFIGURAZIONE SOGLIE PROGRESSIVE (con reinvestimento del 40%) ---
+const REINVEST_PERCENT = 0.4; // 40% del profitto viene reinvestito
+const THRESHOLD_PERCENTS = [
+    { level: 1, percent: 0.19, description: "Soglia Base - Crescita del 19%" },
+    { level: 2, percent: 0.49, description: "Soglia Intermedia - Crescita del 49%" },
+    { level: 3, percent: 0.86, description: "Soglia Avanzata - Crescita del 86%" },
+    { level: 4, percent: 1.23, description: "Soglia Professionale - Crescita del 123%" },
+    { level: 5, percent: 1.98, description: "Soglia Elite - Crescita del 198%" }
 ];
 
 const MAX_TRADES = 56;
@@ -888,20 +894,39 @@ function formatCurrency(amount) {
     }).format(amount);
 }
 
-function generateThresholdConfig(initialCapital) {
-    return THRESHOLD_MULTIPLIERS.map(config => ({
-        level: config.level,
-        baseCapital: config.level === 1 ? initialCapital : initialCapital * THRESHOLD_MULTIPLIERS[config.level - 2].multiplier,
-        targetCapital: initialCapital * config.multiplier,
-        tradeValue: Math.round(initialCapital / MAX_TRADES),
-        maxTrades: MAX_TRADES,
-        description: config.description
-    }));
+// --- GENERA SOGLIE PROGRESSIVE CON REINVESTIMENTO PARZIALE ---
+function generateThresholdProgressive(initialCapital) {
+    let thresholds = [];
+    let baseCapital = initialCapital;
+
+    for (let i = 0; i < THRESHOLD_PERCENTS.length; i++) {
+        const config = THRESHOLD_PERCENTS[i];
+        const profitTarget = baseCapital * config.percent;
+        const reinvest = profitTarget * REINVEST_PERCENT;
+        const withdrawal = profitTarget - reinvest;
+        const targetCapital = baseCapital + profitTarget;
+
+        thresholds.push({
+            level: config.level,
+            baseCapital: baseCapital,
+            profitTarget: profitTarget,
+            reinvest: reinvest,
+            withdrawal: withdrawal,
+            targetCapital: targetCapital,
+            tradeValue: Math.round(baseCapital / MAX_TRADES),
+            maxTrades: MAX_TRADES,
+            description: config.description
+        });
+
+        // Solo la quota reinvestita va aggiunta al capitale per la soglia successiva
+        baseCapital = baseCapital + reinvest;
+    }
+    return thresholds;
 }
 
 function getCurrentThreshold() {
     const capital = currentData.currentCapital;
-    const thresholds = generateThresholdConfig(currentData.initialCapital);
+    const thresholds = generateThresholdProgressive(currentData.initialCapital);
     for (let i = 0; i < thresholds.length; i++) {
         if (capital < thresholds[i].targetCapital) {
             return i;
@@ -912,7 +937,7 @@ function getCurrentThreshold() {
 
 function calculateProgress() {
     const thresholdIndex = getCurrentThreshold();
-    const thresholds = generateThresholdConfig(currentData.initialCapital);
+    const thresholds = generateThresholdProgressive(currentData.initialCapital);
     const currentThreshold = thresholds[thresholdIndex];
     const capital = currentData.currentCapital;
     if (thresholdIndex === 0) {
@@ -932,7 +957,7 @@ function calculateTotalEarnPercent() {
 
 // Funzione per gestire ritiro e reinvestimento alla soglia
 function handleThresholdReached(thresholdIndex) {
-    const thresholds = generateThresholdConfig(currentData.initialCapital);
+    const thresholds = generateThresholdProgressive(currentData.initialCapital);
     const currentThreshold = thresholds[thresholdIndex];
     const baseCapital = currentThreshold.baseCapital;
     const targetCapital = currentThreshold.targetCapital;
@@ -941,9 +966,9 @@ function handleThresholdReached(thresholdIndex) {
     // Calcola profitto realizzato
     const profit = Math.max(0, actualCapital - baseCapital);
 
-    // Calcola quota reinvestibile (max 50%)
-    const maxReinvest = profit * 0.5;
-    const toWithdraw = profit - maxReinvest;
+    // Calcola quota reinvestibile (es. 40%)
+    const reinvest = profit * REINVEST_PERCENT;
+    const toWithdraw = profit - reinvest;
 
     // Aggiorna storico
     withdrawalHistory.push({
@@ -953,19 +978,19 @@ function handleThresholdReached(thresholdIndex) {
     });
     reinvestedHistory.push({
         level: currentThreshold.level,
-        amount: maxReinvest,
+        amount: reinvest,
         date: new Date().toLocaleDateString()
     });
 
     // Aggiorna capitale operativo per la soglia successiva
-    currentData.initialCapital = baseCapital + maxReinvest;
+    currentData.initialCapital = baseCapital + reinvest;
     currentData.currentEarnings = actualCapital - currentData.initialCapital;
     currentData.currentCapital = actualCapital;
 
     // Mostra alert
     showAlert(
         `Soglia ${currentThreshold.level} raggiunta! Profitto: ${formatCurrency(profit)}. 
-        <br>Ritirato: <b>${formatCurrency(toWithdraw)}</b> | Reinvestito: <b>${formatCurrency(maxReinvest)}</b>.<br>
+        <br>Ritirato: <b>${formatCurrency(toWithdraw)}</b> | Reinvestito: <b>${formatCurrency(reinvest)}</b>.<br>
         Il nuovo capitale operativo per la prossima soglia è ${formatCurrency(currentData.initialCapital)}.`,
         'success'
     );
@@ -974,12 +999,12 @@ function handleThresholdReached(thresholdIndex) {
 
 function updateDisplay() {
     const thresholdIndex = getCurrentThreshold();
-    const thresholds = generateThresholdConfig(currentData.initialCapital);
+    const thresholds = generateThresholdProgressive(currentData.initialCapital);
     const currentThreshold = thresholds[thresholdIndex];
     const progress = calculateProgress();
     const totalEarnPercent = calculateTotalEarnPercent();
     const remainingTrades = Math.max(0, currentThreshold.maxTrades - currentData.tradesCompleted);
-    const requiredGainPercent = ((currentThreshold.targetCapital - currentData.initialCapital) / currentData.initialCapital) * 100;
+    const requiredGainPercent = ((currentThreshold.targetCapital - currentThreshold.baseCapital) / currentThreshold.baseCapital) * 100;
 
     // Aggiorna status cards
     document.getElementById('currentCapital').textContent = formatCurrency(currentData.currentCapital);
@@ -1021,7 +1046,7 @@ function updateDisplay() {
 function updateThresholdGrid() {
     const grid = document.getElementById('thresholdGrid');
     const currentThresholdIndex = getCurrentThreshold();
-    const thresholds = generateThresholdConfig(currentData.initialCapital);
+    const thresholds = generateThresholdProgressive(currentData.initialCapital);
 
     grid.innerHTML = '';
 
@@ -1038,7 +1063,7 @@ function updateThresholdGrid() {
         }
 
         const progress = index === currentThresholdIndex ? calculateProgress() : 0;
-        const earnPercent = ((threshold.targetCapital - currentData.initialCapital) / currentData.initialCapital) * 100;
+        const earnPercent = (threshold.profitTarget / threshold.baseCapital) * 100;
         const status = index < currentThresholdIndex ? '✅ Completata' :
             index === currentThresholdIndex ? `🎯 Attuale (${progress.toFixed(1)}%)` :
                 '⏳ Futura';
@@ -1050,11 +1075,13 @@ function updateThresholdGrid() {
             </div>
             <div class="threshold-details">
                 <div><strong>Capitale Base:</strong> ${formatCurrency(threshold.baseCapital)}</div>
-                <div><strong>Guadagno Richiesto:</strong> ${earnPercent.toFixed(1)}%</div>
+                <div><strong>Profitto Richiesto:</strong> ${formatCurrency(threshold.profitTarget)} (${earnPercent.toFixed(1)}%)</div>
+                <div><strong>Quota Reinvestita:</strong> ${formatCurrency(threshold.reinvest)}</div>
+                <div><strong>Quota Ritirabile:</strong> ${formatCurrency(threshold.withdrawal)}</div>
                 <div><strong>Valore Trade:</strong> ${formatCurrency(threshold.tradeValue)}</div>
                 <div><strong>Max Trade:</strong> ${threshold.maxTrades}</div>
                 <div><strong>Status:</strong> ${status}</div>
-                <div style="margin-top: 10px; font-style: italic; color: #666;">${threshold.description}</div>
+                <div style="margin-top: 10px; font-style: italic; color: #6CC417;">${threshold.description}</div>
             </div>
         `;
 
@@ -1129,8 +1156,9 @@ if (document.readyState === 'loading') {
 // Espone le funzioni per l'integrazione esterna
 window.updateThresholdSystem = updateThresholdSystem;
 window.setupTradeCounter = setupTradeCounter;
+</script>
 
-    </script>
+
 
     <script>
         // Inizializzazione delle variabili
