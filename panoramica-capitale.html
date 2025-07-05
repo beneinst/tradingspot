@@ -726,7 +726,7 @@ label {
    <div class="header-stats">
     <div class="header-stat-item">
         <div class="header-stat-label">Trade Totali</div>
-        <div class="header-stat-value" style="color: #987654; font-size: 34px;" id="totaleTrade">30</div>
+        <div class="header-stat-value" style="color: #987654; font-size: 34px;" id="totaleTrade"></div>
     </div>
     <div class="header-stat-item">
         <div class="header-stat-label">$ per Trade</div>
@@ -888,6 +888,10 @@ label {
   let storicoCapitaleChart = null;
   let percentualeCapitaleChart = null;
   let periodoVisualizzato = 30; // default: 30 giorni
+  
+  datiCapitale.totaleTrade = 30;
+aggiornaInterfaccia();
+
   
   // Funzione di inizializzazione
   function inizializza() {
