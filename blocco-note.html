@@ -101,19 +101,32 @@ textarea {
     background-color: #357ab8;
 }
 
-.btn-danger {
-    background-color: var(--color-danger);
-    color: white;
+.btn-edit {
+    background-color: #434190;      /* blu scuro, coerente con il dark */
+    color: #f5f5f5;
     border: none;
     padding: 8px 15px;
     cursor: pointer;
     border-radius: 5px;
     transition: background-color 0.3s;
 }
-
-.btn-danger:hover {
-    background-color: #c0392b;
+.btn-edit:hover {
+    background-color: #667eea;      /* blu più chiaro in hover */
 }
+
+.btn-danger {
+    background-color: #3b3054;      /* viola scuro, elegante per il dark */
+    color: #f5f5f5;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+.btn-danger:hover {
+    background-color: #a259a6;      /* viola chiaro in hover */
+}
+
 
 .btn-secondary {
     background-color: var(--color-secondary);
@@ -133,12 +146,14 @@ textarea {
 .notes-container {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 12px; /* Spazio leggermente aumentato per maggiore leggibilità */
     background: linear-gradient(135deg, #2d3748 0%, #434190 100%);
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
-    padding: 6px;
+    padding: 16px 10px; /* Più spazio interno per non far aderire le note ai bordi */
+    margin-bottom: 24px; /* Spazio sotto il container rispetto ad altri elementi */
 }
+
 
 
 .note {
@@ -323,7 +338,7 @@ input[type="file"] {
             }
         }
 		
-		  .btn-primary, .btn-secondary, .btn-danger, .btn-edit {
+		  .btn-primary, .btn-secondary, .btn-danger, {
             padding: 12px 24px;
             border: none;
             border-radius: 6px;
@@ -350,23 +365,7 @@ input[type="file"] {
             background: #4a5568;
         }
 
-        .btn-danger {
-            background: #e53e3e;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c53030;
-        }
-
-        .btn-edit {
-            background: #38a169;
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background: #2f855a;
-        }
+  
 
         .notes-container {
             display: grid;
