@@ -697,19 +697,19 @@ label {
     <div class="stats-grid">
       <div class="stat-item">
         <div class="stat-label">Su CoinGecko</div>
-        <div class="stat-value coingecko" style="color: #f75e25; font-size: 39px;" id="coingecko"></div>
+        <div class="stat-value coingecko" style="color: #f75e25; font-size: 39px;" id="coingecko">21</div>
       </div>
       <div class="stat-item">
         <div class="stat-label">Su Binance</div>
-        <div class="stat-value binance" style="color: #ffd700; font-size: 39px;" id="binance"></div>
+        <div class="stat-value binance" style="color: #ffd700; font-size: 39px;" id="binance">2</div>
       </div>
       <div class="stat-item">
         <div class="stat-label">Totale in Cripto</div>
-        <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn"></div>
+        <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn">23</div>
       </div>
       <div class="stat-item">
         <div class="stat-label">Restanti in Dollari</div>
-        <div class="stat-value capitale" style="color: #008080; font-size: 39px;" id="capitale"></div>
+        <div class="stat-value capitale" style="color: #008080; font-size: 39px;" id="capitale">43</div>
       </div>
     </div>
     
@@ -726,7 +726,7 @@ label {
    <div class="header-stats">
     <div class="header-stat-item">
         <div class="header-stat-label">Trade Totali</div>
-        <div class="header-stat-value" style="color: #987654; font-size: 34px;" id="totaleTrade">30</div>
+        <div class="header-stat-value" style="color: #987654; font-size: 34px;" id="totaleTrade">56</div>
     </div>
     <div class="header-stat-item">
         <div class="header-stat-label">$ per Trade</div>
@@ -877,7 +877,7 @@ label {
     binance: 0,
     totaleIn: 0,
     capitale: 0,
-    totaleTrade: 30,
+    totaleTrade: 56,
     quotaPerTrade: 40,
     storicoCapitale: [],
     ultimoAggiornamento: new Date().toISOString()
@@ -1523,7 +1523,7 @@ function creaGraficoStoricoCapitale() {
       scales: {
         y: {
           beginAtZero: true,
-          max: 30,
+          max: 56,
           title: {
             display: true,
             text: 'Numero di Trade',
