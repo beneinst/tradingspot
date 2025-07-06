@@ -7,21 +7,21 @@
   <link rel="icon" type="image/png" href="favicon.png"> 
   <style>
  :root {
-  --primary-color: #4caf50;       /* Verde bottone principale */
-  --secondary-color: #2196f3;     /* Blu bottone secondario */
-  --accent-color: #f44336;        /* Rosso bottone chiusura mese */
-  --binance-color: #f2bb66;       /* Giallo personalizzato del footer */
-  --background-color: #1e1e1e;    /* Sfondo principale */
+  --primary-color: #739bf2;       /* Blu-grigio elegante */
+  --secondary-color: #393e46;     /* Grigio scuro */
+  --accent-color: #f44336;        /* Rosso */
+  --background-color: #232526;    /* Sfondo principale */
   --card-color: #2c2c2c;          /* Sfondo card */
-  --border-color: #000000;           /* Bordo elementi/tabella */
-  --text-color: #4c4c4c;          /* Colore principale del testo */
-  --text-light: #aaa;             /* Testo secondario o descrittivo */
-  --highlight-light: #ffe58f;     /* Testo evidenziato - corrente */
-  --highlight-green: #c7ffc7;     /* Evidenziato verde - media */
-  --highlight-red: #ffc7c7;       /* Evidenziato rosso - totale */
+  --border-color: #393e46;        /* Bordo elementi/tabella */
+  --text-color: #e0e0e0;          /* Testo principale chiaro */
+  --text-light: #bfc9d1;          /* Testo secondario */
+  --highlight-light: #ffe58f;     /* Evidenziato corrente */
+  --highlight-green: #c7ffc7;     /* Evidenziato verde */
+  --highlight-red: #ffc7c7;       /* Evidenziato rosso */
   --header-bg: #333a56;           /* Sfondo header */
   --hover-link: #ffdb58;          /* Hover link footer */
 }
+
 
 
   * {
@@ -82,11 +82,12 @@
 }
 
 .header-stat-item:hover {
-  background: var(--primary-color, #0099ff); /* Usa il colore primario o un fallback */
-  box-shadow: 0 4px 20px rgba(0,153,255,0.5); /* Ombra più intensa e colorata */
-  color: #fff !important; /* Testo bianco per contrasto */
+  background: linear-gradient(120deg, #393e46 60%, #232a34 100%);
+  box-shadow: 0 4px 20px rgba(57, 62, 70, 0.5);
+  color: #ffe58f !important; /* Testo evidenziato chiaro */
   cursor: pointer;
 }
+
 
 
   .header-stat-label {
@@ -356,8 +357,9 @@ label {
   }
 
   .chart-container {
-    height: 580px;
-    margin-top: 20px;
+    height: 460px;
+    margin-top: 50px;
+	margin-bottom: 30px;
     color: #ffffff;
     position: relative;
     padding: 20px 0;
@@ -697,19 +699,19 @@ label {
     <div class="stats-grid">
       <div class="stat-item">
         <div class="stat-label">Su CoinGecko</div>
-        <div class="stat-value coingecko" style="color: #f75e25; font-size: 39px;" id="coingecko">0</div>
+        <div class="stat-value coingecko" style="color: #f75e25; font-size: 39px;" id="coingecko"></div>
       </div>
       <div class="stat-item">
         <div class="stat-label">Su Binance</div>
-        <div class="stat-value binance" style="color: #ffd700; font-size: 39px;" id="binance">0</div>
+        <div class="stat-value binance" style="color: #ffd700; font-size: 39px;" id="binance"></div>
       </div>
       <div class="stat-item">
         <div class="stat-label">Totale in Cripto</div>
-        <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn">0</div>
+        <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn"></div>
       </div>
       <div class="stat-item">
         <div class="stat-label">Restanti in Dollari</div>
-        <div class="stat-value capitale" style="color: #008080; font-size: 39px;" id="capitale">0</div>
+        <div class="stat-value capitale" style="color: #008080; font-size: 39px;" id="capitale"></div>
       </div>
     </div>
     
@@ -964,7 +966,7 @@ label {
     salvaDatiLocali();
     
     // Aggiorna i grafici
-    aggiornaGrafico();
+   // aggiornaGrafico();
     aggiornaGraficoStorico();
     aggiornaGraficoPercentuale();
     
@@ -987,7 +989,7 @@ function resettaDati() {
   
   // Aggiorna l'interfaccia e i grafici
   aggiornaInterfaccia();
-  aggiornaGrafico();
+ // aggiornaGrafico();
   aggiornaGraficoStorico();
   aggiornaGraficoPercentuale();
   calcolaStatistichePercentuali();
@@ -1078,7 +1080,7 @@ function scaricaGrafico() {
     salvaDatiLocali();
     
     // Aggiorna i grafici
-    aggiornaGrafico();
+ //   aggiornaGrafico();
     aggiornaGraficoStorico();
     aggiornaGraficoPercentuale();
     
@@ -1870,7 +1872,7 @@ function aggiornaTotali() {
     salvaDatiLocali();
     
     // Aggiorna i grafici
-    aggiornaGrafico();
+   // aggiornaGrafico();
     aggiornaGraficoStorico();
     aggiornaGraficoPercentuale();
     
@@ -1942,7 +1944,7 @@ function aggiornaTotali() {
         aggiornaInterfaccia();
         
         // Aggiorna i grafici
-        aggiornaGrafico();
+       // aggiornaGrafico();
         aggiornaGraficoStorico();
         aggiornaGraficoPercentuale();
         
@@ -2026,7 +2028,7 @@ function aggiornaTotali() {
   // Inizializza l'applicazione quando il documento è pronto
   document.addEventListener('DOMContentLoaded', function() {
     inizializza();
-	window.addEventListener('resize', gestisciRidimensionamento);
+// 	window.addEventListener('resize', gestisciRidimensionamento);
     
     // Aggiungi l'indicatore del tempo dopo l'inizializzazione
     aggiungiIndicatoreTempo();
