@@ -582,7 +582,20 @@ th, td {
         <h2 class="section-title">🏌️‍♀️ I tuoi Trade Attivi</h2>
         <div id="notes-container"></div>
     </div>
+
+
+<div class="card">
+    <div class="card-header">
+        <h2>Backup & Ripristino</h2>
+    </div>
+    <p>Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
+    <div class="backup-container">
+        <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
+        <input type="file" id="fileInput" accept=".json" style="width: 100%;">
+        <button onclick="caricaDati()" class="btn-primary">Carica Dati</button>
+    </div>
 </div>
+
 
 <div class="footer">
             Trading Spot Manager v1.1 | 
@@ -762,6 +775,52 @@ th, td {
         renderNotes();
         generaRighe();
     });
+	
+	// Funzione per scaricare i dati come file JSON
+function scaricaDati() {
+    const data = JSON.stringify(notes, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trade-note-backup_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Funzione per caricare i dati da un file JSON
+function caricaDati() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedNotes = JSON.parse(e.target.result);
+                if (Array.isArray(importedNotes)) {
+                    // Sostituisci tutte le note
+                    notes = importedNotes;
+                    saveNotes();
+                    renderNotes();
+                    alert('Dati importati con successo!');
+                    fileInput.value = '';
+                } else {
+                    alert('Il file non contiene un formato di dati valido.');
+                }
+            } catch (error) {
+                alert('Errore durante l\'importazione dei dati: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    } else {
+        alert('Seleziona un file da importare.');
+    }
+}
+
 </script>
 
 </body>
