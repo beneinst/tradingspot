@@ -598,6 +598,13 @@ th, td {
         </div>
     </div>
 <script>
+    // --- Utility per parsing numeri colonna 1 (accetta virgola o punto) ---
+    function parseInputNumber(val) {
+        if (typeof val !== "string") return 0;
+        // Sostituisci la virgola con il punto per il separatore decimale
+        return parseFloat(val.replace(',', '.')) || 0;
+    }
+
     // --- Utility per generare righe input ---
     function generaRighe(valori = []) {
         let html = "";
@@ -608,7 +615,7 @@ th, td {
                 <tr>
                     <td style="text-align:left;">${i+1}</td>
                     <td>
-                        <input type="number" step="0.0000001" min="0" id="col1-${i}" value="${v1}" style="width:160px;" oninput="calcolaTotali()">
+                        <input type="text" id="col1-${i}" value="${v1}" style="width:160px;" oninput="calcolaTotali()" autocomplete="off" inputmode="decimal" pattern="[0-9]+([\\.,][0-9]*)?">
                     </td>
                     <td>
                         <input type="number" step="1" min="0" id="col2-${i}" value="${v2}" style="width:80px;" oninput="calcolaTotali()">
@@ -624,12 +631,12 @@ th, td {
     function calcolaTotali() {
         let tot1 = 0, tot2 = 0;
         for (let i = 0; i < 10; i++) {
-            let v1 = parseFloat(document.getElementById(`col1-${i}`).value) || 0;
+            let v1 = parseInputNumber(document.getElementById(`col1-${i}`).value);
             let v2 = parseInt(document.getElementById(`col2-${i}`).value) || 0;
             tot1 += v1;
             tot2 += v2;
         }
-        document.getElementById('totale-col1').textContent = tot1.toFixed(7);
+        document.getElementById('totale-col1').textContent = tot1.toFixed(8);
         document.getElementById('totale-col2').textContent = tot2;
     }
 
@@ -654,15 +661,18 @@ th, td {
             let rows = '';
             let tot1 = 0, tot2 = 0;
             note.righe.forEach((r, idx) => {
-                if ((r.col1 && r.col1 !== "0") || (r.col2 && r.col2 !== "0")) {
+                // Parsing sicuro per visualizzazione e totali
+                const val1 = parseInputNumber(r.col1);
+                const val2 = parseInt(r.col2) || 0;
+                if ((r.col1 && val1 !== 0) || (r.col2 && val2 !== 0)) {
                     rows += `<tr>
                         <td style="text-align:left;">${idx+1}</td>
-                        <td>${parseFloat(r.col1 || 0).toFixed(7)}</td>
-                        <td>${parseInt(r.col2 || 0)}</td>
+                        <td>${val1.toFixed(8)}</td>
+                        <td>${val2}</td>
                     </tr>`;
                 }
-                tot1 += parseFloat(r.col1 || 0);
-                tot2 += parseInt(r.col2 || 0);
+                tot1 += val1;
+                tot2 += val2;
             });
             c.innerHTML += `
                 <div class="note">
@@ -675,7 +685,7 @@ th, td {
                         <tfoot>
                             <tr style="font-weight:bold;">
                                 <td style="text-align:right;">Totale</td>
-                                <td>${tot1.toFixed(7)}</td>
+                                <td>${tot1.toFixed(8)}</td>
                                 <td>${tot2}</td>
                             </tr>
                         </tfoot>
@@ -752,7 +762,7 @@ th, td {
         renderNotes();
         generaRighe();
     });
-	
 </script>
+
 </body>
 </html>

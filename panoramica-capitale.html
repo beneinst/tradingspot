@@ -222,7 +222,7 @@
   }
 
   .capitale {
-    color: #008080;
+    color: #1AA6ED;
   }
 
 
@@ -662,7 +662,7 @@ label {
 <body>
 <div class="container">
   <div class="head2" style="color: white !important;">
-    <p class="titolo-bianco"><strong>Panoramica del Capitale in Trading</strong></p>
+    <p class="titolo-bianco"><strong>🪸 Panoramica del Capitale</strong></p>
   </div>
   
 
@@ -699,11 +699,11 @@ label {
     <div class="stats-grid">
       <div class="stat-item">
         <div class="stat-label">Su CoinGecko</div>
-        <div class="stat-value coingecko" style="color: #f75e25; font-size: 39px;" id="coingecko"></div>
+        <div class="stat-value coingecko" style="color: #FF3A33; font-size: 39px;" id="coingecko"></div>
       </div>
       <div class="stat-item">
         <div class="stat-label">Su Binance</div>
-        <div class="stat-value binance" style="color: #ffd700; font-size: 39px;" id="binance"></div>
+        <div class="stat-value binance" style="color: #FFDD33; font-size: 39px;" id="binance"></div>
       </div>
       <div class="stat-item">
         <div class="stat-label">Totale in Cripto</div>
@@ -711,7 +711,7 @@ label {
       </div>
       <div class="stat-item">
         <div class="stat-label">Restanti in Dollari</div>
-        <div class="stat-value capitale" style="color: #008080; font-size: 39px;" id="capitale"></div>
+        <div class="stat-value capitale" style="color: #1AA6ED; font-size: 39px;" id="capitale"></div>
       </div>
     </div>
     
@@ -789,11 +789,11 @@ label {
           <div class="header-stats" style="padding-top: 2px;">
             <div class="header-stat-item">
               <div class="header-stat-label">Media Trade CoinGecko</div>
-              <div class="header-stat-value" style="color: #f75e25; font-size: 28px;" id="mediaTradeCoingecko">0</div>
+              <div class="header-stat-value" style="color: #FF3A33; font-size: 28px;" id="mediaTradeCoingecko">0</div>
             </div>
             <div class="header-stat-item">
               <div class="header-stat-label">Media Trade Binance</div>
-              <div class="header-stat-value" style="color: #ffd700; font-size: 28px;" id="mediaTradeBinance">0</div>
+              <div class="header-stat-value" style="color: #FFDD33; font-size: 28px;" id="mediaTradeBinance">0</div>
             </div>
             <div class="header-stat-item">
               <div class="header-stat-label">Media $ in Trading</div>
@@ -1202,13 +1202,13 @@ function salvaStorico() {
           datiCapitale.capitale
         ],
         backgroundColor: [
-          '#f75e25',
-          '#FFD700',
-          '#008080'
+          '#FF3A33',
+          '#FFDD33',
+          '#1AA6ED'
         ],
-        borderColor: '#003399', // bordo molto scuro
-        borderWidth: 3,
-        hoverOffset: 18
+        borderColor: '#222', // bordo molto scuro
+        borderWidth: 5,
+        hoverOffset: 22
       }]
     },
     options: {
@@ -1232,10 +1232,10 @@ function salvaStorico() {
         },
         tooltip: {
   backgroundColor: '#181c23',
-  titleColor: '#7FFFD4',
+  titleColor: '#739bf2',
   bodyColor: '#F0F8FF',
-  borderColor: '#1F45FC',
-  borderWidth: 3,
+  borderColor: '#2980b9',
+  borderWidth: 2,
   cornerRadius: 10,
   padding: 18,
   displayColors: true,
@@ -1457,7 +1457,7 @@ function creaGraficoStoricoCapitale() {
           label: 'Dollari',
           data: datiPeriodo.map(item => item.capitale),
           backgroundColor: 'rgba(0, 128, 128, 0.2)',
-          borderColor: '#008080',
+          borderColor: '#1AA6ED',
           borderWidth: 3,
           tension: 0.4,
           pointRadius: 4,
