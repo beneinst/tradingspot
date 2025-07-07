@@ -711,7 +711,7 @@ h2 {
     <div class="threshold-inputs">
         <div class="input-group1">
             <label for="initialCapital">Capitale Iniziale ($)</label>
-            <input type="number" id="initialCapital" value="6720" min="1000" step="100">
+            <input type="number" id="initialCapital" value="6000" min="1000" step="100">
         </div>
         
         <div class="input-group1">
@@ -867,10 +867,10 @@ function setupTradeCounter() {
 }
 
 let currentData = {
-    initialCapital: 6720,
+    initialCapital: 6000,
     currentEarnings: 0,
     tradesCompleted: 0,
-    currentCapital: 6720,
+    currentCapital: 6000,
     currentThresholdIndex: 0
 };
 
@@ -915,6 +915,7 @@ function generateThresholdProgressive(initialCapital) {
             withdrawal: withdrawal,
             targetCapital: targetCapital,
             tradeValue: Math.round(baseCapital / MAX_TRADES),
+	// per quota trade da capitale iniziale		tradeValue: Math.round(initialCapital / MAX_TRADES)
             maxTrades: MAX_TRADES,
             description: config.description
         });
@@ -1106,7 +1107,7 @@ function updateHistoryDisplay() {
 }
 
 function calculateThresholds() {
-    const initialCapital = parseFloat(document.getElementById('initialCapital').value) || 6720;
+    const initialCapital = parseFloat(document.getElementById('initialCapital').value) || 6000;
     const currentEarnings = calculateTotalEarned();
     const tradesCompleted = getTotalTradesCount();
 
@@ -1146,6 +1147,8 @@ function autoUpdateOnLoad() {
 // Event listeners
 document.getElementById('calculateBtn').addEventListener('click', calculateThresholds);
 document.getElementById('initialCapital').addEventListener('input', calculateThresholds);
+document.getElementById('tradesCompleted').addEventListener('input', calculateThresholds);
+
 
 // Auto-carica al caricamento della pagina
 if (document.readyState === 'loading') {
