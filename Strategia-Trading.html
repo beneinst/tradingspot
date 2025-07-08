@@ -738,7 +738,7 @@ p {
 
 
 <div class="indicator-info-box">
-  <h2 style="margin-top:0;">Codice sorgente 05.07.2025 22:30</h2>
+  <h2 style="margin-top:0;">Codice sorgente 08.07.2025 20:30</h2>
   
   <p style="margin-top:18px; margin-bottom:10px;"><strong></strong></p>
   <div class="indicator-info-box" style="
@@ -803,7 +803,7 @@ priceActionLookback = input.int(48, minval=1, title="Lookback Pattern & Pivot")
 
 // ========== IMPOSTAZIONI E VALORI ==========
 
-min_pearson = input.float(0.41, 'Pearson R Minimo per Segnali', minval=0.1, maxval=1.0, step=0.01, group='Impostazioni Segnale')
+min_pearson = input.float(0.4, 'Pearson R Minimo per Segnali', minval=0.1, maxval=1.0, step=0.01, group='Impostazioni Segnale')
 
 // Impostazioni Regressione Lineare 
 lengthInput = input.int(100, title = 'LinReg Lunghezza', minval = 10, maxval = 200, group = 'Regressione Lineare')
@@ -842,7 +842,7 @@ rsi_momentum = ta.rsi(close, 14)
 vol_avg = ta.sma(volume, 20)
 
 plot(ema21, title = 'EMA 21', color = color.new(color.yellow, 0), linewidth = 2)
-plot(sma50, title = 'SMA 50', color = color.new(color.red, 0), linewidth = 2)
+plot(sma50, title = 'SMA 50', color = color.new(#4071db, 0), linewidth = 2)
 
 
 // Calcolo Trend generale
@@ -953,7 +953,7 @@ float confluence_score = 0.0
 
 // Calcolo delle Bande di Bollinger
 bb_length = input.int(20, minval = 1, title = 'Lunghezza BB', group = 'Bande di Bollinger')
-bb_mult = input.float(2.0, minval = 0.001, maxval = 50, title = 'Deviazione Std BB', group = 'Bande di Bollinger')
+bb_mult = input.float(1.0, minval = 0.001, maxval = 50, title = 'Deviazione Std BB', group = 'Bande di Bollinger')
 bb_src = input(close, title = 'Sorgente BB', group = 'Bande di Bollinger')
 
 bb_basis = ta.sma(bb_src, bb_length)
@@ -965,8 +965,8 @@ bb_lower = bb_basis - bb_dev
 bb_position = (close - bb_lower) / (bb_upper - bb_lower) * 2 - 1
 
 plot(bb_basis, title='Base BB', color=color.new(#f0e0e0, 100))
-plot(bb_upper, title='Superiore BB', color=color.new(#C11B17, 40))
-plot(bb_lower, title='Inferiore BB', color=color.new(#6CBB3C, 40))
+plot(bb_upper, title='Superiore BB', color=color.new(#C11B17, 10))
+plot(bb_lower, title='Inferiore BB', color=color.new(#6CBB3C, 10))
 
 
 // Contributo BB
@@ -1018,7 +1018,7 @@ var label confluence_label = na
 if not na(confluence_label)
     label.delete(confluence_label)
 confluence_label := label.new(bar_index, high + atr, "Confluence Score: " + str.tostring(confluence_score, "#.#"),
-     color = confluence_score > 0 ? color.new(color.green, 0) : confluence_score < 0 ? color.new(color.red, 0) : color.new(color.gray, 0),
+     color = confluence_score > 0 ? color.new(color.green, 20) : confluence_score < 0 ? color.new(color.red, 20) : color.new(color.gray, 0),
      style = label.style_label_down, size = size.normal, yloc = yloc.abovebar)
 
 
@@ -1092,50 +1092,25 @@ createPivotLabel(cond, x, y, txt, clr, sty, sz, yloc_param) =>
 // ========== FUNZIONE PER VERIFICARE CONDIZIONI BASE ========== 
 
 checkBaseConditions(is_buy_direction) =>
-    // Condizione 1: LinReg in zona critica
+    // 1. LinReg in zona critica
     linreg_in_zone = is_buy_direction ? linreg_position <= -0.7 : linreg_position >= 0.7
 
-    // Condizione 2: Pearson R valido
+    // 2. Pearson R valido (soglia impostabile, es: 0.4)
     pearson_valid = math.abs(pearsonR) >= min_pearson
 
-    // Condizione 3: Almeno un indicatore secondario favorevole
-    secondary_indicators_ok = false
+    // 3. Bollinger Bands favorevole (OBBLIGATORIO)
+    bb_favorable = is_buy_direction ? bb_position <= -0.5 : bb_position >= 0.5
 
-    if is_buy_direction
-       // Per segnali di acquisto
-        bb_favorable = bb_position <= -0.5
-        stoch_favorable = stoch_k <= 30
-        trend_favorable = trend_bullish or (not trend_bearish and rsi_momentum > 45)
-        momentum_favorable = momentum_bullish or (momentum_normalized > -0.5 and roc > -2)
-        pa_favorable = price_action_bullish or (not price_action_bearish and not is_doji)
-        pivot_favorable = not na(recent_pl) and math.abs(close - recent_pl) / recent_pl * 100 < 5
-        macd_favorable = macd_bullish  // NUOVO
+    // 4. Uno (e solo uno necessario) tra gli indicatori di momentum a scelta
+    momentum_ok =
+         (use_stoch_rsi_filter and (is_buy_direction ? (stoch_k <= 30 and stoch_d <= 30) : (stoch_k >= 70 and stoch_d >= 70))) or
+         (use_ma_cross_filter and (is_buy_direction ? (trend_bullish and rsi_momentum > 45) : (trend_bearish and rsi_momentum < 55))) or
+         (use_momentum_filter and (is_buy_direction ? momentum_bullish : momentum_bearish)) or
+         (use_macd_filter and (is_buy_direction ? macd_bullish : macd_bearish)) or
+         (use_price_action_filter and (is_buy_direction ? price_action_bullish : price_action_bearish))
 
-        // Almeno 2 indicatori secondari devono essere favorevoli
-        favorable_count = (bb_favorable ? 1 : 0) + (stoch_favorable ? 1 : 0) +
-                          (trend_favorable ? 1 : 0) + (momentum_favorable ? 1 : 0) +
-                          (pa_favorable ? 1 : 0) + (pivot_favorable ? 1 : 0) +
-                          (macd_favorable ? 1 : 0)  // NUOVO
-        secondary_indicators_ok := favorable_count >= 2
-    else
-        // Per segnali di vendita
-        bb_favorable = bb_position >= 0.5
-        stoch_favorable = stoch_k >= 70
-        trend_favorable = trend_bearish or (not trend_bullish and rsi_momentum < 55)
-        momentum_favorable = momentum_bearish or (momentum_normalized < 0.5 and roc < 2)
-        pa_favorable = price_action_bearish or (not price_action_bullish and not is_doji)
-        pivot_favorable = not na(recent_ph) and math.abs(close - recent_ph) / recent_ph * 100 < 5
-        macd_favorable = macd_bearish  // NUOVO
-
-        // Almeno 2 indicatori secondari devono essere favorevoli
-        favorable_count = (bb_favorable ? 1 : 0) + (stoch_favorable ? 1 : 0) +
-                          (trend_favorable ? 1 : 0) + (momentum_favorable ? 1 : 0) +
-                          (pa_favorable ? 1 : 0) + (pivot_favorable ? 1 : 0) +
-                          (macd_favorable ? 1 : 0)  // NUOVO
-        secondary_indicators_ok := favorable_count >= 2
-
-    // Tutte e 3 le condizioni devono essere soddisfatte
-    linreg_in_zone and pearson_valid and secondary_indicators_ok
+    // Tutte e 4 le condizioni devono essere soddisfatte
+    linreg_in_zone and pearson_valid and bb_favorable and momentum_ok
 
 
 // ========== LOGICA SEGNALE AVANZATA (MODIFICATA) ==========
@@ -1372,6 +1347,27 @@ if show_reg1
     if not na(pl) and (bar_index - length) <= pivotLookback
         createPivotLabel(true, bar_index - length, pl, 'MI', reg_pl_css, label.style_label_up, size.tiny, yloc.price)
 
+// ========== VISUALIZZAZIONE VERIFICA SEGNALE BASE IN HEAD () da implementare ) ==========
+// Determina lo stato dei tre filtri principali
+// linreg_dot = linreg_buy_primary ? '🟢' : linreg_sell_primary ? '🔴☄️' : '⚪'
+//  pearson_dot = pearson_ok ? '🟢' : '🔴'
+// bb_dot = bb_position <= -0.5 ? '🟢' : bb_position >= 0.5 ? '🔴' : '⚪'
+
+// Componi la stringa dei tre pallini
+// header_dots = linreg_dot + " " + pearson_dot + " " + bb_dot
+
+// Calcolo delle distanze dai pivot (da dichiarare PRIMA della dashboard)
+pivot_distance_ph = not na(recent_ph) ? math.abs(close - recent_ph) / recent_ph * 100 : na
+pivot_distance_pl = not na(recent_pl) ? math.abs(close - recent_pl) / recent_pl * 100 : na
+
+// Logica dei pallini colorati per stato Pivot
+pivot_dot = not na(pivot_distance_pl) and pivot_distance_pl < 3 ? '🟢' : not na(pivot_distance_ph) and pivot_distance_ph < 3 ? '🔴' : '↔️'
+pivot_text = not na(pivot_distance_pl) and pivot_distance_pl < 3 ? 'SUPPORTO' : 
+             not na(pivot_distance_ph) and pivot_distance_ph < 3 ? 'RESISTENZA' : 'NEUTRO'
+pivot_bg_color = not na(pivot_distance_pl) and pivot_distance_pl < 3 ? color.new(color.lime, 75) :
+                 not na(pivot_distance_ph) and pivot_distance_ph < 3 ? color.new(color.red, 75) :
+                 color.new(color.black, 85)
+
 
 
 
@@ -1382,45 +1378,43 @@ var table info_table = table.new(position.bottom_right, 3, 15, bgcolor = color.n
 if barstate.islast and showSignals
 
     // Header
-    table.cell(info_table, 0, 0, '📊 4H | Strategia Multi Conf', text_color = color.white, bgcolor = color.new(color.blue, 85), text_size = size.small)
+    table.cell(info_table, 0, 0, '🧭 4H | Strategia Multi-Confluenza', text_color = color.new(color.white, 20) , bgcolor = color.new(color.blue, 80), text_size = size.small)
     table.merge_cells(info_table, 0, 0, 2, 0)
 
     // 1. LinReg Position
-    linreg_icon = linreg_buy_primary ? '🟢' : linreg_sell_primary ? '🔴' : '⚪'
-    linreg_color = linreg_buy_primary ? color.new(color.lime, 60) : linreg_sell_primary ? color.new(color.red, 60) : color.new(color.gray, 80)
+    linreg_icon = linreg_buy_primary ? '🟢' : linreg_sell_primary ? '🔴' : '↔️'
+    linreg_color = linreg_buy_primary ? color.new(color.lime, 60) : linreg_sell_primary ? color.new(color.red, 60) : color.new(color.gray, 70)
     linreg_text = linreg_buy_primary ? 'COMPRA' : linreg_sell_primary ? 'VENDI' : 'NEUTRO'
-    table.cell(info_table, 0, 1, '🎯 LinReg', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 0, 1, '🎯 LinReg', text_color = color.white, bgcolor = color.new(color.gray, 70), text_size = size.small)
     table.cell(info_table, 1, 1, linreg_icon, text_color = color.white, bgcolor = linreg_color, text_size = size.large)
     table.cell(info_table, 2, 1, linreg_text + '\n' + str.tostring(linreg_position, '#.##'), text_color = color.white, bgcolor = linreg_color, text_size = size.small)
 
     // 2. Pearson R
     pearson_icon = pearson_ok ? '✅' : '❌'
-    pearson_color = pearson_ok ? color.new(color.lime, 75) : color.new(color.red, 75)
+    pearson_color = pearson_ok ? color.new(color.lime, 60) : color.new(color.red, 60)
     pearson_text = pearson_ok ? 'VALIDO' : 'DEBOLE'
-    table.cell(info_table, 0, 2, '📊 Pearson R', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 0, 2, '🎯 Pearson R', text_color = color.white, bgcolor = color.new(color.gray, 70), text_size = size.small)
     table.cell(info_table, 1, 2, pearson_icon, text_color = color.white, bgcolor = pearson_color, text_size = size.large)
     table.cell(info_table, 2, 2, pearson_text + '\n' + str.tostring(pearsonR, '#.###'), text_color = color.white, bgcolor = pearson_color, text_size = size.small)
 
-     // 3. Confluence Score
-    conf_icon = confluence_score >= 1 ? '🟢' : confluence_score <= -1 ? '🔴' : '⚪'
-    conf_color = confluence_score >= 1 ? color.new(color.lime, 60) : confluence_score <= -1 ? color.new(color.red, 60) : color.new(color.yellow, 80)
-    conf_text = confluence_score >= 1 ? 'COMPRA' : confluence_score <= -1 ? 'VENDI' : 'NEUTRO'
-    table.cell(info_table, 0, 3, '🎯 Confluenza', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 3, conf_icon, text_color = color.white, bgcolor = conf_color, text_size = size.large)
-    table.cell(info_table, 2, 3, conf_text + '\n' + str.tostring(confluence_score, '#.#'), text_color = color.white, bgcolor = conf_color, text_size = size.small)
-	
-	
-	
-	// 4. Bollinger
-    bb_icon = bb_position <= -0.7 ? '🟢' : bb_position >= 0.7 ? '🔴' : '⚪'
-    bb_color = bb_position <= -0.7 ? color.new(color.lime, 75) : bb_position >= 0.7 ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    // 4. Bollinger
+    bb_icon = bb_position <= -0.7 ? '🟢' : bb_position >= 0.7 ? '🔴' : '↔️'
+    bb_color = bb_position <= -0.7 ? color.new(color.lime, 60) : bb_position >= 0.7 ? color.new(color.red, 60) : color.new(color.yellow, 60)
     bb_text = bb_position <= -0.7 ? 'COMPRA' : bb_position >= 0.7 ? 'VENDI' : 'NEUTRO'
-    table.cell(info_table, 0, 4, '📊 Bollinger', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 4, bb_icon, text_color = color.white, bgcolor = bb_color, text_size = size.large)
-    table.cell(info_table, 2, 4, bb_text + '\n' + str.tostring(bb_position, '#.##'), text_color = color.white, bgcolor = bb_color, text_size = size.small)
+    table.cell(info_table, 0, 3, '🎯 Bollinger', text_color = color.white, bgcolor = color.new(color.gray, 70), text_size = size.small)
+    table.cell(info_table, 1, 3, bb_icon, text_color = color.white, bgcolor = bb_color, text_size = size.large)
+    table.cell(info_table, 2, 3, bb_text + '\n' + str.tostring(bb_position, '#.##'), text_color = color.white, bgcolor = bb_color, text_size = size.small)
 
+     // 3. Confluence Score
+    conf_icon = confluence_score >= 1 ? '🟢' : confluence_score <= -1 ? '🔴' : '↔️'
+    conf_color = confluence_score >= 1 ? color.new(color.lime, 75) : confluence_score <= -1 ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    conf_text = confluence_score >= 1 ? 'COMPRA' : confluence_score <= -1 ? 'VENDI' : 'NEUTRO'
+    table.cell(info_table, 0, 4, '🔑 Confluenza', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 4, conf_icon, text_color = color.white, bgcolor = conf_color, text_size = size.large)
+    table.cell(info_table, 2, 4, conf_text + '\n' + str.tostring(confluence_score, '#.#'), text_color = color.white, bgcolor = conf_color, text_size = size.small)
+    
     // 5. Stochastic RSI
-    stoch_icon = stoch_k <= stoch_oversold ? '🟢' : stoch_k >= stoch_overbought ? '🔴' : '⚪'
+    stoch_icon = stoch_k <= stoch_oversold ? '🟢' : stoch_k >= stoch_overbought ? '🔴' : '↔️'
     stoch_color = stoch_k <= stoch_oversold ? color.new(color.lime, 75) : stoch_k >= stoch_overbought ? color.new(color.red, 75) : color.new(color.yellow, 80)
     stoch_text = stoch_k <= stoch_oversold ? 'COMPRA' : stoch_k >= stoch_overbought ? 'VENDI' : 'NEUTRO'
     table.cell(info_table, 0, 5, '⚡ Stoch RSI', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
@@ -1436,7 +1430,7 @@ if barstate.islast and showSignals
     table.cell(info_table, 2, 6, ma_text + '\nRSI:' + str.tostring(rsi_momentum, '#'), text_color = color.white, bgcolor = ma_color, text_size = size.small)
 
     // 7. Momentum
-    momentum_icon = momentum_bullish ? '🚀' : momentum_bearish ? '📉' : '⚪'
+    momentum_icon = momentum_bullish ? '🚀' : momentum_bearish ? '📉' : '↔️'
     momentum_color = momentum_bullish ? color.new(color.lime, 75) : momentum_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
     momentum_text = momentum_bullish ? 'RIALZISTA' : momentum_bearish ? 'RIBASSISTA' : 'NEUTRO'
     table.cell(info_table, 0, 7, '🚀 Momentum', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
@@ -1444,33 +1438,28 @@ if barstate.islast and showSignals
     table.cell(info_table, 2, 7, momentum_text + '\nROC:' + str.tostring(roc, '#.#'), text_color = color.white, bgcolor = momentum_color, text_size = size.small)
 
     // 8. Price Action
-    pa_icon = price_action_bullish ? '🟢' : price_action_bearish ? '🔴' : '⚪'
+    pa_icon = price_action_bullish ? '🟢' : price_action_bearish ? '🔴' : '↔️'
     pa_color = price_action_bullish ? color.new(color.lime, 75) : price_action_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
     pa_text = price_action_bullish ? 'RIALZISTA' : price_action_bearish ? 'RIBASSISTA' : 'NEUTRO'
     table.cell(info_table, 0, 8, '🕯️ Price Action', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
     table.cell(info_table, 1, 8, pa_icon, text_color = color.white, bgcolor = pa_color, text_size = size.large)
     table.cell(info_table, 2, 8, pa_text + '\nATR:' + str.tostring(atr, '#.####'), text_color = color.white, bgcolor = pa_color, text_size = size.small)
 
-    // 9. MACD
-    macd_icon = macd_bullish ? '📈' : macd_bearish ? '📉' : '⚪'
+    // 9. Pivot Points
+    // Riga Pivot nella tabella
+    table.cell(info_table, 0, 9, '📍 Pivot', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 9, pivot_dot, text_color = color.white, bgcolor = pivot_bg_color, text_size = size.large)
+    table.cell(info_table, 2, 9, pivot_text + '\nA:' + str.tostring(pivot_distance_ph, '#.#') + ' B:' + str.tostring(pivot_distance_pl, '#.#'), text_color = color.white, bgcolor = pivot_bg_color, text_size = size.small)
+    // 10. MACD
+    macd_icon = macd_bullish ? '📈' : macd_bearish ? '📉' : '↔️'
     macd_color = macd_bullish ? color.new(color.lime, 75) : macd_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
     macd_text = macd_bullish ? 'RIALZISTA' : macd_bearish ? 'RIBASSISTA' : 'NEUTRO'
-    table.cell(info_table, 0, 9, '📊 MACD', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 9, macd_icon, text_color = color.white, bgcolor = macd_color, text_size = size.large)
-    table.cell(info_table, 2, 9, macd_text + '\nH:' + str.tostring(histogram, '#.####'), text_color = color.white, bgcolor = macd_color, text_size = size.small)
-
-    // 10. Pivot Points
-    pivot_distance_ph = not na(recent_ph) ? math.abs(close - recent_ph) / recent_ph * 100 : na
-    pivot_distance_pl = not na(recent_pl) ? math.abs(close - recent_pl) / recent_pl * 100 : na
-    pivot_icon = '📍'
-    pivot_color = color.new(color.orange, 75)
-    pivot_text = not na(pivot_distance_pl) and pivot_distance_pl < 3 ? 'SUPPORTO' : not na(pivot_distance_ph) and pivot_distance_ph < 3 ? 'RESISTENZA' : 'NEUTRO'
-    table.cell(info_table, 0, 10, '📍 Pivot', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 10, pivot_icon, text_color = color.white, bgcolor = pivot_color, text_size = size.large)
-    table.cell(info_table, 2, 10, pivot_text + '\nA:' + str.tostring(pivot_distance_ph, '#.#') + ' B:' + str.tostring(pivot_distance_pl, '#.#'), text_color = color.white, bgcolor = pivot_color, text_size = size.small)
+    table.cell(info_table, 0, 10, '🛰️ MACD', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 10, macd_icon, text_color = color.white, bgcolor = macd_color, text_size = size.large)
+    table.cell(info_table, 2, 10, macd_text + '\nH:' + str.tostring(histogram, '#.####'), text_color = color.white, bgcolor = macd_color, text_size = size.small)
 
     // 11. Signal Strength
-    signal_icon = signal_strength >= 2 ? '🔥' : signal_strength <= -2 ? '❄️' : signal_strength > 0 ? '📈' : signal_strength < 0 ? '📉' : '⚪'
+    signal_icon = signal_strength >= 2 ? '🔥' : signal_strength <= -2 ? '❄️' : signal_strength > 0 ? '📈' : signal_strength < 0 ? '📉' : '↔️'
     signal_color = signal_strength >= 2 ? color.new(color.green, 50) : signal_strength <= -2 ? color.new(color.red, 50) : 
                    signal_strength > 0 ? color.new(color.lime, 75) : signal_strength < 0 ? color.new(color.orange, 75) : color.new(color.gray, 80)
     signal_text = signal_strength >= 2 ? 'COMPRA FORTE' : signal_strength <= -2 ? 'VENDI FORTE' : 
@@ -1489,7 +1478,7 @@ if barstate.islast and showSignals
 
     // 13. Ultimo OK
     table.cell(info_table, 0, 13, '🕒 Ultimo OK', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 13, last_signal_buy ? '🟢' : '🔴', text_color = color.white, bgcolor = timer_color_new, text_size = size.large)
+    table.cell(info_table, 1, 13, last_signal_buy ? '🟢' : '↻', text_color = color.white, bgcolor = timer_color_new, text_size = size.large)
 	table.cell(info_table, 2, 13, ultimo_ok_str, text_color = color.white, bgcolor = timer_color_new, text_size = size.small)
     
     // 14. Market State
@@ -1498,9 +1487,9 @@ if barstate.islast and showSignals
          'LATERALE'
     market_icon = trend_bullish and confluence_score > 0 ? '🐂' : 
          trend_bearish and confluence_score < 0 ? '🐻' : '🦀'
-    market_color = trend_bullish and confluence_score > 0 ? color.new(color.lime, 60) : 
-         trend_bearish and confluence_score < 0 ? color.new(color.red, 60) : 
-         color.new(color.yellow, 70)
+    market_color = trend_bullish and confluence_score > 0 ? color.new(color.lime, 80) : 
+         trend_bearish and confluence_score < 0 ? color.new(color.red, 80) : 
+         color.new(color.yellow, 80)
     table.cell(info_table, 0, 14, '🌍 Trend', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
     table.cell(info_table, 1, 14, market_icon, text_color = color.white, bgcolor = market_color, text_size = size.large)
     table.cell(info_table, 2, 14, market_state, text_color = color.white, bgcolor = market_color, text_size = size.small)
