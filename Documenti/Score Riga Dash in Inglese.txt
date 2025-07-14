@@ -1,0 +1,35 @@
+var string quota_trade = "0%"
+var string azione_ingresso = "❌ No Entry"
+var string azione_uscita = "🏃‍♂️ Exit"
+var string etichetta_breve = "❌/🏃‍♂️"
+
+if confluence_score < 0
+    quota_trade := "0%"
+    azione_ingresso := "❌ No Entry"
+    azione_uscita := "🏃‍♂️ Exit"
+    etichetta_breve := "❌/🏃‍♂️"
+else if confluence_score == 0
+    quota_trade := "0%"
+    azione_ingresso := "⏸️ Wait"
+    azione_uscita := "🤔 Consider Exit"
+    etichetta_breve := "⏸️/🤔"
+else if confluence_score == 0.5
+    quota_trade := "10%"
+    azione_ingresso := "🔹 Small Entry"
+    azione_uscita := "➖ Reduce if weak"
+    etichetta_breve := "🔹/➖"
+else if confluence_score == 1
+    quota_trade := "20%"
+    azione_ingresso := "🟢 Entry"
+    azione_uscita := "➗ Partial Exit"
+    etichetta_breve := "🟢/➗"
+else if confluence_score == 1.5
+    quota_trade := "40%"
+    azione_ingresso := "🟢🟢 Strong Entry"
+    azione_uscita := "➗ Partial Exit"
+    etichetta_breve := "🟢🟢/➗"
+else if confluence_score >= 2
+    quota_trade := "60%"
+    azione_ingresso := "🟢🔥 Max Entry"
+    azione_uscita := "🔒 Hold, exit only on strong opp"
+    etichetta_breve := "🟢🔥/🔒"

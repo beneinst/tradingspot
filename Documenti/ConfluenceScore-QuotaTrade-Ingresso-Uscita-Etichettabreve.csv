@@ -1,0 +1,7 @@
+"Confluence Score","Quota Trade","Ingresso","Uscita","Etichetta breve"
+"< 0","0%","❌ Nessun ingresso","🏃‍♂️ Esci","❌/🏃‍♂️"
+"= 0","0%","⏸️ Attendi","🤔 Valuta uscita","⏸️/🤔"
+"0.5","10%","🔹 Ingresso ridotto","➖ Riduci se segnale debole","🔹/➖"
+"1","20%","🟢 Ingresso","➗ Uscita parziale","🟢/➗"
+"1.5","40%","🟢🟢 Ingresso forte","➗ Uscita parziale","🟢🟢/➗"
+"≥ 2","60%","🟢🔥 Ingresso massimo","🔒 Mantieni, esci solo su opposto forte","🟢🔥/🔒"

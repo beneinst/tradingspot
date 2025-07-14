@@ -673,18 +673,17 @@ label {
     </div>
     
     <div class="input-group">
-     
-        
- 
-
-      
       <div class="form-group">
-        <label for="inputTotaleIn" style="font-size: 18px;">Trade Attivi</label>
-        <input type="number" style="color: #18171c; font-size: 32px;" id="inputTotaleIn" value="0" min="0">
+        <label for="inputCoinGecko" style="font-size: 18px;">CoinGecko</label>
+        <input type="number" style="color: #18171c; font-size: 32px;" id="inputCoinGecko" value="22" min="0">
+      </div>
+      <div class="form-group">
+        <label for="inputBinance" style="font-size: 18px;">Binance</label>
+        <input type="number" style="color: #18171c; font-size: 32px;" id="inputBinance" value="4" min="0">
 		
       </div>
     </div>
-    <div>
+    
    <button onclick="aggiornaTrade()" class="header-stat-item" >
   🚀 Aggiorna Trade
 </button>
@@ -707,17 +706,24 @@ label {
       <h2>Distribuzione Capitale</h2>
     </div>
     
-   <div class="stats-grid">
-  <div class="stat-item">
-    <div class="stat-label">Totale in Cripto</div>
-    <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn"></div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-label">Restanti in Dollari</div>
-    <div class="stat-value capitale" style="color: #1AA6ED; font-size: 39px;" id="capitale"></div>
-  </div>
-</div>
-
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-label">Su CoinGecko</div>
+        <div class="stat-value coingecko" style="color: #FF3A33; font-size: 39px;" id="coingecko"></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Su Binance</div>
+        <div class="stat-value binance" style="color: #FFDD33; font-size: 39px;" id="binance"></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Totale in Cripto</div>
+        <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn"></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Restanti in Dollari</div>
+        <div class="stat-value capitale" style="color: #1AA6ED; font-size: 39px;" id="capitale"></div>
+      </div>
+    </div>
     
     <div class="chart-container">
       <canvas id="capitaleChart"></canvas>
@@ -737,7 +743,7 @@ label {
     <div class="header-stat-item">
         <div class="header-stat-label">$ per Trade</div>
         <div class="header-stat-value">
-            <input type="number"  font-size: 24px;" id="quotaPerTrade" class="quota-input" value="0" min="1" oninput="aggiornaCapitale()">
+            <input type="number"  font-size: 24px;" id="quotaPerTrade" class="quota-input" value="40" min="1" oninput="aggiornaCapitale()">
         </div>
     </div>
     <div class="header-stat-item">
@@ -790,17 +796,20 @@ label {
           </div>
           
           <!-- STATISTICHE GIORNI E MEDIE SOTTO IL MENU -->
-         <div class="header-stats" style="padding-top: 2px;">
-  <div class="header-stat-item">
-    <div class="header-stat-label">Media in Cripto</div>
-    <div class="header-stat-value" style="color: #f62817; font-size: 28px;" id="mediaTradeTotaleIn">0</div>
-  </div>
-  <div class="header-stat-item">
-    <div class="header-stat-label">Media in Dollari</div>
-    <div class="header-stat-value" style="color: #f62817; font-size: 28px;" id="mediaDollariTrading">$0</div>
-  </div>
-</div>
-
+          <div class="header-stats" style="padding-top: 2px;">
+            <div class="header-stat-item">
+              <div class="header-stat-label">Media Trade CoinGecko</div>
+              <div class="header-stat-value" style="color: #FF3A33; font-size: 28px;" id="mediaTradeCoingecko">0</div>
+            </div>
+            <div class="header-stat-item">
+              <div class="header-stat-label">Media Trade Binance</div>
+              <div class="header-stat-value" style="color: #FFDD33; font-size: 28px;" id="mediaTradeBinance">0</div>
+            </div>
+            <div class="header-stat-item">
+              <div class="header-stat-label">Media $ in Trading</div>
+              <div class="header-stat-value" style="color: #f62817; font-size: 28px;" id="mediaDollariTrading">$0</div>
+            </div>
+          </div>
         </div>
         
         <div id="tab-percentuale" class="tab-panel">
@@ -872,24 +881,6 @@ label {
         </div>
     </div>
 
-<div style="display:none;">
-  <div id="totaleIn"></div>
-  <div id="capitale"></div>
-  <div id="totaleTrade"></div>
-  <div id="infoTotaleTrade"></div>
-  <input id="quotaPerTrade" type="number">
-  <input id="inputTotaleIn" type="number">
-  <div id="capitaleTotale"></div>
-  <div id="capitaleInDollari"></div>
-  <div id="totaleInDollari"></div>
-  <span id="mediaTradeTotaleIn"></span>
-  <span id="mediaDollariTrading"></span>
-  <canvas id="capitaleChart"></canvas>
-  <canvas id="storicoCapitaleChart"></canvas>
-  <canvas id="percentualeCapitaleChart"></canvas>
-</div>
-
-
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 
@@ -907,15 +898,15 @@ label {
 <script>
   // Dati principali dell'applicazione
   const datiCapitale = {
-  totaleIn: 0,
-  capitale: 0,
-  totaleTrade: 30,
-  quotaPerTrade: 0,
-  storicoCapitale: [],
-  ultimoAggiornamento: new Date().toISOString()
-
-};
-
+    coingecko: 0,
+    binance: 0,
+    totaleIn: 0,
+    capitale: 0,
+    totaleTrade: 30,
+    quotaPerTrade: 40,
+    storicoCapitale: [],
+    ultimoAggiornamento: new Date().toISOString()
+  };
   
   // Variabili per i grafici
   let capitaleChart = null;
@@ -956,25 +947,33 @@ label {
     inizioStorico.setDate(oggi.getDate() - 120); // Crea uno storico di 4 mesi
     
     // Valori di default per lo storico iniziale
-   const valoriDefault = {
-  totaleIn: 0,
-  capitale: datiCapitale.totaleTrade
-};
-
-for (let d = new Date(inizioStorico); d <= oggi; d.setDate(d.getDate() + 3)) {
-  datiCapitale.storicoCapitale.push({
-    data: new Date(d).toISOString(),
-    totaleIn: valoriDefault.totaleIn,
-    capitale: valoriDefault.capitale
-  });
-}
-
-datiCapitale.storicoCapitale.push({
-  data: new Date().toISOString(),
-  totaleIn: datiCapitale.totaleIn,
-  capitale: datiCapitale.capitale
-});
-}
+    const valoriDefault = {
+      coingecko: 0,
+      binance: 0,
+      totaleIn: 0,
+      capitale: datiCapitale.totaleTrade
+    };
+    
+    // Crea un punto dati ogni 3 giorni per gli ultimi 4 mesi
+    for (let d = new Date(inizioStorico); d <= oggi; d.setDate(d.getDate() + 3)) {
+      datiCapitale.storicoCapitale.push({
+        data: new Date(d).toISOString(),
+        coingecko: valoriDefault.coingecko,
+        binance: valoriDefault.binance,
+        totaleIn: valoriDefault.totaleIn,
+        capitale: valoriDefault.capitale
+      });
+    }
+    
+    // Aggiungi i valori attuali come ultimo punto
+    datiCapitale.storicoCapitale.push({
+      data: new Date().toISOString(),
+      coingecko: datiCapitale.coingecko,
+      binance: datiCapitale.binance,
+      totaleIn: datiCapitale.totaleIn,
+      capitale: datiCapitale.capitale
+    });
+  }
   
   // Aggiorna i totali
   function aggiornaTotali() {
@@ -1000,21 +999,29 @@ datiCapitale.storicoCapitale.push({
   
   // Funzione per resettare tutti i dati
 function resettaDati() {
+  // Resetta i dati principali
+  datiCapitale.coingecko = 0;
+  datiCapitale.binance = 0;
   datiCapitale.totaleIn = 0;
   datiCapitale.capitale = datiCapitale.totaleTrade;
   datiCapitale.storicoCapitale = [];
   datiCapitale.ultimoAggiornamento = new Date().toISOString();
-
+  
+  // Crea un nuovo storico iniziale
   creaStoricoIniziale();
+  
+  // Aggiorna l'interfaccia e i grafici
   aggiornaInterfaccia();
+ // aggiornaGrafico();
   aggiornaGraficoStorico();
   aggiornaGraficoPercentuale();
   calcolaStatistichePercentuali();
+  
+  // Salva i dati in localStorage
   salvaDatiLocali();
-
+  
   alert('Dati resettati con successo!');
 }
-
 
 // Salva immagine del grafico
 function scaricaGrafico() {
@@ -1064,14 +1071,21 @@ function scaricaGrafico() {
 
 
   
- // 2. Modifica la funzione aggiornaTrade() 
-function aggiornaTrade() {
-    const nuovoTotaleIn = parseInt(document.getElementById("inputTotaleIn").value);
+  // Aggiorna i dati dei trade
+  function aggiornaTrade() {
+    const nuovoCoinGecko = parseInt(document.getElementById("inputCoinGecko").value);
+    const nuovoBinance = parseInt(document.getElementById("inputBinance").value);
     
-    if (!isNaN(nuovoTotaleIn)) {
-      datiCapitale.totaleIn = nuovoTotaleIn;
-      
+    if (!isNaN(nuovoCoinGecko)) {
+      datiCapitale.coingecko = nuovoCoinGecko;
     }
+    
+    if (!isNaN(nuovoBinance)) {
+      datiCapitale.binance = nuovoBinance;
+    }
+    
+    // Calcola il totale in
+    datiCapitale.totaleIn = datiCapitale.coingecko + datiCapitale.binance;
     
     // Aggiorna il capitale disponibile
     calcolaCapitale();
@@ -1089,19 +1103,18 @@ function aggiornaTrade() {
     salvaDatiLocali();
     
     // Aggiorna i grafici
+ //   aggiornaGrafico();
     aggiornaGraficoStorico();
     aggiornaGraficoPercentuale();
     
     // Ricalcola le statistiche percentuali
     calcolaStatistichePercentuali();
-    
-    setTimeout(() => {
-      salvaDatiLocali();
-      aggiornaGraficoStorico();
-    }, 100);
-}
-
-
+	setTimeout(() => {
+  salvaDatiLocali();
+  aggiornaGraficoStorico();
+}, 100);
+  }
+  
   // Calcola il capitale disponibile
   function calcolaCapitale() {
     datiCapitale.capitale = datiCapitale.totaleTrade - datiCapitale.totaleIn;
@@ -1113,39 +1126,33 @@ function aggiornaTrade() {
   console.log('LocalStorage:', JSON.parse(localStorage.getItem('datiCapitale')));
 }
 
- // 1. Modifica la funzione aggiornaInterfaccia()
-function aggiornaInterfaccia() {
+  // Aggiorna tutti gli elementi dell'interfaccia
+  function aggiornaInterfaccia() {
+    document.getElementById("coingecko").textContent = datiCapitale.coingecko;
+    document.getElementById("binance").textContent = datiCapitale.binance;
     document.getElementById("totaleIn").textContent = datiCapitale.totaleIn;
     document.getElementById("capitale").textContent = datiCapitale.capitale;
     document.getElementById("totaleTrade").textContent = datiCapitale.totaleTrade;
     document.getElementById("infoTotaleTrade").textContent = datiCapitale.totaleTrade;
     document.getElementById("quotaPerTrade").value = datiCapitale.quotaPerTrade;
     
-    // Aggiorna il valore dell'input (ora solo uno)
-    document.getElementById("inputTotaleIn").value = datiCapitale.totaleIn;
+    // Aggiorna anche i valori degli input
+    document.getElementById("inputCoinGecko").value = datiCapitale.coingecko;
+    document.getElementById("inputBinance").value = datiCapitale.binance;
     
-    // Calcola e aggiorna i nuovi valori in dollari
-    const capitaleTotale = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
-    const capitaleInDollari = datiCapitale.capitale * datiCapitale.quotaPerTrade;
-    const totaleInDollari = datiCapitale.totaleIn * datiCapitale.quotaPerTrade;
-    
-    // Aggiorna i nuovi elementi dell'interfaccia
-    document.getElementById('capitaleTotale').innerText = capitaleTotale;
-    document.getElementById('capitaleInDollari').innerText = `$${capitaleInDollari}`;
-    document.getElementById('totaleInDollari').innerText = `$${totaleInDollari}`;
-    
-    // Calcola e aggiorna le medie (modificato per il totale unico)
+    // Calcola e aggiorna le medie
     const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
     
     if (datiPeriodo.length > 0) {
-      const mediaTotaleIn = calcolaMedia(datiPeriodo.map(item => item.totaleIn));
-      const mediaDollari = mediaTotaleIn * datiCapitale.quotaPerTrade;
+      const mediaCoingecko = calcolaMedia(datiPeriodo.map(item => item.coingecko));
+      const mediaBinance = calcolaMedia(datiPeriodo.map(item => item.binance));
+      const mediaDollari = (mediaCoingecko + mediaBinance) * datiCapitale.quotaPerTrade;
       
-      document.getElementById("mediaTradeTotaleIn").textContent = mediaTotaleIn.toFixed(1);
+      document.getElementById("mediaTradeCoingecko").textContent = mediaCoingecko.toFixed(1);
+      document.getElementById("mediaTradeBinance").textContent = mediaBinance.toFixed(1);
       document.getElementById("mediaDollariTrading").textContent = `$${mediaDollari.toFixed(2)}`;
     }
-}
-
+  }
   
   // Calcola la media di un array di numeri
   function calcolaMedia(array) {
@@ -1154,27 +1161,32 @@ function aggiornaInterfaccia() {
   }
   
  // Salva lo stato attuale nei dati storici
- function salvaStorico() {
+function salvaStorico() {
   const oggi = new Date();
+  const timestamp = oggi.toISOString();
+  
+  // Controlla se c'è già un record per oggi
   const oggiString = oggi.toISOString().split('T')[0];
   const recordOggi = datiCapitale.storicoCapitale.find(record => 
     record.data.split('T')[0] === oggiString
   );
-
+  
   if (recordOggi) {
     // Aggiorna il record esistente per oggi
+    recordOggi.coingecko = datiCapitale.coingecko;
+    recordOggi.binance = datiCapitale.binance;
     recordOggi.totaleIn = datiCapitale.totaleIn;
     recordOggi.capitale = datiCapitale.capitale;
   } else {
-    // Aggiungi un nuovo record solo se non esiste già
+    // Aggiungi un nuovo record per oggi
     datiCapitale.storicoCapitale.push({
-      data: oggi.toISOString(),
+      data: timestamp,
+      coingecko: datiCapitale.coingecko,
+      binance: datiCapitale.binance,
       totaleIn: datiCapitale.totaleIn,
       capitale: datiCapitale.capitale
     });
-}
-
-
+  }
   
   // Ordina lo storico per data
   datiCapitale.storicoCapitale.sort((a, b) => new Date(a.data) - new Date(b.data));
@@ -1193,8 +1205,7 @@ function aggiornaInterfaccia() {
     return dati.filter(item => new Date(item.data) >= dataLimite);
   }
   
- // 5. Modifica la funzione creaGraficoCapitale() per il grafico a torta
-function creaGraficoCapitale() {
+ function creaGraficoCapitale() {
   const ctx = document.getElementById('capitaleChart').getContext('2d');
 
   if (capitaleChart) {
@@ -1204,17 +1215,19 @@ function creaGraficoCapitale() {
   capitaleChart = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ['Totale In (Crypto)', 'A Capitale (USD)'],
+      labels: ['CoinGecko (Crypto)', 'Binance (Crypto)', 'A Capitale (USD)'],
       datasets: [{
         data: [
-          datiCapitale.totaleIn,
+          datiCapitale.coingecko,
+          datiCapitale.binance,
           datiCapitale.capitale
         ],
         backgroundColor: [
-          '#F62817',
+          '#FF3A33',
+          '#FFDD33',
           '#1AA6ED'
         ],
-        borderColor: '#222',
+        borderColor: '#222', // bordo molto scuro
         borderWidth: 5,
         hoverOffset: 22
       }]
@@ -1226,38 +1239,38 @@ function creaGraficoCapitale() {
         legend: {
           position: 'right',
           labels: {
-            color: '#ebaa68',
+            color: '#ebaa68', // grigio molto scuro
             font: {
               size: 15,
               family: 'Trebuchet MS'
-            },
-            padding: 8,
-            boxWidth: 16,
-            boxHeight: 16,
-            usePointStyle: true,
-            pointStyle: 'circle'
-          }
+    },
+    padding: 8,                 // Riduci la distanza verticale tra le voci
+    boxWidth: 16,               // Dimensione del punto
+    boxHeight: 16,              // Dimensione del punto
+    usePointStyle: true,        // Usa punti invece di rettangoli
+    pointStyle: 'circle'        // Imposta la forma a cerchio
+  }
         },
         tooltip: {
-          backgroundColor: '#181c23',
-          titleColor: '#739bf2',
-          bodyColor: '#F0F8FF',
-          borderColor: '#2980b9',
-          borderWidth: 2,
-          cornerRadius: 10,
-          padding: 18,
-          displayColors: true,
-          bodyFont: {
-            size: 18
-          },
-          callbacks: {
-            label: function (context) {
-              const label = context.label || '';
-              const value = context.raw || 0;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percentage = ((value / total) * 100).toFixed(1);
-              const dollari = (value * datiCapitale.quotaPerTrade).toFixed(2);
-              return `${label}: ${value} trade (${percentage}%) = $${dollari}`;
+  backgroundColor: '#181c23',
+  titleColor: '#739bf2',
+  bodyColor: '#F0F8FF',
+  borderColor: '#2980b9',
+  borderWidth: 2,
+  cornerRadius: 10,
+  padding: 18,
+  displayColors: true,
+  bodyFont: {
+    size: 18 // Imposta l'altezza del testo delle etichette a 18px
+  },
+  callbacks: {
+    label: function (context) {
+      const label = context.label || '';
+      const value = context.raw || 0;
+      const total = context.dataset.data.reduce((a, b) => a + b, 0);
+      const percentage = ((value / total) * 100).toFixed(1);
+      const dollari = (value * datiCapitale.quotaPerTrade).toFixed(2);
+      return `${label}: ${value} trade (${percentage}%) = $${dollari}`;
             }
           }
         }
@@ -1410,7 +1423,6 @@ const coloriConfig = {
 
 let modalitaExport = false; // Flag per sapere se stiamo esportando
 
-// 3. Modifica la funzione creaGraficoStoricoCapitale() per mostrare solo due linee
 function creaGraficoStoricoCapitale() {
   const canvas = document.getElementById('storicoCapitaleChart');
   const ctx = canvas.getContext('2d');
@@ -1433,7 +1445,27 @@ function creaGraficoStoricoCapitale() {
       }),
       datasets: [
         {
-          label: 'Totale In (Crypto)',
+          label: 'CoinGecko',
+          data: datiPeriodo.map(item => item.coingecko),
+          backgroundColor: 'rgba(161, 201, 53, 0.2)',
+          borderColor: '#A1C935',
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        },
+        {
+          label: 'Binance',
+          data: datiPeriodo.map(item => item.binance),
+          backgroundColor: 'rgba(251, 185, 23, 0.2)',
+          borderColor: '#FBB917',
+          borderWidth: 3,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        },
+        {
+          label: 'Cripto',
           data: datiPeriodo.map(item => item.totaleIn),
           backgroundColor: 'rgba(246, 40, 23, 0.2)',
           borderColor: '#F62817',
@@ -1443,7 +1475,7 @@ function creaGraficoStoricoCapitale() {
           pointHoverRadius: 6
         },
         {
-          label: 'Capitale (USD)',
+          label: 'Dollari',
           data: datiPeriodo.map(item => item.capitale),
           backgroundColor: 'rgba(0, 128, 128, 0.2)',
           borderColor: '#1AA6ED',
@@ -1468,7 +1500,7 @@ function creaGraficoStoricoCapitale() {
         animationDuration: 300
       },
       animation: {
-        duration: modalitaExport ? 0 : 800,
+        duration: modalitaExport ? 0 : 800, // No animazione durante export
         easing: 'easeOutQuart'
       },
       plugins: {
@@ -1488,7 +1520,7 @@ function creaGraficoStoricoCapitale() {
           }
         },
         tooltip: {
-          enabled: !modalitaExport,
+          enabled: !modalitaExport, // Disabilita tooltip durante export
           backgroundColor: 'rgba(51, 51, 51, 0.95)',
           titleColor: '#fff',
           bodyColor: '#fff',
@@ -1507,7 +1539,7 @@ function creaGraficoStoricoCapitale() {
       },
       layout: {
         padding: {
-          top: modalitaExport ? 2 : 5,
+          top: modalitaExport ? 2 : 5, // Più spazio in alto per il watermark
           right: modalitaExport ? 5 : 10,
           bottom: modalitaExport ? 2 : 5,
           left: modalitaExport ? 5 : 5
@@ -1561,7 +1593,6 @@ function creaGraficoStoricoCapitale() {
   });
 }
 
-
 // Funzione per aggiungere watermark al canvas
 function aggiungiWatermark(ctx, width, height) {
   const oggi = new Date();
@@ -1590,8 +1621,8 @@ function aggiungiWatermark(ctx, width, height) {
 
 
   
- // 4. Modifica la funzione aggiornaGraficoStorico()
-function aggiornaGraficoStorico() {
+  // Aggiorna il grafico storico
+  function aggiornaGraficoStorico() {
     if (storicoCapitaleChart) {
       const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
       
@@ -1600,15 +1631,15 @@ function aggiornaGraficoStorico() {
         return `${data.getDate()}/${data.getMonth() + 1}`;
       });
       
-      // Solo due dataset ora
-      storicoCapitaleChart.data.datasets[0].data = datiPeriodo.map(item => item.totaleIn);
-      storicoCapitaleChart.data.datasets[1].data = datiPeriodo.map(item => item.capitale);
+      storicoCapitaleChart.data.datasets[0].data = datiPeriodo.map(item => item.coingecko);
+      storicoCapitaleChart.data.datasets[1].data = datiPeriodo.map(item => item.binance);
+      storicoCapitaleChart.data.datasets[2].data = datiPeriodo.map(item => item.totaleIn);
+      storicoCapitaleChart.data.datasets[3].data = datiPeriodo.map(item => item.capitale);
       
       storicoCapitaleChart.update();
     }
-}
-
-
+  }
+  
   // Cambia il range di tempo visualizzato
   function cambiaRangeTempo(elemento) {
     // Rimuovi la classe active da tutti i bottoni
@@ -1812,7 +1843,43 @@ function aggiornaGraficoStorico() {
     salvaDatiLocali();
 }
 
-
+// Modifica la funzione aggiornaInterfaccia() per includere i nuovi campi
+function aggiornaInterfaccia() {
+    document.getElementById("coingecko").textContent = datiCapitale.coingecko;
+    document.getElementById("binance").textContent = datiCapitale.binance;
+    document.getElementById("totaleIn").textContent = datiCapitale.totaleIn;
+    document.getElementById("capitale").textContent = datiCapitale.capitale;
+    document.getElementById("totaleTrade").textContent = datiCapitale.totaleTrade;
+    document.getElementById("infoTotaleTrade").textContent = datiCapitale.totaleTrade;
+    document.getElementById("quotaPerTrade").value = datiCapitale.quotaPerTrade;
+    
+    // Aggiorna anche i valori degli input
+    document.getElementById("inputCoinGecko").value = datiCapitale.coingecko;
+    document.getElementById("inputBinance").value = datiCapitale.binance;
+    
+    // Calcola e aggiorna i nuovi valori in dollari
+    const capitaleTotale = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
+    const capitaleInDollari = datiCapitale.capitale * datiCapitale.quotaPerTrade;
+    const totaleInDollari = datiCapitale.totaleIn * datiCapitale.quotaPerTrade;
+    
+    // Aggiorna i nuovi elementi dell'interfaccia
+    document.getElementById('capitaleTotale').innerText = capitaleTotale;
+    document.getElementById('capitaleInDollari').innerText = `$${capitaleInDollari}`;
+    document.getElementById('totaleInDollari').innerText = `$${totaleInDollari}`;
+    
+    // Calcola e aggiorna le medie (codice esistente)
+    const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+    
+    if (datiPeriodo.length > 0) {
+      const mediaCoingecko = calcolaMedia(datiPeriodo.map(item => item.coingecko));
+      const mediaBinance = calcolaMedia(datiPeriodo.map(item => item.binance));
+      const mediaDollari = (mediaCoingecko + mediaBinance) * datiCapitale.quotaPerTrade;
+      
+      document.getElementById("mediaTradeCoingecko").textContent = mediaCoingecko.toFixed(1);
+      document.getElementById("mediaTradeBinance").textContent = mediaBinance.toFixed(1);
+      document.getElementById("mediaDollariTrading").textContent = `$${mediaDollari.toFixed(2)}`;
+    }
+}
 
 // Modifica la funzione aggiornaTotali() per salvare quotaPerTrade
 function aggiornaTotali() {
@@ -1844,18 +1911,14 @@ function aggiornaTotali() {
   
   // Carica i dati da localStorage
   function caricaDatiLocali() {
-  const datiSalvati = localStorage.getItem('datiCapitale');
-  if (datiSalvati) {
-    const datiCaricati = JSON.parse(datiSalvati);
-    if (!datiCaricati.hasOwnProperty('totaleIn') || !datiCaricati.hasOwnProperty('capitale')) {
-      alert('Il file non contiene dati validi.');
-      return;
+    const datiSalvati = localStorage.getItem('datiCapitale');
+    if (datiSalvati) {
+      const datiParsati = JSON.parse(datiSalvati);
+      
+      // Aggiorna i dati dell'applicazione
+      Object.assign(datiCapitale, datiParsati);
     }
-    Object.assign(datiCapitale, datiCaricati);
   }
-}
-
-
   
   // Scarica i dati come file JSON
   function scaricaDati() {
@@ -1889,7 +1952,9 @@ function aggiornaTotali() {
         const datiCaricati = JSON.parse(e.target.result);
         
         // Verifica che i dati caricati abbiano la struttura corretta
-        if (!datiCaricati.hasOwnProperty('totaleIn') || 
+        if (!datiCaricati.hasOwnProperty('coingecko') || 
+            !datiCaricati.hasOwnProperty('binance') || 
+            !datiCaricati.hasOwnProperty('totaleIn') || 
             !datiCaricati.hasOwnProperty('capitale')) {
           alert('Il file non contiene dati validi.');
           return;
