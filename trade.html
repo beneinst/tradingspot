@@ -3,29 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blocco Note con Importi</title>
-	<link rel="icon" type="image/png" href="favicon.png"> 
+    <title>Trading Portfolio Manager</title>
     <style>
-     :root {
+:root {
     --color-primary: #4a90e2;
     --color-secondary: #2ecc71;
     --color-danger: #e74c3c;
     --color-warning: #f39c12;
-
     --color-bg: #1e1e2f;
     --color-surface: #2a2a3d;
     --color-border: #3a3a4d;
-
     --color-text: #e0e0e0;
     --color-muted: #a0a0b2;
     --color-heading: #ffffff;
-
     --color-footer-bg: #131322;
     --color-footer-text: #f2bb66;
     --color-link: #faebd7;
     --color-link-hover: #ffdb58;
 }
 
+/* Reset & base */
 * {
     margin: 0;
     padding: 0;
@@ -38,39 +35,81 @@ body {
     color: var(--color-text);
     padding: 20px;
     font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
 }
 
+/* Container */
 .container {
     max-width: 1300px;
     margin: 0 auto;
+    background: transparent;
+    border-radius: 15px;
+    box-shadow: none;
+    overflow: visible;
+    padding: 0 10px;
 }
 
+/* Header */
 .header {
-   background-color: #222831;
+    background-color: #222831;
     padding: 20px 25px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.7);
     margin-bottom: 20px;
     width: 100%;
     box-sizing: border-box;
+    color: var(--color-heading);
+    text-align: center;
+}
+.header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: var(--color-heading);
 }
 
+/* Section Title */
+.section-title {
+    color: var(--color-primary);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+/* Form Container */
 .form-container {
     background-color: var(--color-surface);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.4);
     margin-bottom: 20px;
-}
-
-.section-title {
-    color: var(--color-primary);
     border-bottom: 1px solid var(--color-border);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
 }
 
-input, textarea {
+/* Trade Form (secondo CSS) */
+.trade-form {
+    background: #23233b;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+/* Form Row (secondo CSS) */
+.form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+.form-row label {
+    font-weight: bold;
+    color: var(--color-primary);
+}
+
+/* Input & textarea */
+input, textarea, input[type="text"], input[type="number"] {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -79,342 +118,126 @@ input, textarea {
     font-size: 16px;
     background-color: #1b1b2c;
     color: var(--color-text);
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
-
+input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 5px rgba(74,144,226,0.3);
+}
 textarea {
     min-height: 100px;
     resize: vertical;
 }
-
-.btn-primary {
-    background-color: var(--color-primary);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-.btn-primary:hover {
-    background-color: #357ab8;
-}
-
-.btn-edit {
-    background-color: #434190;      /* blu scuro, coerente con il dark */
-    color: #f5f5f5;
-    border: none;
-    padding: 8px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-.btn-edit:hover {
-    background-color: #667eea;      /* blu più chiaro in hover */
-}
-
-.btn-danger {
-    background-color: #3b3054;      /* viola scuro, elegante per il dark */
-    color: #f5f5f5;
-    border: none;
-    padding: 8px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-.btn-danger:hover {
-    background-color: #a259a6;      /* viola chiaro in hover */
-}
-
-
-.btn-secondary {
-    background-color: var(--color-secondary);
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    margin-right: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-.btn-secondary:hover {
-    background-color: #27ae60;
-}
-
-.notes-container {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    background: linear-gradient(135deg, #2d3748 0%, #434190 100%);
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
-    padding: 8px;
-}
-
-
-.note {
-    background-color: var(--color-surface) !important; /* sfondo scuro */
-    color: var(--color-text) !important;               /* testo chiaro */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-    position: relative;
-	margin-bottom: 20px;
-}
-
-.note h3 {
-    margin-bottom: 10px;
-    color: var(--color-primary) !important; /* titolo colorato */
-    font-size: 1.2em;
-}
-
-.note p {
-    margin-bottom: 15px;
-    color: var(--color-text) !important;    /* testo chiaro */
-    background: transparent !important;     /* nessuno sfondo aggiuntivo */
-    padding: 0 !important;
-    border-radius: 0 !important;
-    white-space: pre-wrap;
-}
-
-
-
-.card {
-    background-color: var(--color-surface);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-    margin-top: 20px;
-}
-
-.card-header {
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: 10px;
-}
-
-.card-header h2 {
-    color: var(--color-heading);
-}
-
-.backup-container {
-    display: flex;
-    align-items: center;
-    margin-top: 15px;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-input[type="file"] {
-    max-width: 50%;
-    background-color: var(--color-surface);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-}
-
-
-.empty-state {
-    text-align: center;
-    padding: 40px 0;
+input::placeholder, textarea::placeholder {
     color: var(--color-muted);
 }
 
-.footer {
-    margin-top: 30px;
-    margin-bottom: 10px;
-    text-align: center;
+/* Buttons */
+.btn-primary, .btn-secondary, .btn-danger, .btn-edit, .btn-info {
     font-size: 16px;
-    color: #f2bb66;
-    font-weight: normal;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
+    padding: 10px 20px;
 }
-
-.footer a {
-    color: #ffe;
-    text-decoration: none;
-    margin: 0 8px;
-    transition: color 0.3s ease;
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
 }
-
-.footer a:hover {
-    color: #ffdb58;
+.btn-primary:hover {
+    background-color: #357ab8;
+    box-shadow: 0 5px 15px rgba(74,144,226,0.18);
+    transform: translateY(-2px);
 }
-
-
-@media (max-width: 600px) {
-    .backup-container {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .backup-container button, .backup-container input {
-        margin: 5px 0;
-        width: 100%;
-    }
+.btn-secondary {
+    background-color: var(--color-secondary);
+    color: white;
+    margin-right: 10px;
 }
-
- h2 {
-    color: #739bf2 !important;
-    font-weight: bold !important;
-    
-    letter-spacing: -0.1px !important;
+.btn-secondary:hover {
+    background-color: #27ae60;
+    box-shadow: 0 5px 15px rgba(46,204,113,0.18);
+    transform: translateY(-2px);
 }
-
-/* --- AGGIUNTE DAL SECONDO CSS (solo classi secondarie mancanti) --- */
+.btn-edit {
+    background-color: #434190;
+    color: #f5f5f5;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-right: 5px;
+}
+.btn-edit:hover {
+    background-color: #667eea;
+}
+.btn-danger {
+    background-color: #3b3054;
+    color: #f5f5f5;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+.btn-danger:hover {
+    background-color: #a259a6;
+}
 .btn-info {
     background: #17a2b8;
     color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.3s;
+    padding: 8px 16px;
 }
 .btn-info:hover {
     background: #138496;
 }
 
-.alert {
-    padding: 15px 20px;
-    background: #ffeeba;
-    color: #856404;
-    border-radius: 6px;
-    border: 1px solid #ffeeba;
-    margin-bottom: 20px;
+/* Notes Container */
+.notes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: linear-gradient(135deg, #2d3748 0%, #434190 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
+    padding: 12px;
 }
 
-   .edit-form {
-    background: var(--color-surface);   /* sfondo scuro */
+/* Note */
+.note {
+    background-color: var(--color-surface);
+    color: var(--color-text);
     padding: 20px;
-    border-radius: 6px;
-    margin-top: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    border-left: 5px solid var(--color-primary);
+    margin-bottom: 20px;
+    transition: box-shadow 0.2s;
 }
-
-.edit-form input,
-.edit-form textarea {
-    width: 100%;
+.note:hover {
+    box-shadow: 0 6px 24px rgba(74, 144, 226, 0.18);
+}
+.note h3 {
+    color: var(--color-primary);
     margin-bottom: 10px;
-    background: #1b1b2c;                /* input scuro */
-    color: var(--color-text);           /* testo chiaro */
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    font-size: 16px;
+    font-size: 1.2em;
 }
-
-.edit-form input::placeholder,
-.edit-form textarea::placeholder {
-    color: var(--color-muted);          /* placeholder tenue */
+.note p {
+    margin-bottom: 15px;
+    color: var(--color-text);
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    white-space: pre-wrap;
 }
-
-.edit-form .btn-group {
+.note-actions {
     display: flex;
     gap: 10px;
+    margin-top: 10px;
+    text-align: right;
 }
-
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .form-container {
-                padding: 20px;
-            }
-
-            .note-actions {
-                flex-direction: column;
-            }
-
-            .backup-container {
-                text-align: center;
-            }
-        }
-		
-		  .btn-primary, .btn-secondary, .btn-danger, {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a67d8;
-        }
-
-        .btn-secondary {
-            background: #718096;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #4a5568;
-        }
-
-  
-
-        .notes-container {
-            display: grid;
-            gap: 20px;
-        }
-
-        .note {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-
-        .note:hover {
-            transform: translateY(-2px);
-        }
-
-        .note h3 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-
-        .note p {
-            color: #666;
-            margin-bottom: 15px;
-            white-space: pre-wrap;
-        }
-
-        .note-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .note-actions button {
-            padding: 8px 16px;
-            font-size: 14px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-		
-		.note-content {
+.note-content {
     margin-bottom: 16px;
 }
-
 .note-content small {
     color: var(--color-muted);
     display: block;
@@ -422,186 +245,289 @@ input[type="file"] {
     font-size: 0.95em;
 }
 
-.note-actions {
+/* Table inside note */
+.note table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    background: transparent;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.note th, .note td {
+    padding: 6px 8px;
+    text-align: right;
+    border-bottom: 1px solid var(--color-border);
+}
+.note th {
+    color: var(--color-primary);
+    font-weight: 600;
+    background: #23233b;
+}
+.note tr:nth-child(even) {
+    background: #262646;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    color: var(--color-muted);
+    padding: 40px 0;
+    font-style: italic;
+}
+
+/* Card */
+.card {
+    background-color: var(--color-surface);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    margin: 20px 0;
+}
+.card-header {
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+    color: var(--color-heading);
+}
+
+/* Trade Summary */
+.trade-summary {
+    background: linear-gradient(135deg, #23233b 0%, #2a2a3d 100%);
+    color: var(--color-heading);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+.trade-summary h3 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+.summary-item {
+    background: rgba(255,255,255,0.03);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+.summary-item .label {
+    font-size: 0.9em;
+    opacity: 0.8;
+    margin-bottom: 5px;
+}
+.summary-item .value {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.positive {
+    color: var(--color-secondary);
+}
+.negative {
+    color: var(--color-danger);
+}
+.neutral {
+    color: var(--color-warning);
+}
+
+/* Backup Container */
+.backup-container {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    text-align: left;
+}
+input[type="file"] {
+    max-width: 50%;
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+
+/* Footer */
+.footer {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 16px;
+    color: var(--color-footer-text);
+    font-weight: normal;
+    background: var(--color-footer-bg);
+    padding: 20px 0;
+}
+.footer a {
+    color: #ffe;
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.3s ease;
+}
+.footer a:hover {
+    color: var(--color-link-hover);
+}
+
+/* Edit Form */
+.edit-form {
+    background: var(--color-surface);
+    padding: 20px;
+    border-radius: 6px;
+    margin-top: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.edit-form input,
+.edit-form textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    background: #1b1b2c;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    font-size: 16px;
+}
+.edit-form input::placeholder,
+.edit-form textarea::placeholder {
+    color: var(--color-muted);
+}
+.edit-form .btn-group {
     display: flex;
     gap: 10px;
 }
 
-:root {
-  --color-primary: #4a90e2;
-  --color-secondary: #2ecc71;
-  --color-danger: #e74c3c;
-  --color-bg: #1e1e2f;
-  --color-surface: #23233b;
-  --color-border: #3a3a4d;
-  --color-text: #e0e0e0;
-  --color-muted: #a0a0b2;
-  --color-heading: #ffffff;
+/* Alerts and Status */
+.alert {
+    padding: 15px 20px;
+    background: #3a3a4d;
+    color: var(--color-warning);
+    border-radius: 6px;
+    border: 1px solid var(--color-warning);
+    margin-bottom: 20px;
+}
+.loading {
+    color: var(--color-primary);
+    font-style: italic;
+}
+.error {
+    color: var(--color-danger);
+    font-size: 0.9em;
+}
+.last-update {
+    font-size: 0.8em;
+    color: var(--color-muted);
+    text-align: center;
+    margin-top: 10px;
+}
+.current-price {
+    font-size: 0.9em;
+    color: var(--color-primary);
+    font-weight: bold;
 }
 
-body {
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 20px;
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+        margin: 10px;
+    }
+    .header h1 {
+        font-size: 2em;
+    }
+    .form-container {
+        padding: 20px;
+    }
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    .note-actions {
+        flex-direction: column;
+    }
+    .backup-container {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: center;
+    }
+    table {
+        font-size: 12px;
+    }
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
-.notes-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  background: linear-gradient(135deg, #2d3748 0%, #434190 100%);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
-  padding: 12px;
+/* Typography */
+h2 {
+    color: #739bf2 !important;
+    font-weight: bold !important;
+    letter-spacing: -0.1px !important;
 }
-
-.note {
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-  border: 1px solid var(--color-border);
-  transition: box-shadow 0.2s;
-}
-
-.note:hover {
-  box-shadow: 0 6px 24px rgba(74, 144, 226, 0.18);
-}
-
-.note h3 {
-  color: var(--color-primary);
-  margin-bottom: 10px;
-  font-size: 1.2em;
-}
-
-.note table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 10px;
-}
-
-.note th, .note td {
-  padding: 6px 8px;
-  text-align: right;
-}
-
-.note th {
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
-.note tr:nth-child(even) {
-  background: #262646;
-}
-
-.note-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.btn-edit {
-  background-color: #434190;
-  color: #f5f5f5;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-.btn-edit:hover {
-  background-color: #667eea;
-}
-
-.btn-danger {
-  background-color: #3b3054;
-  color: #f5f5f5;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-.btn-danger:hover {
-  background-color: #a259a6;
-}
-
 small {
-  color: var(--color-muted);
+    color: var(--color-muted);
 }
 
-.empty-state {
-  text-align: center;
-  color: var(--color-muted);
-  padding: 30px;
-}
-
+/* Utility */
 th, td {
     padding-left: 10px;
     padding-right: 10px;
 }
 
-
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>Calcolo e cambio Trade Attivi</h1>
-    </div>
-    <div class="form-container">
-        <h2 class="section-title">⛹️‍♀️ Aggiungi o Modifica un Trade</h2>
-        <form id="note-form">
-            <input type="text" id="note-title" placeholder="Titolo della nota" required>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="text-align:left;">Trade</th>
-                        <th>Cripto<br><small>(decimali)</small></th>
-                        <th>Dollari<br><small>(interi)</small></th>
-                    </tr>
-                </thead>
-                <tbody id="importi-rows"></tbody>
-                <tfoot>
-                    <tr style="font-weight:bold;">
-                        <td style="text-align:right;">Totale</td>
-                        <td id="totale-col1">0.0000000</td>
-                        <td id="totale-col2">0</td>
-                    </tr>
-                </tfoot>
-            </table>
-           <button type="submit" class="btn-primary" style="margin-top:15px;">Salva Nota</button>
+    <div class="container">
+        <div class="header">
+            <h1>Trading Portfolio Manager</h1>
+            <p>Gestione Trade Singoli con Accumulo e Prezzo Medio</p>
+        </div>
 
+        <div class="form-container">
+            <h2 class="section-title">💱 Aggiungi Entry al Trade</h2>
+            <form id="trade-form" class="trade-form">
+                <div class="form-row">
+                    <label for="crypto-symbol">Simbolo Crypto:</label>
+                    <input type="text" id="crypto-symbol" placeholder="BTC" required>
+                </div>
+                <div class="form-row">
+                    <label for="trade-quantity">Quantità:</label>
+                    <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required>
+                </div>
+                <div class="form-row">
+                    <label for="trade-price">Prezzo Entry (USDT):</label>
+                    <input type="number" id="trade-price" step="0.0001" placeholder="0.0000" required>
+                </div>
+                <div class="form-row">
+                    <label></label>
+                    <button type="submit" class="btn-primary">Aggiungi Entry</button>
+                </div>
+                <input type="hidden" id="edit-trade-id">
+            </form>
+        </div>
 
-            <input type="hidden" id="edit-id">
-        </form>
-    </div>
-    <div class="form-container">
-        <h2 class="section-title">🏌️‍♀️ I tuoi Trade Attivi</h2>
-        <div id="notes-container"></div>
-    </div>
+        <div class="form-container">
+            <h2 class="section-title">🎯 I tuoi Trade Attivi</h2>
+            <div id="trades-container"></div>
+        </div>
 
+        <div class="card">
+            <div class="card-header">
+                <h2>💽 Backup & Ripristino</h2>
+            </div>
+            <p>Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
+            <div class="backup-container">
+                <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
+                <input type="file" id="fileInput" accept=".json" style="flex: 1;">
+                <button onclick="caricaDati()" class="btn-primary">Carica Dati</button>
+            </div>
+        </div>
 
-<div class="card">
-    <div class="card-header">
-        <h2>Backup & Ripristino</h2>
-    </div>
-    <p>Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
-    <div class="backup-container">
-        <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
-        <input type="file" id="fileInput" accept=".json" style="width: 100%;">
-        <button onclick="caricaDati()" class="btn-primary">Carica Dati</button>
-    </div>
-</div>
-
-
-<div class="footer">
-            Trading Spot Manager v1.1 | 
+        <div class="footer">
+            Trading Portfolio Manager v2.0 | 
             <a href="https://beneinst.github.io/tradingspot/index.html">Operatività</a> | 
             <a href="https://beneinst.github.io/tradingspot/panoramica-capitale.html">Capitale</a> | 
-			<a href="https://beneinst.github.io/tradingspot/trade.html">Trade</a> |
+            <a href="https://beneinst.github.io/tradingspot/trade.html">Trade</a> |
             <a href="https://beneinst.github.io/tradingspot/blocco-note.html">Note</a> | 
             <a href="https://beneinst.github.io/tradingspot/chartflow/index.html">Segnali</a> |
             <a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore</a> | 
@@ -610,218 +536,306 @@ th, td {
             <a href="https://beneinst.github.io/tradingspot/cheat-sheet.html">Patterns</a>
         </div>
     </div>
-<script>
-    // --- Utility per parsing numeri colonna 1 (accetta virgola o punto) ---
-    function parseInputNumber(val) {
-        if (typeof val !== "string") return 0;
-        // Sostituisci la virgola con il punto per il separatore decimale
-        return parseFloat(val.replace(',', '.')) || 0;
-    }
 
-    // --- Utility per generare righe input ---
-    function generaRighe(valori = []) {
-        let html = "";
-        for (let i = 0; i < 10; i++) {
-            const v1 = valori[i]?.col1 ?? "";
-            const v2 = valori[i]?.col2 ?? "";
-            html += `
-                <tr>
-                    <td style="text-align:left;">${i+1}</td>
-                    <td>
-                        <input type="text" id="col1-${i}" value="${v1}" style="width:160px;" oninput="calcolaTotali()" autocomplete="off" inputmode="decimal" pattern="[0-9]+([\\.,][0-9]*)?">
-                    </td>
-                    <td>
-                        <input type="number" step="1" min="0" id="col2-${i}" value="${v2}" style="width:80px;" oninput="calcolaTotali()">
-                    </td>
-                </tr>
-            `;
-        }
-        document.getElementById('importi-rows').innerHTML = html;
-        calcolaTotali();
-    }
+    <script>
+        // Cache per i prezzi delle crypto
+        let priceCache = {};
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
+        
+        // Gestione trade
+        let trades = [];
+        let editingTradeId = null;
 
-    // --- Calcolo totali in tempo reale ---
-    function calcolaTotali() {
-        let tot1 = 0, tot2 = 0;
-        for (let i = 0; i < 10; i++) {
-            let v1 = parseInputNumber(document.getElementById(`col1-${i}`).value);
-            let v2 = parseInt(document.getElementById(`col2-${i}`).value) || 0;
-            tot1 += v1;
-            tot2 += v2;
-        }
-        document.getElementById('totale-col1').textContent = tot1.toFixed(8);
-        document.getElementById('totale-col2').textContent = tot2;
-    }
-
-    // --- Gestione note ---
-    let notes = [];
-    let editingId = null;
-
-    function saveNotes() { localStorage.setItem('notes2col', JSON.stringify(notes)); }
-    function loadNotes() {
-        const saved = localStorage.getItem('notes2col');
-        if (saved) notes = JSON.parse(saved);
-    }
-
-    function renderNotes() {
-        const c = document.getElementById('notes-container');
-        c.innerHTML = '';
-        if (notes.length === 0) {
-            c.innerHTML = `<div class="empty-state">Nessuna nota presente.</div>`;
-            return;
-        }
-        notes.forEach(note => {
-            let rows = '';
-            let tot1 = 0, tot2 = 0;
-            note.righe.forEach((r, idx) => {
-                // Parsing sicuro per visualizzazione e totali
-                const val1 = parseInputNumber(r.col1);
-                const val2 = parseInt(r.col2) || 0;
-                if ((r.col1 && val1 !== 0) || (r.col2 && val2 !== 0)) {
-                    rows += `<tr>
-                        <td style="text-align:left;">${idx+1}</td>
-                        <td>${val1.toFixed(8)}</td>
-                        <td>${val2}</td>
-                    </tr>`;
-                }
-                tot1 += val1;
-                tot2 += val2;
-            });
-            c.innerHTML += `
-                <div class="note">
-                    <h3>${note.title}</h3>
-                    <table>
-                        <thead>
-                            <tr><th style="text-align:left;">N Trade</th><th>Cripto</th><th>Dollari</th></tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                        <tfoot>
-                            <tr style="font-weight:bold;">
-                                <td style="text-align:right;">Totale</td>
-                                <td>${tot1.toFixed(8)}</td>
-                                <td>${tot2}</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    <small>Creato il ${new Date(note.createdAt).toLocaleDateString('it-IT')}</small>
-                    <div class="note-actions">
-                        <button class="btn-edit" onclick="editNote(${note.id})">Modifica</button>
-                        <button class="btn-danger" onclick="deleteNote(${note.id})">Elimina</button>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    // --- Salva o aggiorna nota ---
-    document.getElementById('note-form').addEventListener('submit', function(e){
-        e.preventDefault();
-        const title = document.getElementById('note-title').value.trim();
-        const righe = [];
-        for (let i = 0; i < 10; i++) {
-            const col1 = document.getElementById(`col1-${i}`).value;
-            const col2 = document.getElementById(`col2-${i}`).value;
-            righe.push({col1: col1, col2: col2});
-        }
-        if (!title) return;
-        if (editingId !== null) {
-            // Modifica
-            const idx = notes.findIndex(n => n.id === editingId);
-            if (idx !== -1) {
-                notes[idx].title = title;
-                notes[idx].righe = righe;
-                notes[idx].updatedAt = new Date().toISOString();
-            }
-            editingId = null;
-        } else {
-            // Nuova nota
-            notes.unshift({
-                id: Date.now(),
-                title,
-                righe,
-                createdAt: new Date().toISOString()
-            });
-        }
-        saveNotes();
-        renderNotes();
-        this.reset();
-        generaRighe();
-        document.getElementById('edit-id').value = '';
-    });
-
-    // --- Modifica nota ---
-    window.editNote = function(id) {
-        const note = notes.find(n => n.id === id);
-        if (!note) return;
-        document.getElementById('note-title').value = note.title;
-        generaRighe(note.righe);
-        editingId = id;
-        document.getElementById('edit-id').value = id;
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    };
-
-    // --- Elimina nota ---
-    window.deleteNote = function(id) {
-        if (confirm('Eliminare questa nota?')) {
-            notes = notes.filter(n => n.id !== id);
-            saveNotes();
-            renderNotes();
-        }
-    };
-
-    // --- Inizializzazione ---
-    document.addEventListener('DOMContentLoaded', function() {
-        loadNotes();
-        renderNotes();
-        generaRighe();
-    });
-	
-	// Funzione per scaricare i dati come file JSON
-function scaricaDati() {
-    const data = JSON.stringify(notes, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `trade-note-backup_${new Date().toISOString().slice(0,10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-// Funzione per caricare i dati da un file JSON
-function caricaDati() {
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
-
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
+        // Ottieni prezzo da CoinGecko
+        async function getPriceFromCoinGecko(symbol) {
             try {
-                const importedNotes = JSON.parse(e.target.result);
-                if (Array.isArray(importedNotes)) {
-                    // Sostituisci tutte le note
-                    notes = importedNotes;
-                    saveNotes();
-                    renderNotes();
-                    alert('Dati importati con successo!');
-                    fileInput.value = '';
-                } else {
-                    alert('Il file non contiene un formato di dati valido.');
+                const cacheKey = symbol.toLowerCase();
+                const now = Date.now();
+                
+                // Controlla cache
+                if (priceCache[cacheKey] && (now - priceCache[cacheKey].timestamp) < CACHE_DURATION) {
+                    return priceCache[cacheKey].price;
                 }
+
+                // Prima prova con il symbol diretto
+                let response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${symbol.toLowerCase()}&vs_currencies=usd`);
+                let data = await response.json();
+                
+                if (data[symbol.toLowerCase()]?.usd) {
+                    const price = data[symbol.toLowerCase()].usd;
+                    priceCache[cacheKey] = { price, timestamp: now };
+                    return price;
+                }
+
+                // Fallback: cerca per symbol
+                const searchResponse = await fetch(`https://api.coingecko.com/api/v3/search?query=${symbol}`);
+                const searchData = await searchResponse.json();
+                
+                if (searchData.coins && searchData.coins.length > 0) {
+                    const coinId = searchData.coins[0].id;
+                    const priceResponse = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
+                    const priceData = await priceResponse.json();
+                    
+                    if (priceData[coinId]?.usd) {
+                        const price = priceData[coinId].usd;
+                        priceCache[cacheKey] = { price, timestamp: now };
+                        return price;
+                    }
+                }
+                
+                throw new Error(`Prezzo non trovato per ${symbol}`);
             } catch (error) {
-                alert('Errore durante l\'importazione dei dati: ' + error.message);
+                console.error(`Errore nel recupero prezzo per ${symbol}:`, error);
+                return null;
+            }
+        }
+
+        // Calcola prezzo medio ponderato
+        function calcolaPrezzoMedio(entries) {
+            let totalQuantity = 0;
+            let totalValue = 0;
+            
+            entries.forEach(entry => {
+                totalQuantity += entry.quantity;
+                totalValue += entry.quantity * entry.price;
+            });
+            
+            return totalQuantity > 0 ? totalValue / totalQuantity : 0;
+        }
+
+        // Salva trade
+        function saveTrades() {
+            localStorage.setItem('singleTrades', JSON.stringify(trades));
+        }
+
+        // Carica trade
+        function loadTrades() {
+            const saved = localStorage.getItem('singleTrades');
+            if (saved) trades = JSON.parse(saved);
+        }
+
+        // Render trade
+        async function renderTrades() {
+            const container = document.getElementById('trades-container');
+            container.innerHTML = '<div class="loading">Caricamento trade...</div>';
+            
+            if (trades.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nessun trade presente.</div>';
+                return;
+            }
+
+            let html = '';
+            
+            for (const trade of trades) {
+                const totalQuantity = trade.entries.reduce((sum, entry) => sum + entry.quantity, 0);
+                const totalInvestment = trade.entries.reduce((sum, entry) => sum + (entry.quantity * entry.price), 0);
+                const avgPrice = calcolaPrezzoMedio(trade.entries);
+                
+                const currentPrice = await getPriceFromCoinGecko(trade.symbol);
+                const currentValue = currentPrice ? totalQuantity * currentPrice : 0;
+                const pnl = currentValue - totalInvestment;
+                const pnlPercent = totalInvestment > 0 ? (pnl / totalInvestment) * 100 : 0;
+                
+                const pnlClass = pnl > 0 ? 'positive' : pnl < 0 ? 'negative' : 'neutral';
+
+                // Genera tabella entries
+                let entriesHtml = '';
+                trade.entries.forEach((entry, index) => {
+                    entriesHtml += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${entry.quantity.toFixed(8)}</td>
+                            <td>$${entry.price.toFixed(4)}</td>
+                            <td>$${(entry.quantity * entry.price).toFixed(2)}</td>
+                            <td>${new Date(entry.timestamp).toLocaleDateString('it-IT')}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                    <div class="note">
+                        <h3>${trade.symbol.toUpperCase()} - Trade</h3>
+                        
+                        <div class="trade-summary">
+                            <h3>Riepilogo Trade</h3>
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <div class="label">Quantità Totale</div>
+                                    <div class="value">${totalQuantity.toFixed(8)} ${trade.symbol.toUpperCase()}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="label">Prezzo Medio</div>
+                                    <div class="value">$${avgPrice.toFixed(4)}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="label">Investimento Totale</div>
+                                    <div class="value">$${totalInvestment.toFixed(2)}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="label">Prezzo Attuale</div>
+                                    <div class="value current-price">$${currentPrice ? currentPrice.toFixed(4) : 'N/A'}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="label">Valore Attuale</div>
+                                    <div class="value">$${currentValue.toFixed(2)}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="label">P&L</div>
+                                    <div class="value ${pnlClass}">$${pnl.toFixed(2)} (${pnlPercent.toFixed(2)}%)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4>Storia Entry</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Entry #</th>
+                                    <th>Quantità</th>
+                                    <th>Prezzo</th>
+                                    <th>Importo</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>${entriesHtml}</tbody>
+                        </table>
+                        
+                        <div class="last-update">
+                            Ultimo aggiornamento: ${new Date().toLocaleString('it-IT')}
+                        </div>
+                        
+                        <small>Creato il ${new Date(trade.createdAt).toLocaleDateString('it-IT')}</small>
+                        
+                        <div class="note-actions">
+                            <button class="btn-edit" onclick="addEntryToTrade(${trade.id})">Aggiungi Entry</button>
+                            <button class="btn-danger" onclick="deleteTrade(${trade.id})">Elimina Trade</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Aggiungi entry al trade esistente
+        window.addEntryToTrade = function(tradeId) {
+            const trade = trades.find(t => t.id === tradeId);
+            if (trade) {
+                document.getElementById('crypto-symbol').value = trade.symbol;
+                document.getElementById('crypto-symbol').readOnly = true;
+                document.getElementById('edit-trade-id').value = tradeId;
+                window.scrollTo({top: 0, behavior: 'smooth'});
             }
         };
-        reader.readAsText(file);
-    } else {
-        alert('Seleziona un file da importare.');
-    }
-}
 
-</script>
+        // Elimina trade
+        window.deleteTrade = function(id) {
+            if (confirm('Eliminare questo trade?')) {
+                trades = trades.filter(t => t.id !== id);
+                saveTrades();
+                renderTrades();
+            }
+        };
 
+        // Gestione form
+        document.getElementById('trade-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const symbol = document.getElementById('crypto-symbol').value.trim().toUpperCase();
+            const quantity = parseFloat(document.getElementById('trade-quantity').value);
+            const price = parseFloat(document.getElementById('trade-price').value);
+            const editId = document.getElementById('edit-trade-id').value;
+            
+            if (!symbol || !quantity || !price) return;
+            
+            const newEntry = {
+                quantity: quantity,
+                price: price,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (editId) {
+                // Aggiungi entry a trade esistente
+                const tradeIndex = trades.findIndex(t => t.id === parseInt(editId));
+                if (tradeIndex !== -1) {
+                    trades[tradeIndex].entries.push(newEntry);
+                    trades[tradeIndex].updatedAt = new Date().toISOString();
+                }
+            } else {
+                // Verifica se esiste già un trade per questo symbol
+                const existingTrade = trades.find(t => t.symbol.toUpperCase() === symbol);
+                
+                if (existingTrade) {
+                    // Aggiungi entry al trade esistente
+                    existingTrade.entries.push(newEntry);
+                    existingTrade.updatedAt = new Date().toISOString();
+                } else {
+                    // Crea nuovo trade
+                    trades.unshift({
+                        id: Date.now(),
+                        symbol: symbol,
+                        entries: [newEntry],
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    });
+                }
+            }
+            
+            saveTrades();
+            renderTrades();
+            this.reset();
+            document.getElementById('crypto-symbol').readOnly = false;
+            document.getElementById('edit-trade-id').value = '';
+        });
+
+        // Backup functions
+        function scaricaDati() {
+            const data = JSON.stringify(trades, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `trades-backup_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function caricaDati() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedTrades = JSON.parse(e.target.result);
+                        if (Array.isArray(importedTrades)) {
+                            trades = importedTrades;
+                            saveTrades();
+                            renderTrades();
+                            alert('Dati importati con successo!');
+                            fileInput.value = '';
+                        } else {
+                            alert('Il file non contiene un formato di dati valido.');
+                        }
+                    } catch (error) {
+                        alert('Errore durante l\'importazione dei dati: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            } else {
+                alert('Seleziona un file da importare.');
+            }
+        }
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTrades();
+            renderTrades();
+        });
+    </script>
 </body>
 </html>
