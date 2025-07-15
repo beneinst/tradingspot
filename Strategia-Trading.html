@@ -738,7 +738,7 @@ p {
 
 
 <div class="indicator-info-box">
-  <h2 style="margin-top:0;">Codice sorgente 09.07.2025 09:30</h2>
+  <h2 style="margin-top:0;">Codice sorgente 15.07.2025 09:30</h2>
   
   <p style="margin-top:18px; margin-bottom:10px;"><strong></strong></p>
   <div class="indicator-info-box" style="
@@ -841,8 +841,8 @@ sma50 = ta.sma(close, 50)
 rsi_momentum = ta.rsi(close, 14)
 vol_avg = ta.sma(volume, 20)
 
-plot(ema21, title = 'EMA 21', color = color.new(color.yellow, 0), linewidth = 2)
-plot(sma50, title = 'SMA 50', color = color.new(#4071db, 0), linewidth = 2)
+plot(ema21, title = 'EMA 21', color = color.new(#fff176, 0), linewidth = 2)
+plot(sma50, title = 'SMA 50', color = color.new(#5b9cf6, 0), linewidth = 2)
 
 
 // Calcolo Trend generale
@@ -1017,8 +1017,8 @@ if use_macd_filter
 var label confluence_label = na
 if not na(confluence_label)
     label.delete(confluence_label)
-confluence_label := label.new(bar_index, high + atr, "Confluence Score: " + str.tostring(confluence_score, "#.#"),
-     color = confluence_score > 0 ? color.new(color.green, 20) : confluence_score < 0 ? color.new(color.red, 20) : color.new(color.gray, 0),
+confluence_label := label.new(bar_index, high + atr * 1.2, "🌬️ Score " + str.tostring(confluence_score, "#.#"),
+     color = confluence_score > 0 ? color.new(color.green, 10) : confluence_score < 0 ? color.new(color.red, 10) : color.new(color.gray, 0),
      style = label.style_label_down, size = size.normal, yloc = yloc.abovebar)
 
 
@@ -1230,6 +1230,7 @@ signal_strength = confluence_score + (linreg_buy_primary ? 1 : linreg_sell_prima
 // Timer semplificato
 var int last_signal_bar = na
 var int last_signal_time = na
+    
 
 
 if barstate.isconfirmed
@@ -1264,7 +1265,15 @@ else if timer_expired_new
 else
     timer_status_new := "ASPETTA"
 
-	
+color timer_color_new = na
+if timer_active_new
+    timer_color_new := last_signal_buy ? color.new(color.lime, 60) : color.new(color.red, 60)
+else
+    timer_color_new := color.new(color.gray, 80)
+string timer_icon_new = timer_active_new ? (last_signal_buy ? "⏰🟢" : "⏰🔴") : "💤"
+
+
+
 // ========== VISUALIZZAZIONE SEGNALI & PATTERN PRICE ACTION ==========
 
 // ========== FUNZIONI DI GESTIONE LABEL ==========
@@ -1277,8 +1286,7 @@ createPriceActionLabel(cond, x, y, txt, clr, sty, sz, yloc_param) =>
         if array.size(priceaction_labels) > priceActionLookback
             old_lbl = array.pop(priceaction_labels)
             label.delete(old_lbl)
-
-
+            
 
 // ========== VISUALIZZAZIONE SEGNALI DI TRADING (SEMPRE VISIBILI) ==========
 
@@ -1286,25 +1294,58 @@ createPriceActionLabel(cond, x, y, txt, clr, sty, sz, yloc_param) =>
 base_conditions_buy = checkBaseConditions(true)
 base_conditions_sell = checkBaseConditions(false)
 
+
 // ========== LIVE SIGNALS (non confermati) ==========
 if showSignals and base_conditions_buy and not barstate.isconfirmed
-    label.new(bar_index, low - atr * 0.3, 'COMPRA LIVE\n📈 ' + str.tostring(signal_strength, '#.#'), color=color.new(color.green, 30), style=label.style_label_up, size=size.normal, yloc=yloc.price)
+    label.new(bar_index +1, low - atr * 0, 'Compra LIVE\n📈 ' + str.tostring(signal_strength, '#.#'), color=color.new(color.green, 10), style=label.style_label_left, size=size.normal, yloc=yloc.price)
 
 if showSignals and base_conditions_sell and not barstate.isconfirmed
-    label.new(bar_index, high + atr * 0.3, 'VENDI LIVE\n📉 ' + str.tostring(signal_strength, '#.#'), color=color.new(color.red, 30), style=label.style_label_down, size=size.normal, yloc=yloc.price)
+    label.new(bar_index +1, high - atr * 0.3, 'Vendi LIVE\n📉 ' + str.tostring(signal_strength, '#.#'), color=color.new(color.red, 10), style=label.style_label_left, size=size.normal, yloc=yloc.price)
 
 // ========== SEGNALI CONFERMATI ==========
 if showSignals and signal_at_close_buy
-    label.new(bar_index, low - atr * 0.75, 'OK COMPRA ✓\n🔼 ' + str.tostring(signal_strength, '#.#'), color=color.new(#059c1e, 1), style=label.style_label_up, size=size.normal, yloc=yloc.price)
+    label.new(bar_index, low - atr * 0.75, 'OK Compra ✓\n📈 ' + str.tostring(signal_strength, '#.#'), color=color.new(#059c1e, 1), style=label.style_label_up, size=size.normal, yloc=yloc.price)
 
 if showSignals and signal_at_close_sell
-    label.new(bar_index, high + atr * 0.65, 'OK VENDI ✓\n📉🔽 ' + str.tostring(signal_strength, '#.#'), color=color.new(#cc0000, 1), style=label.style_label_down, size=size.normal, yloc=yloc.price)
+    label.new(bar_index, high + atr * 0.65, 'OK Vendi ✓\n📉 ' + str.tostring(signal_strength, '#.#'), color=color.new(#cc0000, 1), style=label.style_label_down, size=size.normal, yloc=yloc.price)
 
 // ========== OPZIONALI (solo se vuoi attivare manualmente emoji extra) ==========
 // Commentati per evitare doppioni, attivabili se preferisci
 // label.new(bar_index, low, "OK 👆📈", color=color.new(#358069, 80), style=label.style_label_up, size=size.small, yloc=yloc.belowbar)
 // label.new(bar_index, high, "OK 👇📉", color=color.new(#b92222, 80), style=label.style_label_down, size=size.small, yloc=yloc.abovebar)
 
+// ========== LIVE SIGNALS Operatività ==========
+var string quota_trade = ""
+var string azione_ingresso = ""
+var string azione_uscita = ""
+var string etichetta_breve = ""
+var string etichetta_breve_acquisto = ""
+var string etichetta_breve_uscita = ""
+
+if confluence_score < 0
+    quota_trade := "0%"
+    etichetta_breve_acquisto := "⏱️ NO"
+    etichetta_breve_uscita := "⭕ ESCI"
+else if confluence_score == 0
+    quota_trade := "0%"
+    etichetta_breve_acquisto := "⏱️ NO"
+    etichetta_breve_uscita := "🤔 VALUTA"
+else if confluence_score == 0.5
+    quota_trade := "10%"
+    etichetta_breve_acquisto := "🪙"
+    etichetta_breve_uscita := "🔒 MANTIENI"
+else if confluence_score == 1
+    quota_trade := "20%"
+    etichetta_breve_acquisto := "🪙🪙"
+    etichetta_breve_uscita := "🔒 MANTIENI"
+else if confluence_score == 1.5
+    quota_trade := "40%"
+    etichetta_breve_acquisto := "🪙🪙🪙"
+    etichetta_breve_uscita := "🔒 MANTIENI"
+else if confluence_score >= 2
+    quota_trade := "60%"
+    etichetta_breve_acquisto := "🪙🪙🪙🪙"
+    etichetta_breve_uscita := "🔒 MANTIENI"
 
 
 // ========== PATTERN PRICE ACTION SUL GRAFICO (SOLO LOOKBACK) ==========
@@ -1366,14 +1407,14 @@ pivot_text = not na(pivot_distance_pl) and pivot_distance_pl < 3 ? 'SUPPORTO' :
              not na(pivot_distance_ph) and pivot_distance_ph < 3 ? 'RESISTENZA' : 'NEUTRO'
 pivot_bg_color = not na(pivot_distance_pl) and pivot_distance_pl < 3 ? color.new(color.lime, 75) :
                  not na(pivot_distance_ph) and pivot_distance_ph < 3 ? color.new(color.red, 75) :
-                 color.new(color.black, 85)
+                 color.new(color.yellow, 75)
 
 
 
 
 // ========== DASHBOARD AVANZATA ==========
 pearson_ok = math.abs(pearsonR) >= min_pearson
-var table info_table = table.new(position.bottom_right, 3, 15, bgcolor = color.new(color.black, 95), border_width = 1, border_color = color.new(color.gray, 60))
+var table info_table = table.new(position.bottom_right, 3, 16, bgcolor = color.new(color.black, 95), border_width = 1, border_color = color.new(color.gray, 60))
 
 if barstate.islast and showSignals
 
@@ -1421,36 +1462,37 @@ if barstate.islast and showSignals
     table.cell(info_table, 1, 5, stoch_icon, text_color = color.white, bgcolor = stoch_color, text_size = size.large)
     table.cell(info_table, 2, 5, stoch_text + '\nK:' + str.tostring(stoch_k, '#') + ' D:' + str.tostring(stoch_d, '#'), text_color = color.white, bgcolor = stoch_color, text_size = size.small)
 
-    // 6. Medie Mobili
-    ma_icon = trend_bullish ? '📈' : trend_bearish ? '📉' : '↔️'
-    ma_color = trend_bullish ? color.new(color.lime, 75) : trend_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
-    ma_text = trend_bullish ? 'RIALZISTA' : trend_bearish ? 'RIBASSISTA' : 'NEUTRO'
-    table.cell(info_table, 0, 6, '📈 Trend MA', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 6, ma_icon, text_color = color.white, bgcolor = ma_color, text_size = size.large)
-    table.cell(info_table, 2, 6, ma_text + '\nRSI:' + str.tostring(rsi_momentum, '#'), text_color = color.white, bgcolor = ma_color, text_size = size.small)
-
-    // 7. Momentum
-    momentum_icon = momentum_bullish ? '🚀' : momentum_bearish ? '📉' : '↔️'
-    momentum_color = momentum_bullish ? color.new(color.lime, 75) : momentum_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
-    momentum_text = momentum_bullish ? 'RIALZISTA' : momentum_bearish ? 'RIBASSISTA' : 'NEUTRO'
-    table.cell(info_table, 0, 7, '🚀 Momentum', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 7, momentum_icon, text_color = color.white, bgcolor = momentum_color, text_size = size.large)
-    table.cell(info_table, 2, 7, momentum_text + '\nROC:' + str.tostring(roc, '#.#'), text_color = color.white, bgcolor = momentum_color, text_size = size.small)
-
-    // 8. Price Action
+    // 6. Price Action
     pa_icon = price_action_bullish ? '🟢' : price_action_bearish ? '🔴' : '↔️'
     pa_color = price_action_bullish ? color.new(color.lime, 75) : price_action_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
     pa_text = price_action_bullish ? 'RIALZISTA' : price_action_bearish ? 'RIBASSISTA' : 'NEUTRO'
-    table.cell(info_table, 0, 8, '🕯️ Price Action', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 8, pa_icon, text_color = color.white, bgcolor = pa_color, text_size = size.large)
-    table.cell(info_table, 2, 8, pa_text + '\nATR:' + str.tostring(atr, '#.####'), text_color = color.white, bgcolor = pa_color, text_size = size.small)
+    table.cell(info_table, 0, 6, '🕯️ Price Action', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 6, pa_icon, text_color = color.white, bgcolor = pa_color, text_size = size.large)
+    table.cell(info_table, 2, 6, pa_text + '\nATR:' + str.tostring(atr, '#.####'), text_color = color.white, bgcolor = pa_color, text_size = size.small)
 
-    // 9. Pivot Points
+    // 7. Pivot Points
     // Riga Pivot nella tabella
-    table.cell(info_table, 0, 9, '📍 Pivot', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 9, pivot_dot, text_color = color.white, bgcolor = pivot_bg_color, text_size = size.large)
-    table.cell(info_table, 2, 9, pivot_text + '\nA:' + str.tostring(pivot_distance_ph, '#.#') + ' B:' + str.tostring(pivot_distance_pl, '#.#'), text_color = color.white, bgcolor = pivot_bg_color, text_size = size.small)
-    // 10. MACD
+    table.cell(info_table, 0, 7, '📍 Pivot', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 7, pivot_dot, text_color = color.white, bgcolor = pivot_bg_color, text_size = size.large)
+    table.cell(info_table, 2, 7, pivot_text + '\nA:' + str.tostring(pivot_distance_ph, '#.#') + ' B:' + str.tostring(pivot_distance_pl, '#.#'), text_color = color.white, bgcolor = pivot_bg_color, text_size = size.small)
+
+    // 8. Momentum
+    momentum_icon = momentum_bullish ? '🚀' : momentum_bearish ? '⭕' : '↔️'
+    momentum_color = momentum_bullish ? color.new(color.lime, 75) : momentum_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    momentum_text = momentum_bullish ? 'RIALZISTA' : momentum_bearish ? 'RIBASSISTA' : 'NEUTRO'
+    table.cell(info_table, 0, 8, '🚀 Momentum', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 8, momentum_icon, text_color = color.white, bgcolor = momentum_color, text_size = size.large)
+    table.cell(info_table, 2, 8, momentum_text + '\nROC:' + str.tostring(roc, '#.#'), text_color = color.white, bgcolor = momentum_color, text_size = size.small)
+
+    // 9. Medie Mobili
+    ma_icon = trend_bullish ? '📈' : trend_bearish ? '📉' : '↔️'
+    ma_color = trend_bullish ? color.new(color.lime, 75) : trend_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
+    ma_text = trend_bullish ? 'RIALZISTA' : trend_bearish ? 'RIBASSISTA' : 'NEUTRO'
+    table.cell(info_table, 0, 9, '🐉 Trend MA', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 9, ma_icon, text_color = color.white, bgcolor = ma_color, text_size = size.large)
+    table.cell(info_table, 2, 9, ma_text + '\nRSI:' + str.tostring(rsi_momentum, '#'), text_color = color.white, bgcolor = ma_color, text_size = size.small)
+
+// 10. MACD
     macd_icon = macd_bullish ? '📈' : macd_bearish ? '📉' : '↔️'
     macd_color = macd_bullish ? color.new(color.lime, 75) : macd_bearish ? color.new(color.red, 75) : color.new(color.yellow, 80)
     macd_text = macd_bullish ? 'RIALZISTA' : macd_bearish ? 'RIBASSISTA' : 'NEUTRO'
@@ -1468,20 +1510,7 @@ if barstate.islast and showSignals
     table.cell(info_table, 1, 11, signal_icon, text_color = color.white, bgcolor = signal_color, text_size = size.large)
     table.cell(info_table, 2, 11, signal_text + '\n' + str.tostring(signal_strength, '#.#'), text_color = color.white, bgcolor = signal_color, text_size = size.small)
 
-    // 12. Stato Ok - riga del segnale
-    timer_icon_new = timer_active_new ? (last_signal_buy ? '⏰🟢' : '⏰🔴') : '💤'
-    timer_color_new = timer_active_new ? (last_signal_buy ? color.new(color.lime, 60) : color.new(color.red, 60)) : color.new(color.gray, 80)
-    timer_text_new = timer_status_new
-    table.cell(info_table, 0, 12, '⏰ Status OK', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 12, timer_icon_new, text_color = color.white, bgcolor = timer_color_new, text_size = size.large)
-    table.cell(info_table, 2, 12, timer_text_new, text_color = color.white, bgcolor = timer_color_new, text_size = size.small)
-
-    // 13. Ultimo OK
-    table.cell(info_table, 0, 13, '🕒 Ultimo OK', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
-    table.cell(info_table, 1, 13, last_signal_buy ? '🟢' : '↻', text_color = color.white, bgcolor = timer_color_new, text_size = size.large)
-	table.cell(info_table, 2, 13, ultimo_ok_str, text_color = color.white, bgcolor = timer_color_new, text_size = size.small)
-    
-    // 14. Market State
+    // 12. Market State
     market_state = trend_bullish and confluence_score > 0 ? 'RIALZISTA' : 
          trend_bearish and confluence_score < 0 ? 'RIBASSISTA' : 
          'LATERALE'
@@ -1490,9 +1519,33 @@ if barstate.islast and showSignals
     market_color = trend_bullish and confluence_score > 0 ? color.new(color.lime, 80) : 
          trend_bearish and confluence_score < 0 ? color.new(color.red, 80) : 
          color.new(color.yellow, 80)
-    table.cell(info_table, 0, 14, '🌍 Trend', text_color = color.white, bgcolor = color.new(#2041bb, 85), text_size = size.small)
-    table.cell(info_table, 1, 14, market_icon, text_color = color.white, bgcolor = market_color, text_size = size.large)
-    table.cell(info_table, 2, 14, market_state, text_color = color.white, bgcolor = market_color, text_size = size.small)
+    table.cell(info_table, 0, 12, '🌍 Trend', text_color = color.white, bgcolor = color.new(#2041bb, 70), text_size = size.small)
+    table.cell(info_table, 1, 12, market_icon, text_color = color.white, bgcolor = market_color, text_size = size.large)
+    table.cell(info_table, 2, 12, market_state, text_color = color.white, bgcolor = market_color, text_size = size.small)
+
+    //  13. Stato Ok - riga del segnale dinamico
+if timer_status_new != "ASPETTA"
+    table.cell(info_table, 0, 13, '⏰ Status OK', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 13, timer_active_new ? (last_signal_buy ? "⏰🟢" : "⏰🔴") : "💤", text_color = color.white, bgcolor = timer_active_new ? (last_signal_buy ? color.new(color.lime, 40) : color.new(color.red, 40)) : color.new(color.gray, 80), text_size = size.large)
+    table.cell(info_table, 2, 13, timer_status_new, text_color = color.white, bgcolor = timer_active_new ? (last_signal_buy ? color.new(color.lime, 40) : color.new(color.red, 40)) : color.new(color.gray, 80), text_size = size.small)
+
+
+    // 14. Ultimo OK Ultimo Ok dinamico
+if ultimo_ok_str != "Nessun segnale"
+    table.cell(info_table, 0, 14, '🕒 Ultimo OK', text_color = color.white, bgcolor = color.new(color.gray, 85), text_size = size.small)
+    table.cell(info_table, 1, 14, last_signal_buy ? '🟢' : '↻', text_color = color.white, bgcolor = timer_color_new, text_size = size.large)
+    table.cell(info_table, 2, 14, ultimo_ok_str, text_color = color.white, bgcolor = timer_color_new, text_size = size.small)
+
+    // 15. Colonna acquisto breve
+if showSignals and (base_conditions_buy or base_conditions_sell) and not barstate.isconfirmed
+    // --- Riga tabella operativa a 3 colonne ---
+    table.cell(info_table, 0, 15, etichetta_breve_acquisto, text_color=color.white, bgcolor=color.new(color.lime, 80), text_size=size.small)
+    table.cell(info_table, 1, 15, quota_trade, text_color=color.white, bgcolor=color.new(color.lime, 80), text_size=size.normal)
+    table.cell(info_table, 2, 15, etichetta_breve_uscita, text_color=color.white, bgcolor=color.new(color.red, 80), text_size=size.small)
+
+
+
+
 
 
 // ============= ALERT CONDITIONS MIGLIORATI =============
