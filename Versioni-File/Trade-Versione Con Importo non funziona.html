@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Portfolio Manager</title>
+    <style>
+:root {
+    --color-primary: #4a90e2;
+    --color-secondary: #2ecc71;
+    --color-danger: #e74c3c;
+    --color-warning: #f39c12;
+    --color-bg: #1e1e2f;
+    --color-surface: #2a2a3d;
+    --color-border: #3a3a4d;
+    --color-text: #e0e0e0;
+    --color-muted: #a0a0b2;
+    --color-heading: #ffffff;
+    --color-footer-bg: #131322;
+    --color-footer-text: #f2bb66;
+    --color-link: #faebd7;
+    --color-link-hover: #ffdb58;
+}
+
+/* Reset & base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+    color: var(--color-text);
+    padding: 20px;
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+}
+
+/* Container */
+.container {
+    max-width: 1300px;
+    margin: 0 auto;
+    background: transparent;
+    border-radius: 15px;
+    box-shadow: none;
+    overflow: visible;
+    padding: 0 10px;
+}
+
+/* Header */
+.header {
+    background-color: #222831;
+    padding: 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    color: var(--color-heading);
+    text-align: center;
+}
+.header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: var(--color-heading);
+}
+
+/* Section Title */
+.section-title {
+    color: var(--color-primary);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+/* Form Container */
+.form-container {
+    background-color: var(--color-surface);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* Trade Form (secondo CSS) */
+.trade-form {
+    background: #23233b;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+/* Form Row (secondo CSS) */
+.form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+.form-row label {
+    font-weight: bold;
+    color: var(--color-primary);
+}
+
+/* Input & textarea */
+input, textarea, input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #1b1b2c;
+    color: var(--color-text);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 5px rgba(74,144,226,0.3);
+}
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+input::placeholder, textarea::placeholder {
+    color: var(--color-muted);
+}
+
+/* Buttons */
+.btn-primary, .btn-secondary, .btn-danger, .btn-edit, .btn-info {
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
+    padding: 10px 20px;
+}
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #357ab8;
+    box-shadow: 0 5px 15px rgba(74,144,226,0.18);
+    transform: translateY(-2px);
+}
+.btn-secondary {
+    background-color: var(--color-secondary);
+    color: white;
+    margin-right: 10px;
+}
+.btn-secondary:hover {
+    background-color: #27ae60;
+    box-shadow: 0 5px 15px rgba(46,204,113,0.18);
+    transform: translateY(-2px);
+}
+.btn-edit {
+    background-color: #434190;
+    color: #f5f5f5;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-right: 5px;
+}
+.btn-edit:hover {
+    background-color: #667eea;
+}
+.btn-danger {
+    background-color: #3b3054;
+    color: #f5f5f5;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+.btn-danger:hover {
+    background-color: #a259a6;
+}
+.btn-info {
+    background: #17a2b8;
+    color: white;
+    padding: 8px 16px;
+}
+.btn-info:hover {
+    background: #138496;
+}
+
+/* Notes Container */
+.notes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: linear-gradient(135deg, #2d3748 0%, #434190 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
+    padding: 12px;
+}
+
+/* Note */
+.note {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    border-left: 5px solid var(--color-primary);
+    margin-bottom: 20px;
+    transition: box-shadow 0.2s;
+}
+.note:hover {
+    box-shadow: 0 6px 24px rgba(74, 144, 226, 0.18);
+}
+.note h3 {
+    color: var(--color-primary);
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+.note p {
+    margin-bottom: 15px;
+    color: var(--color-text);
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    white-space: pre-wrap;
+}
+.note-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    text-align: right;
+}
+.note-content {
+    margin-bottom: 16px;
+}
+.note-content small {
+    color: var(--color-muted);
+    display: block;
+    margin-top: 8px;
+    font-size: 0.95em;
+}
+
+/* Table inside note */
+.note table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    background: transparent;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.note th, .note td {
+    padding: 6px 8px;
+    text-align: right;
+    border-bottom: 1px solid var(--color-border);
+}
+.note th {
+    color: var(--color-primary);
+    font-weight: 600;
+    background: #23233b;
+}
+.note tr:nth-child(even) {
+    background: #262646;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    color: var(--color-muted);
+    padding: 40px 0;
+    font-style: italic;
+}
+
+/* Card */
+.card {
+    background-color: var(--color-surface);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    margin: 20px 0;
+}
+.card-header {
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+    color: var(--color-heading);
+}
+
+/* Trade Summary */
+.trade-summary {
+    background: linear-gradient(135deg, #23233b 0%, #2a2a3d 100%);
+    color: var(--color-heading);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+.trade-summary h3 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+.summary-item {
+    background: rgba(255,255,255,0.03);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+.summary-item .label {
+    font-size: 0.9em;
+    opacity: 0.8;
+    margin-bottom: 5px;
+}
+.summary-item .value {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.positive {
+    color: var(--color-secondary);
+}
+.negative {
+    color: var(--color-danger);
+}
+.neutral {
+    color: var(--color-warning);
+}
+
+/* Backup Container */
+.backup-container {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    text-align: left;
+}
+input[type="file"] {
+    max-width: 50%;
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+
+/* Footer */
+.footer {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 16px;
+    color: #f2bb66;
+    font-weight: normal;
+}
+
+.footer a {
+    color: #ffe;
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #ffdb58;
+}
+
+/* Edit Form */
+.edit-form {
+    background: var(--color-surface);
+    padding: 20px;
+    border-radius: 6px;
+    margin-top: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.edit-form input,
+.edit-form textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    background: #1b1b2c;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    font-size: 16px;
+}
+.edit-form input::placeholder,
+.edit-form textarea::placeholder {
+    color: var(--color-muted);
+}
+.edit-form .btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+/* Alerts and Status */
+.alert {
+    padding: 15px 20px;
+    background: #3a3a4d;
+    color: var(--color-warning);
+    border-radius: 6px;
+    border: 1px solid var(--color-warning);
+    margin-bottom: 20px;
+}
+.loading {
+    color: var(--color-primary);
+    font-style: italic;
+}
+.error {
+    color: var(--color-danger);
+    font-size: 0.9em;
+}
+.last-update {
+    font-size: 0.8em;
+    color: var(--color-muted);
+    text-align: center;
+    margin-top: 10px;
+}
+.current-price {
+    font-size: 0.9em;
+    color: var(--color-primary);
+    font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+        margin: 10px;
+    }
+    .header h1 {
+        font-size: 2em;
+    }
+    .form-container {
+        padding: 20px;
+    }
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    .note-actions {
+        flex-direction: column;
+    }
+    .backup-container {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: center;
+    }
+    table {
+        font-size: 12px;
+    }
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Typography */
+h2 {
+    color: #739bf2 !important;
+    font-weight: bold !important;
+    letter-spacing: -0.1px !important;
+}
+small {
+    color: var(--color-muted);
+}
+
+/* Utility */
+th, td {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Trading Portfolio Manager</h1>
+            <p>Gestione Trade Singoli con Accumulo e Prezzo Medio</p>
+        </div>
+
+        <div class="form-container">
+            <h2 class="section-title">💱 Aggiungi Entry al Trade</h2>
+            <form id="trade-form" class="trade-form">
+                <div class="form-row">
+                    <label for="crypto-symbol">Simbolo Crypto:</label>
+                    <input type="text" id="crypto-symbol" placeholder="BTC" required>
+                </div>
+                <div class="form-row">
+                    <label for="trade-quantity">Quantità:</label>
+                    <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required>
+                </div>
+                <div class="form-row">
+                    <label for="trade-price">Importo Entry (USDT):</label>
+                    <input type="number" id="invested-amount" placeholder="Importo investito ($)" step="0.01" required>
+                </div>
+                <div class="form-row">
+                    <label></label>
+                    <button type="submit" class="btn-primary">Aggiungi Entry</button>
+                </div>
+                <input type="hidden" id="edit-trade-id">
+            </form>
+        </div>
+
+        <div class="form-container">
+            <h2 class="section-title">🎯 I tuoi Trade Attivi</h2>
+            <div id="trades-container"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>💽 Backup & Ripristino</h2>
+            </div>
+            <p>Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
+            <div class="backup-container">
+                <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
+                <input type="file" id="fileInput" accept=".json" style="flex: 1;">
+                <button onclick="caricaDati()" class="btn-primary">Carica Dati</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            Trading Portfolio Manager v1.0 | 
+            <a href="https://beneinst.github.io/tradingspot/index.html">Operatività</a> | 
+            <a href="https://beneinst.github.io/tradingspot/panoramica-capitale.html">Capitale</a> | 
+            <a href="https://beneinst.github.io/tradingspot/trade.html">Trade</a> |
+            <a href="https://beneinst.github.io/tradingspot/blocco-note.html">Note</a> | 
+            <a href="https://beneinst.github.io/tradingspot/chartflow/index.html">Segnali</a> |
+            <a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore</a> | 
+            <a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a> |
+            <a href="https://beneinst.github.io/tradingspot/candlestick.html">Candlestick</a> | 
+            <a href="https://beneinst.github.io/tradingspot/cheat-sheet.html">Patterns</a>
+        </div>
+    </div>
+
+    <script>
+      // Sistema trade migliorato - inserimento per importo investito
+
+// Cache per i prezzi delle crypto
+let priceCache = {};
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
+
+// Gestione trade
+let trades = [];
+let editingTradeId = null;
+
+// Mappa dei simboli crypto ai loro ID CoinGecko
+const coinGeckoIdMap = {
+    'BTC': 'bitcoin',
+    'ETH': 'ethereum',
+    'BNB': 'binancecoin',
+    'ADA': 'cardano',
+    'DOT': 'polkadot',
+    'LINK': 'chainlink',
+    'XRP': 'ripple',
+    'LTC': 'litecoin',
+    'BCH': 'bitcoin-cash',
+    'XLM': 'stellar',
+    'UNI': 'uniswap',
+    'AAVE': 'aave',
+    'SUSHI': 'sushi',
+    'COMP': 'compound-governance-token',
+    'MKR': 'maker',
+    'SNX': 'havven',
+    'YFI': 'yearn-finance',
+    'USDC': 'usd-coin',
+    'USDT': 'tether',
+    'DAI': 'dai',
+    'BUSD': 'binance-usd',
+    'MATIC': 'matic-network',
+    'AVAX': 'avalanche-2',
+    'SOL': 'solana',
+    'ATOM': 'cosmos',
+    'LUNA': 'terra-luna',
+    'FTT': 'ftx-token',
+    'ALGO': 'algorand',
+    'VET': 'vechain',
+    'ICP': 'internet-computer',
+    'TRX': 'tron',
+    'FIL': 'filecoin',
+    'ETC': 'ethereum-classic',
+    'XMR': 'monero',
+    'THETA': 'theta-token',
+    'CAKE': 'pancakeswap-token',
+    'FET': 'artificial-superintelligence-alliance', // ex-Fetch.ai, nuovo id[1]
+    'NEAR': 'near' // aggiunto NEAR Protocol
+};
+
+
+// Ottieni prezzo da CoinGecko
+async function getPriceFromCoinGecko(symbol) {
+    try {
+        const cacheKey = symbol.toLowerCase();
+        const now = Date.now();
+        
+        // Controlla cache
+        if (priceCache[cacheKey] && (now - priceCache[cacheKey].timestamp) < CACHE_DURATION) {
+            return priceCache[cacheKey].price;
+        }
+
+        // Prima prova con la mappa dei simboli
+        const coinId = coinGeckoIdMap[symbol.toUpperCase()];
+        if (coinId) {
+            const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
+            const data = await response.json();
+            
+            if (data[coinId]?.usd) {
+                const price = data[coinId].usd;
+                priceCache[cacheKey] = { price, timestamp: now };
+                return price;
+            }
+        }
+
+        // Fallback: cerca per symbol
+        const searchResponse = await fetch(`https://api.coingecko.com/api/v3/search?query=${symbol}`);
+        const searchData = await searchResponse.json();
+        
+        if (searchData.coins && searchData.coins.length > 0) {
+            const coinId = searchData.coins[0].id;
+            const priceResponse = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
+            const priceData = await priceResponse.json();
+            
+            if (priceData[coinId]?.usd) {
+                const price = priceData[coinId].usd;
+                priceCache[cacheKey] = { price, timestamp: now };
+                return price;
+            }
+        }
+        
+        throw new Error(`Prezzo non trovato per ${symbol}`);
+    } catch (error) {
+        console.error(`Errore nel recupero prezzo per ${symbol}:`, error);
+        return null;
+    }
+}
+
+// Calcola importo medio ponderato e quantità totale
+function calcolaStatisticheTrade(entries) {
+    let totalInvestment = 0;
+    let totalQuantity = 0;
+    
+    entries.forEach(entry => {
+        totalInvestment += entry.investedAmount;
+        totalQuantity += entry.quantity;
+    });
+    
+    const avgPrice = totalQuantity > 0 ? totalInvestment / totalQuantity : 0;
+    
+    return {
+        totalInvestment,
+        totalQuantity,
+        avgPrice
+    };
+}
+
+// Salva trade
+function saveTrades() {
+    localStorage.setItem('singleTrades', JSON.stringify(trades));
+}
+
+// Carica trade
+function loadTrades() {
+    const saved = localStorage.getItem('singleTrades');
+    if (saved) trades = JSON.parse(saved);
+}
+
+// Render trade
+async function renderTrades() {
+    const container = document.getElementById('trades-container');
+    container.innerHTML = '<div class="loading">Caricamento trade...</div>';
+    
+    if (trades.length === 0) {
+        container.innerHTML = '<div class="empty-state">Nessun trade presente.</div>';
+        return;
+    }
+
+    let html = '';
+    
+    for (const trade of trades) {
+        const stats = calcolaStatisticheTrade(trade.entries);
+        const { totalInvestment, totalQuantity, avgPrice } = stats;
+        
+        const currentPrice = await getPriceFromCoinGecko(trade.symbol);
+        const currentValue = currentPrice ? totalQuantity * currentPrice : 0;
+        const pnl = currentValue - totalInvestment;
+        const pnlPercent = totalInvestment > 0 ? (pnl / totalInvestment) * 100 : 0;
+        
+        const pnlClass = pnl > 0 ? 'positive' : pnl < 0 ? 'negative' : 'neutral';
+
+        // Genera tabella entries
+        let entriesHtml = '';
+        trade.entries.forEach((entry, index) => {
+            entriesHtml += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${entry.quantity.toFixed(8)}</td>
+                    <td>$${entry.priceAtPurchase.toFixed(2)}</td>
+                    <td>$${entry.investedAmount.toFixed(2)}</td>
+                    <td>${new Date(entry.timestamp).toLocaleDateString('it-IT')}</td>
+                </tr>
+            `;
+        });
+
+        html += `
+            <div class="note">
+                <h3>${trade.symbol.toUpperCase()} - Trade</h3>
+                
+                <div class="trade-summary">
+                    <h3>Riepilogo Trade</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="label">Quantità Totale</div>
+                            <div class="value">${totalQuantity.toFixed(8)} ${trade.symbol.toUpperCase()}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Prezzo Medio di Acquisto</div>
+                            <div class="value">$${avgPrice.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Investimento Totale</div>
+                            <div class="value">$${totalInvestment.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Prezzo Attuale</div>
+                            <div class="value current-price">$${currentPrice ? currentPrice.toFixed(2) : 'N/A'}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Valore Attuale</div>
+                            <div class="value">$${currentValue.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Profitto/Perdita (P&L)</div>
+                            <div class="value ${pnlClass}">$${pnl.toFixed(2)} (${pnlPercent.toFixed(2)}%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>Storia Entry</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entry #</th>
+                            <th>Quantità</th>
+                            <th>Prezzo di Acquisto</th>
+                            <th>Importo Investito</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>${entriesHtml}</tbody>
+                </table>
+                
+                <div class="last-update">
+                    Ultimo aggiornamento: ${new Date().toLocaleString('it-IT')}
+                </div>
+                
+                <small>Creato il ${new Date(trade.createdAt).toLocaleDateString('it-IT')}</small>
+                
+                <div class="note-actions">
+                    <button class="btn-edit" onclick="addEntryToTrade(${trade.id})">Aggiungi Entry</button>
+                    <button class="btn-danger" onclick="deleteTrade(${trade.id})">Elimina Trade</button>
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+}
+
+// Aggiungi entry al trade esistente
+window.addEntryToTrade = function(tradeId) {
+    const trade = trades.find(t => t.id === tradeId);
+    if (trade) {
+        document.getElementById('crypto-symbol').value = trade.symbol;
+        document.getElementById('crypto-symbol').readOnly = true;
+        document.getElementById('edit-trade-id').value = tradeId;
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+};
+
+// Elimina trade
+window.deleteTrade = function(id) {
+    if (confirm('Eliminare questo trade?')) {
+        trades = trades.filter(t => t.id !== id);
+        saveTrades();
+        renderTrades();
+    }
+};
+
+// Gestione form - NUOVO SISTEMA
+document.getElementById('trade-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const symbol = document.getElementById('crypto-symbol').value.trim().toUpperCase();
+    const quantity = parseFloat(document.getElementById('trade-quantity').value);
+    const investedAmount = parseFloat(document.getElementById('invested-amount').value);
+    const editId = document.getElementById('edit-trade-id').value;
+    
+    if (!symbol || !quantity || !investedAmount) {
+        alert('Compila tutti i campi');
+        return;
+    }
+    
+    // Ottieni prezzo attuale per calcolare il prezzo di acquisto
+    const currentPrice = await getPriceFromCoinGecko(symbol);
+    if (!currentPrice) {
+        alert('Impossibile ottenere il prezzo per ' + symbol);
+        return;
+    }
+    
+    const priceAtPurchase = investedAmount / quantity;
+    
+    const newEntry = {
+        quantity: quantity,
+        investedAmount: investedAmount,
+        priceAtPurchase: priceAtPurchase,
+        timestamp: new Date().toISOString()
+    };
+    
+    if (editId) {
+        // Aggiungi entry a trade esistente
+        const tradeIndex = trades.findIndex(t => t.id === parseInt(editId));
+        if (tradeIndex !== -1) {
+            trades[tradeIndex].entries.push(newEntry);
+            trades[tradeIndex].updatedAt = new Date().toISOString();
+        }
+    } else {
+        // Verifica se esiste già un trade per questo symbol
+        const existingTrade = trades.find(t => t.symbol.toUpperCase() === symbol);
+        
+        if (existingTrade) {
+            // Aggiungi entry al trade esistente
+            existingTrade.entries.push(newEntry);
+            existingTrade.updatedAt = new Date().toISOString();
+        } else {
+            // Crea nuovo trade
+            trades.unshift({
+                id: Date.now(),
+                symbol: symbol,
+                entries: [newEntry],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            });
+        }
+    }
+    
+    saveTrades();
+    renderTrades();
+    this.reset();
+    document.getElementById('crypto-symbol').readOnly = false;
+    document.getElementById('edit-trade-id').value = '';
+});
+
+// Backup functions
+function scaricaDati() {
+    const data = JSON.stringify(trades, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trades-backup_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function caricaDati() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedTrades = JSON.parse(e.target.result);
+                if (Array.isArray(importedTrades)) {
+                    trades = importedTrades;
+                    saveTrades();
+                    renderTrades();
+                    alert('Dati importati con successo!');
+                    fileInput.value = '';
+                } else {
+                    alert('Il file non contiene un formato di dati valido.');
+                }
+            } catch (error) {
+                alert('Errore durante l\'importazione dei dati: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    } else {
+        alert('Seleziona un file da importare.');
+    }
+}
+
+// Inizializzazione
+document.addEventListener('DOMContentLoaded', function() {
+    loadTrades();
+    renderTrades();
+});
+</script>
+
+</body>
+</html>
