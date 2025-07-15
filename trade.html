@@ -495,8 +495,8 @@ th, td {
                     <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required>
                 </div>
                 <div class="form-row">
-                    <label for="trade-price">Prezzo Entry (USDT):</label>
-                    <input type="number" id="trade-price" step="0.0001" placeholder="0.0000" required>
+                    <label for="trade-price">Importo Entry (USDT):</label>
+                    <input type="number" id="invested-amount" placeholder="Importo investito ($)" step="0.01" required>
                 </div>
                 <div class="form-row">
                     <label></label>
@@ -538,329 +538,370 @@ th, td {
     </div>
 
     <script>
-        // Cache per i prezzi delle crypto
-        let priceCache = {};
-        const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
+      // Sistema trade migliorato - inserimento per importo investito
+
+// Cache per i prezzi delle crypto
+let priceCache = {};
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
+
+// Gestione trade
+let trades = [];
+let editingTradeId = null;
+
+// Mappa dei simboli crypto ai loro ID CoinGecko
+const coinGeckoIdMap = {
+    'BTC': 'bitcoin',
+    'ETH': 'ethereum',
+    'BNB': 'binancecoin',
+    'ADA': 'cardano',
+    'DOT': 'polkadot',
+    'LINK': 'chainlink',
+    'XRP': 'ripple',
+    'LTC': 'litecoin',
+    'BCH': 'bitcoin-cash',
+    'XLM': 'stellar',
+    'UNI': 'uniswap',
+    'AAVE': 'aave',
+    'SUSHI': 'sushi',
+    'COMP': 'compound-governance-token',
+    'MKR': 'maker',
+    'SNX': 'havven',
+    'YFI': 'yearn-finance',
+    'USDC': 'usd-coin',
+    'USDT': 'tether',
+    'DAI': 'dai',
+    'BUSD': 'binance-usd',
+    'MATIC': 'matic-network',
+    'AVAX': 'avalanche-2',
+    'SOL': 'solana',
+    'ATOM': 'cosmos',
+    'LUNA': 'terra-luna',
+    'FTT': 'ftx-token',
+    'ALGO': 'algorand',
+    'VET': 'vechain',
+    'ICP': 'internet-computer',
+    'TRX': 'tron',
+    'FIL': 'filecoin',
+    'ETC': 'ethereum-classic',
+    'XMR': 'monero',
+    'THETA': 'theta-token',
+    'CAKE': 'pancakeswap-token',
+    'FET': 'artificial-superintelligence-alliance', // ex-Fetch.ai, nuovo id[1]
+    'NEAR': 'near' // aggiunto NEAR Protocol
+};
+
+
+// Ottieni prezzo da CoinGecko
+async function getPriceFromCoinGecko(symbol) {
+    try {
+        const cacheKey = symbol.toLowerCase();
+        const now = Date.now();
         
-        // Gestione trade
-        let trades = [];
-        let editingTradeId = null;
+        // Controlla cache
+        if (priceCache[cacheKey] && (now - priceCache[cacheKey].timestamp) < CACHE_DURATION) {
+            return priceCache[cacheKey].price;
+        }
 
-        // Ottieni prezzo da CoinGecko
-        async function getPriceFromCoinGecko(symbol) {
-            try {
-                const cacheKey = symbol.toLowerCase();
-                const now = Date.now();
-                
-                // Controlla cache
-                if (priceCache[cacheKey] && (now - priceCache[cacheKey].timestamp) < CACHE_DURATION) {
-                    return priceCache[cacheKey].price;
-                }
-
-                // Prima prova con il symbol diretto
-                let response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${symbol.toLowerCase()}&vs_currencies=usd`);
-                let data = await response.json();
-                
-                if (data[symbol.toLowerCase()]?.usd) {
-                    const price = data[symbol.toLowerCase()].usd;
-                    priceCache[cacheKey] = { price, timestamp: now };
-                    return price;
-                }
-
-                // Fallback: cerca per symbol
-                const searchResponse = await fetch(`https://api.coingecko.com/api/v3/search?query=${symbol}`);
-                const searchData = await searchResponse.json();
-                
-                if (searchData.coins && searchData.coins.length > 0) {
-                    const coinId = searchData.coins[0].id;
-                    const priceResponse = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
-                    const priceData = await priceResponse.json();
-                    
-                    if (priceData[coinId]?.usd) {
-                        const price = priceData[coinId].usd;
-                        priceCache[cacheKey] = { price, timestamp: now };
-                        return price;
-                    }
-                }
-                
-                throw new Error(`Prezzo non trovato per ${symbol}`);
-            } catch (error) {
-                console.error(`Errore nel recupero prezzo per ${symbol}:`, error);
-                return null;
+        // Prima prova con la mappa dei simboli
+        const coinId = coinGeckoIdMap[symbol.toUpperCase()];
+        if (coinId) {
+            const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
+            const data = await response.json();
+            
+            if (data[coinId]?.usd) {
+                const price = data[coinId].usd;
+                priceCache[cacheKey] = { price, timestamp: now };
+                return price;
             }
         }
 
-        // Calcola prezzo medio ponderato
-        function calcolaPrezzoMedio(entries) {
-            let totalQuantity = 0;
-            let totalValue = 0;
+        // Fallback: cerca per symbol
+        const searchResponse = await fetch(`https://api.coingecko.com/api/v3/search?query=${symbol}`);
+        const searchData = await searchResponse.json();
+        
+        if (searchData.coins && searchData.coins.length > 0) {
+            const coinId = searchData.coins[0].id;
+            const priceResponse = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
+            const priceData = await priceResponse.json();
             
-            entries.forEach(entry => {
-                totalQuantity += entry.quantity;
-                totalValue += entry.quantity * entry.price;
-            });
-            
-            return totalQuantity > 0 ? totalValue / totalQuantity : 0;
-        }
-
-        // Salva trade
-        function saveTrades() {
-            localStorage.setItem('singleTrades', JSON.stringify(trades));
-        }
-
-        // Carica trade
-        function loadTrades() {
-            const saved = localStorage.getItem('singleTrades');
-            if (saved) trades = JSON.parse(saved);
-        }
-
-        // Render trade
-        async function renderTrades() {
-            const container = document.getElementById('trades-container');
-            container.innerHTML = '<div class="loading">Caricamento trade...</div>';
-            
-            if (trades.length === 0) {
-                container.innerHTML = '<div class="empty-state">Nessun trade presente.</div>';
-                return;
+            if (priceData[coinId]?.usd) {
+                const price = priceData[coinId].usd;
+                priceCache[cacheKey] = { price, timestamp: now };
+                return price;
             }
+        }
+        
+        throw new Error(`Prezzo non trovato per ${symbol}`);
+    } catch (error) {
+        console.error(`Errore nel recupero prezzo per ${symbol}:`, error);
+        return null;
+    }
+}
 
-            let html = '';
-            
-            for (const trade of trades) {
-                const totalQuantity = trade.entries.reduce((sum, entry) => sum + entry.quantity, 0);
-                const totalInvestment = trade.entries.reduce((sum, entry) => sum + (entry.quantity * entry.price), 0);
-                const avgPrice = calcolaPrezzoMedio(trade.entries);
+// Calcola importo medio ponderato e quantità totale
+function calcolaStatisticheTrade(entries) {
+    let totalInvestment = 0;
+    let totalQuantity = 0;
+    
+    entries.forEach(entry => {
+        totalInvestment += entry.investedAmount;
+        totalQuantity += entry.quantity;
+    });
+    
+    const avgPrice = totalQuantity > 0 ? totalInvestment / totalQuantity : 0;
+    
+    return {
+        totalInvestment,
+        totalQuantity,
+        avgPrice
+    };
+}
+
+// Salva trade
+function saveTrades() {
+    localStorage.setItem('singleTrades', JSON.stringify(trades));
+}
+
+// Carica trade
+function loadTrades() {
+    const saved = localStorage.getItem('singleTrades');
+    if (saved) trades = JSON.parse(saved);
+}
+
+// Render trade
+async function renderTrades() {
+    const container = document.getElementById('trades-container');
+    container.innerHTML = '<div class="loading">Caricamento trade...</div>';
+    
+    if (trades.length === 0) {
+        container.innerHTML = '<div class="empty-state">Nessun trade presente.</div>';
+        return;
+    }
+
+    let html = '';
+    
+    for (const trade of trades) {
+        const stats = calcolaStatisticheTrade(trade.entries);
+        const { totalInvestment, totalQuantity, avgPrice } = stats;
+        
+        const currentPrice = await getPriceFromCoinGecko(trade.symbol);
+        const currentValue = currentPrice ? totalQuantity * currentPrice : 0;
+        const pnl = currentValue - totalInvestment;
+        const pnlPercent = totalInvestment > 0 ? (pnl / totalInvestment) * 100 : 0;
+        
+        const pnlClass = pnl > 0 ? 'positive' : pnl < 0 ? 'negative' : 'neutral';
+
+        // Genera tabella entries
+        let entriesHtml = '';
+        trade.entries.forEach((entry, index) => {
+            entriesHtml += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${entry.quantity.toFixed(8)}</td>
+                    <td>$${entry.priceAtPurchase.toFixed(2)}</td>
+                    <td>$${entry.investedAmount.toFixed(2)}</td>
+                    <td>${new Date(entry.timestamp).toLocaleDateString('it-IT')}</td>
+                </tr>
+            `;
+        });
+
+        html += `
+            <div class="note">
+                <h3>${trade.symbol.toUpperCase()} - Trade</h3>
                 
-                const currentPrice = await getPriceFromCoinGecko(trade.symbol);
-                const currentValue = currentPrice ? totalQuantity * currentPrice : 0;
-                const pnl = currentValue - totalInvestment;
-                const pnlPercent = totalInvestment > 0 ? (pnl / totalInvestment) * 100 : 0;
-                
-                const pnlClass = pnl > 0 ? 'positive' : pnl < 0 ? 'negative' : 'neutral';
-
-                // Genera tabella entries
-                let entriesHtml = '';
-                trade.entries.forEach((entry, index) => {
-                    entriesHtml += `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>${entry.quantity.toFixed(8)}</td>
-                            <td>$${entry.price.toFixed(4)}</td>
-                            <td>$${(entry.quantity * entry.price).toFixed(2)}</td>
-                            <td>${new Date(entry.timestamp).toLocaleDateString('it-IT')}</td>
-                        </tr>
-                    `;
-                });
-
-                html += `
-                    <div class="note">
-                        <h3>${trade.symbol.toUpperCase()} - Trade</h3>
-                        
-                        <div class="trade-summary">
-                            <h3>Riepilogo Trade</h3>
-                            <div class="summary-grid">
-                                <div class="summary-item">
-                                    <div class="label">Quantità Totale</div>
-                                    <div class="value">${totalQuantity.toFixed(8)} ${trade.symbol.toUpperCase()}</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="label">Prezzo Medio</div>
-                                    <div class="value">$${avgPrice.toFixed(4)}</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="label">Investimento Totale</div>
-                                    <div class="value">$${totalInvestment.toFixed(2)}</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="label">Prezzo Attuale</div>
-                                    <div class="value current-price">$${currentPrice ? currentPrice.toFixed(4) : 'N/A'}</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="label">Valore Attuale</div>
-                                    <div class="value">$${currentValue.toFixed(2)}</div>
-                                </div>
-                                <div class="summary-item">
-                                    <div class="label">P&L</div>
-                                    <div class="value ${pnlClass}">$${pnl.toFixed(2)} (${pnlPercent.toFixed(2)}%)</div>
-                                </div>
-                            </div>
+                <div class="trade-summary">
+                    <h3>Riepilogo Trade</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="label">Quantità Totale</div>
+                            <div class="value">${totalQuantity.toFixed(8)} ${trade.symbol.toUpperCase()}</div>
                         </div>
-
-                        <h4>Storia Entry</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Entry #</th>
-                                    <th>Quantità</th>
-                                    <th>Prezzo</th>
-                                    <th>Importo</th>
-                                    <th>Data</th>
-                                </tr>
-                            </thead>
-                            <tbody>${entriesHtml}</tbody>
-                        </table>
-                        
-                        <div class="last-update">
-                            Ultimo aggiornamento: ${new Date().toLocaleString('it-IT')}
+                        <div class="summary-item">
+                            <div class="label">Prezzo Medio di Acquisto</div>
+                            <div class="value">$${avgPrice.toFixed(2)}</div>
                         </div>
-                        
-                        <small>Creato il ${new Date(trade.createdAt).toLocaleDateString('it-IT')}</small>
-                        
-                        <div class="note-actions">
-                            <button class="btn-edit" onclick="addEntryToTrade(${trade.id})">Aggiungi Entry</button>
-                            <button class="btn-danger" onclick="deleteTrade(${trade.id})">Elimina Trade</button>
+                        <div class="summary-item">
+                            <div class="label">Investimento Totale</div>
+                            <div class="value">$${totalInvestment.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Prezzo Attuale</div>
+                            <div class="value current-price">$${currentPrice ? currentPrice.toFixed(2) : 'N/A'}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Valore Attuale</div>
+                            <div class="value">$${currentValue.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Profitto/Perdita (P&L)</div>
+                            <div class="value ${pnlClass}">$${pnl.toFixed(2)} (${pnlPercent.toFixed(2)}%)</div>
                         </div>
                     </div>
-                `;
-            }
-            
-            container.innerHTML = html;
-        }
+                </div>
 
-        // Aggiungi entry al trade esistente
-        window.addEntryToTrade = function(tradeId) {
-            const trade = trades.find(t => t.id === tradeId);
-            if (trade) {
-                document.getElementById('crypto-symbol').value = trade.symbol;
-                document.getElementById('crypto-symbol').readOnly = true;
-                document.getElementById('edit-trade-id').value = tradeId;
-                window.scrollTo({top: 0, behavior: 'smooth'});
-            }
-        };
-
-        // Elimina trade
-        window.deleteTrade = function(id) {
-            if (confirm('Eliminare questo trade?')) {
-                trades = trades.filter(t => t.id !== id);
-                saveTrades();
-                renderTrades();
-            }
-        };
-
-        // Gestione form
-        document.getElementById('trade-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const symbol = document.getElementById('crypto-symbol').value.trim().toUpperCase();
-            const quantity = parseFloat(document.getElementById('trade-quantity').value);
-            const price = parseFloat(document.getElementById('trade-price').value);
-            const editId = document.getElementById('edit-trade-id').value;
-            
-            if (!symbol || !quantity || !price) return;
-            
-            const newEntry = {
-                quantity: quantity,
-                price: price,
-                timestamp: new Date().toISOString()
-            };
-            
-            if (editId) {
-                // Aggiungi entry a trade esistente
-                const tradeIndex = trades.findIndex(t => t.id === parseInt(editId));
-                if (tradeIndex !== -1) {
-                    trades[tradeIndex].entries.push(newEntry);
-                    trades[tradeIndex].updatedAt = new Date().toISOString();
-                }
-            } else {
-                // Verifica se esiste già un trade per questo symbol
-                const existingTrade = trades.find(t => t.symbol.toUpperCase() === symbol);
+                <h4>Storia Entry</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entry #</th>
+                            <th>Quantità</th>
+                            <th>Prezzo di Acquisto</th>
+                            <th>Importo Investito</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>${entriesHtml}</tbody>
+                </table>
                 
-                if (existingTrade) {
-                    // Aggiungi entry al trade esistente
-                    existingTrade.entries.push(newEntry);
-                    existingTrade.updatedAt = new Date().toISOString();
-                } else {
-                    // Crea nuovo trade
-                    trades.unshift({
-                        id: Date.now(),
-                        symbol: symbol,
-                        entries: [newEntry],
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString()
-                    });
-                }
-            }
-            
-            saveTrades();
-            renderTrades();
-            this.reset();
-            document.getElementById('crypto-symbol').readOnly = false;
-            document.getElementById('edit-trade-id').value = '';
-        });
-
-        // Backup functions
-        function scaricaDati() {
-            const data = JSON.stringify(trades, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `trades-backup_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function caricaDati() {
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedTrades = JSON.parse(e.target.result);
-                        if (Array.isArray(importedTrades)) {
-                            trades = importedTrades;
-                            saveTrades();
-                            renderTrades();
-                            alert('Dati importati con successo!');
-                            fileInput.value = '';
-                        } else {
-                            alert('Il file non contiene un formato di dati valido.');
-                        }
-                    } catch (error) {
-                        alert('Errore durante l\'importazione dei dati: ' + error.message);
-                    }
-                };
-                reader.readAsText(file);
-            } else {
-                alert('Seleziona un file da importare.');
-            }
-        }
-
-        // Inizializzazione
-        document.addEventListener('DOMContentLoaded', function() {
-            loadTrades();
-            renderTrades();
-        });
-    </script>
-	
-<script type="module">
-  import { initFirebase, caricaDatiPagina, salvaDatiPagina } from './firebase-utils.js';
-
-  const nomePagina = "trade"; // cambia per ogni pagina!
-
-  let datiCorrenti = null;
-
-  // Avvio
-  initFirebase().then(async () => {
-    datiCorrenti = await caricaDatiPagina(nomePagina);
-    if (datiCorrenti) {
-      console.log("✅ Dati caricati:", datiCorrenti);
-      // carica nella UI
-    } else {
-      console.log("ℹ️ Nessun dato presente.");
+                <div class="last-update">
+                    Ultimo aggiornamento: ${new Date().toLocaleString('it-IT')}
+                </div>
+                
+                <small>Creato il ${new Date(trade.createdAt).toLocaleDateString('it-IT')}</small>
+                
+                <div class="note-actions">
+                    <button class="btn-edit" onclick="addEntryToTrade(${trade.id})">Aggiungi Entry</button>
+                    <button class="btn-danger" onclick="deleteTrade(${trade.id})">Elimina Trade</button>
+                </div>
+            </div>
+        `;
     }
-  });
+    
+    container.innerHTML = html;
+}
 
-  // Quando vuoi salvare (es. su pulsante o evento)
-  function salva() {
-    // datiCorrenti = aggiorna con i nuovi dati
-    salvaDatiPagina(nomePagina, datiCorrenti);
-  }
+// Aggiungi entry al trade esistente
+window.addEntryToTrade = function(tradeId) {
+    const trade = trades.find(t => t.id === tradeId);
+    if (trade) {
+        document.getElementById('crypto-symbol').value = trade.symbol;
+        document.getElementById('crypto-symbol').readOnly = true;
+        document.getElementById('edit-trade-id').value = tradeId;
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+};
+
+// Elimina trade
+window.deleteTrade = function(id) {
+    if (confirm('Eliminare questo trade?')) {
+        trades = trades.filter(t => t.id !== id);
+        saveTrades();
+        renderTrades();
+    }
+};
+
+// Gestione form - NUOVO SISTEMA
+document.getElementById('trade-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const symbol = document.getElementById('crypto-symbol').value.trim().toUpperCase();
+    const quantity = parseFloat(document.getElementById('trade-quantity').value);
+    const investedAmount = parseFloat(document.getElementById('invested-amount').value);
+    const editId = document.getElementById('edit-trade-id').value;
+    
+    if (!symbol || !quantity || !investedAmount) {
+        alert('Compila tutti i campi');
+        return;
+    }
+    
+    // Ottieni prezzo attuale per calcolare il prezzo di acquisto
+    const currentPrice = await getPriceFromCoinGecko(symbol);
+    if (!currentPrice) {
+        alert('Impossibile ottenere il prezzo per ' + symbol);
+        return;
+    }
+    
+    const priceAtPurchase = investedAmount / quantity;
+    
+    const newEntry = {
+        quantity: quantity,
+        investedAmount: investedAmount,
+        priceAtPurchase: priceAtPurchase,
+        timestamp: new Date().toISOString()
+    };
+    
+    if (editId) {
+        // Aggiungi entry a trade esistente
+        const tradeIndex = trades.findIndex(t => t.id === parseInt(editId));
+        if (tradeIndex !== -1) {
+            trades[tradeIndex].entries.push(newEntry);
+            trades[tradeIndex].updatedAt = new Date().toISOString();
+        }
+    } else {
+        // Verifica se esiste già un trade per questo symbol
+        const existingTrade = trades.find(t => t.symbol.toUpperCase() === symbol);
+        
+        if (existingTrade) {
+            // Aggiungi entry al trade esistente
+            existingTrade.entries.push(newEntry);
+            existingTrade.updatedAt = new Date().toISOString();
+        } else {
+            // Crea nuovo trade
+            trades.unshift({
+                id: Date.now(),
+                symbol: symbol,
+                entries: [newEntry],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            });
+        }
+    }
+    
+    saveTrades();
+    renderTrades();
+    this.reset();
+    document.getElementById('crypto-symbol').readOnly = false;
+    document.getElementById('edit-trade-id').value = '';
+});
+
+// Backup functions
+function scaricaDati() {
+    const data = JSON.stringify(trades, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trades-backup_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function caricaDati() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedTrades = JSON.parse(e.target.result);
+                if (Array.isArray(importedTrades)) {
+                    trades = importedTrades;
+                    saveTrades();
+                    renderTrades();
+                    alert('Dati importati con successo!');
+                    fileInput.value = '';
+                } else {
+                    alert('Il file non contiene un formato di dati valido.');
+                }
+            } catch (error) {
+                alert('Errore durante l\'importazione dei dati: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    } else {
+        alert('Seleziona un file da importare.');
+    }
+}
+
+// Inizializzazione
+document.addEventListener('DOMContentLoaded', function() {
+    loadTrades();
+    renderTrades();
+});
 </script>
 
 </body>
