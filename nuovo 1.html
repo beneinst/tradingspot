@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Trade Crypto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .trade-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+        }
+        .trade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .trade-symbol {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .trade-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        .entries-list {
+            margin-top: 10px;
+        }
+        .entry-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: white;
+            margin-bottom: 5px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .profit-positive {
+            color: #28a745;
+        }
+        .profit-negative {
+            color: #dc3545;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-small {
+            width: auto;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema Trade Crypto</h1>
+        
+        <div id="message-container"></div>
+        
+        <div class="form-group">
+            <label for="crypto-symbol">Symbol Crypto:</label>
+            <input type="text" id="crypto-symbol" placeholder="es. bitcoin, ethereum, cardano">
+        </div>
+        
+        <div class="form-group">
+            <label for="invested-amount">Importo Investito ($):</label>
+            <input type="number" id="invested-amount" step="0.01" min="0">
+        </div>
+        
+        <button onclick="addTrade()" id="add-btn">Aggiungi Trade</button>
+        <button onclick="clearAllTrades()" class="btn-danger">Cancella Tutti i Trade</button>
+    </div>
+
+    <div class="container">
+        <h2>I Tuoi Trade</h2>
+        <div id="trades-container">
+            <div class="loading">Caricamento trade...</div>
+        </div>
+    </div>
+
+    <script>
+        // Sistema trade migliorato - inserimento per importo investito
+        // Cache per i prezzi delle crypto
+        let priceCache = {};
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
+
+        // Gestione trade
+        let trades = [];
+        let editingTradeId = null;
+
+        // Ottieni prezzo da CoinGecko
+        async function getPriceFromCoinGecko(symbol) {
+            try {
+                const cacheKey = symbol.toLowerCase();
+                const now = Date.now();
+                
+                // Controlla cache
+                if (priceCache[cacheKey] && (now - priceCache[cacheKey].timestamp) < CACHE_DURATION) {
+                    return priceCache[cacheKey].price;
+                }
+
+                // Prima prova con il symbol diretto
+                let response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${symbol.toLowerCase()}&vs_currencies=usd`);
+                let data = await response.json();
+                
+                if (data[symbol.toLowerCase()]?.usd) {
+                    const price = data[symbol.toLowerCase()].usd;
+                    priceCache[cacheKey] = { price, timestamp: now };
+                    return price;
+                }
+
+                // Fallback: cerca per symbol
+                const searchResponse = await fetch(`https://api.coingecko.com/api/v3/search?query=${symbol}`);
+                const searchData = await searchResponse.json();
+                
+                if (searchData.coins && searchData.coins.length > 0) {
+                    const coinId = searchData.coins[0].id;
+                    const priceResponse = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
+                    const priceData = await priceResponse.json();
+                    
+                    if (priceData[coinId]?.usd) {
+                        const price = priceData[coinId].usd;
+                        priceCache[cacheKey] = { price, timestamp: now };
+                        return price;
+                    }
+                }
+                
+                throw new Error(`Prezzo non trovato per ${symbol}`);
+            } catch (error) {
+                console.error(`Errore nel recupero prezzo per ${symbol}:`, error);
+                return null;
+            }
+        }
+
+        // Calcola importo medio ponderato e quantità totale
+        function calcolaStatisticheTrade(entries) {
+            let totalInvestment = 0;
+            let totalQuantity = 0;
+            
+            entries.forEach(entry => {
+                totalInvestment += entry.investedAmount;
+                totalQuantity += entry.quantity;
+            });
+            
+            const avgPrice = totalQuantity > 0 ? totalInvestment / totalQuantity : 0;
+            
+            return {
+                totalInvestment,
+                totalQuantity,
+                avgPrice
+            };
+        }
+
+        // Salva trade
+        function saveTrades() {
+            try {
+                localStorage.setItem('singleTrades', JSON.stringify(trades));
+                console.log('Trade salvati:', trades.length);
+            } catch (error) {
+                console.error('Errore nel salvataggio:', error);
+            }
+        }
+
+        // Carica trade
+        function loadTrades() {
+            try {
+                const saved = localStorage.getItem('singleTrades');
+                if (saved) {
+                    trades = JSON.parse(saved);
+                    console.log('Trade caricati:', trades.length);
+                }
+            } catch (error) {
+                console.error('Errore nel caricamento:', error);
+                trades = [];
+            }
+        }
+
+        // Render trade
+        async function renderTrades() {
+            const container = document.getElementById('trades-container');
+            if (!container) {
+                console.error('Container non trovato');
+                return;
+            }
+
+            if (trades.length === 0) {
+                container.innerHTML = '<div class="loading">Nessun trade presente. Aggiungi il tuo primo trade!</div>';
+                return;
+            }
+
+            container.innerHTML = '<div class="loading">Caricamento prezzi attuali...</div>';
+
+            let html = '';
+            
+            for (let trade of trades) {
+                const stats = calcolaStatisticheTrade(trade.entries);
+                
+                // Ottieni prezzo attuale
+                const currentPrice = await getPriceFromCoinGecko(trade.symbol);
+                
+                let profitLoss = 0;
+                let profitPercentage = 0;
+                let profitClass = '';
+                
+                if (currentPrice && stats.totalQuantity > 0) {
+                    const currentValue = stats.totalQuantity * currentPrice;
+                    profitLoss = currentValue - stats.totalInvestment;
+                    profitPercentage = (profitLoss / stats.totalInvestment) * 100;
+                    profitClass = profitLoss >= 0 ? 'profit-positive' : 'profit-negative';
+                }
+
+                html += `
+                    <div class="trade-card">
+                        <div class="trade-header">
+                            <span class="trade-symbol">${trade.symbol.toUpperCase()}</span>
+                            <div>
+                                <button onclick="addEntryToTrade(${trade.id})" class="btn-small">Aggiungi Entry</button>
+                                <button onclick="deleteTrade(${trade.id})" class="btn-small btn-danger">Elimina</button>
+                            </div>
+                        </div>
+                        
+                        <div class="trade-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">$${stats.totalInvestment.toFixed(2)}</div>
+                                <div class="stat-label">Investito</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${stats.totalQuantity.toFixed(6)}</div>
+                                <div class="stat-label">Quantità</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">$${stats.avgPrice.toFixed(6)}</div>
+                                <div class="stat-label">Prezzo Medio</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">$${currentPrice ? currentPrice.toFixed(6) : 'N/A'}</div>
+                                <div class="stat-label">Prezzo Attuale</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value ${profitClass}">$${profitLoss.toFixed(2)}</div>
+                                <div class="stat-label">Profitto/Perdita</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value ${profitClass}">${profitPercentage.toFixed(2)}%</div>
+                                <div class="stat-label">Percentuale</div>
+                            </div>
+                        </div>
+                        
+                        <div class="entries-list">
+                            <strong>Entry (${trade.entries.length}):</strong>
+                            ${trade.entries.map((entry, index) => `
+                                <div class="entry-item">
+                                    <span>Entry ${index + 1}</span>
+                                    <span>Investito: $${entry.investedAmount.toFixed(2)}</span>
+                                    <span>Quantità: ${entry.quantity.toFixed(6)}</span>
+                                    <span>Prezzo: $${entry.pricePerUnit.toFixed(6)}</span>
+                                    <span>${new Date(entry.timestamp).toLocaleDateString()}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Aggiungi nuovo trade
+        async function addTrade() {
+            const symbol = document.getElementById('crypto-symbol').value.trim();
+            const investedAmount = parseFloat(document.getElementById('invested-amount').value);
+            
+            if (!symbol || !investedAmount || investedAmount <= 0) {
+                showMessage('Inserisci un symbol valido e un importo maggiore di 0', 'error');
+                return;
+            }
+
+            const addBtn = document.getElementById('add-btn');
+            addBtn.disabled = true;
+            addBtn.textContent = 'Recuperando prezzo...';
+
+            try {
+                const price = await getPriceFromCoinGecko(symbol);
+                
+                if (!price) {
+                    showMessage('Impossibile recuperare il prezzo per ' + symbol, 'error');
+                    return;
+                }
+
+                const quantity = investedAmount / price;
+                
+                // Trova trade esistente o crea nuovo
+                let existingTrade = trades.find(t => t.symbol.toLowerCase() === symbol.toLowerCase());
+                
+                if (existingTrade) {
+                    // Aggiungi entry a trade esistente
+                    existingTrade.entries.push({
+                        investedAmount,
+                        quantity,
+                        pricePerUnit: price,
+                        timestamp: Date.now()
+                    });
+                    showMessage(`Entry aggiunta al trade ${symbol.toUpperCase()}!`, 'success');
+                } else {
+                    // Crea nuovo trade
+                    const newTrade = {
+                        id: Date.now(),
+                        symbol: symbol.toLowerCase(),
+                        entries: [{
+                            investedAmount,
+                            quantity,
+                            pricePerUnit: price,
+                            timestamp: Date.now()
+                        }],
+                        createdAt: Date.now()
+                    };
+                    
+                    trades.push(newTrade);
+                    showMessage(`Nuovo trade ${symbol.toUpperCase()} creato!`, 'success');
+                }
+
+                // Salva e aggiorna
+                saveTrades();
+                renderTrades();
+                
+                // Reset form
+                document.getElementById('crypto-symbol').value = '';
+                document.getElementById('invested-amount').value = '';
+                
+            } catch (error) {
+                showMessage('Errore: ' + error.message, 'error');
+            } finally {
+                addBtn.disabled = false;
+                addBtn.textContent = 'Aggiungi Trade';
+            }
+        }
+
+        // Aggiungi entry a trade esistente
+        async function addEntryToTrade(tradeId) {
+            const investedAmount = prompt('Inserisci importo da investire ($):');
+            
+            if (!investedAmount || parseFloat(investedAmount) <= 0) {
+                showMessage('Importo non valido', 'error');
+                return;
+            }
+
+            const trade = trades.find(t => t.id === tradeId);
+            if (!trade) {
+                showMessage('Trade non trovato', 'error');
+                return;
+            }
+
+            try {
+                const price = await getPriceFromCoinGecko(trade.symbol);
+                
+                if (!price) {
+                    showMessage('Impossibile recuperare il prezzo', 'error');
+                    return;
+                }
+
+                const amount = parseFloat(investedAmount);
+                const quantity = amount / price;
+                
+                trade.entries.push({
+                    investedAmount: amount,
+                    quantity,
+                    pricePerUnit: price,
+                    timestamp: Date.now()
+                });
+
+                saveTrades();
+                renderTrades();
+                showMessage('Entry aggiunta con successo!', 'success');
+                
+            } catch (error) {
+                showMessage('Errore: ' + error.message, 'error');
+            }
+        }
+
+        // Elimina trade
+        function deleteTrade(tradeId) {
+            if (confirm('Sei sicuro di voler eliminare questo trade?')) {
+                trades = trades.filter(t => t.id !== tradeId);
+                saveTrades();
+                renderTrades();
+                showMessage('Trade eliminato', 'success');
+            }
+        }
+
+        // Cancella tutti i trade
+        function clearAllTrades() {
+            if (confirm('Sei sicuro di voler cancellare tutti i trade? Questa azione non può essere annullata.')) {
+                trades = [];
+                saveTrades();
+                renderTrades();
+                showMessage('Tutti i trade sono stati cancellati', 'success');
+            }
+        }
+
+        // Mostra messaggio
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="${type}">${message}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // Gestione eventi
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTrades();
+            renderTrades();
+            
+            // Enter key per aggiungere trade
+            document.getElementById('invested-amount').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTrade();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
