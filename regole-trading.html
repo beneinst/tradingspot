@@ -4,276 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regole e Appunti</title>
-    <link rel="icon" type="image/png" href="favicon.png"> 
-    <style>
-        :root {
-            --color-primary: #4a90e2;
-            --color-secondary: #2ecc71;
-            --color-danger: #e74c3c;
-            --color-warning: #f39c12;
-
-            --color-bg: #1e1e2f;
-            --color-surface: #2a2a3d;
-            --color-border: #3a3a4d;
-
-            --color-text: #e0e0e0;
-            --color-muted: #a0a0b2;
-            --color-heading: #ffffff;
-
-            --color-footer-bg: #131322;
-            --color-footer-text: #f2bb66;
-            --color-link: #faebd7;
-            --color-link-hover: #ffdb58;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            color: var(--color-text);
-            padding: 20px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background-color: #222831;
-            padding: 20px 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.7);
-            margin-bottom: 20px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .form-container {
-            background-color: var(--color-surface);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-            margin-bottom: 20px;
-        }
-
-        .section-title {
-            color: var(--color-primary);
-            border-bottom: 1px solid var(--color-border);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid var(--color-border);
-            border-radius: 5px;
-            font-size: 16px;
-            background-color: #1b1b2c;
-            color: var(--color-text);
-        }
-
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .image-upload-container {
-            margin-bottom: 15px;
-        }
-
-        .image-upload-label {
-            color: var(--color-muted);
-            font-size: 14px;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .image-preview {
-            display: none;
-            margin-top: 10px;
-            border-radius: 5px;
-            max-width: 100%;
-            max-height: 200px;
-            border: 2px solid var(--color-border);
-        }
-
-        .btn-primary {
-            background-color: var(--color-primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-
-        .btn-primary:hover {
-            background-color: #357ab8;
-        }
-
-        .btn-danger {
-            background-color: var(--color-danger);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-
-        .btn-secondary {
-            background-color: var(--color-secondary);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            margin-right: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .btn-secondary:hover {
-            background-color: #27ae60;
-        }
-
-        .rules-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .rule {
-            background-color: var(--color-surface);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-            position: relative;
-        }
-
-        .rule h3 {
-            margin-bottom: 15px;
-            color: var(--color-primary);
-            font-size: 1.3em;
-        }
-
-        .rule-content {
-            margin-bottom: 15px;
-            color: var(--color-text);
-            line-height: 1.6;
-            white-space: pre-wrap;
-        }
-
-        .rule-image {
-            margin: 15px 0;
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            border: 2px solid var(--color-border);
-            display: block;
-        }
-
-        .rule-date {
-            color: var(--color-muted);
-            font-size: 0.9em;
-            margin-bottom: 15px;
-        }
-
-        .rule-actions {
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .card {
-            background-color: var(--color-surface);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-            margin-top: 20px;
-        }
-
-        .card-header {
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--color-border);
-            padding-bottom: 10px;
-        }
-
-        .card-header h2 {
-            color: var(--color-heading);
-        }
-
-        .backup-container {
-            display: flex;
-            align-items: center;
-            margin-top: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        input[type="file"] {
-            max-width: 50%;
-            background-color: var(--color-surface);
-            color: var(--color-text);
-            border: 1px solid var(--color-border);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 0;
-            color: var(--color-muted);
-        }
-
-        .footer {
-            margin-top: 30px;
-            margin-bottom: 10px;
-            text-align: center;
-            font-size: 16px;
-            color: #f2bb66;
-            font-weight: normal;
-        }
-
-        .footer a {
-            color: #ffe;
-            text-decoration: none;
-            margin: 0 8px;
-            transition: color 0.3s ease;
-        }
-
-        .footer a:hover {
-            color: #ffdb58;
-        }
-
-        h2 {
-            color: #739bf2 !important;
-            font-weight: bold !important;
-            letter-spacing: -0.1px !important;
-        }
-
-        @media (max-width: 600px) {
-            .backup-container {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .backup-container button, .backup-container input {
-                margin: 5px 0;
-                width: 100%;
-            }
-        }
-    </style>
+	<link rel="icon" type="image/png" href="favicon.png"> 
+	<link rel="stylesheet" href="css/regole.css">
+	<link rel="stylesheet" href="css/menusotto.css">
 </head>
 <body>
     <div class="container">
@@ -318,229 +51,59 @@
             </div>
         </div>
         
-     <div class="footer">
-            Trading Spot Manager v1.1 | 
-            <a href="https://beneinst.github.io/tradingspot/index.html">Operatività</a> | 
-            <a href="https://beneinst.github.io/tradingspot/panoramica-capitale.html">Capitale</a> | 
-			<a href="https://beneinst.github.io/tradingspot/Trade12.html">Trade</a> |
-            <a href="https://beneinst.github.io/tradingspot/blocco-note.html">Note</a> | 
-            <a href="https://beneinst.github.io/tradingspot/chartflow/index.html">Segnali</a> |
-            <a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore</a> | 
-            <a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a> |
-            <a href="https://beneinst.github.io/tradingspot/candlestick.html">Candlestick</a> | 
-            <a href="https://beneinst.github.io/tradingspot/cheat-sheet.html">Patterns</a>
-        </div>
-    </div>
+    
+    <div style="padding: 15px;"></div>  
+		
+		
+	<!-- FOOTER -->
+	<div class="container">
+<div class="iflow-body">
+  <nav class="iflow-custom-menu">
+    <ul>
+      <li>
+        <div class="iflow-menu-label">Home</div>
+        <ul>
+          <li><a href="https://beneinst.github.io/tradingspot/">Home</a></li>
+        </ul>
+      </li>
+      <li>
+        <div class="iflow-menu-label">Gestione</div>
+        <ul>
+          <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
+          <li><a href="https://beneinst.github.io/tradingspot/Trade12.html">Trade Attivi</a></li>
+          <li><a href="https://beneinst.github.io/tradingspot/panoramica-capitale.html">Panoramica Capitale</a></li>
+          <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
+        </ul>
+      </li>
+      <li>
+        <div class="iflow-menu-label">Strategia 4H</div>
+        <ul>
+          <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
+          <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore</a></li>
+          <li><a href="https://beneinst.github.io/tradingspot/chartflow/index.html">Segnali</a></li>
+        </ul>
+      </li>
+      <li>
+        <div class="iflow-menu-label">Fondamenti</div>
+        <ul>
+          <li><a href="https://beneinst.github.io/tradingspot/cheat-sheet.html">Patterns</a></li>
+          <li><a href="https://beneinst.github.io/tradingspot/candlestick.html">Candlestick</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
 
-    <script>
-        // Array per memorizzare le regole
-        let rules = [];
-        
-        // Carica le regole salvate al caricamento della pagina
-        document.addEventListener('DOMContentLoaded', () => {
-            loadRules();
-            renderRules();
-        });
-        
-        // Gestione anteprima immagine
-        document.getElementById('rule-image').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const preview = document.getElementById('image-preview');
-            
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                preview.style.display = 'none';
-            }
-        });
-        
-        // Gestione del form di invio delle regole
-        document.getElementById('rule-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const titleInput = document.getElementById('rule-title');
-            const contentInput = document.getElementById('rule-content');
-            const imageInput = document.getElementById('rule-image');
-            const preview = document.getElementById('image-preview');
-            
-            const title = titleInput.value.trim();
-            const content = contentInput.value.trim();
-            
-            if (title && content) {
-                let imageData = null;
-                if (imageInput.files[0]) {
-                    imageData = preview.src; // Base64 dell'immagine
-                }
-                
-                addRule(title, content, imageData);
-                
-                // Reset form
-                titleInput.value = '';
-                contentInput.value = '';
-                imageInput.value = '';
-                preview.style.display = 'none';
-            }
-        });
-        
-        // Funzione per aggiungere una nuova regola
-        function addRule(title, content, imageData = null) {
-            const rule = {
-                id: Date.now(),
-                title: title,
-                content: content,
-                image: imageData,
-                createdAt: new Date().toISOString()
-            };
-            
-            // Aggiungi la regola all'inizio dell'array
-            rules.unshift(rule);
-            
-            // Salva e aggiorna la visualizzazione
-            saveRules();
-            renderRules();
-        }
-        
-        // Funzione per eliminare una regola
-        function deleteRule(id) {
-            if (confirm('Sei sicuro di voler eliminare questa regola?')) {
-                rules = rules.filter(rule => rule.id !== id);
-                saveRules();
-                renderRules();
-            }
-        }
-        
-        // Funzione per salvare le regole nel localStorage
-        function saveRules() {
-            try {
-                localStorage.setItem('tradingRules', JSON.stringify(rules));
-            } catch (e) {
-                console.error('Errore nel salvataggio:', e);
-                alert('Errore nel salvataggio. Le immagini potrebbero essere troppo grandi.');
-            }
-        }
-        
-        // Funzione per caricare le regole dal localStorage
-        function loadRules() {
-            try {
-                const savedRules = localStorage.getItem('tradingRules');
-                if (savedRules) {
-                    rules = JSON.parse(savedRules);
-                }
-            } catch (e) {
-                console.error('Errore nel caricamento:', e);
-                rules = [];
-            }
-        }
-        
-        // Funzione per visualizzare le regole
-        function renderRules() {
-            const rulesContainer = document.getElementById('rules-container');
-            rulesContainer.innerHTML = '';
-            
-            if (rules.length === 0) {
-                rulesContainer.innerHTML = `
-                    <div class="empty-state">
-                        <p>Non hai ancora regole. Aggiungi una nuova regola usando il form qui sopra.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            rules.forEach(rule => {
-                const ruleElement = document.createElement('div');
-                ruleElement.className = 'rule';
-                
-                const createdDate = new Date(rule.createdAt).toLocaleString('it-IT');
-                
-                ruleElement.innerHTML = `
-                    <h3>${rule.title}</h3>
-                    <div class="rule-date">Creato il: ${createdDate}</div>
-                    <div class="rule-content">${rule.content}</div>
-                    ${rule.image ? `<img src="${rule.image}" class="rule-image" alt="Immagine regola">` : ''}
-                    <div class="rule-actions">
-                        <button onclick="deleteRule(${rule.id})" class="btn-danger">Elimina</button>
-                    </div>
-                `;
-                rulesContainer.appendChild(ruleElement);
-            });
-        }
-        
-        // Funzione per scaricare i dati come file JSON
-        function scaricaDati() {
-            const data = JSON.stringify(rules, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `regole-trading-backup_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-        
-        // Funzione per caricare i dati da un file JSON
-        function caricaDati() {
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
-            
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedRules = JSON.parse(e.target.result);
-                        if (Array.isArray(importedRules)) {
-                            // Sostituisci tutte le regole
-                            rules = importedRules;
-                            
-                            saveRules();
-                            renderRules();
-                            alert('Dati importati con successo!');
-                            fileInput.value = '';
-                        } else {
-                            alert('Il file non contiene un formato di dati valido.');
-                        }
-                    } catch (error) {
-                        alert('Errore durante l\'importazione dei dati: ' + error.message);
-                    }
-                };
-                reader.readAsText(file);
-            } else {
-                alert('Seleziona un file da importare.');
-            }
-        }
-    </script>
-	
-<script type="module">
-  import { initFirebase, caricaDatiPagina, salvaDatiPagina } from './firebase-utils.js';
+  <div class="iflow-copyright-bar">
+  <p></p>
+   <p> © 2025 Invest Flow | Trading Spot di Gerardo D'Orrico – Tutti i diritti riservati.</p><p></p>
+  </div>
+</div>
+</div>
 
-  const nomePagina = "regole"; // cambia per ogni pagina!
 
-  let datiCorrenti = null;
 
-  // Avvio
-  initFirebase().then(async () => {
-    datiCorrenti = await caricaDatiPagina(nomePagina);
-    if (datiCorrenti) {
-      console.log("✅ Dati caricati:", datiCorrenti);
-      // carica nella UI
-    } else {
-      console.log("ℹ️ Nessun dato presente.");
-    }
-  });
-
-  // Quando vuoi salvare (es. su pulsante o evento)
-  function salva() {
-    // datiCorrenti = aggiorna con i nuovi dati
-    salvaDatiPagina(nomePagina, datiCorrenti);
-  }
-</script>
+<script src="js/regole.js"></script>
+<script type="module" src="jsmodule/regole_Mod.js"></script>
 
 </body>
 </html>
