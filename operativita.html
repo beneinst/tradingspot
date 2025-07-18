@@ -62,6 +62,9 @@
                 <div class="value total-value" id="totalEarn">0,00</div>
             </div>
         </div>
+		</div>
+		<div style="padding: 5px;"></div> 
+        <div class="container">
         
         <div class="input-section">
             <div class="input-group">
@@ -74,7 +77,7 @@
         
         <div class="tables-container">
             <div class="table-section">
-                <h2>Importi Mese Corrente</h2>
+                <h3 style="color: #4caf50 !important;">🧑🏽‍💻 Importi Mese Corrente</h3>
                 <table id="currentMonthTable">
                     <thead>
                         <tr>
@@ -89,7 +92,7 @@
             </div>
             
             <div class="table-section">
-                <h2>Storico Mensile</h2>
+                <h3 style="color: #4caf50 !important;">🎍 Storico Mensilità</h3>
                 <table id="historicalTable">
                     <thead>
                         <tr>
@@ -108,24 +111,24 @@
 		
     
 	
-	 <div class="backup-container">
+	 <div class="container">
         
-        <h2>Grafico Storico Mensile</h2>
-    <canvas id="monthlyChart" width="800" height="400"></canvas>
+        <h3 style="color: #4caf50 !important;">📈 Grafico Storico Mensile</h3>
+    <canvas id="monthlyChart" width="1150" height="550"></canvas>
     <div style="display: flex; gap: 10px; margin-top: 15px;">
 	
-        <button id="downloadChartBtn" class="btn-secondary">Scarica Grafico</button>
-        <button id="downloadTableBtn" class="btn-secondary">Scarica Tabella</button>
+        <button id="downloadChartBtn" class="btn-danger">Scarica Grafico</button>
+        <button id="downloadTableBtn" class="btn-danger">Scarica Tabella</button>
     </div>
 	</div>
 	
 
 
    <div class="backup-container">
-            <button id="scaricaDatiBtn" class="btn-secondary">Scarica Dati (JSON)</button>
+            <button id="scaricaDatiBtn" class="btn-edit">Scarica Dati (JSON)</button>
             <input type="file" id="fileInput" class="file-input" accept=".json">
-            <label for="fileInput" class="btn-secondary" style="cursor: pointer;">Seleziona File</label>
-            <button id="caricaDatiBtn">Carica Dati</button>
+            <label for="fileInput" class="btn-danger" style="cursor: pointer;">Seleziona File</label>
+            <button id="caricaDatiBtn" class="btn-edit">Carica Dati</button>
         </div>
         
         <div id="message"></div>
@@ -134,7 +137,7 @@
 		</div>
 		<div class="card">
             <div class="card-header">
-                <h2 style="color: #4caf50 !important;">🚀 Sistema a Soglie incrementali al capitale</h2>
+                <h3 style="color: #9ac5d3 !important;">🚀 Sistema a Soglie incrementali del capitale</h3>
             </div>
 		<div style="height: 28px;"></div>
 	<div class="container">
@@ -157,7 +160,7 @@
 </div>
 
         
-        <button id="calculateBtn" class="btn-primary">Aggiorna Sistema</button>
+        <button id="calculateBtn" class="btn-danger">Aggiorna Sistema</button>
     </div>
 
     <div id="alertContainer"></div>
