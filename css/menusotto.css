@@ -36,8 +36,8 @@
 
 .iflow-custom-menu {
   background-color: var(--color-menu-bg);
-  padding: 10px 12px;
-  border-radius: 12px;
+  padding: 3px 3px;
+  border-radius: 10px;
   box-shadow: var(--color-shadow);
   display: flex;
   justify-content: space-around;
@@ -152,7 +152,6 @@
 
 /* Copyright footer */
 .iflow-copyright-bar {
-  background: rgba(44, 44, 44, 0.7);
   color: var(--color-muted);
   text-align: center;
   font-size: 1em;

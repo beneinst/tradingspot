@@ -319,7 +319,7 @@ function creaGraficoCapitale() {
         legend: {
           position: 'right',
           labels: {
-            color: '#ebaa68',
+            color: '#c3c3c3',
             font: {
               size: 15,
               family: 'Trebuchet MS'

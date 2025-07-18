@@ -1,0 +1,65 @@
+<style>
+  .button-flex-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .sppb-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    text-decoration: none;
+    text-align: center;
+    border: 1px solid;
+    transition: background 0.2s, color 0.2s;
+  }
+  .sppb-btn-warning {
+    background-color: #f0ad4e;
+    color: white;
+    border-color: #eea236;
+  }
+  .sppb-btn-outline {
+    background-color: transparent;
+    color: #f0ad4e;
+    border-color: #f0ad4e;
+  }
+  .sppb-btn-xlg {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+  .sppb-btn-square {
+    border-radius: 0;
+  }
+  /* Effetto hover: il pulsante (outline) viene riempito del colore bordo */
+  .sppb-btn.sppb-btn-outline:hover,
+  .sppb-btn.sppb-btn-outline:focus {
+    background-color: #f0ad4e;
+    color: #fff;
+    border-color: #f0ad4e;
+  }
+</style>
+
+<div class="button-flex-container">
+  <div class="sppb-button-wrapper">
+    <a href="https://beneinst.github.io/tradingspot/operativita.html"
+       id="btn-1752502334234"
+       class="sppb-btn sppb-btn-warning sppb-btn-xlg sppb-btn-square sppb-btn-outline">
+      Operatività
+    </a>
+  </div>
+  <div class="sppb-button-wrapper">
+    <a href="https://beneinst.github.io/tradingspot/Trade12.html"
+       id="btn-yNOPsjGmmMEZBpBytjBZk"
+       class="sppb-btn sppb-btn-warning sppb-btn-xlg sppb-btn-square sppb-btn-outline">
+      Trade Attivi
+    </a>
+  </div>
+  <div class="sppb-button-wrapper">
+    <a href="https://beneinst.github.io/tradingspot/panoramica-capitale.html"
+       id="btn-bUBiYldg4zKtz-_6V9hW2"
+       class="sppb-btn sppb-btn-warning sppb-btn-xlg sppb-btn-square sppb-btn-outline">
+      Panoramica
+    </a>
+  </div>
+</div>
