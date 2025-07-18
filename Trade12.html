@@ -41,7 +41,7 @@
   
 
         <div class="form-container">
-            <h2 class="section-title" <h2 style="color: #4caf50 !important;">💱 Aggiungi Entry al Trade</h2>
+            <h3 class="section-title" style="color: #4caf50 !important;">💱 Aggiungi Entry al Trade</h3>
             <form id="trade-form" class="trade-form">
                 <div class="form-row">
                     <label for="crypto-symbol">Simbolo Crypto:</label>
@@ -64,19 +64,20 @@
         </div>
 
         <div class="form-container">
-            <h2 class="section-title" <h2 style="color: #4caf50 !important;">🎯 I tuoi Trade Attivi</h2>
+            <h3 class="section-title" style="color: #4caf50 !important;">🎯 I tuoi Trade Attivi</h3>
             <div id="trades-container"></div>
         </div>
 
         <div class="card">
-            <div class="card-header">
-                <h2 style="color: #4caf50 !important;">💽 Backup & Ripristino</h2>
-            </div>
+            <div class="card">
+                <h3 style="color: #4caf50 !important;">💽 Backup & Ripristino</h3>
+            
             <p>Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
-            <div class="backup-container">
-                <button onclick="scaricaDati()" class="btn-secondary">Scarica Dati (JSON)</button>
+			<div style="padding: 15px;"></div>
+            <div class="container">
+                <button onclick="scaricaDati()" class="btn-edit">Scarica Dati (JSON)</button>
                 <input type="file" id="fileInput" accept=".json" style="flex: 1;">
-                <button onclick="caricaDati()" class="btn-primary">Carica Dati</button>
+                <button onclick="caricaDati()" class="btn-edit">Carica Dati</button>
             </div>
         </div>
 
