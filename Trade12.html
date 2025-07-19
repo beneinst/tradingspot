@@ -41,18 +41,18 @@
   
 
         <div class="form-container">
-            <h3 class="section-title" style="color: #4caf50 !important;">💱 Aggiungi Entry al Trade</h3>
+            <h3 class="section-title" style="color: #99C68E !important;">💱 Aggiungi Entry al Trade</h3>
             <form id="trade-form" class="trade-form">
                 <div class="form-row">
-                    <label for="crypto-symbol">Simbolo Crypto:</label>
+                    <label for="crypto-symbol" style="color: #8EEBEC !important;">SIMBOLO CRIPTO</label>
                     <input type="text" id="crypto-symbol" placeholder="BTC" required>
                 </div>
                 <div class="form-row">
-                    <label for="trade-quantity">Quantità:</label>
+                    <label for="trade-quantity" style="color: #8EEBEC !important;">QUANTITA'</label>
                     <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required>
                 </div>
                 <div class="form-row">
-                    <label for="trade-price">Importo Entry (USDT):</label>
+                    <label for="trade-price" style="color: #8EEBEC !important;">IMPORTO ENTRY(USDT):</label>
                     <input type="number" id="invested-amount" placeholder="Importo investito ($)" step="0.01" required>
                 </div>
                 <div class="form-row">
@@ -64,13 +64,13 @@
         </div>
 
         <div class="form-container">
-            <h3 class="section-title" style="color: #4caf50 !important;">🎯 I tuoi Trade Attivi</h3>
+            <h4 class="section-title" style="color: #99C68E !important;">🎯 I tuoi Trade Attivi</h4>
             <div id="trades-container"></div>
         </div>
 
         <div class="card">
             <div class="card">
-                <h3 style="color: #4caf50 !important;">💽 Backup & Ripristino</h3>
+                <h3 style="color: #99C68E !important;">💽 Backup & Ripristino</h3>
             
             <p>Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
 			<div style="padding: 15px;"></div>
@@ -79,7 +79,7 @@
                 <input type="file" id="fileInput" accept=".json" style="flex: 1;">
                 <button onclick="caricaDati()" class="btn-edit">Carica Dati</button>
             </div>
-        </div>
+        </div></div>
 
       <div style="padding: 5px;"></div>  
 		
@@ -314,7 +314,7 @@ async function renderTrades() {
 
         html += `
             <div class="note">
-                <h3>${trade.symbol.toUpperCase()} - Trade</h3>
+                <h3>🪙 ${trade.symbol.toUpperCase()} | Trade</h3>
                 
                 <div class="trade-summary">
                     <h3>Riepilogo Trade</h3>
@@ -346,7 +346,7 @@ async function renderTrades() {
                     </div>
                 </div>
 
-                <h4>Storia Entry</h4>
+                <h4>Storia Entry</h4><p></p>
                 <table>
                     <thead>
                         <tr>
