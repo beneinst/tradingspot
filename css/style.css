@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'Bitcount';
-  src: url('https://beneinst.github.io/tradingspot/componenti/BitcountGridDouble_Cursive-Medium.ttf') format('truetype');
+  src: url('https://beneinst.github.io/tradingspot/componenti/BitcountPropSingle-Regular.ttf') format('truetype');
 }
 
 @font-face {
@@ -13,7 +13,7 @@
   --font-body: 'AncizarSans', sans-serif;
 }
 
-body {
+body, p {
   font-family: var(--font-body);
   font-size: 1.05em;
   line-height: 1.8;
