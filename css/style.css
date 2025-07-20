@@ -1,21 +1,12 @@
-/* style.css */
-/*@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap'); */
-/* Titoli - Font in stile "bit art" */
 @font-face {
   font-family: 'Bitcount';
   src: url('https://beneinst.github.io/tradingspot/componenti/BitcountGridDouble_Cursive-Medium.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
 }
 
-/* Corpo del testo */
 @font-face {
   font-family: 'AncizarSans';
   src: url('https://beneinst.github.io/tradingspot/componenti/AncizarSans-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
 }
-
 
 :root {
   --font-heading: 'Bitcount', monospace;
