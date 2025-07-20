@@ -13,18 +13,18 @@
   --font-body: 'AncizarSans', sans-serif;
 }
 
-body, p {
+p {
   font-family: var(--font-body);
-  font-size: 1.05em;
-  line-height: 1.8;
-  background-color: #1e1e1e;
+  
+  
   color: #e0e0e0;
-  margin: 0;
-  padding: 20px;
+  
+  
 }
 
 h1, h2, h3, h4, h5, header {
   font-family: var(--font-heading);
+  font-size: 1.5em;
   color: #FFD012;
 }
 
