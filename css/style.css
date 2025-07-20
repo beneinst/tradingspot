@@ -1,0 +1,29 @@
+/* style.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap');
+
+:root {
+  --font-heading: 'Montserrat', sans-serif;
+  --font-body: 'Roboto', sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1.05em;
+  line-height: 1.8;
+  background: #1e1e1e;
+  color: #e0e0e0;
+}
+
+/* Titoli */
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: #FFD012;
+}
+
+/* Paragrafi e liste */
+p, ul, li {
+  font-family: var(--font-body);
+}
+
+/* Altri elementi layout possono seguire... */
