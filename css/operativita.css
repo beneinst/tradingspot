@@ -56,12 +56,12 @@
     justify-content: space-between;
     align-items: center;
     background-color: #2E3B4E;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.9);
 }
 
 .stats-box h3 {
     margin: 0;
-    font-size: 16px;
+    font-size: 26px;
     color: #F2F2F2;
 }
 
