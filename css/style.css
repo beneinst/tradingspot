@@ -4,6 +4,12 @@
 }
 
 @font-face {
+  font-family: 'Bitcount';
+  src: url('https://beneinst.github.io/tradingspot/componenti/BitcountPropSingle-Light.ttf') format('truetype');
+}
+
+
+@font-face {
   font-family: 'AncizarSans';
   src: url('https://beneinst.github.io/tradingspot/componenti/TitilliumWeb-Regular.ttf') format('truetype');
 }
@@ -11,22 +17,37 @@
 :root {
   --font-heading: 'Bitcount', monospace;
   --font-body: 'AncizarSans', sans-serif;
+  
 }
 
 p {
   font-family: var(--font-body);
-  
-  
   color: #e0e0e0;
-  
-  
 }
 
-h1, h2, h3, h4, h5, header {
+/* Heading Styles */
+h1, header {
   font-family: var(--font-heading);
-  font-size: 1.5em;
-  color: #FFD012;
+  color: var(--color-heading-main);
 }
+
+h2 {
+  font-family: var(--font-heading-light);
+  color: var(--color-heading-2);
+}
+h3 {
+  font-family: var(--font-heading-light);
+  color: var(--color-heading-3);
+}
+h4 {
+  font-family: var(--font-heading-light);
+  color: var(--color-heading-4);
+}
+h5 {
+  font-family: var(--font-heading-light);
+  color: var(--color-heading-5);
+}
+
 
 
 /* Altri elementi layout possono seguire... */
