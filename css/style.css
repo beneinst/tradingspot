@@ -12,20 +12,26 @@
 }
 
 :root {
+	
   --font-heading: 'Bitcount', monospace;
   --font-heading-light: 'Bitcount-Light', monospace;
   --font-body: 'AncizarSans', sans-serif;
-
+  
   /* Palette colori headings */
   --color-heading-main: #FFD012; /* h1 e header */
   --color-heading-2: #BF9900;    /* h2 */
   --color-heading-3: #E8BA00;    /* h3 */
   --color-heading-4: #FFCD04;    /* h4 */
   --color-heading-5: #FFD21F;    /* h5 */
+  --color-header-bg: #2e2f3b;    /* Colore di partenza gradient */
+  --color-border: #35354d;
+  --color-border-light: #44455a;
+  --color-heading: var(--color-heading-main);
 }
 
 
-p {
+
+p, body {
   font-family: var(--font-body);
   color: #e0e0e0;
   font-size: 18px;
@@ -129,22 +135,25 @@ body {
 
 /* Header */
 .header {
-    background: linear-gradient(135deg, var(--color-header-bg) 0%, #0f0f0f 100%);
-    padding: 25px 30px;
-    border-radius: 8px;
-    border: 1px solid var(--color-border);
-    border-bottom: 2px solid var(--color-border-light);
-    margin-bottom: 30px;
-    width: 100%;
-    box-sizing: border-box;
-    color: var(--color-heading);
-    box-shadow: 0 2px 20px rgba(0,0,0,0.8);
+  background: linear-gradient(135deg, var(--color-header-bg) 0%, #0f0f0f 100%);
+  padding: 25px 30px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-bottom: 2px solid var(--color-border-light);
+  margin-bottom: 30px;
+  width: 100%;
+  box-sizing: border-box;
+  color: var(--color-heading);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.8);
 }
+
 
 .header h1 {
     font-size: 1.9em;
     text-align: left;
     margin-left: 20px;
+	 font-family: var(--font-heading);
+  color: var(--color-heading-main);
     
 }
 
