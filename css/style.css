@@ -66,7 +66,6 @@ small {
   font-size: 0.8em;              /* Dimensione più piccola rispetto al testo normale */
 }
 
-
 /* Heading Styles */
 h1, header {
   font-family: var(--font-heading);
@@ -141,12 +140,6 @@ body {
     color: var(--color-heading);
     box-shadow: 0 2px 20px rgba(0,0,0,0.8);
 }
-@media (max-width: 1,350px) {
-  .container {
-    width: 95%;
-  }
-}
-
 
 .header h1 {
     font-size: 1.9em;
@@ -154,5 +147,14 @@ body {
     margin-left: 20px;
     
 }
+
+.link-no-underline {
+    text-decoration: none;
+    color: white;
+  }
+
+  .link-no-underline:hover {
+    text-decoration: underline;
+  }
 
 /* Altri elementi layout possono seguire... */
