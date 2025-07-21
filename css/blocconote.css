@@ -22,30 +22,10 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
 }
 
-body {
-    background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-    color: var(--color-text);
-    padding: 20px;
-    font-family: 'Poppins', sans-serif;
-}
 
-.container {
-    max-width: 1300px;
-    margin: 0 auto;
-}
-
-.header {
-   background-color: #222831;
-    padding: 20px 25px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
-    margin-bottom: 20px;
-    width: 100%;
-    box-sizing: border-box;
-}
 
 .form-container {
     background-color: #23233b;
@@ -418,34 +398,7 @@ input[type="file"] {
     gap: 10px;
 }
 
-.container {
-    max-width: 1300px;
-    margin: 0 auto;
-    background-color: #2c2c2c;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
-}
 
-/* Header */
-.header {
-    background-color: #222831;
-    padding: 1px 1px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
-    margin-bottom: 20px;
-    width: 100%;
-    box-sizing: border-box;
-    color: var(--color-heading);
-    
-}
-.header h1 {
-    font-size: 2em;
-    text-align: left;
-	margin-left: 20px;
-    color: var(--color-heading);
-	
-}
 /* Buttons */
 .btn-primary, .btn-secondary, .btn-danger, .btn-edit, .btn-info {
     font-size: 16px;
