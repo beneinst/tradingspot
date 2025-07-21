@@ -871,6 +871,9 @@ function createChart() {
     const minValue = Math.min(...values);
     const range = maxValue - minValue || 1;
     
+    // Calcolare la media
+    const averageValue = values.reduce((sum, value) => sum + value, 0) / values.length;
+    
     // Configurazione del grafico
     const padding = 50;
     const chartWidth = canvas.width - (padding * 2);
@@ -884,6 +887,23 @@ function createChart() {
     ctx.lineTo(padding, canvas.height - padding);
     ctx.lineTo(canvas.width - padding, canvas.height - padding);
     ctx.stroke();
+    
+    // Disegnare la linea della media
+    const averageY = canvas.height - padding - ((averageValue - minValue) / range) * chartHeight;
+    ctx.strokeStyle = '#ff9800';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]); // Linea tratteggiata
+    ctx.beginPath();
+    ctx.moveTo(padding, averageY);
+    ctx.lineTo(canvas.width - padding, averageY);
+    ctx.stroke();
+    ctx.setLineDash([]); // Ripristinare linea continua
+    
+    // Etichetta per la media
+    ctx.fillStyle = '#ff9800';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Media: ${formatImport(averageValue)}`, canvas.width - padding - 100, averageY - 8);
     
     // Disegnare il grafico a linee
     if (values.length > 1) {
@@ -964,6 +984,9 @@ function createHighResChart() {
     const minValue = Math.min(...values);
     const range = maxValue - minValue || 1;
     
+    // Calcolare la media
+    const averageValue = values.reduce((sum, value) => sum + value, 0) / values.length;
+    
     // Configurazione del grafico ad alta risoluzione
     const padding = 400;
     const chartWidth = width - (padding * 2);
@@ -971,9 +994,9 @@ function createHighResChart() {
     
     // Titolo
     highResCtx.fillStyle = '#333';
-    highResCtx.font = 'bold 180px Arial';
+    highResCtx.font = 'bold 110px Arial';
     highResCtx.textAlign = 'center';
-    highResCtx.fillText('Storico Mensile Trading', width / 2, 250);
+    highResCtx.fillText('Storico Mensilità di Trading', width / 2, 250);
     
     // Disegnare gli assi
     highResCtx.strokeStyle = '#333';
@@ -994,6 +1017,23 @@ function createHighResChart() {
         highResCtx.lineTo(width - padding, y);
         highResCtx.stroke();
     }
+    
+    // Disegnare la linea della media
+    const averageY = height - padding - ((averageValue - minValue) / range) * chartHeight;
+    highResCtx.strokeStyle = '#ff9800';
+    highResCtx.lineWidth = 8;
+    highResCtx.setLineDash([20, 20]); // Linea tratteggiata ad alta risoluzione
+    highResCtx.beginPath();
+    highResCtx.moveTo(padding, averageY);
+    highResCtx.lineTo(width - padding, averageY);
+    highResCtx.stroke();
+    highResCtx.setLineDash([]); // Ripristinare linea continua
+    
+    // Etichetta per la media
+    highResCtx.fillStyle = '#ff9800';
+    highResCtx.font = 'bold 60px Arial';
+    highResCtx.textAlign = 'left';
+    highResCtx.fillText(`Media: ${formatImport(averageValue)}`, width - padding - 600, averageY - 40);
     
     // Disegnare il grafico a linee
     if (values.length > 1) {
@@ -1055,8 +1095,6 @@ function createHighResChart() {
     
     return highResCanvas;
 }
-
-
 
 
 // Funzione per scaricare il grafico
