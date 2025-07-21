@@ -26,49 +26,58 @@
  
 
 
-  .header-stats {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-
- .header-stat-item {
-  padding: 10px 20px;
-  text-align: center;
-  min-width: 140px;
-  background-color: #222831;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.7); /* bordo/alone principale */
+ /* Wrapper flessibile per le card */
+.header-stats {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
   margin-bottom: 20px;
-  box-sizing: border-box;
-  transition: background 0.3s, box-shadow 0.3s;
+  flex-wrap: wrap;
 }
 
+/* Singola card: unione tra status-card e header-stat-item */
+.header-stat-item {
+  background: linear-gradient(135deg, #333, #444);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 140px;
+  border: 2px solid #555;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.7); /* bordo/alone principale */
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+/* Hover con effetto "glow" raffinato */
 .header-stat-item:hover {
-  background: linear-gradient(120deg, #393e46 60%, #232a34 100%);
-  /* Mantieni la shadow 'base' e aggiungi un'altra per l'hover */
+  transform: translateY(-5px);
   box-shadow: 
-    0 2px 10px rgba(0,0,0,0.7),  /* ombra base */
-    0 4px 20px rgba(57, 62, 70, 0.5); /* effetto "glow" in più */
+    0 2px 10px rgba(0,0,0,0.7),     /* ombra base */
+    0 8px 25px rgba(0,0,0,0.3);     /* effetto look 3D */
+  background: linear-gradient(120deg, #393e46 60%, #232a34 100%);
   color: #ffe58f !important;
   cursor: pointer;
 }
 
+/* Etichetta sopra */
+.header-stat-label {
+  font-size: 14px;
+  color: #aaa; /* oppure: var(--text-light); */
+  margin-bottom: 5px;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 
+/* Valore numerico o principale */
+.header-stat-value {
+  color: #4caf50;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
 
-
-  .header-stat-label {
-    font-size: 14px;
-    color: var(--text-light);
-    margin-bottom: 2px;
-  }
-
-  .header-stat-value {
-    font-size: 20px;
-    font-weight: bold;
-  }
 
   .quota-input {
     width: 70px;
@@ -631,3 +640,32 @@ label {
   outline: none;
 }
 
+    .status-card {
+        background: linear-gradient(135deg, #333, #444);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px solid #555;
+        transition: all 0.3s ease;
+    }
+
+    .status-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+
+    .status-card h3 {
+        margin: 0 0 10px 0;
+        color: #aaa;
+        font-size: 14px;
+        font-weight: normal;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .status-card .value {
+        color: #4caf50;
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0;
+    }
