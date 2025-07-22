@@ -380,6 +380,7 @@ input::placeholder, textarea::placeholder {
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+	color: #fff;
 }
 
 .summary-item .value {
