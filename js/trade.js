@@ -1,140 +1,4 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade Attivi Portfolio</title>
-    <link rel="icon" type="image/png" href="favicon.png"> 
-    <link rel="stylesheet" href="css/trade.css">
-    <link rel="stylesheet" href="css/menusotto.css">
-	<link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-
-  <div class="container">
-    <div class="header">
-  <h1>🔥 Trade Attivi</h1>
-
-
-<div style="height: 18px; line-height: 18px; text-align: left; font-size: 16px; color: white; padding-left: 25px; padding-top: 15px; padding-bottom: 20px;">
-  <a href="https://beneinst.github.io/tradingspot/" class="link-no-underline">Home</a> |
-  <a href="https://beneinst.github.io/tradingspot/operativita.html" class="link-no-underline">Operatività</a> |
-  <a href="https://beneinst.github.io/tradingspot/Trade12.html" class="link-no-underline">Trade Attivi</a> |
-  <a href="https://beneinst.github.io/tradingspot/panoramica-capitale.html" class="link-no-underline">Panoramica Capitale</a>
-  
-</div>
-</div>
-
-        
-               
-        <div  style="height: 18px; line-height: 18px; color: white; padding-left: 25px; padding-top: 5px; padding-bottom: 20px;"><em>
-  *Gestione <strong>Trade</strong> Singoli con Accumulo e Prezzo Medio.</em>
-</div>
-  
-
-        <div class="card">
-            <h3 class="section-title" style="color: #99C68E !important;">💱 Aggiungi Entry al Trade</h3>
-            <form id="trade-form" class="trade-form">
-                <div class="form-row">
-                    <label for="crypto-symbol" style="color: #8EEBEC !important;">SIMBOLO CRIPTO</label>
-                    <input type="text" id="crypto-symbol" placeholder="BTC" required>
-                </div>
-                <div class="form-row">
-                    <label for="trade-quantity" style="color: #8EEBEC !important;">QUANTITA'</label>
-                    <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required>
-                </div>
-                <div class="form-row">
-                    <label for="trade-price" style="color: #8EEBEC !important;">IMPORTO ENTRY(USDT):</label>
-                    <input type="number" id="invested-amount" placeholder="Importo investito ($)" step="0.01" required>
-                </div>
-                <div class="form-row">
-                    <label></label>
-                    <button type="submit" class="btn-primary">Aggiungi Entry</button>
-                </div>
-                <input type="hidden" id="edit-trade-id">
-            </form>
-        </div>
-		
-		<div class="card">
-            <div class="container">
-<button onclick="stampaTuttiTrade()" class="btn-edit">📊 Stampa Tutti i Trade</button>
-        
-           
-        </div>
-		</div>
-
-        <div class="card">
-            <div class="container">
-                <h3 style="color: #99C68E !important;">💽 Backup & Ripristino</h3>
-            
-            <p>Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
-			<div style="padding: 15px;"></div>
-            <div class="container-f">
-                <button onclick="scaricaDati()" class="btn-edit">Scarica Dati (JSON)</button>
-                <input type="file" id="fileInput" accept=".json" style="flex: 1;">
-                <button onclick="caricaDati()" class="btn-edit">Carica Dati</button>
-            </div>
-        </div></div>
-
-     
-		
-		
-	<!-- FOOTER -->
-<div class="container" style="padding-top: 12px; padding-bottom: 12px;">
-  <!-- BLOCCO MENU -->
-  <div class="iflow-body">
-    <nav class="iflow-custom-menu">
-      <ul>
-        <li>
-          <div class="iflow-menu-label">Home</div>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/">Home</a></li>
-          </ul>
-        </li>
-        <li>
-          <div class="iflow-menu-label">Gestione</div>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/Trade12.html">Trade Attivi</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/panoramica-capitale.html">Panoramica Capitale</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
-          </ul>
-        </li>
-        <li>
-          <div class="iflow-menu-label">Strategia 4H</div>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/chartflow/index.html">Segnali</a></li>
-          </ul>
-        </li>
-        <li>
-          <div class="iflow-menu-label">Fondamenti</div>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/cheat-sheet.html">Patterns</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/candlestick.html">Candlestick</a></li>
-          </ul>
-        </li>
-      </ul>
-    </nav>
-  </div>
-  </div>
-<div style="padding: 5px;"></div>  
-
-<div class="container">
-  <div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-      <p style="margin: 0; color: #c3c3c3; text-align: left; height: 10px; line-height: 12px;">
-        © 2025 Invest Flow | Trading Spot di Gerardo D'Orrico – Tutti i diritti riservati.
-      </p>
-      <img src="images/logoinvest2.svg"
-           alt="Invest Flow"
-           style="height: 40px; width: auto; margin-left: 16px;" />
-    </div>
-  </div>
-</div>
-
-// Sistema trade migliorato - inserimento per importo investito
+ // Sistema trade migliorato - inserimento per importo investito
 
 // Cache per i prezzi delle crypto
 let priceCache = {};
@@ -378,7 +242,7 @@ async function stampaTuttiTrade() {
         htmlContent += `
         <div class="trade-card">
             <div class="trade-title">
-                🪙 ${trade.symbol.toUpperCase()} | Trade #${String(index + 1).padStart(2, '0')}
+                🪙 ${trade.symbol.toUpperCase()} | Trade #${String(trades.length - index).padStart(2, '0')}
             </div>
             
             <h3>Riepilogo Trade</h3>
@@ -468,16 +332,18 @@ async function stampaTuttiTrade() {
     `;
 
     // Apri in una nuova finestra per la stampa
-    const newWindow = window.open('', '_blank');
-    newWindow.document.write(htmlContent);
-    newWindow.document.close();
-    
-    // Attendi il caricamento e poi apri il dialogo di stampa
-    newWindow.onload = function() {
-        setTimeout(() => {
-            newWindow.print();
-        }, 100);
-    };
+   // ✅ SOLO download automatico .html via Blob
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = `report-trading-${new Date().toISOString().slice(0, 10)}.html`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(url);
+
 }
 
 // Esponi la funzione globalmente per il pulsante
@@ -557,7 +423,7 @@ async function renderTrades() {
 
         html += `
             <div class="note">
-                <h3>🪙 ${trade.symbol.toUpperCase()} | Trade #${String(index + 1).padStart(2, '0')}</h3>
+                <h3>🪙 ${trade.symbol.toUpperCase()} | Trade #${String(trades.length - index).padStart(2, '0')}</h3>
                 
                 <div class="trade-summary">
                     <h3>Riepilogo Trade</h3>
@@ -614,9 +480,152 @@ async function renderTrades() {
                     <button class="btn-danger" onclick="deleteTrade(${trade.id})">Elimina Trade</button>
                 </div>
             </div>
-			
+        `;
+    }
+    
+    container.innerHTML = html;
+}
 
- <script src="js/trade.js"></script>
+// Aggiungi entry al trade esistente
+window.addEntryToTrade = function(tradeId) {
+    const trade = trades.find(t => t.id === tradeId);
+    if (trade) {
+        document.getElementById('crypto-symbol').value = trade.symbol;
+        document.getElementById('crypto-symbol').readOnly = true;
+        document.getElementById('edit-trade-id').value = tradeId;
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+};
 
-</body>
-</html>
+// Elimina trade
+window.deleteTrade = function(id) {
+    if (confirm('Eliminare questo trade?')) {
+        trades = trades.filter(t => t.id !== id);
+        saveTrades();
+        renderTrades();
+    }
+};
+
+// Gestione form - MODIFICATA PER PERMETTERE TRADE MULTIPLI
+document.getElementById('trade-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const symbol = document.getElementById('crypto-symbol').value.trim().toUpperCase();
+    const quantity = parseFloat(document.getElementById('trade-quantity').value);
+    const investedAmount = parseFloat(document.getElementById('invested-amount').value);
+    const editId = document.getElementById('edit-trade-id').value;
+    
+    if (!symbol || !quantity || !investedAmount) {
+        alert('Compila tutti i campi');
+        return;
+    }
+    
+    // Ottieni prezzo attuale per calcolare il prezzo di acquisto
+    const currentPrice = await getPriceFromCoinGecko(symbol);
+    if (!currentPrice) {
+        alert('Impossibile ottenere il prezzo per ' + symbol);
+        return;
+    }
+    
+    const priceAtPurchase = investedAmount / quantity;
+    
+    const newEntry = {
+        quantity: quantity,
+        investedAmount: investedAmount,
+        priceAtPurchase: priceAtPurchase,
+        timestamp: new Date().toISOString()
+    };
+    
+    if (editId) {
+        // MODIFICA: Aggiungi entry SOLO a trade esistente quando si usa il pulsante "Aggiungi Entry"
+        const tradeIndex = trades.findIndex(t => t.id === parseInt(editId));
+        if (tradeIndex !== -1 && Array.isArray(trades[tradeIndex].entries)) {
+            trades[tradeIndex].entries.push(newEntry);
+            trades[tradeIndex].updatedAt = new Date().toISOString();
+        } else {
+            alert("Trade non trovato o struttura corrotta, impossibile aggiungere entry.");
+            return;
+        }
+    } else {
+        // MODIFICA: Crea SEMPRE un nuovo trade quando non si è in modalità modifica
+        // Non cerca più trade esistenti con lo stesso simbolo
+        trades.unshift({
+            id: Date.now(),
+            symbol: symbol,
+            entries: [newEntry],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        });
+    }
+    
+    saveTrades();
+    renderTrades();
+    this.reset();
+    document.getElementById('crypto-symbol').readOnly = false;
+    document.getElementById('edit-trade-id').value = '';
+});
+
+function validateTrades(tradesArray) {
+    if (!Array.isArray(tradesArray)) return [];
+    return tradesArray.map(trade => ({
+        id: typeof trade.id === "number" ? trade.id : Date.now(),
+        symbol: typeof trade.symbol === "string" ? trade.symbol : "",
+        entries: Array.isArray(trade.entries) ? trade.entries.map(entry => ({
+            quantity: typeof entry.quantity === "number" ? entry.quantity : 0,
+            investedAmount: typeof entry.investedAmount === "number" ? entry.investedAmount : 0,
+            priceAtPurchase: typeof entry.priceAtPurchase === "number" ? entry.priceAtPurchase : 0,
+            timestamp: typeof entry.timestamp === "string" ? entry.timestamp : new Date().toISOString()
+        })) : [],
+        createdAt: typeof trade.createdAt === "string" ? trade.createdAt : new Date().toISOString(),
+        updatedAt: typeof trade.updatedAt === "string" ? trade.updatedAt : new Date().toISOString()
+    }));
+}
+
+// Backup functions
+function scaricaDati() {
+    const data = JSON.stringify(trades, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trades-backup_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function caricaDati() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedTrades = JSON.parse(e.target.result);
+                if (Array.isArray(importedTrades)) {
+                    trades = importedTrades;
+                    saveTrades();
+                    renderTrades();
+                    alert('Dati importati con successo!');
+                    fileInput.value = '';
+                } else {
+                    alert('Il file non contiene un formato di dati valido.');
+                }
+            } catch (error) {
+                alert('Errore durante l\'importazione dei dati: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+    } else {
+        alert('Seleziona un file da importare.');
+    }
+}
+
+// Inizializzazione
+document.addEventListener('DOMContentLoaded', function() {
+    loadTrades();
+    renderTrades();
+});
