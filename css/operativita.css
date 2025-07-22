@@ -261,10 +261,6 @@ h2 {
 }
 
 
-
-    </style>
-	
-	<style>
     h1 {
         text-align: center;
         color: #4caf50;
@@ -394,7 +390,7 @@ h2 {
         background: #444;
         padding: 20px;
         border-radius: 8px;
-        border-left: 4px solid #666;
+		border-left: 4px solid #666;
         transition: all 0.3s ease;
         position: relative;
     }
@@ -437,13 +433,13 @@ h2 {
     }
 
     .threshold-amount {
-        font-size: 20px;
+        font-size: 24px;
         font-weight: bold;
         color: #4caf50;
     }
 
     .threshold-details {
-        font-size: 14px;
+        font-size: 17px;
         color: #ccc;
         margin-top: 10px;
     }
@@ -554,13 +550,13 @@ h2 {
     }
 
     .limit-item .label {
-        font-size: 12px;
+        font-size: 18px;
         color: #aaa;
         margin-bottom: 5px;
     }
 
     .limit-item .value {
-        font-size: 16px;
+        font-size: 22px;
         font-weight: bold;
         color: #fff;
     }

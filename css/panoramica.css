@@ -352,7 +352,7 @@ label {
 }
 
 .chart-container:hover {
-    box-shadow: 0 12px 36px rgba(0, 153, 255, 0.7);
+    box-shadow: 0 12px 36px rgba(255, 189, 0, 0.7);
 }
 
 /* 👇 Sfondo canvas */
