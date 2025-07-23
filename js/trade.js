@@ -263,7 +263,7 @@ tr:hover {
     box-shadow: 0 4px 20px rgba(34, 147, 250, 0.15);
 }
 .portfolio-summary h2 {
-    color: #2293fa;
+    color: #fff;
     margin-top: 0;
     font-size: 1.8em;
     font-weight: 300;
