@@ -402,7 +402,7 @@ tr:hover {
             </div>
             
             <div class="trade-content">
-                <h3 style="color: #495057; margin-top: 0;">📊 Riepilogo Finanziario</h3>
+                <h3 style="color: #CFECEC; margin-top: 0;">📊 Riepilogo Finanziario</h3>
                 <div class="summary-grid">
                     <div class="summary-item">
                         <div class="label">💰 Quantità Totale</div>
@@ -430,7 +430,7 @@ tr:hover {
                     </div>
                 </div>
 
-                <h4 style="color: #495057;">📋 Storico Entry Dettagliato</h4>
+                <h4 style="color: #CFECEC;">📋 Storico Entry Dettagliato</h4>
                 <table>
                     <thead>
                         <tr>
