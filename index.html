@@ -124,7 +124,12 @@
   </div>
 </div>
 </div>
-
+<!-- mettilo dove vuoi -->
+<div id="backup-panel">
+  <button id="btn-download-backup">📥 Backup completo (JSON)</button>
+  <input type="file" id="file-upload-backup" accept=".json" style="display:none">
+  <button id="btn-upload-backup">📤 Ripristina backup</button>
+</div>
 
 
   	<div style="padding: 10px;"></div>
@@ -183,3 +188,79 @@
     </div>
   </div>
 </div>
+
+<script>
+/**
+ * Scarica l’intero contenuto di localStorage in un unico file.
+ * Il nome del file contiene data e ora.
+ */
+function scaricaBackupCompleto() {
+  const blob = new Blob([JSON.stringify(localStorage, null, 2)], {
+    type: 'application/json'
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `backup-app-${new Date()
+    .toISOString()
+    .slice(0, 19)
+    .replace(/:/g, '-')}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Carica il file selezionato dal disco e sovrascrive localStorage.
+ * Mostra un avviso di conferma prima di procedere.
+ */
+function caricaBackupCompleto(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const nuovoStorage = JSON.parse(e.target.result);
+
+      if (typeof nuovoStorage !== 'object') throw 'Formato non valido';
+
+      if (
+        !confirm(
+          '⚠️  Questo sovrascriverà TUTTI i dati dell’app. Procedere?'
+        )
+      )
+        return;
+
+      // Pulisci localStorage
+      localStorage.clear();
+
+      // Ricarica le chiavi
+      Object.keys(nuovoStorage).forEach(k => {
+        localStorage.setItem(k, nuovoStorage[k]);
+      });
+
+      alert('✅ Backup ripristinato con successo!');
+      location.reload(); // ricarica la pagina per coerenza
+    } catch (err) {
+      alert('❌ Errore nel caricamento: ' + err);
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ---- collega i pulsanti ---- */
+document.addEventListener('DOMContentLoaded', () => {
+  const btnDown = document.getElementById('btn-download-backup');
+  const btnUp   = document.getElementById('btn-upload-backup');
+  const fileIn  = document.getElementById('file-upload-backup');
+
+  if (btnDown) btnDown.addEventListener('click', scaricaBackupCompleto);
+  if (btnUp)   btnUp.addEventListener('click', () => fileIn.click());
+  if (fileIn)  fileIn.addEventListener('change', e => caricaBackupCompleto(e.target.files[0]));
+});
+</script>
+
+
+
+</body>
+</html>
