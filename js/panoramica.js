@@ -1091,3 +1091,18 @@ function aggiornaTotali() {
       });
     });
   });
+  
+ // 🟢  Ascolta gli eventi di apertura / chiusura trade
+window.addEventListener('storage', e => {
+  if (e.key === '__tradeEvent__' && e.newValue) {
+    const { delta } = JSON.parse(e.newValue);
+    datiCapitale.totaleIn += delta;      // +1 aperto, ‑1 chiuso
+    calcolaCapitale();                   // ricava datiCapitale.capitale
+    aggiornaInterfaccia();
+    salvaStorico();
+    salvaDatiLocali();
+    aggiornaGraficoStorico();
+    aggiornaGraficoPercentuale();
+    calcolaStatistichePercentuali();
+  }
+});

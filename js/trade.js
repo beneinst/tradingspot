@@ -656,6 +656,7 @@ function loadTrades() {
     }
 }
 
+
 // Render trade (RIMOSSO IL PULSANTE STAMPA INDIVIDUALE)
 async function renderTrades() {
     const container = document.getElementById('trades-container');
@@ -902,3 +903,27 @@ document.addEventListener('DOMContentLoaded', function() {
     loadTrades();
     renderTrades();
 });
+
+// 🟢  EVENTI per apertura / chiusura trade
+function emitTradeEvent(delta) {
+  localStorage.setItem('__tradeEvent__', JSON.stringify({ delta, ts: Date.now() }));
+}
+
+// sovrascrivi saveTrades per rilevare NUOVI trade
+const _saveTrades = saveTrades;
+saveTrades = () => {
+  const old = JSON.parse(localStorage.getItem('singleTrades') || '[]').length;
+  _saveTrades();
+  if (trades.length > old) emitTradeEvent(+1);        // APERTO
+};
+
+// sovrascrivi deleteTrade
+const _deleteTrade = window.deleteTrade;
+window.deleteTrade = id => {
+  if (confirm('Eliminare questo trade?')) {
+    trades = trades.filter(t => t.id !== id);
+    saveTrades();
+    renderTrades();
+    emitTradeEvent(-1);                              // CHIUSO
+  }
+};
