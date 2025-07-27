@@ -1011,6 +1011,28 @@ function aggiornaTotali() {
     }
   }
   
+  // 🔁 Sincronizza il numero di trade attivi con il contatore reale
+function sincronizzaTradeAttivi() {
+  const trades = JSON.parse(localStorage.getItem('singleTrades') || '[]');
+  const tradeCount = trades.length;
+
+  // Aggiorna il modello
+  datiCapitale.totaleIn = tradeCount;
+
+  // Ricostruisci il capitale
+  datiCapitale.capitale = datiCapitale.totaleTrade - tradeCount;
+
+  // Aggiorna interfaccia e grafici
+  aggiornaInterfaccia();
+  salvaStorico();
+  salvaDatiLocali();
+  aggiornaGraficoStorico();
+  aggiornaGraficoPercentuale();
+  calcolaStatistichePercentuali();
+}
+
+
+  
   // Inizializza l'applicazione quando il documento è pronto
   document.addEventListener('DOMContentLoaded', function() {
     inizializza();
@@ -1027,6 +1049,18 @@ function aggiornaTotali() {
     });
   });
   
+  document.addEventListener('DOMContentLoaded', function () {
+  inizializza();
+  sincronizzaTradeAttivi(); // 👈 prima sincronizzazione
+
+  // 🔄 Ascolta eventi di apertura/chiusura trade
+  window.addEventListener('storage', e => {
+    if (e.key === '__tradeEvent__' && e.newValue) {
+      sincronizzaTradeAttivi();
+    }
+  });
+});
+
  // 🟢  Ascolta gli eventi di apertura / chiusura trade
 window.addEventListener('storage', e => {
   if (e.key === '__tradeEvent__' && e.newValue) {
@@ -1041,3 +1075,8 @@ window.addEventListener('storage', e => {
     calcolaStatistichePercentuali();
   }
 });
+
+// 🔄 Sincronizzazione automatica ogni 3 secondi
+setInterval(() => {
+  sincronizzaTradeAttivi();
+}, 3000);

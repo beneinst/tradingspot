@@ -855,48 +855,6 @@ function validateTrades(tradesArray) {
     }));
 }
 
-// Backup functions
-function scaricaDati() {
-    const data = JSON.stringify(trades, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `trades-backup_${new Date().toISOString().slice(0,10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-function caricaDati() {
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
-
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const importedTrades = JSON.parse(e.target.result);
-                if (Array.isArray(importedTrades)) {
-                    trades = importedTrades;
-                    saveTrades();
-                    renderTrades();
-                    alert('Dati importati con successo!');
-                    fileInput.value = '';
-                } else {
-                    alert('Il file non contiene un formato di dati valido.');
-                }
-            } catch (error) {
-                alert('Errore durante l\'importazione dei dati: ' + error.message);
-            }
-        };
-        reader.readAsText(file);
-    } else {
-        alert('Seleziona un file da importare.');
-    }
-}
 
 // Inizializzazione
 document.addEventListener('DOMContentLoaded', function() {
@@ -927,3 +885,29 @@ window.deleteTrade = id => {
     emitTradeEvent(-1);                              // CHIUSO
   }
 };
+
+
+
+// 🧠 Aggiorna anche al caricamento pagina
+document.addEventListener('DOMContentLoaded', updateTradeCount);
+
+// Sovrascrivi saveTrades per aggiornare il contatore anche nella stessa pagina
+const originalSaveTrades = saveTrades;
+saveTrades = () => {
+  originalSaveTrades();
+  updateTradeCount(); // 👈 forza aggiornamento contatore
+};
+// 🔄 Contatore reattivo trade attivi
+function updateTradeCount() {
+  const trades = JSON.parse(localStorage.getItem('singleTrades') || '[]');
+  const count = trades.length;
+  const span = document.getElementById('trade-count');
+  if (span) span.textContent = count;
+}
+
+// 📡 Ascolta eventi di apertura/chiusura trade
+window.addEventListener('storage', (e) => {
+  if (e.key === '__tradeEvent__') {
+    updateTradeCount();
+  }
+});

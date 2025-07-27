@@ -6,6 +6,7 @@
     <title>Trade Attivi Portfolio</title>
     <link rel="icon" type="image/png" href="favicon.png"> 
     <link rel="stylesheet" href="css/trade.css">
+	<link rel="stylesheet" href="css/panoramica12.css">
     <link rel="stylesheet" href="css/menusotto.css">
 	<link rel="stylesheet" href="css/style.css">
 </head>
@@ -61,6 +62,164 @@
         </div>
 		
 		
+		<div id="trade-counter" style="display: none;">
+  📊 Trade attivi: <span id="trade-count" style="display: inline;">0</span>
+</div>
+		
+		<div class="container">
+		
+	<div style="display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap;">
+
+  <!-- Colonna sinistra: Scheda Gestione Trade -->
+
+  <div class="header-stat-item_f"
+       <div class="stats-grid">
+  <div class="header-stat-item">
+    <div class="stat-label">Totale in Cripto</div>
+    <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn"></div>
+  </div><div style="padding: 5px;"></div>
+  <div class="header-stat-item">
+    <div class="stat-label">Restanti in Dollari</div>
+    <div class="stat-value capitale" style="color: #1AA6ED; font-size: 39px;" id="capitale"></div>
+  </div>
+  </div>
+
+  <!-- Colonna destra: Grafico -->
+  <div class="header-stat-item_f" style="flex: 1 1 48%; background: #2c2c2c; padding: 1px; border-radius: 8px;">
+    <canvas id="capitaleChart"></canvas>
+  </div>
+
+</div>
+    
+ 
+  
+  
+  <!-- Nuova card per il grafico storico -->
+ <div class="container">
+    <div class="card-header">
+       <h3 style="color: #4caf50 !important;">🪔 Storico Distribuzione Capitale</h3>
+    </div>
+    
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-button active" onclick="cambiaTab(event, 'tab-distribuzione')">Distribuzione nel Tempo</button>
+        <button class="tab-button" onclick="cambiaTab(event, 'tab-percentuale')">Analisi Percentuale</button>
+      </div>
+      
+      <div class="tab-content">
+        <div id="tab-distribuzione" class="tab-panel active">
+          <!-- GRAFICO PRIMA DEL MENU -->
+          <div class="storico-chart-container">
+            <canvas id="storicoCapitaleChart"></canvas>
+          </div>
+          
+          <!-- MENU TEMPORALE SOTTO IL GRAFICO -->
+          <div class="time-range-selector" style="margin-top: 30px;">
+            <button class="btn-danger active" data-days="30" onclick="cambiaRangeTempo(this)">30 Giorni</button>
+            <button class="btn-danger" data-days="90" onclick="cambiaRangeTempo(this)">90 Giorni</button>
+            <button class="btn-danger" data-days="180" onclick="cambiaRangeTempo(this)">6 Mesi</button>
+            <button class="btn-danger" data-days="365" onclick="cambiaRangeTempo(this)">1 Anno</button>
+            <button class="btn-danger" data-days="all" onclick="cambiaRangeTempo(this)">Tutto</button>
+            <!-- NUOVO PULSANTE -->
+            <button class="btn-edit" onclick="scaricaGrafico()" style="margin-left: 15px;">📷 Scarica Grafico</button>
+          </div>
+          
+         
+
+        </div>
+        
+        <div id="tab-percentuale" class="tab-panel">
+          <div class="info-box">
+            Analisi del tempo in cui il capitale è stato allocato nelle seguenti percentuali in dollari.
+          </div>
+          
+          <!-- GRAFICO PERCENTUALE SPOSTATO PRIMA DEI BOX -->
+          <div class="storico-chart-container">
+            <canvas id="percentualeCapitaleChart"></canvas>
+          </div>
+          
+          
+          
+          <!-- BOX PERCENTUALI SPOSTATI SOTTO IL GRAFICO -->
+          <div class="distribution-stats">
+            <div class="distribution-item">
+              <div class="distribution-label">0-25% in Dollari</div>
+              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale0_25">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">25-50% in Dollari</div>
+              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale25_50">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">50-75% in Dollari</div>
+              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale50_75">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">75-100% in Dollari</div>
+              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale75_100">0 giorni</div>
+            </div>
+			<button onclick="scaricaGraficoPercentuale1()" class="header-stat-item" style="margin-top: 15px; margin-bottom: 20px;">
+            <i class="fas fa-download"></i> Scarica Grafico Percentuale
+          </button>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+<span id="infoTotaleTrade"></span>
+<div style="padding: 5px;"></div>
+
+<div class="container">
+  <div class="card-header">
+    <h3 style="color: #4caf50 !important;">🪔 Capitale Totale</h3>
+  </div>
+  <div style="padding: 5px;"></div>  
+  <!-- Gruppo principale: 5 box -->
+  <div class="header-stats">
+    <div class="header-stat-item">
+      <div class="header-stat-label">Trade Totali</div>
+      <div class="header-stat-value" style="color: #987654; font-size: 34px;" id="totaleTrade">30</div>
+    </div>
+   <div class="header-stat-item">
+  <div class="header-stat-label">$ per Trade</div>
+  <div class="header-stat-value" style="display: flex; align-items: center; gap: 6px;">
+    <input type="number" style="font-size: 22px; width: 64px;" id="quotaPerTrade" class="quota-input" value="0" min="1" oninput="aggiornaCapitale()">
+    <button onclick="aggiornaTrade()" class="btn-danger btn-tiny" title="Aggiorna Capitale">🎯</button>
+  </div>
+</div>
+
+    <div class="header-stat-item">
+      <div class="header-stat-label">Capitale Totale</div>
+      <div class="header-stat-value" style="color: #f5f5f5; font-size: 34px;" id="capitaleTotale"></div>
+    </div>
+    <div class="header-stat-item">
+      <div class="header-stat-label">Capitale Restante</div>
+      <div class="header-stat-value" style="color: #3BB9FF; font-size: 34px;" id="capitaleInDollari"></div>
+    </div>
+    <div class="header-stat-item">
+      <div class="header-stat-label">Totale In Cripto</div>
+      <div class="header-stat-value" style="color: #f62817; font-size: 34px;" id="totaleInDollari"></div>
+    </div>
+  </div>
+  
+ <!-- Box secondari -->
+<div class="header-stats">
+  <div class="header-stat-item">
+    <div class="header-stat-label">Media Trade Attivi</div>
+    <div class="header-stat-value" style="color: #f62817; font-size: 28px;" id="mediaTradeTotaleIn">0</div>
+  </div>
+  <div class="header-stat-item">
+    <div class="header-stat-label">Media Dollari in USDT</div>
+    <div class="header-stat-value" style="color: #1aa6ed; font-size: 28px;" id="mediaDollariTrading">$0</div>
+  </div>
+ 
+</div>
+
+  <!-- Pulsante a parte, eventuale box separato -->
+  
+</div></div></div>
+
+<div style="padding: 10px;"></div>		
 		
      
 		
@@ -120,66 +279,44 @@
   </div>
 </div>
 
+<div style="display:none;">
+  <div id="totaleIn"></div>
+  <div id="capitale"></div>
+  <div id="totaleTrade"></div>
+  <div id="infoTotaleTrade"></div>
+  <input id="quotaPerTrade" type="number">
+  <input id="inputTotaleIn" type="number">
+  <div id="capitaleTotale"></div>
+  <div id="capitaleInDollari"></div>
+  <div id="totaleInDollari"></div>
+  <span id="mediaTradeTotaleIn"></span>
+  <span id="mediaDollariTrading"></span>
+  <canvas id="capitaleChart"></canvas>
+  <canvas id="storicoCapitaleChart"></canvas>
+  <canvas id="percentualeCapitaleChart"></canvas>
+</div>
 
 <script src="js/trade.js"></script>
-<script type="module">
-  import { initFirebase, caricaDatiPagina, salvaDatiPagina } from './firebase-utils.js';
-  
-  const nomePagina = "operativita";
-  let datiCorrenti = null;
-  
-  // Test completo
-  async function testFirebase() {
-    try {
-      console.log("🚀 Inizio test Firebase...");
-      
-      // 1. Inizializza Firebase
-      await initFirebase();
-      console.log("✅ Firebase inizializzato");
-      
-      // 2. Carica dati esistenti
-      datiCorrenti = await caricaDatiPagina(nomePagina);
-      
-      // 3. Test di salvataggio
-      const datiTest = {
-        timestamp: new Date().toISOString(),
-        trades: [
-          { simbolo: "AAPL", quantita: 100, prezzo: 150 },
-          { simbolo: "MSFT", quantita: 50, prezzo: 300 }
-        ],
-        bilancio: 25000
-      };
-      
-      console.log("🔄 Salvataggio dati test...");
-      await salvaDatiPagina(nomePagina, datiTest);
-      
-      // 4. Ricarica per verificare
-      console.log("🔄 Ricaricamento per verifica...");
-      const datiRicaricati = await caricaDatiPagina(nomePagina);
-      
-      if (datiRicaricati) {
-        console.log("🎉 TEST SUPERATO! Persistenza funziona");
-        console.log("Dati ricaricati:", datiRicaricati);
-      } else {
-        console.log("❌ TEST FALLITO! Persistenza non funziona");
-      }
-      
-    } catch (error) {
-      console.error("💥 Errore durante il test:", error);
-    }
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script src="js/panoramica.js"></script>
+<script>
+// 🔄 Contatore reattivo trade attivi
+function updateTradeCount() {
+  const trades = JSON.parse(localStorage.getItem('singleTrades') || '[]');
+  const count = trades.length;
+  const span = document.getElementById('trade-count');
+  if (span) span.textContent = count;
+}
+
+// 📡 Ascolta eventi di apertura/chiusura trade
+window.addEventListener('storage', (e) => {
+  if (e.key === '__tradeEvent__') {
+    updateTradeCount();
   }
-  
-  // Avvia il test
-  testFirebase();
-  
-  // Funzione per salvare (collegala ai tuoi pulsanti)
-  window.salvaDatiTrading = function() {
-    if (datiCorrenti) {
-      // Aggiorna datiCorrenti con i nuovi valori dalla UI
-      datiCorrenti.ultimoAggiornamento = new Date().toISOString();
-      salvaDatiPagina(nomePagina, datiCorrenti);
-    }
-  }
+});
+
+// 🧠 Aggiorna anche al caricamento pagina
+document.addEventListener('DOMContentLoaded', updateTradeCount);
 </script>
 
 
