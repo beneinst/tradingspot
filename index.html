@@ -1,101 +1,229 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Invest Flow - Home</title>
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="stylesheet" href="css/menusotto.css">
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Attivi Portfolio</title>
+    <link rel="icon" type="image/png" href="favicon.png"> 
+    <link rel="stylesheet" href="css/trade.css">
+	<link rel="stylesheet" href="css/panoramica12.css">
+    <link rel="stylesheet" href="css/menusotto.css">
+	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
   <div class="container">
-    <!-- Header -->
-    <div class="header" style="padding-bottom: 14px; padding-top: 14px;">
-      <img src="images/logoinvest2.svg" height="72" alt="Invest Flow">
+    <div class="header">
+  <h1>🔥 Trade Attivi e panoramica Capitale</h1>
+
+
+<div style="height: 18px; line-height: 18px; text-align: left; font-size: 16px; color: white; padding-left: 25px; padding-top: 15px; padding-bottom: 20px;">
+  <a href="https://beneinst.github.io/tradingspot/" class="link-no-underline">Home</a> |
+  <a href="https://beneinst.github.io/tradingspot/Trade12.html" class="link-no-underline">Trade Attivi</a> |
+  <a href="https://beneinst.github.io/tradingspot/operativita.html" class="link-no-underline">Operatività</a> |
+ 
+  
+</div>
+</div>
+
+        
+               
+        <div  style="height: 18px; line-height: 18px; color: white; padding-left: 25px; padding-top: 5px; padding-bottom: 20px;"><em>
+  *Gestione <strong>Trade</strong> Singoli con Accumulo e Prezzo Medio.</em>
+</div>
+  
+
+        <div class="card">
+            <h3 class="section-title" style="color: #99C68E !important;">💱 Aggiungi Entry al Trade</h3>
+            <form id="trade-form" class="trade-form">
+                <div class="form-row">
+                    <label for="crypto-symbol" style="color: #8EEBEC !important;">SIMBOLO CRIPTO</label>
+                    <input type="text" id="crypto-symbol" placeholder="BTC" required>
+                </div>
+                <div class="form-row">
+                    <label for="trade-quantity" style="color: #8EEBEC !important;">QUANTITA'</label>
+                    <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required>
+                </div>
+                <div class="form-row">
+                    <label for="trade-price" style="color: #8EEBEC !important;">IMPORTO ENTRY(USDT):</label>
+                    <input type="number" id="invested-amount" placeholder="Importo investito ($)" step="0.01" required>
+                </div>
+                <div class="form-row">
+                    <label></label>
+                    <button type="submit" class="btn-primary">Aggiungi Entry</button>
+                </div>
+                <input type="hidden" id="edit-trade-id">
+            </form>
+        </div>
+
+        <div class="form-container">
+            <h4 class="section-title" style="color: #99C68E !important;">🎯 I tuoi Trade Attivi</h4>
+            <div id="trades-container"></div>
+        </div>
+		
+		
+		<div id="trade-counter" style="display: none;">
+  📊 Trade attivi: <span id="trade-count" style="display: inline;">0</span>
+</div>
+		
+		<div class="form-container">
+		
+	<div style="display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap;">
+
+  <!-- Colonna sinistra: Scheda Gestione Trade -->
+
+  <div class="header-stat-item_f"
+       <div class="stats-grid">
+  <div class="header-stat-item">
+    <div class="stat-label">Totale in Cripto</div>
+    <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn"></div>
+  </div><div style="padding: 5px;"></div>
+  <div class="header-stat-item">
+    <div class="stat-label">Restanti in Dollari</div>
+    <div class="stat-value capitale" style="color: #1AA6ED; font-size: 39px;" id="capitale"></div>
+  </div>
+  </div>
+
+  <!-- Colonna destra: Grafico -->
+  <div class="header-stat-item_f" style="flex: 1 1 48%; background: #2c2c2c; padding: 1px; border-radius: 8px;">
+    <canvas id="capitaleChart"></canvas>
+  </div>
+
+</div>
+
+<!-- Gruppo unico: tutti i box -->
+<div class="form-container">
+
+  <div class="header-stats all-in-one">
+    <!-- 1° riga (primi 5) -->
+    <div class="header-stat-item">
+      <div class="header-stat-label">Trade Totali</div>
+      <div class="header-stat-value" style="color: #987654; font-size: 34px;" id="totaleTrade">30</div>
     </div>
 
-    <!-- Card Container Scelte rapide -->
-    <div class="card container">
-      <h4>🧭 Scelte rapide</h4>
-
-      <a href="https://beneinst.github.io/tradingspot/operativita.html" class="btn-outline">Operatività di trading</a>
-      <a href="https://beneinst.github.io/tradingspot/Trade12.html" class="btn-outline">Trade Attivi e panoramica Capitale</a>
-      
-
-      <div style="margin-top: 20px;">
-        <p style="color: #b1a7a7; text-align: center;">
-          Entrate in $ dai singoli trade e grafici e quote mensili più sistema a soglie per l'avanzamento del capitale.
-        </p>
-        <p style="color: #b1a7a7; text-align: center;">
-          Trade Cripto attivi e in corso con importi totali e parziali e valori in tempo reale. Da aggiornare mentre si fanno gli acquisti.
-        </p>
-        <p style="color: #b1a7a7; text-align: center;">
-          Panoramica del capitale nel tempo per vedere l'andamento Cripto / Dollari e la stabilità generale del sistema.
-        </p>
+    <div class="header-stat-item">
+      <div class="header-stat-label">$ per Trade</div>
+      <div class="header-stat-value" style="display: flex; align-items: center; gap: 6px;">
+        <input type="number" style="font-size: 22px; width: 64px;" id="quotaPerTrade" class="quota-input" value="0" min="1" oninput="aggiornaCapitale()">
+        <button onclick="aggiornaTrade()" class="btn-danger btn-tiny" title="Aggiorna Capitale">🎯</button>
       </div>
     </div>
 
-  </div>
-  <div style="padding: 7px;"></div>
-  
-   
-  <div class="container">
-  
-  <div class="container" style="padding-left: 30px; padding-right: 30px; padding-bottom: 20px; padding-top: 20px; text-align: justify; line-height: 1.8;">
-    <h3 style="color: #FFD012;">🎉 Benvenuto su Invest Flow</h3>
-    <div>
-      Nell'app trovi strumenti concreti per la gestione del capitale e la crescita nel trading spot:<br>
-      <ul >
-        <li><p><b>Gestione del capitale</b>: monitora il capitale totale, l'andamento nel tempo e i dettagli dei singoli trade.</li></p>
-        <li><b>Strategia 4H</b>: la strategia principale è pensata sul time frame a 4 ore, ideale per ridurre lo stress, migliorare la visione d'insieme e ottimizzare la gestione del rischio.</li>
-        <li><b>Regole operative</b>: puoi consultare e personalizzare le regole che guidano la tua operatività, prendendo spunto dalle best practice del trading professionale.</li>
-        <li><b>Indicatore Pine Script open source</b>: l’app offre un indicatore personalizzato per implementare la strategia direttamente sui tuoi grafici.</li>
-        <li><b>Blocco note appunti</b>: uno spazio dedicato per annotare idee, osservazioni e spunti operativi.</li>
-        <li><b>Blocco note regole personali</b>: salva e aggiorna le regole che vuoi seguire, così da poterle consultare e modificare facilmente nel tempo.</li>
-      </ul>
-    </div></div><div style="padding: 7px;"></div>
-<div class="container" style="padding-left: 30px; padding-right: 30px; padding-bottom: 20px; padding-top: 20px; text-align: justify; line-height: 1.8;">
-    <div style="color: #359350;">
-      <strong><h4>📊 Perché il Time Frame a 4H è Ideale per il Trading Spot</h4></strong>
+    <div class="header-stat-item">
+      <div class="header-stat-label">Capitale Totale</div>
+      <div class="header-stat-value" style="color: #f5f5f5; font-size: 34px;" id="capitaleTotale"></div>
     </div>
-    <div style="font-size:0.98em; line-height: 1.3;"><br>	
-      Il passaggio al 4H segna un punto di svolta nell'operatività di trading. È qui che l’analisi, unita a una gestione attenta del capitale, offre maggiore certezza operativa.<br><br>
-      <b>Minore frequenza di controllo e maggiore recuperabilità:</b> ogni candela di 4 ore consente di gestire meglio le variazioni di prezzo e recuperare eventuali errori, riducendo la necessità di monitoraggio costante.<br><br>
-      <b>Precisione e visione a lungo termine:</b> il 4H filtra il rumore del mercato, rendendo più chiari i trend e i pattern realmente significativi.<br><br>
-      <b>Gestione del rischio e degli importi:</b> partire dal 4H ti permette di costruire una base solida per strategie di rischio più robuste e consapevoli.<br><br>
-      In sintesi, il 4H è lo standard per chi vuole un trading spot più professionale, meno stressante e con maggiori probabilità di successo a lungo termine.
-    </div>
-  </div>
-</div>
-</div>
-<div style="padding: 7px;"></div> 
 
-		
-  <div class="container">
-            <div class="container">
-                <h3 style="color: #FFDB58 !important;" class="section-title">💽 Back10up & Ripristino</h3>
-           
-            
-            <p> Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
-              <div style="padding: 15px;"></div>  
-            <div class="back-container" >
-			<button id="btn-download-backup" class="btn-danger">📥 Backup completo (JSON)</button>
-  <input type="file" id="file-upload-backup" accept=".json" style="display:none">
-  <button id="btn-upload-backup" class="btn-edit">📤 Ripristina backup</button>
-               
-            </div>
-        </div></div>
-        
+    <div class="header-stat-item">
+      <div class="header-stat-label">Capitale Restante</div>
+      <div class="header-stat-value" style="color: #3BB9FF; font-size: 34px;" id="capitaleInDollari"></div>
+    </div>
+
+    <div class="header-stat-item">
+      <div class="header-stat-label">Totale In Cripto</div>
+      <div class="header-stat-value" style="color: #f62817; font-size: 34px;" id="totaleInDollari"></div>
+    </div>
+
+    <!-- 2° riga (secondari) -->
+    <div class="header-stat-item">
+      <div class="header-stat-label">Media Trade Attivi</div>
+      <div class="header-stat-value" style="color: #f62817; font-size: 28px;" id="mediaTradeTotaleIn">0</div>
+    </div>
+
+    <div class="header-stat-item">
+      <div class="header-stat-label">Media Dollari in USDT</div>
+      <div class="header-stat-value" style="color: #1aa6ed; font-size: 28px;" id="mediaDollariTrading">$0</div>
+    </div>
+  </div>
+
+</div>
     
-    <div style="padding: 7px;"></div>  
+ 
+  
+  
+  <!-- Nuova card per il grafico storico -->
+ <div class="container">
+    <div class="card-header">
+       <h3 style="color: #4caf50 !important;">🪔 Storico Distribuzione Capitale</h3>
+    </div>
+    
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-button active" onclick="cambiaTab(event, 'tab-distribuzione')">Distribuzione nel Tempo</button>
+        <button class="tab-button" onclick="cambiaTab(event, 'tab-percentuale')">Analisi Percentuale</button>
+      </div>
+      
+      <div class="tab-content">
+        <div id="tab-distribuzione" class="tab-panel active">
+          <!-- GRAFICO PRIMA DEL MENU -->
+          <div class="storico-chart-container">
+            <canvas id="storicoCapitaleChart"></canvas>
+          </div>
+          
+          <!-- MENU TEMPORALE SOTTO IL GRAFICO -->
+          <div class="time-range-selector" style="margin-top: 30px;">
+            <button class="btn-danger active" data-days="30" onclick="cambiaRangeTempo(this)">30 Giorni</button>
+            <button class="btn-danger" data-days="90" onclick="cambiaRangeTempo(this)">90 Giorni</button>
+            <button class="btn-danger" data-days="180" onclick="cambiaRangeTempo(this)">6 Mesi</button>
+            <button class="btn-danger" data-days="365" onclick="cambiaRangeTempo(this)">1 Anno</button>
+            <button class="btn-danger" data-days="all" onclick="cambiaRangeTempo(this)">Tutto</button>
+            <!-- NUOVO PULSANTE -->
+            <button class="btn-edit" onclick="scaricaGrafico()" style="margin-left: 15px;">📷 Scarica Grafico</button>
+          </div>
+          
+         
 
-
-
-  	
+        </div>
         
-   <!-- FOOTER -->
+        <div id="tab-percentuale" class="tab-panel">
+          <div class="info-box">
+            Analisi del tempo in cui il capitale è stato allocato nelle seguenti percentuali in dollari.
+          </div>
+          
+          <!-- GRAFICO PERCENTUALE SPOSTATO PRIMA DEI BOX -->
+          <div class="storico-chart-container">
+            <canvas id="percentualeCapitaleChart"></canvas>
+          </div>
+          
+          
+          
+          <!-- BOX PERCENTUALI SPOSTATI SOTTO IL GRAFICO -->
+          <div class="distribution-stats">
+            <div class="distribution-item">
+              <div class="distribution-label">0-25% in Dollari</div>
+              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale0_25">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">25-50% in Dollari</div>
+              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale25_50">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">50-75% in Dollari</div>
+              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale50_75">0 giorni</div>
+            </div>
+            <div class="distribution-item">
+              <div class="distribution-label">75-100% in Dollari</div>
+              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale75_100">0 giorni</div>
+            </div>
+			<button onclick="scaricaGraficoPercentuale1()" class="header-stat-item" style="margin-top: 15px; margin-bottom: 20px;">
+            <i class="fas fa-download"></i> Scarica Grafico Percentuale
+          </button>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+<span id="infoTotaleTrade"></span>
+<div style="padding: 5px;"></div>
+
+
+
+<div style="padding: 8px;"></div>		
+		
+     
+		
+		
+	<!-- FOOTER -->
 <div class="container" style="padding-top: 12px; padding-bottom: 12px;">
   <!-- BLOCCO MENU -->
   <div class="iflow-body">
@@ -112,7 +240,7 @@
           <ul>
             <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
             <li><a href="https://beneinst.github.io/tradingspot/Trade12.html">Trade Attivi</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/panoramica-capitale.html">Panoramica Capitale</a></li>
+            
             <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
           </ul>
         </li>
@@ -135,7 +263,7 @@
     </nav>
   </div>
   </div>
-<div style="padding: 5px;"></div>  
+<div style="padding: 7px;"></div>  
 
 <div class="container">
   <div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
@@ -150,87 +278,45 @@
   </div>
 </div>
 
+<div style="display:none;">
+  <div id="totaleIn"></div>
+  <div id="capitale"></div>
+  <div id="totaleTrade"></div>
+  <div id="infoTotaleTrade"></div>
+  <input id="quotaPerTrade" type="number">
+  <input id="inputTotaleIn" type="number">
+  <div id="capitaleTotale"></div>
+  <div id="capitaleInDollari"></div>
+  <div id="totaleInDollari"></div>
+  <span id="mediaTradeTotaleIn"></span>
+  <span id="mediaDollariTrading"></span>
+  <canvas id="capitaleChart"></canvas>
+  <canvas id="storicoCapitaleChart"></canvas>
+  <canvas id="percentualeCapitaleChart"></canvas>
+</div>
+
+<script src="js/trade.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script src="js/panoramica.js"></script>
 <script>
-/**
- * Scarica l’intero contenuto di localStorage in un unico file.
- * Il nome del file contiene data e ora.
- */
-function scaricaBackupCompleto() {
-  const blob = new Blob([JSON.stringify(localStorage, null, 2)], {
-    type: 'application/json'
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `backup-app-${new Date()
-    .toISOString()
-    .slice(0, 19)
-    .replace(/:/g, '-')}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+// 🔄 Contatore reattivo trade attivi
+function updateTradeCount() {
+  const trades = JSON.parse(localStorage.getItem('singleTrades') || '[]');
+  const count = trades.length;
+  const span = document.getElementById('trade-count');
+  if (span) span.textContent = count;
 }
 
-/**
- * Carica il file selezionato dal disco e sovrascrive localStorage.
- * Mostra un avviso di conferma prima di procedere.
- */
-function caricaBackupCompleto(file) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const nuovoStorage = JSON.parse(e.target.result);
-
-      if (typeof nuovoStorage !== 'object') throw 'Formato non valido';
-
-      if (
-        !confirm(
-          '⚠️  Questo sovrascriverà TUTTI i dati dell’app. Procedere?'
-        )
-      )
-        return;
-
-      localStorage.clear();
-
-      Object.keys(nuovoStorage).forEach(k => {
-        const raw = nuovoStorage[k];
-        let parsed = raw;
-
-        // Proviamo a parsare il valore se è una stringa JSON
-        if (typeof raw === 'string' && (raw.startsWith('[') || raw.startsWith('{'))) {
-          try {
-            parsed = JSON.parse(raw);
-          } catch {
-            // Se non è JSON valido, lo lascio com'è
-          }
-        }
-
-        localStorage.setItem(k, typeof parsed === 'object' ? JSON.stringify(parsed) : parsed);
-      });
-
-      alert('✅ Backup ripristinato con successo!');
-      location.reload();
-    } catch (err) {
-      alert('❌ Errore nel caricamento: ' + err);
-    }
-  };
-  reader.readAsText(file);
-}
-
-/* ---- collega i pulsanti ---- */
-document.addEventListener('DOMContentLoaded', () => {
-  const btnDown = document.getElementById('btn-download-backup');
-  const btnUp   = document.getElementById('btn-upload-backup');
-  const fileIn  = document.getElementById('file-upload-backup');
-
-  if (btnDown) btnDown.addEventListener('click', scaricaBackupCompleto);
-  if (btnUp)   btnUp.addEventListener('click', () => fileIn.click());
-  if (fileIn)  fileIn.addEventListener('change', e => caricaBackupCompleto(e.target.files[0]));
+// 📡 Ascolta eventi di apertura/chiusura trade
+window.addEventListener('storage', (e) => {
+  if (e.key === '__tradeEvent__') {
+    updateTradeCount();
+  }
 });
-</script>
 
+// 🧠 Aggiorna anche al caricamento pagina
+document.addEventListener('DOMContentLoaded', updateTradeCount);
+</script>
 
 
 </body>
