@@ -1210,3 +1210,9 @@ function updateAll() {
     updateDashboard();
     createChart(); // Aggiungi questa riga
 }
+
+// Ricarica i dati ogni volta che la pagina torna visibile (es. dopo navigazione)
+window.addEventListener('pageshow', () => {
+    loadFromLocalStorage();
+    updateAll();
+});
