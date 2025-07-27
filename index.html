@@ -7,60 +7,6 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="css/menusotto.css">
   <link rel="stylesheet" href="css/style.css">
-
-
-  <style>
-      
-
-    .card {
-      background-color: #1e1e1e;
-      border-radius: 10px;
-      padding: 25px;
-      margin-bottom: 30px;
-    }
-
-    .card h4 {
-      margin-bottom: 15px;
-      font-size: 1.4em;
-      color: #FFD012;
-    }
-
-    .btn-outline {
-      display: inline-block;
-      padding: 12px 20px;
-      margin: 8px 12px 8px 0;
-      font-size: 1em;
-      border: 2px solid #FFD012;
-      border-radius: 8px;
-      background: transparent;
-      color: #FFD012;
-      text-decoration: none;
-      transition: all 0.3s ease-in-out;
-    }
-
-    .btn-outline:hover {
-      background-color: #FFD012;
-      color: #1e1e1e;
-    }
-
-    .footer {
-      margin-top: 40px;
-      padding-top: 20px;
-      border-top: 1px solid #444;
-      text-align: center;
-      color: #aaa;
-      font-size: 0.95em;
-    }
-
-    @media (max-width: 1400px) {
-      .container {
-        max-width: 98vw;
-        padding: 10px;
-      }
-    }
-	
-
-  </style>
 </head>
 <body>
 
@@ -246,33 +192,32 @@ function caricaBackupCompleto(file) {
       )
         return;
 
-      // Pulisci localStorage
       localStorage.clear();
 
-      // Ricarica le chiavi
       Object.keys(nuovoStorage).forEach(k => {
-        localStorage.setItem(k, nuovoStorage[k]);
+        const raw = nuovoStorage[k];
+        let parsed = raw;
+
+        // Proviamo a parsare il valore se è una stringa JSON
+        if (typeof raw === 'string' && (raw.startsWith('[') || raw.startsWith('{'))) {
+          try {
+            parsed = JSON.parse(raw);
+          } catch {
+            // Se non è JSON valido, lo lascio com'è
+          }
+        }
+
+        localStorage.setItem(k, typeof parsed === 'object' ? JSON.stringify(parsed) : parsed);
       });
 
       alert('✅ Backup ripristinato con successo!');
-      location.reload(); // ricarica la pagina per coerenza
+      location.reload();
     } catch (err) {
       alert('❌ Errore nel caricamento: ' + err);
     }
   };
   reader.readAsText(file);
 }
-
-/* ---- collega i pulsanti ---- */
-document.addEventListener('DOMContentLoaded', () => {
-  const btnDown = document.getElementById('btn-download-backup');
-  const btnUp   = document.getElementById('btn-upload-backup');
-  const fileIn  = document.getElementById('file-upload-backup');
-
-  if (btnDown) btnDown.addEventListener('click', scaricaBackupCompleto);
-  if (btnUp)   btnUp.addEventListener('click', () => fileIn.click());
-  if (fileIn)  fileIn.addEventListener('change', e => caricaBackupCompleto(e.target.files[0]));
-});
 </script>
 
 
