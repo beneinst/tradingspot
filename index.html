@@ -75,7 +75,7 @@
 		
   <div class="container">
             <div class="container">
-                <h3 style="color: #FFDB58 !important;" class="section-title">💽 Backup & Ripristino</h3>
+                <h3 style="color: #FFDB58 !important;" class="section-title">💽 Back6up & Ripristino</h3>
            
             
             <p> Salva e carica i tuoi dati per trasferirli tra dispositivi diversi.</p>
@@ -218,6 +218,17 @@ function caricaBackupCompleto(file) {
   };
   reader.readAsText(file);
 }
+
+/* ---- collega i pulsanti ---- */
+document.addEventListener('DOMContentLoaded', () => {
+  const btnDown = document.getElementById('btn-download-backup');
+  const btnUp   = document.getElementById('btn-upload-backup');
+  const fileIn  = document.getElementById('file-upload-backup');
+
+  if (btnDown) btnDown.addEventListener('click', scaricaBackupCompleto);
+  if (btnUp)   btnUp.addEventListener('click', () => fileIn.click());
+  if (fileIn)  fileIn.addEventListener('change', e => caricaBackupCompleto(e.target.files[0]));
+});
 </script>
 
 
