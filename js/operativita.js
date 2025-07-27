@@ -356,25 +356,20 @@ window.setupTradeCounter = setupTradeCounter;
         let historicalEntries = [];
         
         // Caricare dati da localStorage se disponibili
-        function loadFromLocalStorage() {
-            const savedCurrentEntries = localStorage.getItem('currentMonthEntries');
-            const savedHistoricalEntries = localStorage.getItem('historicalEntries');
-            
-            if (savedCurrentEntries) {
-                currentMonthEntries = JSON.parse(savedCurrentEntries);
-            }
-            
-            if (savedHistoricalEntries) {
-                historicalEntries = JSON.parse(savedHistoricalEntries);
-            }
-        }
+      function loadFromLocalStorage() {
+    const savedCurrentEntries = localStorage.getItem('currentMonthEntries');
+    const savedHistoricalEntries = localStorage.getItem('historicalEntries');
+
+    currentMonthEntries = savedCurrentEntries ? JSON.parse(savedCurrentEntries) : [];
+    historicalEntries   = savedHistoricalEntries ? JSON.parse(savedHistoricalEntries) : [];
+}
         
         // Salvare dati nel localStorage
-        function saveToLocalStorage() {
-            localStorage.setItem('currentMonthEntries', JSON.stringify(currentMonthEntries));
-            localStorage.setItem('historicalEntries', JSON.stringify(historicalEntries));
-        }
-        
+       function saveToLocalStorage() {
+    localStorage.setItem('currentMonthEntries', JSON.stringify(currentMonthEntries));
+    localStorage.setItem('historicalEntries', JSON.stringify(historicalEntries));
+}
+
         // Funzione per formattare le date nel formato italiano
         function formatDate(date) {
             const day = String(date.getDate()).padStart(2, '0');
@@ -1270,3 +1265,9 @@ function updateAll() {
     updateDashboard();
     createChart(); // Aggiungi questa riga
 }
+
+// Ricarica dati ogni volta che si torna nella pagina (es. da "Indietro")
+window.addEventListener('pageshow', () => {
+    loadFromLocalStorage();
+    updateAll();
+});
