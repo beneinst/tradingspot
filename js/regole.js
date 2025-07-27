@@ -135,48 +135,4 @@
             });
         }
         
-        // Funzione per scaricare i dati come file JSON
-        function scaricaDati() {
-            const data = JSON.stringify(rules, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `regole-trading-backup_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-        
-        // Funzione per caricare i dati da un file JSON
-        function caricaDati() {
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
-            
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedRules = JSON.parse(e.target.result);
-                        if (Array.isArray(importedRules)) {
-                            // Sostituisci tutte le regole
-                            rules = importedRules;
-                            
-                            saveRules();
-                            renderRules();
-                            alert('Dati importati con successo!');
-                            fileInput.value = '';
-                        } else {
-                            alert('Il file non contiene un formato di dati valido.');
-                        }
-                    } catch (error) {
-                        alert('Errore durante l\'importazione dei dati: ' + error.message);
-                    }
-                };
-                reader.readAsText(file);
-            } else {
-                alert('Seleziona un file da importare.');
-            }
-        }
+   

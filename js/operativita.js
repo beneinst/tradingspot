@@ -768,66 +768,6 @@ function showMessage(text, type) {
     }, 5000);
 }
 
-// Funzione aggiornata per esportare i dati
-function scaricaDati() {
-    const data = {
-        currentMonthEntries,
-        historicalEntries
-    };
-    
-    const dataStr = JSON.stringify(data, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `trading_backup_${getCurrentDate().replace(/\./g, '-')}.json`;
-    link.click();
-    
-    URL.revokeObjectURL(url);
-    
-    showMessage('Backup effettuato con successo!', 'success');
-}
-
-// Funzione per importare i dati
-function caricaDati() {
-    const fileInput = document.getElementById('fileInput');
-    if (fileInput.files.length === 0) {
-        showMessage('Seleziona un file da caricare', 'error');
-        return;
-    }
-    
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            
-            if (data.currentMonthEntries && data.historicalEntries) {
-                currentMonthEntries = data.currentMonthEntries;
-                historicalEntries = data.historicalEntries;
-                
-                // Salviamo nel localStorage
-                saveToLocalStorage();
-                
-                // Aggiorniamo l'interfaccia
-                updateAll();
-                
-                showMessage('Dati ripristinati con successo!', 'success');
-            } else {
-                showMessage('Il file di backup non è valido!', 'error');
-            }
-        } catch (err) {
-            showMessage('Errore durante il caricamento del backup: ' + err.message, 'error');
-        }
-        
-        // Reset del file input
-        fileInput.value = '';
-    };
-    
-    reader.readAsText(file);
-}
 
 // Funzione per aggiornare tutto
 function updateAll() {

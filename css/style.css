@@ -46,7 +46,7 @@ h2 {
   font-family: var(--font-heading-light);
   color: var(--color-heading-2);
 }
-h3 {
+h3, note h3 {
   font-family: var(--font-heading-light);
   color: var(--color-heading-3);
   font-size: 22px;
@@ -95,43 +95,35 @@ h5 {
   color: var(--color-heading-5);
 }
 
+/* Reset margini di default */
+* {
+  box-sizing: border-box;
+}
 
+/* Body */
 body {
-    background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-    color: var(--color-text);
-    padding: 20px;
-    min-height: 100vh;
-}
-/* Container */
-.container {
-    max-width: 1300px;
-    margin: 0 auto;
-    background-color: #2c2c2c;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
-}
-@media (max-width: 1,350px) {
-  .container {
-    width: 95%;
-  }
+  background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+  color: var(--color-text);
+  margin: 0;              /* ← rimuove margini di default */
+  padding: 0;             /* ← rimuove il padding che creava il bordo */
+  min-height: 100vh;
 }
 
+/* Container */
+.container,
+.container-f {
+  width: 100%;            /* ← occupa tutto lo spazio su mobile */
+  max-width: 1300px;      /* ← ma non oltre 1300px su desktop */
+  margin: 0 auto;
+  background-color: #2c2c2c;
+  padding: 20px;          /* ← padding ora è dentro al container */
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
 
 .container-f {
-    max-width: 1300px;
-    margin: 0 auto;
-    background-color: #2c2c2c;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.0);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0);
 }
-@media (max-width: 1,350px) {
-  .container {
-    width: 95%;
-  }
-}
-
 
 /* Header */
 .header {
@@ -146,8 +138,6 @@ body {
   color: var(--color-heading);
   box-shadow: 0 2px 20px rgba(0,0,0,0.8);
 }
-
-
 .header h1 {
     font-size: 1.9em;
     text-align: left;
