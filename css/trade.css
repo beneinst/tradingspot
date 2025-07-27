@@ -47,16 +47,7 @@
     font-weight: 600;
 }
 
-/* Form Container */
-.form-container {
-    
-    padding: 25px;
-    border-radius: 8px;
-    border: 1px solid var(--color-border);
-    margin-bottom: 25px;
-    border-left: 4px solid var(--color-primary);
-    box-shadow: 0 4px 25px rgba(0,0,0,0.6);
-}
+
 
 .trade-form {
     background: linear-gradient(135deg, #3a3a3a 0%, #606060 100%);

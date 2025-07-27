@@ -135,4 +135,33 @@
             });
         }
         
-   
+      // Funzione per caricare i dati da un file JSON
+        function caricaDati() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedRules = JSON.parse(e.target.result);
+                        if (Array.isArray(importedRules)) {
+                            // Sostituisci tutte le regole
+                            rules = importedRules;
+                            
+                            saveRules();
+                            renderRules();
+                            alert('Dati importati con successo!');
+                            fileInput.value = '';
+                        } else {
+                            alert('Il file non contiene un formato di dati valido.');
+                        }
+                    } catch (error) {
+                        alert('Errore durante l\'importazione dei dati: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            } else {
+                alert('Seleziona un file da importare.');
+            }
+        }

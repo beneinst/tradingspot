@@ -66,7 +66,7 @@
   📊 Trade attivi: <span id="trade-count" style="display: inline;">0</span>
 </div>
 		
-		<div class="container">
+		<div class="form-container">
 		
 	<div style="display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap;">
 
@@ -87,6 +87,53 @@
   <!-- Colonna destra: Grafico -->
   <div class="header-stat-item_f" style="flex: 1 1 48%; background: #2c2c2c; padding: 1px; border-radius: 8px;">
     <canvas id="capitaleChart"></canvas>
+  </div>
+
+</div>
+
+<!-- Gruppo unico: tutti i box -->
+<div class="form-container">
+
+  <div class="header-stats all-in-one">
+    <!-- 1° riga (primi 5) -->
+    <div class="header-stat-item">
+      <div class="header-stat-label">Trade Totali</div>
+      <div class="header-stat-value" style="color: #987654; font-size: 34px;" id="totaleTrade">30</div>
+    </div>
+
+    <div class="header-stat-item">
+      <div class="header-stat-label">$ per Trade</div>
+      <div class="header-stat-value" style="display: flex; align-items: center; gap: 6px;">
+        <input type="number" style="font-size: 22px; width: 64px;" id="quotaPerTrade" class="quota-input" value="0" min="1" oninput="aggiornaCapitale()">
+        <button onclick="aggiornaTrade()" class="btn-danger btn-tiny" title="Aggiorna Capitale">🎯</button>
+      </div>
+    </div>
+
+    <div class="header-stat-item">
+      <div class="header-stat-label">Capitale Totale</div>
+      <div class="header-stat-value" style="color: #f5f5f5; font-size: 34px;" id="capitaleTotale"></div>
+    </div>
+
+    <div class="header-stat-item">
+      <div class="header-stat-label">Capitale Restante</div>
+      <div class="header-stat-value" style="color: #3BB9FF; font-size: 34px;" id="capitaleInDollari"></div>
+    </div>
+
+    <div class="header-stat-item">
+      <div class="header-stat-label">Totale In Cripto</div>
+      <div class="header-stat-value" style="color: #f62817; font-size: 34px;" id="totaleInDollari"></div>
+    </div>
+
+    <!-- 2° riga (secondari) -->
+    <div class="header-stat-item">
+      <div class="header-stat-label">Media Trade Attivi</div>
+      <div class="header-stat-value" style="color: #f62817; font-size: 28px;" id="mediaTradeTotaleIn">0</div>
+    </div>
+
+    <div class="header-stat-item">
+      <div class="header-stat-label">Media Dollari in USDT</div>
+      <div class="header-stat-value" style="color: #1aa6ed; font-size: 28px;" id="mediaDollariTrading">$0</div>
+    </div>
   </div>
 
 </div>
@@ -169,57 +216,9 @@
 <span id="infoTotaleTrade"></span>
 <div style="padding: 5px;"></div>
 
-<div class="container">
-  <div class="card-header">
-    <h3 style="color: #4caf50 !important;">🪔 Capitale Totale</h3>
-  </div>
-  <div style="padding: 5px;"></div>  
-  <!-- Gruppo principale: 5 box -->
-  <div class="header-stats">
-    <div class="header-stat-item">
-      <div class="header-stat-label">Trade Totali</div>
-      <div class="header-stat-value" style="color: #987654; font-size: 34px;" id="totaleTrade">30</div>
-    </div>
-   <div class="header-stat-item">
-  <div class="header-stat-label">$ per Trade</div>
-  <div class="header-stat-value" style="display: flex; align-items: center; gap: 6px;">
-    <input type="number" style="font-size: 22px; width: 64px;" id="quotaPerTrade" class="quota-input" value="0" min="1" oninput="aggiornaCapitale()">
-    <button onclick="aggiornaTrade()" class="btn-danger btn-tiny" title="Aggiorna Capitale">🎯</button>
-  </div>
-</div>
 
-    <div class="header-stat-item">
-      <div class="header-stat-label">Capitale Totale</div>
-      <div class="header-stat-value" style="color: #f5f5f5; font-size: 34px;" id="capitaleTotale"></div>
-    </div>
-    <div class="header-stat-item">
-      <div class="header-stat-label">Capitale Restante</div>
-      <div class="header-stat-value" style="color: #3BB9FF; font-size: 34px;" id="capitaleInDollari"></div>
-    </div>
-    <div class="header-stat-item">
-      <div class="header-stat-label">Totale In Cripto</div>
-      <div class="header-stat-value" style="color: #f62817; font-size: 34px;" id="totaleInDollari"></div>
-    </div>
-  </div>
-  
- <!-- Box secondari -->
-<div class="header-stats">
-  <div class="header-stat-item">
-    <div class="header-stat-label">Media Trade Attivi</div>
-    <div class="header-stat-value" style="color: #f62817; font-size: 28px;" id="mediaTradeTotaleIn">0</div>
-  </div>
-  <div class="header-stat-item">
-    <div class="header-stat-label">Media Dollari in USDT</div>
-    <div class="header-stat-value" style="color: #1aa6ed; font-size: 28px;" id="mediaDollariTrading">$0</div>
-  </div>
- 
-</div>
 
-  <!-- Pulsante a parte, eventuale box separato -->
-  
-</div></div></div>
-
-<div style="padding: 10px;"></div>		
+<div style="padding: 8px;"></div>		
 		
      
 		
@@ -264,7 +263,7 @@
     </nav>
   </div>
   </div>
-<div style="padding: 5px;"></div>  
+<div style="padding: 7px;"></div>  
 
 <div class="container">
   <div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
