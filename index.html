@@ -6,11 +6,12 @@
     <title>Trade Attivi Portfolio</title>
     <link rel="icon" type="image/png" href="favicon.png"> 
     <link rel="stylesheet" href="css/trade.css">
-	<link rel="stylesheet" href="css/panoramica12.css">
+	<link rel="stylesheet" href="css/panoramica.css">
     <link rel="stylesheet" href="css/menusotto.css">
 	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<div style="padding: 4px;"></div>
 <div class="container">
         <div class="header" style="padding-top: 20px; padding-left: 0px; padding-bottom: 20px;">
             <h1>🔥 Trade Attivi e Panoramica</h1>
@@ -18,36 +19,36 @@
 
         
                
-        <div  style="height: 18px; line-height: 18px; color: white; padding-left: 25px; padding-top: 5px; padding-bottom: 20px;"><em>
-  *Gestione <strong>Trade</strong> Singoli con Accumulo e Prezzo Medio.</em>
+        <div  style="height: 18px; line-height: 18px; color: white; padding-left: 25px; padding-top: 5px; padding-bottom: 20px;"><p><em>
+  *Gestione <strong>Trade</strong> Singoli con Accumulo e Prezzo Medio.</em></p>
 </div>
   
 
         <div class="card">
-            <h3 class="section-title" style="color: #99C68E !important;">💱 Aggiungi Entry al Trade</h3>
+            <h4 class="section-title" style="color: #FFD801 !important;">💱 Aggiungi Entry al Trade</h4>
             <form id="trade-form" class="trade-form">
                 <div class="form-row">
-                    <label for="crypto-symbol" style="color: #8EEBEC !important;">SIMBOLO CRIPTO</label>
+                    <label for="crypto-symbol" style="color: #7FFFD4 !important;">SIMBOLO CRIPTO</label>
                     <input type="text" id="crypto-symbol" placeholder="BTC" required>
                 </div>
                 <div class="form-row">
-                    <label for="trade-quantity" style="color: #8EEBEC !important;">QUANTITA'</label>
+                    <label for="trade-quantity" style="color: #7FFFD4 !important;">QUANTITA'</label>
                     <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required>
                 </div>
                 <div class="form-row">
-                    <label for="trade-price" style="color: #8EEBEC !important;">IMPORTO ENTRY(USDT):</label>
+                    <label for="trade-price" style="color: #7FFFD4 !important;">IMPORTO ENTRY(USDT):</label>
                     <input type="number" id="invested-amount" placeholder="Importo investito ($)" step="0.01" required>
                 </div>
                 <div class="form-row">
                     <label></label>
-                    <button type="submit" class="btn-primary">Aggiungi Entry</button>
+                    <button type="submit" class="btn-edit">Aggiungi Entry</button>
                 </div>
                 <input type="hidden" id="edit-trade-id">
             </form>
         </div>
 
         <div class="form-container">
-            <h4 class="section-title" style="color: #99C68E !important;">🎯 I tuoi Trade Attivi</h4>
+            <h4 class="section-title" style="color: #FFD801 !important;">🎯 I tuoi Trade Attivi</h4>
             <div id="trades-container"></div>
         </div>
 		
@@ -56,26 +57,28 @@
   📊 Trade attivi: <span id="trade-count" style="display: inline;">0</span>
 </div>
 		
-		<div class="form-container">
-		
+		<div class="card">
+		<h5 class="section-title" style="color: #FFD801 !important;">🪔 Storico Distribuzione Capitale</h5>
 	<div style="display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap;">
 
   <!-- Colonna sinistra: Scheda Gestione Trade -->
 
-  <div class="header-stat-item_f"
-       <div class="stats-grid">
-  <div class="header-stat-item">
-    <div class="stat-label">Totale in Cripto</div>
-    <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn"></div>
-  </div><div style="padding: 5px;"></div>
-  <div class="header-stat-item">
-    <div class="stat-label">Restanti in Dollari</div>
-    <div class="stat-value capitale" style="color: #1AA6ED; font-size: 39px;" id="capitale"></div>
+  <div class="header-stat-item_f">
+  <div class="container_f" style="display: flex; flex-direction: column; gap: 0px;">
+    <div class="header-stat-item">
+      <div class="stat-label">Totale in Cripto</div>
+      <div class="stat-value totale" style="color: #f62817; font-size: 39px;" id="totaleIn"></div>
+    </div>
+    
+    <div class="header-stat-item">
+      <div class="stat-label">Restanti in Dollari</div>
+      <div class="stat-value capitale" style="color: #1AA6ED; font-size: 39px;" id="capitale"></div>
+    </div>
   </div>
-  </div>
+</div>
 
   <!-- Colonna destra: Grafico -->
-  <div class="header-stat-item_f" style="flex: 1 1 48%; background: #2c2c2c; padding: 1px; border-radius: 8px;">
+  <div class="header-stat-item_f" style="flex: 1 1 48%;  padding: 1px; border-radius: 8px;">
     <canvas id="capitaleChart"></canvas>
   </div>
 
@@ -92,7 +95,7 @@
     </div>
 
     <div class="header-stat-item">
-      <div class="header-stat-label">$ per Trade</div>
+      <div class="header-stat-label" >$ per Trade</div>
       <div class="header-stat-value" style="display: flex; align-items: center; gap: 6px;">
         <input type="number" style="font-size: 22px; width: 64px;" id="quotaPerTrade" class="quota-input" value="0" min="1" oninput="aggiornaCapitale()">
         <button onclick="aggiornaTrade()" class="btn-danger btn-tiny" title="Aggiorna Capitale">🎯</button>
@@ -126,16 +129,14 @@
     </div>
   </div>
 
-</div>
+</div></div>
     
- 
+
   
   
   <!-- Nuova card per il grafico storico -->
- <div class="container">
-    <div class="card-header">
-       <h3 style="color: #4caf50 !important;">🪔 Storico Distribuzione Capitale</h3>
-    </div>
+ <div class="card">
+   
     
     <div class="tab-container">
       <div class="tab-buttons">
@@ -203,12 +204,12 @@
       </div>
     </div>
 </div>
-<span id="infoTotaleTrade"></span>
-<div style="padding: 5px;"></div>
+<span id="infoTotaleTrade"></span></div></div>
+<div style="padding: 6px;"></div>
 
 
 
-<div style="padding: 8px;"></div>		
+		
 		
      
 		
@@ -261,7 +262,7 @@
     </nav>
   </div>
   </div>
-<div style="padding: 7px;"></div>  
+<div style="padding: 4px;"></div>  
 
 <div class="container">
   <div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
@@ -275,6 +276,7 @@
     </div>
   </div>
 </div>
+<div style="padding: 4px;"></div>
 
 <div style="display:none;">
   <div id="totaleIn"></div>

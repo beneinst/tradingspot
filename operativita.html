@@ -11,6 +11,7 @@
 
 </head>
 <body>
+<div style="padding: 4px;"></div>
     <div class="container">
         <div class="header" style="padding-top: 1px; padding-left: 0px; padding-bottom: 0px;">
             <h1>💼 Operatività di Trading</h1>
@@ -25,10 +26,10 @@
             
         </div>
         
-        <div style="height: 18px; line-height: 18px; color: white; padding-left: 25px; padding-top: 10px; padding-bottom: 27px;">
-  *La quota in <strong>mese corrente</strong>, è il guadagno da ritirare come tua mensilità, rispetto al tuo capitale e dal tuo trading.
+        <div style="height: 18px; line-height: 18px; color: white; padding-left: 20px; padding-top: 0.2px; padding-bottom: 47px;"><p><em>
+  *La quota in <strong>mese corrente</strong>, è il guadagno da ritirare come tua mensilità, rispetto al tuo capitale e dal tuo trading.</p></em>
 </div>
-        <div style="padding: 5px;"></div> 
+        <div style="padding: 15px;"></div> 
         <div class="dashboard">
             <div class="stats-box current">
                 <h3>Mese corrente</h3>
@@ -58,7 +59,7 @@
         
         <div class="tables-container">
             <div class="table-section">
-                <h3 style="color: #4caf50 !important;">🧑🏽‍💻 Importi Mese Corrente</h3>
+                <h3 style="color: #7FE817 !important;">🧑🏽‍💻 Importi Mese Corrente</h3>
                 <table id="currentMonthTable">
                     <thead>
                         <tr>
@@ -73,7 +74,7 @@
             </div>
             
             <div class="table-section">
-                <h3 style="color: #4caf50 !important;">🎍 Storico Mensilità</h3>
+                <h3 style="color: #7FE817 !important;">🎍 Storico Mensilità</h3>
                 <table id="historicalTable">
                     <thead>
                         <tr>
@@ -94,7 +95,7 @@
 	
 	 <div class="container">
         
-        <h3 style="color: #4caf50 !important;">📈 Grafico Storico Mensile</h3>
+        <h2 style="color: #ffd012 !important;">📈 Grafico Storico Mensile</h2>
     <canvas id="monthlyChart" width="1150" height="550"></canvas>
     <div style="display: flex; gap: 10px; margin-top: 15px;">
 	
@@ -105,7 +106,7 @@
 	
 
 
-   <div class="backup-container">
+   <div class="backup-container" style="display: none;>
             <button id="scaricaDatiBtn" class="btn-edit">Scarica Dati (JSON)</button>
             <input type="file" id="fileInput" class="file-input" accept=".json">
             <label for="fileInput" class="btn-danger" style="cursor: pointer;">Seleziona File</label>
@@ -122,7 +123,7 @@
 		
 		<div class="card">
             <div class="card-header">
-                <h3 >🚀 Sistema a Soglie incrementali del capitale</h3>
+                <h2 style="color: #ffd012 !important;">🚀 Sistema a Soglie incrementali del capitale</h2>
             </div>
 		<div style="height: 5px;"></div>
 	<div class="container">
@@ -280,7 +281,7 @@
   </div>
 </div>
 
-
+<div style="padding: 4px;"></div>
 
 <script src="js/operativita.js"></script>
 <script type="module" src="jsmodule/operativita_Mod.js"></script>

@@ -46,7 +46,7 @@
   box-shadow: 0 2px 10px rgba(0,0,0,0.7); /* bordo/alone principale */
   box-sizing: border-box;
   transition: all 0.3s ease;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 /* Hover con effetto "glow" raffinato */
@@ -78,6 +78,7 @@
   margin: 0;
 }
 
+
 /* Singola card: unione tra status-card e header-stat-item */
 .header-stat-item_f {
   background: linear-gradient(135deg, #333, #444);
@@ -103,6 +104,40 @@
 
 /* Hover con effetto "glow" raffinato */
 .header-stat-item_f:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 2px 10px rgba(0,0,0,0.7),     /* ombra base */
+    0 8px 25px rgba(0,0,0,0.3);     /* effetto look 3D */
+  background: linear-gradient(120deg, #393e46 60%, #232a34 100%);
+  color: #ffe58f !important;
+  cursor: pointer;
+}
+
+/* Singola card: unione tra status-card e header-stat-item */
+.header-stat-item_c {
+  background: linear-gradient(135deg, #333, #444);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 140px;
+  
+  box-shadow: 0 2px 10px rgba(0,0,0,0.0); /* bordo/alone principale */
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  margin-bottom: 30px;
+  height: 360px;
+    
+   
+    position: relative;
+   
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+/* Hover con effetto "glow" raffinato */
+.header-stat-item_c:hover {
   transform: translateY(-5px);
   box-shadow: 
     0 2px 10px rgba(0,0,0,0.7),     /* ombra base */

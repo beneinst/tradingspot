@@ -86,9 +86,9 @@ h3 {
   font-family: var(--font-heading-light);
   color: var(--color-heading-3);
 }
-h4 {
+h4, header-stat-label {
   font-family: var(--font-heading-light);
-  color: var(--color-heading-4);
+  color: #BCC6CC;
 }
 h5 {
   font-family: var(--font-heading-light);
@@ -280,3 +280,23 @@ body {
       }
     }
 	
+	
+	 .card_v {
+    background-color: var(--card-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+	
+  }
+
+  .card-header_v {
+   background-color: #222831;
+    padding: 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    }
+
