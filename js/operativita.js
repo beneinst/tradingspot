@@ -1256,8 +1256,6 @@ document.getElementById('downloadChartBtn').addEventListener('click', downloadCh
 document.getElementById('downloadTableBtn').addEventListener('click', downloadCombinedTablesHTML);
 
 
-
-
 // Aggiornare la funzione updateAll esistente per includere il grafico
 function updateAll() {
     updateCurrentMonthTable();
@@ -1271,3 +1269,50 @@ window.addEventListener('pageshow', () => {
     loadFromLocalStorage();
     updateAll();
 });
+
+
+/* IIFE per ogni blocco (parentesi iniziale corretta) */
+(function () {
+  // --- LEGGO DA LOCALSTORAGE (se presente)
+  const valori = {
+    1: JSON.parse(localStorage.getItem('valori_1') || '[]'),
+    2: JSON.parse(localStorage.getItem('valori_2') || '[]')
+  };
+
+  // rendo gli input più stretti
+  document.querySelectorAll('.importo').forEach(inp => inp.style.width = '99px');
+
+  // --- AGGIORNO VISUALIZZAZIONE
+  function aggiorna(id) {
+    const tot = valori[id].reduce((a, b) => a + b, 0);
+    document.getElementById(`totale_${id}`).textContent = Math.round(tot) + ' €';
+
+    // --- SALVO SU LOCALSTORAGE
+    localStorage.setItem(`valori_${id}`, JSON.stringify(valori[id]));
+  }
+
+  // --- EVENTI BOTTONI
+  document.querySelectorAll('.addBtn').forEach(btn =>
+    btn.addEventListener('click', e => {
+      const id  = e.target.dataset.target;
+      const inp = document.getElementById(`importo_${id}`);
+      const v   = parseFloat(inp.value);
+      if (isNaN(v)) return;
+      valori[id].push(v);
+      inp.value = '';
+      aggiorna(id);
+    })
+  );
+
+  document.querySelectorAll('.delBtn').forEach(btn =>
+    btn.addEventListener('click', e => {
+      const id = e.target.dataset.target;
+      valori[id].pop();
+      aggiorna(id);
+    })
+  );
+
+  // --- MOSTRO I TOTALI AL CARICAMENTO
+  aggiorna(1);
+  aggiorna(2);
+})();

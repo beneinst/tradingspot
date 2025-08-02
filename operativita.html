@@ -45,6 +45,12 @@
             </div>
         </div>
 		</div>
+	
+
+
+
+
+  
 		<div style="padding: 5px;"></div> 
         <div class="container">
         <div class="container">
@@ -214,8 +220,48 @@
         </div>
     </div>
 </div></div></div>
-<div style="padding: 4px;"></div>
+<div style="padding: 7px;"></div>
+<div class="container">
+ <div class="threshold-levels" style="padding-top:10px; padding-bottom:10px;">
+            <h3 style="color: #ffd012 !important;">💸 Storico Ritiro su conto corrente IBAN</h3>
+            
+        </div>
 
+
+
+
+   <!-- CONTAINER FLEX -->
+<div class="container" style="display:flex; gap:20px; align-items:flex-start;">
+
+    <!-- BOX 1 (sinistra) -->
+    <div class="stats-box current" style="flex:1;">
+        <h3>Staking</h3>
+        <div class="value current-value" id="currentMonthValue">
+            <span class="totale" id="totale_1">0 €</span>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+            <input type="number" step="0.10" class="importo" id="importo_1" placeholder="€" style="width:99px;">
+            <button class="addBtn" data-target="1">+</button>
+            <button class="delBtn" data-target="1">–</button>
+        </div>
+    </div>
+
+    <!-- BOX 2 (destra) -->
+    <div class="stats-box average" style="flex:1;">
+        <h3>Trading</h3>
+        <div class="value average-value" id="monthlyAverage">
+            <span class="totale" id="totale_2">0 €</span>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+            <input type="number" step="0.10" class="importo" id="importo_2" placeholder="€" style="width:99px;">
+            <button class="addBtn" data-target="2"><strong>+</strong></button>
+            <button class="delBtn" data-target="2"><strong>–</strong></button>
+        </div>
+    </div>
+</div>
+</div>
+
+<div style="padding: 7px;"></div>
 
 
 	<!-- FOOTER -->
