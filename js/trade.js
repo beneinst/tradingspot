@@ -699,8 +699,11 @@ async function renderTrades() {
             <div class="note">
                 <h3>🪙 ${trade.symbol.toUpperCase()} | Trade #${String(trades.length - index).padStart(2, '0')}</h3>
                 
+  
+  
+
                 <div class="trade-summary">
-                    <h4>Riepilogo Trade</h4><p></p>
+                    
                     <div class="summary-grid">
                         <div class="summary-item">
                             <div class="label">Quantità Totale</div>
