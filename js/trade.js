@@ -348,7 +348,7 @@ tr:hover {
         let currentPrice = null;
         let attempts = 0;
         while (attempts < 3 && !currentPrice) {
-            currentPrice = await getPriceFromCoinGecko(trade.symbol);
+            currentPrice = await getPriceFromBinance(trade.symbol);
             if (!currentPrice) {
                 attempts++;
                 await new Promise(resolve => setTimeout(resolve, 1000)); // Attendi 1 secondo
@@ -886,7 +886,31 @@ window.deleteTrade = id => {
   }
 };
 
+// ------------------------------------------------------------------
+//  Prezzi da Binance (nessuna API key richiesta)
+// ------------------------------------------------------------------
+async function getPriceFromBinance(symbol) {
+    const pair = `${symbol.toUpperCase()}USDT`;
+    const cacheKey = pair.toLowerCase();
+    const now = Date.now();
 
+    // cache 5 min
+    if (priceCache[cacheKey] && (now - priceCache[cacheKey].timestamp) < CACHE_DURATION) {
+        return priceCache[cacheKey].price;
+    }
+
+    try {
+        const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pair}`);
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        const price = parseFloat(data.price);
+        priceCache[cacheKey] = { price, timestamp: now };
+        return price;
+    } catch {
+        console.warn(`Binance: ${pair} non trovato`);
+        return null; // se vuoi un fallback, gestiscilo altrove
+    }
+}
 
 // 🧠 Aggiorna anche al caricamento pagina
 document.addEventListener('DOMContentLoaded', updateTradeCount);
