@@ -49,7 +49,7 @@ h2 {
 h3, note h3 {
   font-family: var(--font-heading-light);
   color: var(--color-heading-3);
-  font-size: 22px;
+  font-size: 18px;
 }
 h4 {
   font-family: var(--font-heading-light);
