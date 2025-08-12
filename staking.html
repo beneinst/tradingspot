@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Attivi Portfolio</title>
+    <link rel="icon" type="image/png" href="favicon.png"> 
+    <link rel="stylesheet" href="css/trade.css">
+	<link rel="stylesheet" href="css/operativita.css">
+	<link rel="stylesheet" href="css/panoramica.css">
+    <link rel="stylesheet" href="css/menusotto.css">
+	<link rel="stylesheet" href="css/style.css">
+	
+	<style>
+	.atom-entry-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: #22242a;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,.18);
+}
+.atom-entry-table th,
+.atom-entry-table td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #2d313a;
+}
+.atom-entry-table th {
+  background: linear-gradient(135deg, #353850 0%, #23243b 100%);
+  color: #ececf1;
+  font-weight: 600;
+  font-size: .9em;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.atom-entry-table tr:hover {
+  background-color: #2d313a;
+}
+.btn-del {
+  background: #ff4d6d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+<div style="padding: 4px;"></div>
+<div class="container">
+<!-- Titolo a sinistra, sottotitolo a destra -->
+<div class="container">
+<div class="container-f" style="display:flex; align-items:center; justify-content:space-between; padding:4px 0;">
+  <h1 style="margin:0; font-size:1.75rem; line-height:1.8;">🎍 Staking ATOM (Cosmos)</h1>
+
+  <div style="font-size:0.9rem; line-height:1.3; color:#fff; text-align:right; padding-right: 10px;">
+    <em>*Gestione <strong>Entry ATOM</strong> con accumulo e prezzo medio.</em>
+  </div>
+</div>
+</div>
+<div style="padding: 4px;"></div> 
+ <div class="container" style="padding-top: 12px; padding-bottom: 12px;">
+  <!-- BLOCCO MENU -->
+  <div class="iflow-body">
+    <nav class="iflow-custom-menu">
+      <ul>
+        <li>
+          <div class="iflow-menu-label"><a href="https://beneinst.github.io/tradingspot/">Trade</a></div>
+          <ul>
+            <li><a href="https://beneinst.github.io/tradingspot/">Trade attivi</a></li>
+          </ul>
+        </li>
+		 
+        <li>
+          <div class="iflow-menu-label"><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></div>
+          <ul>
+            <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
+			<li><a href="https://beneinst.github.io/tradingspot/traking.html">Traking</a></li>
+          </ul>
+        </li>
+       
+        <li>
+          <div class="iflow-menu-label">Strategia</div>
+          <ul>
+		  <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
+            
+            <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/chartflow/index.html">Segnali</a></li>
+          </ul>
+        </li>
+        <li>
+          <div class="iflow-menu-label">Fondamenti</div>
+          <ul>
+		  <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/cheat-sheet.html">Patterns</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/candlestick.html">Candlestick</a></li>
+          </ul>
+        </li>
+		<li>
+          <div class="iflow-menu-label"><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></div>
+          <ul>
+            <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
+          </ul>
+        </li>
+		
+      </ul>
+    </nav>
+  </div>
+  </div>       
+   <div style="padding: 4px;"></div>  
+
+  <!-- CARD FORM -->
+  <div class="card">
+    <h5 class="section-title" style="color: #FFD801 !important;">💱 Aggiungi Entry ATOM/USDC</h5>
+    <form id="entryForm" class="trade-form">
+      <div class="form-row">
+        <label for="qtyAtom" style="color: #BCC6CC !important;">QUANTITÀ ATOM</label>
+        <input type="number" id="qtyAtom" step="0.00000001" placeholder="0.00000000" required>
+      </div>
+      <div class="form-row">
+        <label for="spentUsdc" style="color: #BCC6CC !important;">IMPORTO USDC SPESI</label>
+        <input type="number" id="spentUsdc" placeholder="Importo USDC ($)" step="0.01" required>
+      </div>
+      <div class="form-row">
+        <label for="note" style="color: #BCC6CC !important;">NOTA (opzionale)</label>
+        <input type="text" id="note" maxlength="50" placeholder="Breve nota">
+      </div>
+      <div class="form-row">
+        <label></label>
+        <button type="submit" class="btn-edit" style="font-size:1.1rem; padding:9px 22px; min-width:220px; margin-right:20px;">
+          ➕ Aggiungi Entry
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- LISTA ENTRY -->
+  <div class="form-container">
+   <div id="note">
+    <h4 class="section-title" style="color: #FFD801 !important;">🎯 Entry ATOM Accumulate</h4>
+    <div id="portfolio" class="trade-card" style="margin-top: 0;"></div>
+  </div>
+</div>
+  <!-- PULSANTE DOWNLOAD -->
+  <div class="form-container" style="margin-top: 30px;">
+    <button id="btnDownload" class="btn-edit" style="font-size:1.1rem; padding:9px 22px;">
+      📥 Scarica Report Completo
+    </button>
+  </div>
+</div>
+
+<div style="padding: 7px;"></div>
+
+<div class="container">
+ <div class="threshold-levels" style="padding-top:10px; padding-bottom:10px;">
+            <h3 style="color: #ffd012 !important;">🎍 Storico Ritiro su conto corrente IBAN</h3>
+            
+        </div>
+
+
+
+
+   <!-- CONTAINER FLEX -->
+<div class="container" style="display:flex; gap:20px; align-items:flex-start;">
+
+    <!-- BOX 1 (sinistra) -->
+    <div class="stats-box current" style="flex:1;">
+        <h3>Staking</h3>
+        <div class="value current-value" id="currentMonthValue">
+            <span class="totale" id="totale_1">0 €</span>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+            <input type="number" step="0.10" class="importo" id="importo_1" placeholder="€" style="width:99px;">
+            <button class="addBtn" data-target="1">+</button>
+            <button class="del1Btn" data-target="1">–</button>
+        </div>
+    </div>
+
+    <!-- BOX 2 (destra) -->
+    <div class="stats-box average" style="flex:1;">
+        <h3>Trading</h3>
+        <div class="value average-value" id="monthlyAverage">
+            <span class="totale" id="totale_2">0 €</span>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+            <input type="number" step="0.10" class="importo" id="importo_2" placeholder="€" style="width:99px;">
+            <button class="addBtn" data-target="2">+</button>
+            <button class="del1Btn" data-target="2">–</button>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+ 
+
+
+
+<div style="padding: 2px;"></div>
+
+
+		
+		
+     
+
+  </div>
+<div style="padding: 4px;"></div>  
+
+<div class="container">
+  <div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <p style="margin: 0; color: #c3c3c3; text-align: left; height: 10px; line-height: 12px;">
+        © 2025 Invest Flow | Trading Spot di Gerardo D'Orrico – Tutti i diritti riservati.
+      </p>
+      <img src="images/logoinvest2.svg"
+           alt="Invest Flow"
+           style="height: 40px; width: auto; margin-left: 16px;" />
+    </div>
+  </div>
+</div>
+<div style="padding: 4px;"></div>
+
+
+
+
+
+
+<script src="js/staking.js"></script>
+
+
+
+</body>
+</html>
