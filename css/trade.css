@@ -564,3 +564,51 @@ h3.storia-entry-title {
     margin-bottom: 14px; /* aumenta o riduci secondo gusto */
     display: block;      /* serve se l’elemento non è già block, es: <span> */
 }
+
+/* === TABELLA RIEPILOGO RAPIDO ======================= */
+.tabella-sintesi {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto 20px;
+  border-collapse: collapse;
+  font-family: inherit;
+  background: rgba(44, 44, 44, 0.8); /* #2c2c2c con 0.8 opacità */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabella-sintesi th,
+.tabella-sintesi td {
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 15px;
+  color: #f5f5f5;
+}
+
+.tabella-sintesi th {
+  background: rgba(0, 0, 0, 0.45);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Input dentro la cella */
+.ts-input {
+  width: 64px;
+  font-size: 15px;
+  text-align: center;
+  border: none;
+  border-radius: 4px;
+  background: #2c2c2c;
+  color: #fff;
+  padding: 4px;
+}
+
+/* Rimuove le frecce su input[type=number] */
+.ts-input::-webkit-outer-spin-button,
+.ts-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ts-input[type=number] {
+  -moz-appearance: textfield;
+}

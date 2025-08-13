@@ -74,7 +74,7 @@
 .iflow-custom-menu ul ul {
   display: none;
   position: absolute;
-  bottom: 100%;
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--color-submenu-bg);
