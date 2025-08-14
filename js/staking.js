@@ -74,7 +74,7 @@ async function render() {
         <td>$${e.priceAtBuy.toFixed(4)}</td>
         <td>$${entryVal}</td>
         <td>${e.note || '-'}</td>
-        <td><button onclick="deleteEntry(${i})" class="btn-del">❌</button></td>
+        <td><button onclick="deleteEntry(${i})" class="btn-del">↪</button></td>
       </tr>`;
   });
 
@@ -108,7 +108,7 @@ async function render() {
     </div>
 
     <div class="trade-card">
-      <div class="trade-title">📋 Entry accumulate</div>
+      <div class="trade-title"><br><h3>📋 Riassunto x ritiri in parti</h3></div>
       <div class="trade-content">
         <table class="atom-entry-table">
           <thead>

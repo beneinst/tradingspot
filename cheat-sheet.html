@@ -684,6 +684,7 @@
           <div class="iflow-menu-label"><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></div>
           <ul>
             <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
+			<li><a href="https://beneinst.github.io/tradingspot/staking.html">Traking</a></li>
           </ul>
         </li>
        
@@ -791,6 +792,40 @@
     document.querySelector('.filter-btn[data-filter="all"]').click();
 });
     </script>
-
+<!-- Bottone torna sopra principale (con freccia CSS) -->
+    <button class="back-to-top" id="backToTop" title="Torna in cima"></button>  
+    
+    <script>
+        // Funzione per mostrare/nascondere il bottone
+        function toggleBackToTopButton() {
+            const backToTop = document.getElementById('backToTop');
+            const backToTopAlt = document.getElementById('backToTopAlt');
+            
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+                backToTopAlt.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+                backToTopAlt.classList.remove('show');
+            }
+        }
+        
+        // Funzione per tornare in cima con animazione smooth
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Event listeners
+        window.addEventListener('scroll', toggleBackToTopButton);
+        
+        document.getElementById('backToTop').addEventListener('click', scrollToTop);
+        document.getElementById('backToTopAlt').addEventListener('click', scrollToTop);
+        
+        // Controlla subito se mostrare il bottone
+        toggleBackToTopButton();
+    </script>
 </body>
 </html>

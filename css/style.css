@@ -316,4 +316,93 @@ body::before {
     width: 100%;
     box-sizing: border-box;
     }
+	
+  /* Stili per il bottone torna sopra */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: #2c2c2c;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
+        }
+        
+        /* Bottone visibile quando si scrolla */
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Effetti hover */
+        .back-to-top:hover {
+            background-color: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Freccia verso l'alto */
+        .back-to-top::before {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 12px solid #ffffff;
+        }
+        
+        /* Versione alternativa con icona Unicode */
+        .back-to-top-alt {
+            position: fixed;
+            bottom: 30px;
+            right: 100px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #333, #555);
+            border: 2px solid #444;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .back-to-top-alt.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top-alt:hover {
+            background: linear-gradient(135deg, #555, #777);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .back-to-top, .back-to-top-alt {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+        }
 
