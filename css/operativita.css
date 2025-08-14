@@ -55,13 +55,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #2E3B4E;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.9);
+    background-color: rgba(46, 59, 78, 0.7);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.8);
 }
 
 .stats-box h3 {
     margin: 0;
-    font-size: 22px;
+    font-size: 24px;
     color: #F2F2F2;
 }
 
