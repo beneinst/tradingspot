@@ -113,58 +113,60 @@
   📊 Trade attivi: <span id="trade-count" style="display: inline;">0</span>
 </div>
 <div style="padding: 7px;"></div>		
-		<div class="container">
-		<h5 class="section-title" style="color: #FFD801 !important;">🪔 Storico Distribuzione Capitale</h5>
-	<div style="display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap;">
+<div class="container">
+  <h5 class="section-title" style="color: #FFD801 !important;">🪔 Storico Distribuzione Capitale</h5>
+  
+  <div style="display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; flex-wrap: nowrap;">
 
-  <!-- Colonna sinistra: Scheda Gestione Trade -->
-<div class="header-stat-item_f" style="background-color: rgba(34, 34, 34, 0.2); border-radius: 8px; padding: 10px;">
-  <div class="container_f" style="display: flex; flex-direction: column; gap: 0px;">
-    <div class="header-stat-item">
-      <div class="stat-label">Totale in Cripto</div>
-      <div class="stat-value totale" style="color: #f62817; font-size: 36px;" id="totaleIn"></div>
+    <!-- Colonna 1: larghezza 16.66% -->
+    <div style="flex: 0 0 12%; background-color: rgba(34, 34, 34, 0.2); border-radius: 8px; padding: 10px;">
+      <div style="display: flex; flex-direction: column; gap: 0px;">
+        <div class="header-stat-item">
+          <div class="stat-label">Totale in Cripto</div>
+          <div class="stat-value totale" style="color: #f62817; font-size: 36px;" id="totaleIn"></div>
+        </div>
+        <div class="header-stat-item">
+          <div class="stat-label">Restanti in Dollari</div>
+          <div class="stat-value capitale" style="color: #1AA6ED; font-size: 36px;" id="capitale"></div>
+        </div>
+      </div>
     </div>
-    
-    <div class="header-stat-item">
-      <div class="stat-label">Restanti in Dollari</div>
-      <div class="stat-value capitale" style="color: #1AA6ED; font-size: 36px;" id="capitale"></div>
+
+    <!-- Colonna 2: larghezza 41.66% -->
+    <div style="flex: 0 0 42%; background-color: rgba(34, 34, 34, 0.2); border-radius: 8px; padding: 10px;">
+      <table class="tabella-sintesi" style="width: 100%;">
+        <thead>
+          <tr>
+            <th>Trade</th>
+            <th>$ / Trade</th>
+            <th>Capitale Totale</th>
+            <th>Capitale Residuo</th>
+            <th>Investito in Cripto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="totaleTrade">30</td>
+            <td>
+              <input type="number" id="quotaPerTrade" class="ts-input" value="0" min="1" oninput="aggiornaCapitale()">
+            </td>
+            <td id="capitaleTotale">—</td>
+            <td id="capitaleInDollari">—</td>
+            <td id="totaleInDollari">—</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+
+    <!-- Colonna 3: larghezza 41.66% -->
+	
+    <div style="flex: 0 0 46%; padding: 1px; border-radius: 8px; background-color: rgba(34, 34, 34, 0.2);">
+      <canvas id="capitaleChart" style="width: 80%; height: 80%;"></canvas>
+    </div>
+
   </div>
 </div>
 
-<!-- Colonna destra: Grafico -->
-<div class="header-stat-item_f" style="flex: 1 1 48%; padding: 1px; border-radius: 8px; background-color: rgba(34, 34, 34, 0.2);">
-  <canvas id="capitaleChart"></canvas>
-</div>
-
-
-<!-- Gruppo unico: tutti i box -->
-
-
-  <!-- Riepilogo rapido in tabella (usa gli stessi ID del JS) -->
-<table class="tabella-sintesi">
-  <thead>
-    <tr>
-      <th>Trade</th>
-      <th>$ / Trade</th>
-      <th>Capitale Totale</th>
-      <th>Capitale Residuo</th>
-      <th>Investito in Cripto</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td id="totaleTrade">30</td>
-      <td>
-        <input type="number" id="quotaPerTrade" class="ts-input" value="0" min="1" oninput="aggiornaCapitale()">
-      </td>
-      <td id="capitaleTotale">—</td>
-      <td id="capitaleInDollari">—</td>
-      <td id="totaleInDollari">—</td>
-    </tr>
-  </tbody>
-</table>
-    
 
   
   
