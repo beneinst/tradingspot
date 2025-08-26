@@ -123,12 +123,12 @@
                 const createdDate = new Date(rule.createdAt).toLocaleString('it-IT');
                 
                 ruleElement.innerHTML = `
-                    <h3>${rule.title}</h3>
+                    <h3>📟 ${rule.title}</h3>
                     <div class="rule-date">Creato il: ${createdDate}</div>
                     <div class="rule-content">${rule.content}</div>
                     ${rule.image ? `<img src="${rule.image}" class="rule-image" alt="Immagine regola">` : ''}
                     <div class="rule-actions">
-                        <button onclick="deleteRule(${rule.id})" class="btn-danger">Elimina</button>
+                        <button onclick="deleteRule(${rule.id})" class="btn-danger">🗑️ Elimina</button>
                     </div>
                 `;
                 rulesContainer.appendChild(ruleElement);

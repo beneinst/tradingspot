@@ -146,13 +146,13 @@
                 
                 noteElement.innerHTML = `
                     <div class="note-content">
-                        <h3>${note.title}</h3>
+                        <h2>📋 ${note.title}</h2>
                         <p>${note.content}</p>
                         <small style="color: #999;">Creata il ${new Date(note.createdAt).toLocaleDateString('it-IT')}${updatedText}</small>
                     </div>
-                    <div class="note-actions">
-                        <button onclick="editNote(${note.id})" class="btn-edit">Modifica</button>
-                        <button onclick="deleteNote(${note.id})" class="btn-danger">Elimina</button>
+                    <div class="note-actions"><p></p>
+                        <button onclick="editNote(${note.id})" class="btn-edit">✍🏻 Modifica</button>
+                        <button onclick="deleteNote(${note.id})" class="btn-danger">🗑️ Elimina</button>
                     </div>
                 `;
                 notesContainer.appendChild(noteElement);
