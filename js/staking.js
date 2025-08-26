@@ -1,4 +1,4 @@
-/*  ATOM / USDC  Portfolio – Binance
+/*  ATOM / USDC  Portfolio – Binance - Figment
     Autore: you
     ----------------------------------------------------------- */
 
