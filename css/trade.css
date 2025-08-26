@@ -117,17 +117,17 @@ input::placeholder, textarea::placeholder {
 .notes-container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-card-bg) 100%);
+    gap: 12px;
+    background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-card-bg) 40%);
     border-radius: 8px;
     border: 1px solid var(--color-border);
     box-shadow: 0 6px 35px rgba(0,0,0,0.4);
-    padding: 20px;
+    padding: 15px;
 }
 
 /* Note */
 .note {
-    background: linear-gradient(135deg, var(--color-surface-elevated) 0%, var(--color-surface) 100%);
+    background-color: rgba(35, 35, 59, 0.4);
     color: var(--color-text);
     padding: 25px;
     border-radius: 8px;
@@ -443,7 +443,7 @@ input[type="file"] {
     }
     
     .form-container, .trade-form {
-        padding: 25px;
+        padding: 20px;
     }
     
     .form-row {
@@ -519,11 +519,14 @@ table th, .trade-summary table th {
 .trade-form,
 .trade-summary,
 .summary-item {
-    background: linear-gradient(135deg, #4a4a4a 0%, #383838 100%) !important;
+    background: linear-gradient(135deg, #4a4a4a 0%, #383838 40%) !important;
     border: 1px solid #4a4a4a !important;
-    box-shadow: 0 4px 25px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
+.form-container {
+    background: background-color: rgba(35, 35, 59, 0.4) !important;
+}
 /* Tabella header: niente viola */
 table th,
 .note th,

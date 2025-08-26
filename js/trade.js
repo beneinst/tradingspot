@@ -124,68 +124,74 @@ async function stampaTuttiTrade() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Trade12 - Report Completo Trading</title>
         <style>
-            body { 
+body { 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     margin: 20px; 
     line-height: 1.6;
     color: #ececf1;
-    background-color: #9d9598;
+    background-color: rgba(157, 149, 152, 0.8); /* trasparente */
+    transition: background-color 0.6s ease; /* transizione lunga */
 }
 .header {
     text-align: center;
-    margin-bottom: 30px;
-    padding: 30px 20px;
-    background: linear-gradient(135deg, #4d3470 0%, #2b193a 100%);
+    margin-bottom: 20px;
+    padding: 15px 10px; /* padding ridotto */
+    background: linear-gradient(135deg, rgba(77,52,112,0.85) 0%, rgba(43,25,58,0.85) 100%);
     color: #ececf1;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.24);
+    transition: background 0.6s ease, padding 0.6s ease;
 }
 .header h1 {
-    margin: 0 0 10px 0;
-    font-size: 2.5em;
+    margin: 0 0 8px 0;
+    font-size: 2.2em;
     font-weight: 300;
 }
 .trade-card {
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     page-break-inside: avoid;
-    background: #22242a;
+    background: rgba(34, 36, 42, 0.85);
     color: #ececf1;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0,0,0,0.24);
-    border: 1px solid #2d313a;
+    border: 1px solid rgba(45, 49, 58, 0.8);
+    transition: background-color 0.6s ease, padding 0.6s ease;
 }
 .trade-title {
-    background: linear-gradient(135deg, #184636 0%, #14532d 100%);
+    background: linear-gradient(135deg, rgba(24,70,54,0.85) 0%, rgba(20,83,45,0.85) 100%);
     color: #ececf1;
-    padding: 20px;
+    padding: 10px; /* padding ridotto */
     font-size: 1.3em;
     font-weight: 600;
     display: flex;
     align-items: center;
     gap: 10px;
+    transition: background 0.6s ease, padding 0.6s ease;
 }
 .trade-content {
-    padding: 25px;
+    padding: 15px; /* padding ridotto */
 }
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-    padding: 20px;
-    background: linear-gradient(135deg, #24262d 0%, #2d313a 100%);
+    gap: 15px; /* gap leggermente ridotto */
+    margin-bottom: 20px;
+    padding: 15px; /* padding ridotto */
+    background: linear-gradient(135deg, rgba(36,38,45,0.85) 0%, rgba(45,49,58,0.85) 100%);
     border-radius: 8px;
-    border-left: 4px solid #2293fa;
+    border-left: 4px solid rgba(34,147,250,0.8);
+    transition: background 0.6s ease, padding 0.6s ease;
 }
 .summary-item {
     display: flex;
     flex-direction: column;
-    padding: 15px;
-    background: #22242a;
+    padding: 10px; /* padding ridotto */
+    background: rgba(34, 36, 42, 0.85);
     color: #ececf1;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: background-color 0.6s ease, padding 0.6s ease;
 }
 .label {
     font-weight: 600;
@@ -193,7 +199,7 @@ async function stampaTuttiTrade() {
     font-size: 0.85em;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 .value {
     font-size: 1.2em;
@@ -201,66 +207,73 @@ async function stampaTuttiTrade() {
 }
 .positive { 
     color: #26c281; 
-    background: linear-gradient(135deg, #223f31 0%, #14452c 100%);
-    padding: 6px 12px;
+    background: linear-gradient(135deg, rgba(34,63,49,0.85) 0%, rgba(20,69,44,0.85) 100%);
+    padding: 5px 10px; /* padding ridotto */
     border-radius: 6px;
+    transition: background 0.6s ease, padding 0.6s ease;
 }
 .negative { 
     color: #ff4d6d; 
-    background: linear-gradient(135deg, #3f1b2a 0%, #522231 100%);
-    padding: 8px 12px;
+    background: linear-gradient(135deg, rgba(63,27,42,0.85) 0%, rgba(82,34,49,0.85) 100%);
+    padding: 5px 10px; /* padding ridotto */
     border-radius: 6px;
+    transition: background 0.6s ease, padding 0.6s ease;
 }
 .neutral { 
     color: #ececf1;
-    background: linear-gradient(135deg, #292c35 0%, #23262f 100%);
-    padding: 8px 12px;
+    background: linear-gradient(135deg, rgba(41,44,53,0.85) 0%, rgba(35,38,47,0.85) 100%);
+    padding: 5px 10px; /* padding ridotto */
     border-radius: 6px;
+    transition: background 0.6s ease, padding 0.6s ease;
 }
 table {
     width: 100%;
     border-collapse: collapse;
-    margin: 25px 0;
-    background: #22242a;
+    margin: 20px 0;
+    background: rgba(34, 36, 42, 0.85);
     color: #ececf1;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+    transition: background-color 0.6s ease;
 }
 th, td {
-    padding: 15px 12px;
+    padding: 10px 8px; /* padding ridotto */
     text-align: left;
-    border-bottom: 1px solid #2d313a;
+    border-bottom: 1px solid rgba(45, 49, 58, 0.85);
+    transition: background-color 0.6s ease;
 }
 th {
-    background: linear-gradient(135deg, #353850 0%, #23243b 100%);
+    background: linear-gradient(135deg, rgba(53,56,80,0.85) 0%, rgba(35,36,59,0.85) 100%);
     color: #ececf1;
     font-weight: 600;
     font-size: 0.9em;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    transition: background 0.6s ease;
 }
 tr:hover {
-    background-color: #2d313a;
+    background-color: rgba(45, 49, 58, 0.6);
 }
 .footer {
-    margin-top: 40px;
+    margin-top: 30px;
     text-align: center;
     font-size: 0.9em;
     color: #b0b3bd;
-    border-top: 2px solid #353850;
-    padding-top: 30px;
-    background: #23262f;
-    padding: 30px;
+    border-top: 2px solid rgba(53, 56, 80, 0.85);
+    padding: 15px; /* padding ridotto */
+    background: rgba(35, 38, 47, 0.85);
     border-radius: 12px;
+    transition: background-color 0.6s ease, padding 0.6s ease;
 }
 .portfolio-summary {
-    background: linear-gradient(135deg, #1f2632 0%, #20476b 100%);
-    padding: 30px;
+    background: linear-gradient(135deg, rgba(31, 38, 50, 0.85) 0%, rgba(32, 71, 107, 0.85) 100%);
+    padding: 15px; /* padding ridotto */
     border-radius: 12px;
-    margin-bottom: 30px;
-    border-left: 6px solid #2293fa;
+    margin-bottom: 20px;
+    border-left: 6px solid rgba(34,147,250,0.8);
     box-shadow: 0 4px 20px rgba(34, 147, 250, 0.15);
+    transition: background 0.6s ease, padding 0.6s ease;
 }
 .portfolio-summary h2 {
     color: #fff;
@@ -272,22 +285,24 @@ tr:hover {
     font-size: 0.85em;
     color: #b0b3bd;
     margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #2d313a;
+    padding-top: 10px; /* padding ridotto */
+    border-top: 1px solid rgba(45, 49, 58, 0.85);
     line-height: 2;
 }
 .trade-number {
     background: rgba(255,255,255,0.07);
-    padding: 5px 15px;
+    padding: 3px 10px; /* padding ridotto */
     border-radius: 20px;
     font-size: 0.9em;
     font-weight: 600;
 }
+
 @media print {
     body { 
         margin: 0; 
         background: white;
         color: #333;
+        transition: none;
     }
     .trade-card { 
         page-break-inside: avoid;
@@ -298,6 +313,8 @@ tr:hover {
         background: #667eea !important;
         color: #fff !important;
         -webkit-print-color-adjust: exact;
+        transition: none;
+        padding: 30px 20px;
     }
 }
 
@@ -753,8 +770,8 @@ async function renderTrades() {
                 <small>Creato il ${new Date(trade.createdAt).toLocaleDateString('it-IT')}</small>
                 
                 <div class="note-actions">
-                    <button class="btn-edit" onclick="addEntryToTrade(${trade.id})">Aggiungi Entry</button>
-                    <button class="btn-danger" onclick="deleteTrade(${trade.id})">Elimina Trade</button>
+                    <button class="btn-edit" onclick="addEntryToTrade(${trade.id})">✍🏻 Aggiungi Entry</button>
+                    <button class="btn-danger" onclick="deleteTrade(${trade.id})">🗑️ Elimina Trade</button>
                 </div>
             </div>
         `;
