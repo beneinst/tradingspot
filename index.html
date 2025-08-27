@@ -343,7 +343,22 @@ window.addEventListener('storage', (e) => {
 // 🧠 Aggiorna anche al caricamento pagina
 document.addEventListener('DOMContentLoaded', updateTradeCount);
 </script>
+<script>
+  // ID dei trade da nascondere
+  const tradesToHide = [1753637890323]; // aggiungi altri numeri se serve
 
+  window.addEventListener('DOMContentLoaded', () => {
+    tradesToHide.forEach(id => {
+      // bottone che contiene l’onclick con deleteTrade(ID)
+      const btn = document.querySelector(`button[onclick="deleteTrade(${id})"]`);
+      if (btn) {
+        const noteBlock = btn.closest('.note'); // saliamo al div.note
+        if (noteBlock) noteBlock.style.display = 'none';
+      }
+    });
+  });
+</script>
 
 </body>
+
 </html>
