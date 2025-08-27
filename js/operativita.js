@@ -1301,27 +1301,32 @@ function downloadCombinedTablesHTML() {
         </div>
     `;
 
-    // Tabella Storico Mensile
-    let historicalTableHTML = `
-        <h3>Storico Mensile</h3>
-        <div style="overflow-x: auto;">
-            <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
-                <thead>
-                    <tr>
-                        <th>Periodo</th>
-                        <th>Importo (€)</th>
-                    </tr>
-                </thead>
-                <tbody>
+  // Tabella Storico Mensile
+let historicalTableHTML = `
+    <h3>Storico Mensile</h3>
+    <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; border-radius: 4px;">
+        <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; margin: 0;">
+            <thead style="position: sticky; top: 0; background-color: #f5f5f5; z-index: 1;">
+                <tr>
+                    <th style="border-bottom: 2px solid #333;">Periodo</th>
+                    <th style="border-bottom: 2px solid #333;">Importo (€)</th>
+                </tr>
+            </thead>
+            <tbody>
+`;
+historicalEntries.forEach(entry => {
+    historicalTableHTML += `
+        <tr>
+            <td>${entry.periodo}</td>
+            <td>${formatImport(entry.importo)}</td>
+        </tr>
     `;
-    historicalEntries.forEach(entry => {
-        historicalTableHTML += `
-            <tr>
-                <td>${entry.periodo}</td>
-                <td>${formatImport(entry.importo)}</td>
-            </tr>
-        `;
-    });
+});
+historicalTableHTML += `
+            </tbody>
+        </table>
+    </div>
+`;
     // Calcola il totale storico
     const total = historicalEntries.reduce((sum, entry) => sum + parseFloat(entry.importo), 0);
     historicalTableHTML += `
