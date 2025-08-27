@@ -652,48 +652,192 @@ function downloadTableBtn() {
 }
 
         
-// Funzione modificata per chiudere il mese
-function closeMonth() {
+// Funzione per creare un dialog personalizzato
+function showCustomPrompt(message, defaultValue = '') {
+    return new Promise((resolve, reject) => {
+        // Crea l'overlay del modal
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        
+        // Crea il contenuto del modal
+        overlay.innerHTML = `
+            <div class="modal-content">
+                <h3>${message}</h3>
+                <input type="text" class="modal-input" value="${defaultValue}" placeholder="Inserisci qui...">
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-secondary" id="cancelBtn">Annulla</button>
+                    <button class="modal-btn modal-btn-primary" id="okBtn">OK</button>
+                </div>
+            </div>
+        `;
+        
+        // Aggiungi il modal al DOM
+        document.body.appendChild(overlay);
+        
+        // Ottieni riferimenti agli elementi
+        const input = overlay.querySelector('.modal-input');
+        const okBtn = overlay.querySelector('#okBtn');
+        const cancelBtn = overlay.querySelector('#cancelBtn');
+        
+        // Focus sull'input
+        input.focus();
+        input.select();
+        
+        // Gestisci gli eventi
+        okBtn.addEventListener('click', () => {
+            const value = input.value.trim();
+            document.body.removeChild(overlay);
+            resolve(value);
+        });
+        
+        cancelBtn.addEventListener('click', () => {
+            document.body.removeChild(overlay);
+            resolve(null);
+        });
+        
+        // Gestisci Enter e Escape
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                okBtn.click();
+            } else if (e.key === 'Escape') {
+                cancelBtn.click();
+            }
+        });
+
+        // Chiudi cliccando sull'overlay
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                cancelBtn.click();
+            }
+        });
+    });
+}
+
+// Funzione specifica per le date (migliore per il tuo caso)
+function showDatesDialog() {
+    return new Promise((resolve, reject) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        
+        overlay.innerHTML = `
+            <div class="modal-content">
+                <h3>Inserisci le date del periodo</h3>
+                <label for="startDate">Data di inizio (GG.MM.AA):</label>
+                <input type="text" id="startDate" class="modal-input" placeholder="es. 01.08.24">
+                
+                <label for="endDate">Data di fine (GG.MM.AA):</label>
+                <input type="text" id="endDate" class="modal-input" value="${getCurrentDate()}">
+                
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-secondary" id="cancelBtn">Annulla</button>
+                    <button class="modal-btn modal-btn-primary" id="okBtn">Conferma</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        
+        const startDateInput = overlay.querySelector('#startDate');
+        const endDateInput = overlay.querySelector('#endDate');
+        const okBtn = overlay.querySelector('#okBtn');
+        const cancelBtn = overlay.querySelector('#cancelBtn');
+        
+        startDateInput.focus();
+        
+        okBtn.addEventListener('click', () => {
+            const startDate = startDateInput.value.trim();
+            const endDate = endDateInput.value.trim();
+            
+            if (!startDate || !endDate) {
+                showMessage('Entrambe le date sono obbligatorie!', 'error');
+                return;
+            }
+            
+            document.body.removeChild(overlay);
+            resolve({ startDate, endDate });
+        });
+        
+        cancelBtn.addEventListener('click', () => {
+            document.body.removeChild(overlay);
+            resolve(null);
+        });
+        
+        // Gestisci Enter per passare al campo successivo
+        startDateInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                endDateInput.focus();
+            } else if (e.key === 'Escape') {
+                cancelBtn.click();
+            }
+        });
+        
+        endDateInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                okBtn.click();
+            } else if (e.key === 'Escape') {
+                cancelBtn.click();
+            }
+        });
+
+        // Chiudi cliccando sull'overlay
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                cancelBtn.click();
+            }
+        });
+    });
+}
+
+// SOSTITUISCI la tua funzione closeMonth() con questa:
+async function closeMonth() {
     if (currentMonthEntries.length === 0) {
         showMessage('Non ci sono importi da registrare per questo mese!', 'error');
         return;
     }
     
-    // Chiediamo input per le date tramite prompt del browser
-    const startDateStr = prompt("Inserisci la data di inizio (formato GG.MM.AA):", "");
-    if (!startDateStr) return; // L'utente ha annullato
-    
-    const endDateStr = prompt("Inserisci la data di fine (formato GG.MM.AA):", getCurrentDate());
-    if (!endDateStr) return; // L'utente ha annullato
-    
-    // Verifica che le date siano nel formato corretto
-    if (!isValidDateFormat(startDateStr) || !isValidDateFormat(endDateStr)) {
-        showMessage('Il formato delle date deve essere GG.MM.AA!', 'error');
-        return;
+    try {
+        // Usa il dialog personalizzato invece di prompt()
+        const dates = await showDatesDialog();
+        
+        if (!dates) {
+            return; // L'utente ha annullato
+        }
+        
+        const { startDate, endDate } = dates;
+        
+        // Verifica che le date siano nel formato corretto
+        if (!isValidDateFormat(startDate) || !isValidDateFormat(endDate)) {
+            showMessage('Il formato delle date deve essere GG.MM.AA!', 'error');
+            return;
+        }
+        
+        // Calcoliamo la media degli importi del mese corrente
+        const totalMonthValue = calculateCurrentMonthValue();
+        
+        // Creiamo una nuova entry per lo storico
+        const newHistoricalEntry = {
+            periodo: `dal ${startDate} al ${endDate}`,
+            importo: totalMonthValue
+        };
+        
+        // Aggiungiamo l'entry allo storico
+        historicalEntries.push(newHistoricalEntry);
+        
+        // Resettiamo gli importi del mese corrente
+        currentMonthEntries = [];
+        
+        // Salviamo nel localStorage
+        saveToLocalStorage();
+        
+        // Aggiorniamo l'interfaccia
+        updateAll();
+        
+        showMessage('Mese chiuso con successo!', 'success');
+        
+    } catch (error) {
+        console.error('Errore durante la chiusura del mese:', error);
+        showMessage('Errore durante la chiusura del mese', 'error');
     }
-    
-    // Calcoliamo la media degli importi del mese corrente
-    const totalMonthValue = calculateCurrentMonthValue();
-    
-    // Creiamo una nuova entry per lo storico
-    const newHistoricalEntry = {
-        periodo: `dal ${startDateStr} al ${endDateStr}`,
-        importo: totalMonthValue
-    };
-    
-    // Aggiungiamo l'entry allo storico
-    historicalEntries.push(newHistoricalEntry);
-    
-    // Resettiamo gli importi del mese corrente
-    currentMonthEntries = [];
-    
-    // Salviamo nel localStorage
-    saveToLocalStorage();
-    
-    // Aggiorniamo l'interfaccia
-    updateAll();
-    
-    showMessage('Mese chiuso con successo!', 'success');
 }
 
 // Funzione per verificare il formato della data
