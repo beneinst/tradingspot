@@ -214,7 +214,7 @@ document.getElementById('btnDownload').addEventListener('click', async () => {
   </style>
 </head>
 <body>
-  <h1>Staking ATOM (Cosmos)</h1>
+  <h1>Staking ATOM | Val. Figment</h1>
   <p style="text-align:center; color:#666;">Report generato il ${new Date().toLocaleString('it-IT')}</p>
 
   <div class="summary">
@@ -268,7 +268,7 @@ document.getElementById('btnDownload').addEventListener('click', async () => {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = `Staking-ATOM-Report-${new Date().toISOString().slice(0,10)}.html`;
+  a.download = `Staking-ATOM-Figment-${new Date().toISOString().slice(0,10)}.html`;
   a.style.display = 'none';
   document.body.appendChild(a);
   a.click();

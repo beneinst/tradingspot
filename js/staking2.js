@@ -213,7 +213,7 @@ document.getElementById('btnDownload_1').addEventListener('click', async () => {
   </style>
 </head>
 <body>
-  <h1>Staking ATOM (Cosmos)</h1>
+  <h1>Staking ATOM | Val. Ledger by Chorus One</h1>
   <p style="text-align:center; color:#666;">Report generato il ${new Date().toLocaleString('it-IT')}</p>
 
   <div class="summary">
@@ -267,7 +267,7 @@ document.getElementById('btnDownload_1').addEventListener('click', async () => {
   const url_1  = URL.createObjectURL(blob_1);
   const a_1    = document.createElement('a');
   a_1.href     = url_1;
-  a_1.download = `Staking-ATOM-Report-SecondaPagina-${new Date().toISOString().slice(0,10)}.html`;
+  a_1.download = `Staking-ATOM-Ledger-${new Date().toISOString().slice(0,10)}.html`;
   a_1.style.display = 'none';
   document.body.appendChild(a_1);
   a_1.click();
