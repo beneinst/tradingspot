@@ -910,7 +910,7 @@ window.deleteTrade = id => {
 //  Prezzi da Binance (nessuna API key richiesta)
 // ------------------------------------------------------------------
 async function getPriceFromBinance(symbol) {
-    const pair = `${symbol.toUpperCase()}USDT`;
+    const pair = `${symbol.toUpperCase()}USDC`;
     const cacheKey = pair.toLowerCase();
     const now = Date.now();
 
