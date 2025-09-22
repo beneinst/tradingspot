@@ -427,15 +427,15 @@ tr:hover {
                     </div>
                     <div class="summary-item">
                         <div class="label">📊 Prezzo Medio Acquisto</div>
-                        <div class="value">$${avgPrice.toFixed(8)}</div>
+                        <div class="value">$${avgPrice.toFixed(4)}</div>
                     </div>
                     <div class="summary-item">
                         <div class="label">💵 Investimento Totale</div>
-                        <div class="value">$${totalInvestment.toFixed(0)}</div>
+                        <div class="value">$${totalInvestment.toFixed(2)}</div>
                     </div>
                     <div class="summary-item">
                         <div class="label">📈 Prezzo Attuale</div>
-                        <div class="value">${currentPrice ? '$' + currentPrice.toFixed(8) : '⚠️ Non disponibile'}</div>
+                        <div class="value">${currentPrice ? '$' + currentPrice.toFixed(4) : '⚠️ Non disponibile'}</div>
                     </div>
                     <div class="summary-item">
                         <div class="label">💎 Valore Attuale</div>
@@ -477,7 +477,7 @@ tr:hover {
                         hour: '2-digit',
                         minute: '2-digit'
                     })}</div>
-                    <div><strong>📊 Performance vs Mercato:</strong> <span class="${marketPerformance > 0 ? 'positive' : marketPerformance < 0 ? 'negative' : 'neutral'}">${marketIcon} ${marketPerformance.toFixed(6)}%</span></div>
+                    <div><strong>📊 Performance vs Mercato:</strong> <span class="${marketPerformance > 0 ? 'positive' : marketPerformance < 0 ? 'negative' : 'neutral'}">${marketIcon} ${marketPerformance.toFixed(2)}%</span></div>
                     <div><strong>📈 Numero Entry:</strong> ${trade.entries.length}</div>
                 </div>
             </div>
@@ -505,7 +505,7 @@ tr:hover {
                 </div>
                 <div class="summary-item">
                     <div class="label">💰 Capitale Investito</div>
-                    <div class="value">$${totalInvestmentPortfolio.toFixed(0)}</div>
+                    <div class="value">$${totalInvestmentPortfolio.toFixed(2)}</div>
                 </div>
                 <div class="summary-item">
                     <div class="label">💎 Valore Attuale</div>
@@ -529,7 +529,7 @@ tr:hover {
                 </div>
                 <div class="summary-item">
                     <div class="label">📊 Trade Medio</div>
-                    <div class="value">$${avgTradeSize.toFixed(6)}</div>
+                    <div class="value">$${avgTradeSize.toFixed(2)}</div>
                 </div>
             </div>
             
@@ -724,19 +724,19 @@ async function renderTrades() {
                     <div class="summary-grid">
                         <div class="summary-item">
                             <div class="label">Quantità Totale</div>
-                            <div class="value">${totalQuantity.toFixed(6)} ${trade.symbol.toUpperCase()}</div>
+                            <div class="value">${totalQuantity.toFixed(8)} ${trade.symbol.toUpperCase()}</div>
                         </div>
                         <div class="summary-item">
                             <div class="label">Prezzo Medio di Acquisto</div>
-                            <div class="value">$${avgPrice.toFixed(4)}</div>
+                            <div class="value">$${avgPrice.toFixed(2)}</div>
                         </div>
                         <div class="summary-item">
                             <div class="label">Investimento Totale</div>
-                            <div class="value">$${totalInvestment.toFixed(0)}</div>
+                            <div class="value">$${totalInvestment.toFixed(2)}</div>
                         </div>
                         <div class="summary-item">
                             <div class="label">Prezzo Attuale</div>
-                            <div class="value current-price">$${currentPrice ? currentPrice.toFixed(4) : 'N/A'}</div>
+                            <div class="value current-price">$${currentPrice ? currentPrice.toFixed(2) : 'N/A'}</div>
                         </div>
                         <div class="summary-item">
                             <div class="label">Valore Attuale</div>
