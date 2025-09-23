@@ -586,14 +586,14 @@ function creaGraficoStoricoCapitale() {
           titleColor: '#fff',
           bodyColor: '#fff',
           borderColor: '#666',
-          borderWidth: 1,
+          borderWidth: 4,
           cornerRadius: 8,
           displayColors: true,
           callbacks: {
             label: function(context) {
               const label = context.dataset.label || '';
               const value = context.parsed.y || 0;
-              return `${label}: ${value.toFixed(2)}`;
+              return `${label}: ${value.toFixed(0)}`;
             }
           }
         }
