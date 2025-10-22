@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizzatore Dati Fiscali - Trading</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .year-selector {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .year-selector label {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .year-selector select {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            background: white;
+            color: #333;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .import-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .import-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+        }
+
+        .import-box h3 {
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .import-box p {
+            margin-bottom: 15px;
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+        }
+
+        .summary-box h3 {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .summary-box .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .export-section {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-imported {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .import-section {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 Organizzatore Dati Fiscali</h1>
+            <p>Gestione dati per dichiarazione dei redditi - Trading Crypto</p>
+        </div>
+
+        <!-- Selezione Anno -->
+        <div class="year-selector">
+            <label for="yearSelect">Anno Fiscale:</label>
+            <select id="yearSelect">
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+            </select>
+            <button class="btn btn-success" onclick="loadYearData()">Carica Dati Anno</button>
+        </div>
+
+        <!-- Messaggi -->
+        <div id="message" class="message"></div>
+
+        <!-- Sezione Importazione -->
+        <div class="card">
+            <h2>1️⃣ Importa Dati</h2>
+            <div class="import-section">
+                <!-- Importa da App Trading -->
+                <div class="import-box">
+                    <h3>📈 App Trading</h3>
+                    <p>Importa i totali mensili dalla tua app di trading</p>
+                    <span id="tradingStatus" class="status-badge status-pending">Non importato</span>
+                    <br><br>
+                    <button class="btn btn-primary" onclick="importFromTrading()">Importa Dati</button>
+                </div>
+
+                <!-- Giacenza al 31/12 -->
+                <div class="import-box">
+                    <h3>💰 Giacenza 31/12</h3>
+                    <p>Valore totale cripto possedute al 31 dicembre</p>
+                    <span id="giacenzaStatus" class="status-badge status-pending">Non inserito</span>
+                    <br><br>
+                    <button class="btn btn-primary" onclick="openGiacenzaDialog()">Inserisci Giacenza</button>
+                </div>
+
+                <!-- Note Binance PDF -->
+                <div class="import-box">
+                    <h3>📄 PDF Binance</h3>
+                    <p>Ricorda di allegare il PDF delle transazioni Binance</p>
+                    <span class="status-badge status-pending">Da allegare</span>
+                    <br><br>
+                    <button class="btn btn-primary" disabled style="opacity: 0.6;">Promemoria</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Riepilogo Mensile -->
+        <div class="card">
+            <h2>2️⃣ Riepilogo Mensile</h2>
+            <div style="overflow-x: auto;">
+                <table id="monthlyTable">
+                    <thead>
+                        <tr>
+                            <th>Mese</th>
+                            <th>Periodo</th>
+                            <th>Plusvalenze (€)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monthlyTableBody">
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: #999;">
+                                Nessun dato disponibile. Importa i dati dall'app trading.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Riepilogo Annuale -->
+        <div class="card">
+            <h2>3️⃣ Riepilogo Annuale</h2>
+            <div class="summary-grid">
+                <div class="summary-box">
+                    <h3>Totale Plusvalenze</h3>
+                    <div class="value" id="totalPlusvalenze">0,00 €</div>
+                </div>
+                <div class="summary-box">
+                    <h3>Giacenza al 31/12</h3>
+                    <div class="value" id="totalGiacenza">0,00 €</div>
+                </div>
+                <div class="summary-box">
+                    <h3>Mesi Registrati</h3>
+                    <div class="value" id="totalMesi">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Esportazione -->
+        <div class="card">
+            <h2>4️⃣ Esporta Dati</h2>
+            <div class="export-section">
+                <button class="btn btn-success" onclick="exportHTML()">📄 Scarica Report HTML</button>
+                <button class="btn btn-success" onclick="exportJSON()">💾 Esporta JSON</button>
+                <button class="btn btn-danger" onclick="resetData()">🗑️ Reset Dati Anno</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variabili globali
+        let currentYear = '2024';
+        let fiscalData = {
+            year: '2024',
+            monthlyData: [],
+            giacenza31_12: 0,
+            importDate: null
+        };
+
+        // Funzione per formattare importi
+        function formatImport(value) {
+            return parseFloat(value).toFixed(2).replace('.', ',');
+        }
+
+        // Funzione per mostrare messaggi
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Funzione per caricare dati anno
+        function loadYearData() {
+            currentYear = document.getElementById('yearSelect').value;
+            const savedData = localStorage.getItem(`fiscalData_${currentYear}`);
+            
+            if (savedData) {
+                fiscalData = JSON.parse(savedData);
+                updateUI();
+                showMessage(`Dati anno ${currentYear} caricati con successo!`, 'success');
+            } else {
+                fiscalData = {
+                    year: currentYear,
+                    monthlyData: [],
+                    giacenza31_12: 0,
+                    importDate: null
+                };
+                updateUI();
+                showMessage(`Nessun dato trovato per l'anno ${currentYear}`, 'error');
+            }
+        }
+
+        // Funzione per importare dati dall'app trading
+        function importFromTrading() {
+            try {
+                const historicalEntries = localStorage.getItem('historicalEntries');
+                
+                if (!historicalEntries) {
+                    showMessage('Nessun dato trovato nell\'app trading. Assicurati di aver chiuso almeno un mese.', 'error');
+                    return;
+                }
+
+                const entries = JSON.parse(historicalEntries);
+                
+                // Filtra per anno corrente
+                fiscalData.monthlyData = entries.filter(entry => {
+                    const periodo = entry.periodo;
+                    const endDate = periodo.split('al ')[1].trim();
+                    const year = '20' + endDate.split('.')[2];
+                    return year === currentYear;
+                }).map(entry => ({
+                    periodo: entry.periodo,
+                    importo: parseFloat(entry.importo)
+                }));
+
+                fiscalData.importDate = new Date().toISOString();
+                
+                // Salva dati
+                localStorage.setItem(`fiscalData_${currentYear}`, JSON.stringify(fiscalData));
+                
+                // Aggiorna UI
+                updateUI();
+                document.getElementById('tradingStatus').className = 'status-badge status-imported';
+                document.getElementById('tradingStatus').textContent = 'Importato';
+                
+                showMessage(`${fiscalData.monthlyData.length} mesi importati con successo!`, 'success');
+                
+            } catch (error) {
+                console.error('Errore importazione:', error);
+                showMessage('Errore durante l\'importazione dei dati', 'error');
+            }
+        }
+
+        // Dialog per giacenza
+        function openGiacenzaDialog() {
+            const giacenza = prompt(`Inserisci la giacenza totale al 31/12/${currentYear} in euro:`, fiscalData.giacenza31_12 || '');
+            
+            if (giacenza !== null && giacenza.trim() !== '') {
+                const value = parseFloat(giacenza.replace(',', '.'));
+                
+                if (isNaN(value) || value < 0) {
+                    showMessage('Inserisci un valore valido!', 'error');
+                    return;
+                }
+
+                fiscalData.giacenza31_12 = value;
+                localStorage.setItem(`fiscalData_${currentYear}`, JSON.stringify(fiscalData));
+                
+                updateUI();
+                document.getElementById('giacenzaStatus').className = 'status-badge status-imported';
+                document.getElementById('giacenzaStatus').textContent = 'Inserito';
+                
+                showMessage('Giacenza salvata con successo!', 'success');
+            }
+        }
+
+        // Funzione per aggiornare l'interfaccia
+        function updateUI() {
+            // Aggiorna tabella mensile
+            const tbody = document.getElementById('monthlyTableBody');
+            tbody.innerHTML = '';
+
+            if (fiscalData.monthlyData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: #999;">
+                            Nessun dato disponibile per l'anno ${currentYear}
+                        </td>
+                    </tr>
+                `;
+            } else {
+                const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 
+                                   'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+                
+                fiscalData.monthlyData.forEach((entry, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${monthNames[index] || index + 1}</strong></td>
+                        <td>${entry.periodo}</td>
+                        <td><strong>${formatImport(entry.importo)} €</strong></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            // Aggiorna riepilogo
+            const totalPlusvalenze = fiscalData.monthlyData.reduce((sum, entry) => sum + entry.importo, 0);
+            document.getElementById('totalPlusvalenze').textContent = formatImport(totalPlusvalenze) + ' €';
+            document.getElementById('totalGiacenza').textContent = formatImport(fiscalData.giacenza31_12) + ' €';
+            document.getElementById('totalMesi').textContent = fiscalData.monthlyData.length;
+
+            // Aggiorna status
+            if (fiscalData.monthlyData.length > 0) {
+                document.getElementById('tradingStatus').className = 'status-badge status-imported';
+                document.getElementById('tradingStatus').textContent = 'Importato';
+            }
+            
+            if (fiscalData.giacenza31_12 > 0) {
+                document.getElementById('giacenzaStatus').className = 'status-badge status-imported';
+                document.getElementById('giacenzaStatus').textContent = 'Inserito';
+            }
+        }
+
+        // Esporta HTML
+        function exportHTML() {
+            if (fiscalData.monthlyData.length === 0) {
+                showMessage('Non ci sono dati da esportare!', 'error');
+                return;
+            }
+
+            const totalPlusvalenze = fiscalData.monthlyData.reduce((sum, entry) => sum + entry.importo, 0);
+
+            const html = `
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Fiscale ${currentYear}</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; max-width: 900px; margin: 0 auto; }
+        h1 { color: #667eea; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h2 { color: #764ba2; margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border: 1px solid #ddd; }
+        th { background: #667eea; color: white; }
+        .summary { background: #f5f5f5; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .summary-item { margin: 10px 0; font-size: 1.1em; }
+        .value { font-weight: bold; color: #667eea; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; color: #666; }
+    </style>
+</head>
+<body>
+    <h1>📊 Report Fiscale Anno ${currentYear}</h1>
+    <p><strong>Data generazione:</strong> ${new Date().toLocaleDateString('it-IT')}</p>
+    
+    <div class="summary">
+        <h2>Riepilogo Annuale</h2>
+        <div class="summary-item">💰 Totale Plusvalenze: <span class="value">${formatImport(totalPlusvalenze)} €</span></div>
+        <div class="summary-item">📊 Giacenza al 31/12/${currentYear}: <span class="value">${formatImport(fiscalData.giacenza31_12)} €</span></div>
+        <div class="summary-item">📅 Mesi registrati: <span class="value">${fiscalData.monthlyData.length}</span></div>
+    </div>
+
+    <h2>Dettaglio Mensile</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Mese</th>
+                <th>Periodo</th>
+                <th>Plusvalenze (€)</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${fiscalData.monthlyData.map((entry, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${entry.periodo}</td>
+                <td>${formatImport(entry.importo)} €</td>
+            </tr>
+            `).join('')}
+            <tr style="font-weight: bold; background: #f5f5f5;">
+                <td colspan="2">TOTALE</td>
+                <td>${formatImport(totalPlusvalenze)} €</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p><strong>⚠️ NOTA IMPORTANTE:</strong></p>
+        <p>Questo report è solo un'organizzazione dei dati. Per la compilazione corretta della dichiarazione dei redditi, consulta sempre un commercialista qualificato.</p>
+        <p><strong>📄 Allegare:</strong> PDF transazioni Binance per l'anno ${currentYear}</p>
+    </div>
+</body>
+</html>
+            `;
+
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `report_fiscale_${currentYear}.html`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+
+            showMessage('Report HTML scaricato con successo!', 'success');
+        }
+
+        // Esporta JSON
+        function exportJSON() {
+            if (fiscalData.monthlyData.length === 0) {
+                showMessage('Non ci sono dati da esportare!', 'error');
+                return;
+            }
+
+            const dataStr = JSON.stringify(fiscalData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `fiscal_data_${currentYear}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+
+            showMessage('Dati JSON esportati con successo!', 'success');
+        }
+
+        // Reset dati
+        function resetData() {
+            if (!confirm(`Sei sicuro di voler cancellare tutti i dati dell'anno ${currentYear}?`)) {
+                return;
+            }
+
+            localStorage.removeItem(`fiscalData_${currentYear}`);
+            fiscalData = {
+                year: currentYear,
+                monthlyData: [],
+                giacenza31_12: 0,
+                importDate: null
+            };
+
+            updateUI();
+            document.getElementById('tradingStatus').className = 'status-badge status-pending';
+            document.getElementById('tradingStatus').textContent = 'Non importato';
+            document.getElementById('giacenzaStatus').className = 'status-badge status-pending';
+            document.getElementById('giacenzaStatus').textContent = 'Non inserito';
+
+            showMessage('Dati cancellati con successo!', 'success');
+        }
+
+        // Inizializzazione
+        document.getElementById('yearSelect').value = currentYear;
+        loadYearData();
+    </script>
+</body>
+</html>
