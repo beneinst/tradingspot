@@ -803,3 +803,48 @@ body.modal-open {
     z-index: 1;
     border-bottom: 2px solid #333;
 }
+
+.expand-icon {
+    cursor: pointer;
+    user-select: none;
+    margin-right: 8px;
+    display: inline-block;
+    width: 20px;
+    color: #4caf50;
+    font-weight: bold;
+}
+
+.expand-icon:hover {
+    color: #66bb6a;
+}
+
+.historical-main-row {
+    cursor: pointer;
+}
+
+.historical-main-row:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+.details-container {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-left: 3px solid #4caf50;
+}
+
+.details-table {
+    width: 100%;
+    margin: 10px 0;
+    border-collapse: collapse;
+}
+
+.details-table th {
+    background-color: #e0e0e0;
+    padding: 8px;
+    text-align: left;
+}
+
+.details-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #ddd;
+}
