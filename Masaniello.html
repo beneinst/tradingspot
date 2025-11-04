@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calcolatore Masaniello – Gestione Bankroll</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#edd5b0 0%,#ebb55f 100%);min-height:100vh;padding:20px;color:#333}
+    .container{max-width:800px;margin:0 auto;background:#fff;border-radius:15px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:30px}
+    h1{text-align:center;margin-bottom:10px;font-size:2em}
+    .subtitle{text-align:center;color:#666;margin-bottom:30px;font-style:italic}
+    .input-section{background:#f8f9fa;padding:25px;border-radius:10px;margin-bottom:25px}
+    .input-group{margin-bottom:20px}
+    label{display:block;margin-bottom:8px;font-weight:600}
+    input{width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:16px;transition:border-color .3s}
+    input:focus{outline:none;border-color:#667eea}
+    .btn{width:100%;padding:15px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;border-radius:8px;font-size:18px;font-weight:600;cursor:pointer;transition:transform .2s}
+    .btn:hover{transform:translateY(-2px)}
+    .results{display:none;margin-top:30px}
+    .summary{background:#e8f4f8;padding:20px;border-radius:10px;margin-bottom:20px;border-left:4px solid #667eea}
+    .summary-item{display:flex;justify-content:space-between;margin-bottom:10px;font-size:16px}
+    .summary-item span:last-child{color:#667eea;font-weight:700}
+    table{width:100%;border-collapse:collapse;margin-top:20px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,.1)}
+    th{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:15px;text-align:left;font-weight:600}
+    td{padding:12px 15px;border-bottom:1px solid #eee}
+    tr:hover{background:#f8f9fa}
+    .event-num{font-weight:700;color:#667eea}
+    .warning{background:#fff3cd;border-left:4px solid #ffc107;padding:15px;margin-top:20px;border-radius:5px;color:#856404}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚽ Calcolatore Masaniello</h1>
+    <p class="subtitle">Tecnica napoletana di gestione bankroll per scommesse</p>
+
+    <div class="input-section">
+      <div class="input-group">
+        <label for="bankroll">💰 Bankroll Iniziale (€)</label>
+        <input type="number" id="bankroll" placeholder="Es: 100" step="0.01" min="1">
+      </div>
+      <div class="input-group">
+        <label for="obiettivo">🎯 Obiettivo di Vincita (€)</label>
+        <input type="number" id="obiettivo" placeholder="Es: 50" step="0.01" min="1">
+      </div>
+      <div class="input-group">
+        <label for="eventi">📊 Numero di Eventi</label>
+        <input type="number" id="eventi" placeholder="Es: 5" min="2" max="20">
+      </div>
+      <div class="input-group">
+        <label for="quota">📈 Quota Media degli Eventi</label>
+        <input type="number" id="quota" placeholder="Es: 1.80" step="0.01" min="1.01">
+      </div>
+      <div class="input-group">
+        <label for="errori">❌ Numero Massimo di Errori Consentiti</label>
+        <input type="number" id="errori" placeholder="Es: 2" min="0" max="10">
+      </div>
+      <button class="btn" onclick="calcolaMasaniello()">🔢 Calcola Masaniello</button>
+    </div>
+
+    <div class="results" id="results">
+      <h2 style="margin-bottom:20px">📋 Piano Masaniello</h2>
+      <div class="summary" id="summary"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Evento</th>
+            <th>Puntata (€)</th>
+            <th>Vincita Potenziale (€)</th>
+            <th>Cassa Progressiva (€)</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="warning" id="warningBox"></div>
+    </div>
+  </div>
+
+  <script>
+    /* ---------- FUNZIONI DI CALCOLO ---------- */
+    function comb(n, k) {
+      let res = 1;
+      for (let i = 1; i <= k; i++) res = res * (n - k + i) / i;
+      return res;
+    }
+
+    function calcolaMasaniello() {
+      const B = parseFloat(document.getElementById('bankroll').value);
+      const G = parseFloat(document.getElementById('obiettivo').value);
+      const N = parseInt(document.getElementById('eventi').value);
+      const Q = parseFloat(document.getElementById('quota').value);
+      const E = parseInt(document.getElementById('errori').value);
+
+      if (![B, G, N, Q, E].every(v => !isNaN(v))) return alert('Compila tutti i campi!');
+      if (G >= B) return alert("L'obiettivo deve essere inferiore al bankroll!");
+      if (E >= N) return alert('Gli errori devono essere minori degli eventi!');
+
+      const V = B + G;
+      const puntate = [];
+      let cassa = B;
+
+      for (let k = 0; k < N; k++) {
+        let somma = 0;
+        for (let j = 0; j <= E; j++) {
+          if (N - k - j >= 0) somma += comb(N - k - 1, j) * Math.pow(Q - 1, j);
+        }
+        const p = (V - cassa) / (Math.pow(Q, N - k) * somma);
+        const vincita = p * Q;
+        cassa += (vincita - p);
+        puntate.push({ evento: k + 1, puntata: p.toFixed(2), vincita: vincita.toFixed(2), cassa: cassa.toFixed(2) });
+      }
+
+      const totPuntato = puntate.reduce((s, x) => s + parseFloat(x.puntata), 0);
+      document.getElementById('summary').innerHTML = `
+        <div class="summary-item"><span>Bankroll Iniziale:</span><span>€ ${B.toFixed(2)}</span></div>
+        <div class="summary-item"><span>Obiettivo:</span><span>€ ${G.toFixed(2)}</span></div>
+        <div class="summary-item"><span>Errori Max:</span><span>${E}</span></div>
+        <div class="summary-item"><span>Cassa Finale:</span><span>€ ${V.toFixed(2)}</span></div>
+        <div class="summary-item"><span>Totale Puntato:</span><span>€ ${totPuntato.toFixed(2)}</span></div>
+        <div class="summary-item"><span>ROI Atteso:</span><span>${((G / B) * 100).toFixed(2)}%</span></div>
+      `;
+
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = puntate.map(p => `
+        <tr>
+          <td class="event-num">Evento ${p.evento}</td>
+          <td>€ ${p.puntata}</td>
+          <td>€ ${p.vincita}</td>
+          <td>€ ${p.cassa}</td>
+        </tr>`).join('');
+
+      document.getElementById('warningBox').innerHTML = `
+        ⚠️ <strong>Attenzione:</strong> il piano ti permette fino a <strong>${E} errori</strong> su <strong>${N} eventi</strong>.
+        Superato questo limite perdi l’intero bankroll. Gioca responsabilmente!
+      `;
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
