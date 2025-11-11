@@ -566,6 +566,7 @@
     function verificaFineProgramma() {
       const sconfitteMax = config.totEventi - config.eventiVincenti;
 
+      // Controlla se il piano è terminato
       if (stato.eventiGiocati >= config.totEventi) {
         mostraRisultatoFinale('completato');
         return;
@@ -581,13 +582,16 @@
         return;
       }
 
-      if (stato.budgetCorrente <= 0) {
+      if (stato.budgetCorrente <= 0.01) {
         mostraRisultatoFinale('bankroll_esaurito');
         return;
       }
 
-      // Resetta il campo quota per il prossimo evento
-      document.getElementById('quotaEvento').value = config.quotaMedia.toFixed(2);
+      // Il piano continua - prepara il prossimo evento
+      const inputQuota = document.getElementById('quotaEvento');
+      inputQuota.value = config.quotaMedia.toFixed(2);
+      inputQuota.focus(); // Metti il focus sul campo quota
+      
       aggiornaInterfaccia();
     }
 
