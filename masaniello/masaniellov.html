@@ -251,13 +251,6 @@
 
       <div class="current-bet">
         <h2>Evento <span id="eventoCorrente">1</span></h2>
-        
-        <div class="quota-input-box">
-          <label style="display:block;margin-bottom:8px;font-size:1em;">📈 Quota di questo evento:</label>
-          <input type="number" id="quotaEvento" placeholder="Es: 1.85" step="0.01" min="1.01" 
-                 style="width:100%;padding:10px;border:none;border-radius:6px;font-size:1.1em;text-align:center;">
-        </div>
-        
         <div class="bet-amount">€ <span id="puntataCorrente">0.00</span></div>
         <p style="margin-bottom:20px;">Vincita potenziale: € <span id="vincitaPotenziale">0.00</span></p>
         <div>
@@ -273,7 +266,7 @@
         <div id="historyList"></div>
       </div>
 
-     <button class="btn" onclick="resetMasaniello()" style="background:#6c757d;margin-top:20px;">🔄 Ricomincia da Capo</button>
+       <button class="btn" onclick="resetMasaniello()" style="background:#6c757d;margin-top:20px;">🔄 Ricomincia da Capo</button>
     </div>
 
  
@@ -298,23 +291,12 @@
       eventiGiocati: 0,
       vittorie: 0,
       sconfitte: 0,
-      storico: [],
-      quotaEventoCorrente: 0
+      storico: []
     };
 
-    // Verifica sessione salvata all'avvio
+    // Carica stato salvato all'avvio
     window.addEventListener('DOMContentLoaded', function() {
       verificaSessioneSalvata();
-      
-      // Listener per ricalcolo dinamico quando cambia la quota
-      const inputQuota = document.getElementById('quotaEvento');
-      if (inputQuota) {
-        inputQuota.addEventListener('input', function() {
-          if (config.quotaMedia) {
-            ricalcolaPuntata();
-          }
-        });
-      }
     });
 
     function verificaSessioneSalvata() {
@@ -354,10 +336,12 @@
           config = dati.config;
           stato = dati.stato;
           
+          // Mostra la sezione gioco con i dati recuperati
           document.getElementById('setupSection').classList.add('hidden');
           document.getElementById('gameSection').classList.remove('hidden');
           aggiornaInterfaccia();
           
+          // Mostra messaggio di recupero
           const warningInfo = document.getElementById('warningInfo');
           const messaggioOriginale = warningInfo.innerHTML;
           warningInfo.innerHTML = '<strong>✅ Sessione recuperata!</strong> Stai continuando il piano precedente. ' + messaggioOriginale;
@@ -381,83 +365,24 @@
       return res;
     }
 
-    function calcolaPuntata(quotaReale) {
+    function calcolaPuntata() {
       const eventiRimasti = config.totEventi - stato.eventiGiocati;
       const vittorieRimaste = config.eventiVincenti - stato.vittorie;
       const sconfitteRimaste = eventiRimasti - vittorieRimaste;
 
       if (vittorieRimaste <= 0) return 0;
       if (sconfitteRimaste < 0) return 0;
-      if (eventiRimasti <= 0) return 0;
 
-      const B = stato.budgetCorrente;
-      const Q = quotaReale || config.quotaMedia;
-      const N = eventiRimasti;
-      const E_max = sconfitteRimaste;
+      const obiettivo = config.budgetIniziale * (1 + config.eventiVincenti / config.totEventi);
+      const differenza = obiettivo - stato.budgetCorrente;
 
-      // Calcolo cassa finale obiettivo (V)
-      // Obiettivo più aggressivo per puntate più consistenti
-      const rapportoVincite = config.eventiVincenti / config.totEventi;
-      
-      // Calcolo profitto atteso realistico
-      let profittoPercentuale;
-      if (rapportoVincite >= 0.8) {
-        profittoPercentuale = 0.6; // 60% con alta % vittorie
-      } else if (rapportoVincite >= 0.7) {
-        profittoPercentuale = 0.5; // 50%
-      } else if (rapportoVincite >= 0.6) {
-        profittoPercentuale = 0.4; // 40%
-      } else {
-        profittoPercentuale = 0.3; // 30%
-      }
-      
-      const V = config.budgetIniziale * (1 + profittoPercentuale);
-
-      // Calcolo sommatoria Masaniello
-      let sommatoria = 0;
-      for (let j = 0; j <= E_max; j++) {
-        const combinazioni = comb(N - 1, j);
-        sommatoria += combinazioni * Math.pow(config.quotaMedia - 1, j);
+      let somma = 0;
+      for (let j = 0; j <= sconfitteRimaste; j++) {
+        somma += comb(eventiRimasti - 1, j) * Math.pow(config.quotaMedia - 1, j);
       }
 
-      if (sommatoria === 0) {
-        // Fallback: distribuzione più aggressiva
-        return (B / N) * 1.2;
-      }
-
-      // Formula Masaniello: P = (V - B) / (Q^N * Σ)
-      const numeratore = V - B;
-      const denominatore = Math.pow(config.quotaMedia, N) * sommatoria;
-
-      let puntata = numeratore / denominatore;
-
-      // Adattamento per quota reale diversa dalla media
-      if (quotaReale && quotaReale !== config.quotaMedia) {
-        const fattore = config.quotaMedia / quotaReale;
-        puntata = puntata * fattore;
-      }
-
-      // Limiti più realistici: tra 3% e 25% del budget corrente
-      // Con 20€ budget = tra 0.60€ e 5€
-      const minPuntata = B * 0.03;
-      const maxPuntata = B * 0.25;
-      
-      puntata = Math.max(minPuntata, Math.min(puntata, maxPuntata));
-      
-      return Math.round(puntata * 100) / 100;
-    }
-
-    function ricalcolaPuntata() {
-      const inputQuota = document.getElementById('quotaEvento');
-      const quotaValue = inputQuota.value;
-      
-      // Se il campo è vuoto o non valido, usa la quota media
-      const quotaReale = (quotaValue && !isNaN(parseFloat(quotaValue))) ? parseFloat(quotaValue) : config.quotaMedia;
-      
-      const puntata = calcolaPuntata(quotaReale);
-      const vincita = puntata * quotaReale;
-      document.getElementById('puntataCorrente').textContent = puntata.toFixed(2);
-      document.getElementById('vincitaPotenziale').textContent = vincita.toFixed(2);
+      const puntata = differenza / (Math.pow(config.quotaMedia, eventiRimasti) * somma);
+      return Math.max(0, puntata);
     }
 
     function avviaMasaniello() {
@@ -496,23 +421,15 @@
       document.getElementById('setupSection').classList.add('hidden');
       document.getElementById('gameSection').classList.remove('hidden');
       
+      // Salva lo stato iniziale
       salvaStato();
+      
       aggiornaInterfaccia();
     }
 
     function aggiornaInterfaccia() {
-      const inputQuota = document.getElementById('quotaEvento');
-      
-      // Imposta la quota media come valore predefinito se il campo è vuoto
-      if (!inputQuota.value) {
-        inputQuota.value = config.quotaMedia.toFixed(2);
-      }
-      
-      const quotaValue = inputQuota.value;
-      const quotaReale = (quotaValue && !isNaN(parseFloat(quotaValue))) ? parseFloat(quotaValue) : config.quotaMedia;
-      
-      const puntata = calcolaPuntata(quotaReale);
-      const vincita = puntata * quotaReale;
+      const puntata = calcolaPuntata();
+      const vincita = puntata * config.quotaMedia;
 
       document.getElementById('budgetAttuale').textContent = '€ ' + stato.budgetCorrente.toFixed(2);
       document.getElementById('eventiGiocati').textContent = stato.eventiGiocati + ' / ' + config.totEventi;
@@ -542,7 +459,7 @@
         <div class="history-item ${item.vinto ? 'history-win' : 'history-loss'}">
           <div>
             <strong>Evento ${idx + 1}</strong><br>
-            <small>Puntata: € ${item.puntata.toFixed(2)} | Quota: ${item.quota ? item.quota.toFixed(2) : config.quotaMedia.toFixed(2)}</small>
+            <small>Puntata: € ${item.puntata.toFixed(2)} | Quota: ${config.quotaMedia}</small>
           </div>
           <div>
             <span class="badge ${item.vinto ? 'badge-win' : 'badge-loss'}">
@@ -555,26 +472,10 @@
     }
 
     function registraRisultato(vinto) {
-      console.log('Registrazione risultato:', vinto); // Debug
-      
-      const inputQuota = document.getElementById('quotaEvento');
-      const quotaReale = parseFloat(inputQuota.value);
-      
-      console.log('Quota inserita:', quotaReale); // Debug
-      
-      if (!quotaReale || quotaReale < 1.01 || isNaN(quotaReale)) {
-        alert('⚠️ Inserisci una quota valida per questo evento (minimo 1.01)!');
-        inputQuota.focus();
-        return;
-      }
-      
-      const puntata = calcolaPuntata(quotaReale);
-      
-      console.log('Puntata calcolata:', puntata); // Debug
+      const puntata = calcolaPuntata();
 
       if (vinto) {
-        const vincitaNetta = puntata * quotaReale - puntata;
-        stato.budgetCorrente += vincitaNetta;
+        stato.budgetCorrente += (puntata * config.quotaMedia - puntata);
         stato.vittorie++;
       } else {
         stato.budgetCorrente -= puntata;
@@ -584,22 +485,22 @@
       stato.storico.push({
         vinto: vinto,
         puntata: puntata,
-        quota: quotaReale,
         budgetDopo: stato.budgetCorrente
       });
 
       stato.eventiGiocati++;
-      
-      console.log('Stato aggiornato:', stato); // Debug
 
+      // Salva lo stato dopo ogni evento
       salvaStato();
+
       verificaFineProgramma();
     }
 
     function verificaFineProgramma() {
+      const vittorieRimaste = config.eventiVincenti - stato.vittorie;
       const sconfitteMax = config.totEventi - config.eventiVincenti;
+      const sconfitteRimaste = sconfitteMax - stato.sconfitte;
 
-      // Controlla se il piano è terminato
       if (stato.eventiGiocati >= config.totEventi) {
         mostraRisultatoFinale('completato');
         return;
@@ -615,16 +516,11 @@
         return;
       }
 
-      if (stato.budgetCorrente <= 0.01) {
+      if (stato.budgetCorrente <= 0) {
         mostraRisultatoFinale('bankroll_esaurito');
         return;
       }
 
-      // Il piano continua - prepara il prossimo evento
-      const inputQuota = document.getElementById('quotaEvento');
-      inputQuota.value = config.quotaMedia.toFixed(2);
-      inputQuota.focus(); // Metti il focus sul campo quota
-      
       aggiornaInterfaccia();
     }
 
@@ -633,6 +529,7 @@
       const finalSection = document.getElementById('finalSection');
       finalSection.classList.remove('hidden');
 
+      // Cancella lo stato salvato perché il piano è concluso
       cancellaStatoSalvato();
 
       const profitto = stato.budgetCorrente - config.budgetIniziale;
@@ -691,6 +588,7 @@
       document.getElementById('gameSection').classList.add('hidden');
       document.getElementById('finalSection').classList.add('hidden');
       
+      // Cancella lo stato salvato
       cancellaStatoSalvato();
       
       document.getElementById('finalSection').innerHTML = '';
