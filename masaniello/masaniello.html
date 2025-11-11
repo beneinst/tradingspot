@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Masaniello Dinamico</title>
-  <style>
+ <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -251,6 +251,13 @@
 
       <div class="current-bet">
         <h2>Evento <span id="eventoCorrente">1</span></h2>
+        
+        <div class="quota-input-box">
+          <label style="display:block;margin-bottom:8px;font-size:1em;">📈 Quota di questo evento:</label>
+          <input type="number" id="quotaEvento" placeholder="Es: 1.85" step="0.01" min="1.01" 
+                 style="width:100%;padding:10px;border:none;border-radius:6px;font-size:1.1em;text-align:center;">
+        </div>
+        
         <div class="bet-amount">€ <span id="puntataCorrente">0.00</span></div>
         <p style="margin-bottom:20px;">Vincita potenziale: € <span id="vincitaPotenziale">0.00</span></p>
         <div>
@@ -266,7 +273,7 @@
         <div id="historyList"></div>
       </div>
 
-      <button class="btn" onclick="resetMasaniello()" style="background:#6c757d;margin-top:20px;">🔄 Ricomincia da Capo</button>
+     <button class="btn" onclick="resetMasaniello()" style="background:#6c757d;margin-top:20px;">🔄 Ricomincia da Capo</button>
     </div>
 
  
@@ -284,7 +291,6 @@
    <div id="finalSection" class="hidden"></div>
   </div>
 
-
   <script>
     let config = {};
     let stato = {
@@ -292,12 +298,23 @@
       eventiGiocati: 0,
       vittorie: 0,
       sconfitte: 0,
-      storico: []
+      storico: [],
+      quotaEventoCorrente: 0
     };
 
-    // Carica stato salvato all'avvio
+    // Verifica sessione salvata all'avvio
     window.addEventListener('DOMContentLoaded', function() {
       verificaSessioneSalvata();
+      
+      // Listener per ricalcolo dinamico quando cambia la quota
+      const inputQuota = document.getElementById('quotaEvento');
+      if (inputQuota) {
+        inputQuota.addEventListener('input', function() {
+          if (config.quotaMedia) {
+            ricalcolaPuntata();
+          }
+        });
+      }
     });
 
     function verificaSessioneSalvata() {
@@ -337,12 +354,10 @@
           config = dati.config;
           stato = dati.stato;
           
-          // Mostra la sezione gioco con i dati recuperati
           document.getElementById('setupSection').classList.add('hidden');
           document.getElementById('gameSection').classList.remove('hidden');
           aggiornaInterfaccia();
           
-          // Mostra messaggio di recupero
           const warningInfo = document.getElementById('warningInfo');
           const messaggioOriginale = warningInfo.innerHTML;
           warningInfo.innerHTML = '<strong>✅ Sessione recuperata!</strong> Stai continuando il piano precedente. ' + messaggioOriginale;
@@ -366,50 +381,64 @@
       return res;
     }
 
-    function calcolaPuntata() {
+    function calcolaPuntata(quotaReale) {
       const eventiRimasti = config.totEventi - stato.eventiGiocati;
       const vittorieRimaste = config.eventiVincenti - stato.vittorie;
       const sconfitteRimaste = eventiRimasti - vittorieRimaste;
 
-      if (vittorieRimaste <= 0) return 0;
+      if (vittorieRimasti <= 0) return 0;
       if (sconfitteRimaste < 0) return 0;
       if (eventiRimasti <= 0) return 0;
 
-      // Calcolo cassa finale desiderata (V)
-      const percProfitto = (config.eventiVincenti / config.totEventi) * 100;
-      const profittoDesiderato = config.budgetIniziale * (percProfitto / 100);
-      const V = config.budgetIniziale + profittoDesiderato;
-      
-      const B_attuale = stato.budgetCorrente;
-      const Q = config.quotaMedia;
+      const B = stato.budgetCorrente;
+      const Q = quotaReale || config.quotaMedia;
       const N = eventiRimasti;
-      const E = sconfitteRimaste;
+      const E_max = sconfitteRimaste;
 
-      // Formula Masaniello: P_k = (V - B_k) / (Q^(N-k) * Σ)
+      // Calcolo cassa finale obiettivo (V)
+      const rapportoVincite = config.eventiVincenti / config.totEventi;
+      const guadagnoMedio = (config.quotaMedia - 1) * rapportoVincite;
+      const V = config.budgetIniziale * (1 + guadagnoMedio);
+
+      // Calcolo sommatoria Masaniello
       let sommatoria = 0;
-      for (let j = 0; j <= E; j++) {
-        const c = comb(N - 1, j);
-        const p = Math.pow(Q - 1, j);
-        sommatoria += c * p;
+      for (let j = 0; j <= E_max; j++) {
+        const combinazioni = comb(N - 1, j);
+        sommatoria += combinazioni * Math.pow(config.quotaMedia - 1, j);
       }
 
-      const numeratore = V - B_attuale;
-      const denominatore = Math.pow(Q, N) * sommatoria;
-      
-      if (denominatore === 0 || sommatoria === 0) {
-        // Fallback: punta una percentuale del budget
-        return B_attuale * 0.1;
+      if (sommatoria === 0) {
+        return (B / N) * 0.8;
       }
-      
+
+      // Formula Masaniello: P = (V - B) / (Q^N * Σ)
+      const numeratore = V - B;
+      const denominatore = Math.pow(config.quotaMedia, N) * sommatoria;
+
       let puntata = numeratore / denominatore;
-      
-      // Limita la puntata tra 0.1% e 50% del budget corrente
-      const minPuntata = B_attuale * 0.001;
-      const maxPuntata = B_attuale * 0.5;
+
+      // Adattamento per quota reale diversa dalla media
+      if (quotaReale && quotaReale !== config.quotaMedia) {
+        const fattore = config.quotaMedia / quotaReale;
+        puntata = puntata * fattore;
+      }
+
+      // Limiti: tra 1% e 50% del budget
+      const minPuntata = B * 0.01;
+      const maxPuntata = B * 0.50;
       
       puntata = Math.max(minPuntata, Math.min(puntata, maxPuntata));
       
-      return puntata;
+      return Math.round(puntata * 100) / 100;
+    }
+
+    function ricalcolaPuntata() {
+      const inputQuota = document.getElementById('quotaEvento');
+      const quotaReale = parseFloat(inputQuota.value) || config.quotaMedia;
+      const puntata = calcolaPuntata(quotaReale);
+      const vincita = puntata * quotaReale;
+      document.getElementById('puntataCorrente').textContent = puntata.toFixed(2);
+      document.getElementById('vincitaPotenziale').textContent = vincita.toFixed(2);
     }
 
     function avviaMasaniello() {
@@ -448,15 +477,16 @@
       document.getElementById('setupSection').classList.add('hidden');
       document.getElementById('gameSection').classList.remove('hidden');
       
-      // Salva lo stato iniziale
       salvaStato();
-      
       aggiornaInterfaccia();
     }
 
     function aggiornaInterfaccia() {
-      const puntata = calcolaPuntata();
-      const vincita = puntata * config.quotaMedia;
+      const inputQuota = document.getElementById('quotaEvento');
+      const quotaReale = parseFloat(inputQuota.value) || config.quotaMedia;
+      
+      const puntata = calcolaPuntata(quotaReale);
+      const vincita = puntata * quotaReale;
 
       document.getElementById('budgetAttuale').textContent = '€ ' + stato.budgetCorrente.toFixed(2);
       document.getElementById('eventiGiocati').textContent = stato.eventiGiocati + ' / ' + config.totEventi;
@@ -465,6 +495,10 @@
       document.getElementById('eventoCorrente').textContent = stato.eventiGiocati + 1;
       document.getElementById('puntataCorrente').textContent = puntata.toFixed(2);
       document.getElementById('vincitaPotenziale').textContent = vincita.toFixed(2);
+      
+      if (!inputQuota.value) {
+        inputQuota.value = config.quotaMedia.toFixed(2);
+      }
 
       const sconfitteMax = config.totEventi - config.eventiVincenti;
       document.getElementById('warningInfo').innerHTML = `
@@ -486,7 +520,7 @@
         <div class="history-item ${item.vinto ? 'history-win' : 'history-loss'}">
           <div>
             <strong>Evento ${idx + 1}</strong><br>
-            <small>Puntata: € ${item.puntata.toFixed(2)} | Quota: ${config.quotaMedia}</small>
+            <small>Puntata: € ${item.puntata.toFixed(2)} | Quota: ${item.quota ? item.quota.toFixed(2) : config.quotaMedia.toFixed(2)}</small>
           </div>
           <div>
             <span class="badge ${item.vinto ? 'badge-win' : 'badge-loss'}">
@@ -499,10 +533,17 @@
     }
 
     function registraRisultato(vinto) {
-      const puntata = calcolaPuntata();
+      const quotaReale = parseFloat(document.getElementById('quotaEvento').value);
+      
+      if (!quotaReale || quotaReale < 1.01) {
+        alert('⚠️ Inserisci una quota valida per questo evento!');
+        return;
+      }
+      
+      const puntata = calcolaPuntata(quotaReale);
 
       if (vinto) {
-        stato.budgetCorrente += (puntata * config.quotaMedia - puntata);
+        stato.budgetCorrente += (puntata * quotaReale - puntata);
         stato.vittorie++;
       } else {
         stato.budgetCorrente -= puntata;
@@ -512,21 +553,18 @@
       stato.storico.push({
         vinto: vinto,
         puntata: puntata,
+        quota: quotaReale,
         budgetDopo: stato.budgetCorrente
       });
 
       stato.eventiGiocati++;
 
-      // Salva lo stato dopo ogni evento
       salvaStato();
-
       verificaFineProgramma();
     }
 
     function verificaFineProgramma() {
-      const vittorieRimaste = config.eventiVincenti - stato.vittorie;
       const sconfitteMax = config.totEventi - config.eventiVincenti;
-      const sconfitteRimaste = sconfitteMax - stato.sconfitte;
 
       if (stato.eventiGiocati >= config.totEventi) {
         mostraRisultatoFinale('completato');
@@ -548,6 +586,8 @@
         return;
       }
 
+      // Resetta il campo quota per il prossimo evento
+      document.getElementById('quotaEvento').value = config.quotaMedia.toFixed(2);
       aggiornaInterfaccia();
     }
 
@@ -556,7 +596,6 @@
       const finalSection = document.getElementById('finalSection');
       finalSection.classList.remove('hidden');
 
-      // Cancella lo stato salvato perché il piano è concluso
       cancellaStatoSalvato();
 
       const profitto = stato.budgetCorrente - config.budgetIniziale;
@@ -615,7 +654,6 @@
       document.getElementById('gameSection').classList.add('hidden');
       document.getElementById('finalSection').classList.add('hidden');
       
-      // Cancella lo stato salvato
       cancellaStatoSalvato();
       
       document.getElementById('finalSection').innerHTML = '';
