@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guida Masaniello Dinamico</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #2D2D2D 0%, #1A1A1A 100%);
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      color: #00A000;
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 2.5em;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 1.2em;
+    }
+    h2 {
+      color: #00A000;
+      margin-top: 35px;
+      margin-bottom: 15px;
+      font-size: 1.8em;
+      border-bottom: 3px solid #00A000;
+      padding-bottom: 10px;
+    }
+    h3 {
+      color: #007A00;
+      margin-top: 25px;
+      margin-bottom: 12px;
+      font-size: 1.4em;
+    }
+    p {
+      margin-bottom: 15px;
+      color: #333;
+      font-size: 1.05em;
+    }
+    .box {
+      background: #F5F5F5;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+      border-left: 5px solid #00A000;
+    }
+    .warning-box {
+      background: #FFF3CD;
+      border-left: 5px solid #FFA000;
+    }
+    .success-box {
+      background: #D4EDDA;
+      border-left: 5px solid #009624;
+    }
+    .danger-box {
+      background: #F8D7DA;
+      border-left: 5px solid #B71C1C;
+    }
+    .info-box {
+      background: #D1ECF1;
+      border-left: 5px solid #17a2b8;
+    }
+    ul, ol {
+      margin-left: 30px;
+      margin-bottom: 15px;
+    }
+    li {
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .step {
+      background: linear-gradient(135deg, #00A000, #007A00);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      margin: 15px 0;
+      font-weight: 600;
+      font-size: 1.1em;
+    }
+    .example {
+      background: #f0f0f0;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      font-family: 'Courier New', monospace;
+    }
+    .example-title {
+      font-weight: bold;
+      color: #00A000;
+      margin-bottom: 10px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    th {
+      background: linear-gradient(135deg, #00A000, #007A00);
+      color: white;
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    tr:hover {
+      background: #F5F5F5;
+    }
+    .highlight {
+      background: #FFEB3B;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+    .emoji {
+      font-size: 1.3em;
+      margin-right: 8px;
+    }
+    a {
+      color: #00A000;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .toc {
+      background: #F5F5F5;
+      padding: 25px;
+      border-radius: 12px;
+      margin: 30px 0;
+    }
+    .toc ul {
+      list-style: none;
+      margin-left: 0;
+    }
+    .toc li {
+      margin-bottom: 8px;
+    }
+    .toc a {
+      display: block;
+      padding: 8px 15px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .toc a:hover {
+      background: white;
+      text-decoration: none;
+    }
+    .btn-back {
+      display: inline-block;
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #00A000, #007A00);
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 30px;
+      transition: transform 0.2s;
+    }
+    .btn-back:hover {
+      transform: translateY(-2px);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📚 Guida Completa al Masaniello Dinamico</h1>
+    <p class="subtitle">Sistema professionale di gestione bankroll per scommesse consecutive</p>
+
+    <div class="toc">
+      <h3 style="margin-top:0;">📋 Indice dei Contenuti</h3>
+      <ul>
+        <li><a href="#cos-e">🎯 Cos'è il Masaniello?</a></li>
+        <li><a href="#come-funziona">⚙️ Come funziona</a></li>
+        <li><a href="#setup">🚀 Configurazione iniziale</a></li>
+        <li><a href="#utilizzo">💡 Come utilizzare il sistema</a></li>
+        <li><a href="#esempi">📊 Esempi pratici</a></li>
+        <li><a href="#consigli">✅ Consigli e strategie</a></li>
+        <li><a href="#errori">❌ Errori da evitare</a></li>
+        <li><a href="#faq">❓ Domande frequenti</a></li>
+      </ul>
+    </div>
+
+    <h2 id="cos-e"><span class="emoji">🎯</span>Cos'è il Masaniello?</h2>
+    <p>Il <strong>Masaniello</strong> è un sistema matematico di gestione del bankroll nato a Napoli, studiato per pianificare una serie di scommesse consecutive in modo da:</p>
+    <ul>
+      <li>Proteggere il capitale iniziale</li>
+      <li>Massimizzare i profitti in caso di successo</li>
+      <li>Calcolare automaticamente le puntate ottimali</li>
+      <li>Sapere in anticipo quanti errori ci si può permettere</li>
+    </ul>
+
+    <div class="box info-box">
+      <strong><span class="emoji">💡</span>Principio chiave:</strong> Il Masaniello calcola quanto puntare su ogni evento in modo che, se ottieni il numero di vittorie previste, raggiungi un obiettivo di profitto prestabilito, anche se le vittorie non arrivano tutte di seguito.
+    </div>
+
+    <h2 id="come-funziona"><span class="emoji">⚙️</span>Come funziona</h2>
+    <p>Il sistema Masaniello Dinamico si basa su questi elementi fondamentali:</p>
+
+    <h3>📊 Parametri iniziali</h3>
+    <table>
+      <tr>
+        <th>Parametro</th>
+        <th>Descrizione</th>
+        <th>Esempio</th>
+      </tr>
+      <tr>
+        <td><strong>Budget Iniziale</strong></td>
+        <td>Il capitale che sei disposto a investire</td>
+        <td>100 €</td>
+      </tr>
+      <tr>
+        <td><strong>Numero Eventi Totali</strong></td>
+        <td>Quante scommesse vuoi fare in totale</td>
+        <td>10 eventi</td>
+      </tr>
+      <tr>
+        <td><strong>Eventi Vincenti Previsti</strong></td>
+        <td>Quanti eventi pensi di vincere</td>
+        <td>7 vittorie</td>
+      </tr>
+      <tr>
+        <td><strong>Quota Media</strong></td>
+        <td>La quota media delle tue scommesse</td>
+        <td>1.80</td>
+      </tr>
+    </table>
+
+    <h3>🧮 Calcolo automatico</h3>
+    <p>Il sistema calcola automaticamente:</p>
+    <ul>
+      <li><strong>Sconfitte massime consentite:</strong> Totale eventi - Eventi vincenti previsti</li>
+      <li><strong>Puntata ottimale per ogni evento</strong> basata su:
+        <ul>
+          <li>Budget disponibile al momento</li>
+          <li>Eventi rimasti da giocare</li>
+          <li>Vittorie già ottenute</li>
+          <li>Sconfitte già accumulate</li>
+        </ul>
+      </li>
+    </ul>
+
+    <div class="box success-box">
+      <strong><span class="emoji">✨</span>La magia del Masaniello:</strong> Le puntate si adattano dinamicamente! Se perdi un evento, la puntata successiva viene ricalcolata per recuperare. Se vinci, le puntate successive possono essere più conservative.
+    </div>
+
+    <h2 id="setup"><span class="emoji">🚀</span>Configurazione Iniziale</h2>
+    
+    <div class="step">PASSO 1: Determina il tuo budget</div>
+    <p>Scegli un capitale che:</p>
+    <ul>
+      <li>Puoi permetterti di perdere completamente (worst case)</li>
+      <li>Non ti crea stress psicologico</li>
+      <li>È proporzionato alla tua esperienza</li>
+    </ul>
+    <div class="box warning-box">
+      <strong>⚠️ IMPORTANTE:</strong> Non usare mai denaro necessario per spese essenziali. Il gioco deve rimanere un'attività ricreativa.
+    </div>
+
+    <div class="step">PASSO 2: Pianifica il numero di eventi</div>
+    <p>Consiglio in base all'esperienza:</p>
+    <ul>
+      <li><strong>Principianti:</strong> 5-8 eventi</li>
+      <li><strong>Intermedi:</strong> 8-12 eventi</li>
+      <li><strong>Esperti:</strong> 12-20 eventi</li>
+    </ul>
+
+    <div class="step">PASSO 3: Stima realistica delle vittorie</div>
+    <p>Questo è il parametro più critico! Devi essere <span class="highlight">onesto e realista</span>:</p>
+    <table>
+      <tr>
+        <th>Tasso di successo</th>
+        <th>Esempio (su 10 eventi)</th>
+        <th>Livello</th>
+      </tr>
+      <tr>
+        <td>60%</td>
+        <td>6 vittorie previste</td>
+        <td>Conservativo</td>
+      </tr>
+      <tr>
+        <td>70%</td>
+        <td>7 vittorie previste</td>
+        <td>Equilibrato</td>
+      </tr>
+      <tr>
+        <td>80%</td>
+        <td>8 vittorie previste</td>
+        <td>Ambizioso</td>
+      </tr>
+      <tr>
+        <td>90%+</td>
+        <td>9+ vittorie previste</td>
+        <td>Molto rischioso</td>
+      </tr>
+    </table>
+
+    <div class="step">PASSO 4: Scegli la quota media</div>
+    <p>La quota media influenza molto i risultati:</p>
+    <ul>
+      <li><strong>Quote basse (1.30-1.60):</strong> Più sicure ma guadagni minori</li>
+      <li><strong>Quote medie (1.60-2.00):</strong> Equilibrio rischio/rendimento</li>
+      <li><strong>Quote alte (2.00+):</strong> Più rischiose ma potenzialmente più profittevoli</li>
+    </ul>
+
+    <h2 id="utilizzo"><span class="emoji">💡</span>Come Utilizzare il Sistema</h2>
+
+    <h3>Fase 1: Avvio</h3>
+    <ol>
+      <li>Inserisci tutti i parametri nella schermata di configurazione</li>
+      <li>Clicca su <strong>"🚀 Avvia Masaniello"</strong></li>
+      <li>Il sistema ti mostrerà immediatamente la <span class="highlight">puntata per il primo evento</span></li>
+    </ol>
+
+    <h3>Fase 2: Gioco dinamico</h3>
+    <p>Per ogni evento:</p>
+    <ol>
+      <li>Il sistema ti dice <strong>esattamente quanto puntare</strong></li>
+      <li>Fai la tua scommessa con quella puntata</li>
+      <li>Attendi il risultato dell'evento</li>
+      <li>Clicca su <strong>"✅ HO VINTO"</strong> oppure <strong>"❌ HO PERSO"</strong></li>
+      <li>Il sistema ricalcola automaticamente la puntata successiva</li>
+    </ol>
+
+    <div class="box info-box">
+      <strong><span class="emoji">📊</span>Monitoraggio costante:</strong> Durante il gioco vedrai sempre:
+      <ul style="margin-top:10px;">
+        <li>Budget attuale in tempo reale</li>
+        <li>Numero di vittorie e sconfitte</li>
+        <li>Quante sconfitte puoi ancora permetterti</li>
+        <li>Storico completo delle giocate</li>
+      </ul>
+    </div>
+
+    <h3>Fase 3: Conclusione</h3>
+    <p>Il sistema termina automaticamente quando:</p>
+    <ul>
+      <li>✅ Raggiungi il numero di vittorie previste → <strong>SUCCESSO!</strong></li>
+      <li>❌ Superi il numero di sconfitte consentite → Piano fallito</li>
+      <li>🏁 Completi tutti gli eventi programmati</li>
+      <li>💸 Il budget si esaurisce (caso raro se segui le puntate)</li>
+    </ul>
+
+    <h2 id="esempi"><span class="emoji">📊</span>Esempi Pratici</h2>
+
+    <h3>Esempio 1: Piano Conservativo</h3>
+    <div class="example">
+      <div class="example-title">📝 Configurazione:</div>
+      Budget Iniziale: 100 €<br>
+      Eventi Totali: 10<br>
+      Eventi Vincenti Previsti: 6<br>
+      Quota Media: 1.70<br>
+      <br>
+      <div class="example-title">📊 Risultati:</div>
+      Sconfitte Massime Consentite: 4<br>
+      Probabilità di successo: Alta<br>
+      Profitto atteso: ~20-25%<br>
+      Rischio: Basso
+    </div>
+
+    <h3>Esempio 2: Piano Equilibrato</h3>
+    <div class="example">
+      <div class="example-title">📝 Configurazione:</div>
+      Budget Iniziale: 200 €<br>
+      Eventi Totali: 12<br>
+      Eventi Vincenti Previsti: 9<br>
+      Quota Media: 1.80<br>
+      <br>
+      <div class="example-title">📊 Risultati:</div>
+      Sconfitte Massime Consentite: 3<br>
+      Probabilità di successo: Media<br>
+      Profitto atteso: ~35-45%<br>
+      Rischio: Medio
+    </div>
+
+    <h3>Esempio 3: Piano Aggressivo</h3>
+    <div class="example">
+      <div class="example-title">📝 Configurazione:</div>
+      Budget Iniziale: 150 €<br>
+      Eventi Totali: 8<br>
+      Eventi Vincenti Previsti: 7<br>
+      Quota Media: 2.00<br>
+      <br>
+      <div class="example-title">📊 Risultati:</div>
+      Sconfitte Massime Consentite: 1<br>
+      Probabilità di successo: Bassa<br>
+      Profitto atteso: ~60-80%<br>
+      Rischio: Alto
+    </div>
+
+    <h2 id="consigli"><span class="emoji">✅</span>Consigli e Strategie</h2>
+
+    <div class="box success-box">
+      <h3 style="margin-top:0;">🎯 Le regole d'oro</h3>
+      <ul>
+        <li><strong>Disciplina ferrea:</strong> Segui SEMPRE le puntate calcolate dal sistema</li>
+        <li><strong>Non modificare in corsa:</strong> Non cambiare i parametri a metà percorso</li>
+        <li><strong>Scegli eventi con criterio:</strong> Analizza bene ogni scommessa</li>
+        <li><strong>Quote coerenti:</strong> Cerca di mantenere quote vicine alla media impostata</li>
+        <li><strong>Gestione emotiva:</strong> Non farti prendere dall'entusiasmo o dalla disperazione</li>
+      </ul>
+    </div>
+
+    <h3>📈 Strategie avanzate</h3>
+    <ol>
+      <li><strong>Multiple piani paralleli:</strong> Usa diversi piani Masaniello su sport/mercati diversi</li>
+      <li><strong>Adatta le quote:</strong> Se un evento ha quota diversa dalla media, puoi comunque giocarla (il sistema compensa)</li>
+      <li><strong>Tieni traccia delle performance:</strong> Annota i risultati per migliorare le future previsioni</li>
+      <li><strong>Pausa strategica:</strong> Se perdi 2-3 eventi di fila, valuta una pausa per riflettere</li>
+    </ol>
+
+    <h3>🧠 Aspetto psicologico</h3>
+    <p>Il Masaniello è anche uno strumento psicologico:</p>
+    <ul>
+      <li>Ti toglie l'ansia di "quanto puntare"</li>
+      <li>Previene le puntate impulsive dopo una sconfitta</li>
+      <li>Ti fa giocare in modo razionale e metodico</li>
+      <li>Sai sempre dove sei rispetto all'obiettivo</li>
+    </ul>
+
+    <h2 id="errori"><span class="emoji">❌</span>Errori da Evitare</h2>
+
+    <div class="box danger-box">
+      <h3 style="margin-top:0;">🚫 Errori critici</h3>
+      <ol>
+        <li><strong>Modificare le puntate:</strong> "Questa è sicura, punterò di più" → NO!</li>
+        <li><strong>Saltare eventi:</strong> Se perdi e vuoi "recuperare dopo" → NO!</li>
+        <li><strong>Essere troppo ottimisti:</strong> Prevedere 90%+ di vittorie → Irrealistico!</li>
+        <li><strong>Quote troppo variabili:</strong> Un evento a 1.30 e uno a 3.00 → Problematico!</li>
+        <li><strong>Inseguire le perdite:</strong> Ricominciare subito dopo un piano fallito → Pericoloso!</li>
+      </ol>
+    </div>
+
+    <div class="box warning-box">
+      <h3 style="margin-top:0;">⚠️ Errori comuni</h3>
+      <ul>
+        <li>Non considerare l'aspetto emotivo delle sconfitte consecutive</li>
+        <li>Pianificare troppi eventi per la propria esperienza</li>
+        <li>Non fare analisi approfondita degli eventi</li>
+        <li>Confondere "quota media" con "quota singola"</li>
+        <li>Non rispettare i limiti di budget personali</li>
+      </ul>
+    </div>
+
+    <h2 id="faq"><span class="emoji">❓</span>Domande Frequenti</h2>
+
+    <h3>🤔 Posso cambiare la quota durante il piano?</h3>
+    <p>Sì! La "quota media" è indicativa. Puoi giocare eventi con quote diverse, il sistema si adatta. Cerca però di rimanere vicino alla media per avere calcoli più precisi.</p>
+
+    <h3>🤔 Cosa succede se vinco più eventi del previsto?</h3>
+    <p>Il piano si conclude con successo! Avrai un profitto maggiore del previsto. Il sistema termina quando raggiungi le vittorie target.</p>
+
+    <h3>🤔 Posso fare pause tra gli eventi?</h3>
+    <p>Assolutamente sì! Il Masaniello Dinamico non ha vincoli temporali. Puoi fare un evento al giorno o più eventi nello stesso giorno.</p>
+
+    <h3>🤔 Il sistema garantisce il successo?</h3>
+    <p><strong>NO!</strong> Il Masaniello è uno strumento di gestione, non una garanzia di vincita. Devi comunque fare buone analisi e avere fortuna.</p>
+
+    <h3>🤔 Posso usarlo per live betting?</h3>
+    <p>Meglio evitare. Il Masaniello funziona meglio con eventi programmati dove puoi analizzare con calma. Nel live betting le decisioni sono troppo rapide.</p>
+
+    <h3>🤔 Cosa fare dopo un piano fallito?</h3>
+    <p>Analizza cosa è andato storto:</p>
+    <ul>
+      <li>Eri troppo ottimista sulle vittorie previste?</li>
+      <li>Hai scelto eventi a caso o analizzati male?</li>
+      <li>Il margine di errore era troppo stretto?</li>
+    </ul>
+    <p>Poi, se decidi di riprovarci, parti con parametri più conservativi.</p>
+
+    <h3>🤔 È meglio pochi eventi o molti?</h3>
+    <p>Dipende dall'esperienza:</p>
+    <ul>
+      <li><strong>Pochi eventi (5-8):</strong> Piano più veloce, margine d'errore ridotto</li>
+      <li><strong>Molti eventi (12-20):</strong> Piano più lungo, margine d'errore più ampio, più "respiro"</li>
+    </ul>
+
+    <div class="box info-box">
+      <h3 style="margin-top:0;"><span class="emoji">💡</span>Ultimo consiglio</h3>
+      <p><strong>Il Masaniello è matematica, non magia.</strong></p>
+      <p>Ti aiuta a gestire il bankroll in modo ottimale e a non fare errori di gestione, ma la qualità delle tue scommesse dipende sempre da te. Analisi, disciplina e realismo sono le chiavi del successo!</p>
+    </div>
+
+    <div class="box success-box">
+      <h3 style="margin-top:0;"><span class="emoji">🎯</span>Ricorda sempre</h3>
+      <ul>
+        <li>Il gioco deve rimanere un divertimento</li>
+        <li>Non scommettere mai più di quanto puoi permetterti di perdere</li>
+        <li>Se senti di perdere il controllo, fermati</li>
+        <li>La vittoria più grande è giocare responsabilmente</li>
+      </ul>
+    </div>
+
+    <div style="text-align:center;margin-top:40px;">
+      <a href="https://beneinst.github.io/tradingspot/masaniello/masaniello.html" class="btn-back" onclick="history.back(); return false;">← Torna al Calcolatore</a>
+    </div>
+
+    <div style="text-align:center;margin-top:30px;padding-top:30px;border-top:2px solid #e0e0e0;color:#999;">
+      <p>📚 Masaniello Dinamico - Guida Completa v1.0</p>
+      <p style="font-size:0.9em;margin-top:10px;">Gioca sempre responsabilmente | +18</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -8,20 +8,29 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #2D2D2D 0%, #1A1A1A 100%);
       min-height: 100vh;
       padding: 20px;
     }
     .container {
       max-width: 900px;
       margin: 0 auto;
-      background: white;
+      background: #FFFFFF;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+	
+	 .container-f {
+      max-width: 900px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #2D2D2D 0%, #1A1A1A 100%);
       border-radius: 20px;
       padding: 30px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
     h1 {
-      color: #667eea;
+      color: #00A000;
       text-align: center;
       margin-bottom: 10px;
       font-size: 2.2em;
@@ -33,7 +42,7 @@
       font-size: 1.1em;
     }
     .section {
-      background: #f8f9ff;
+      background: #F5F5F5;
       padding: 20px;
       border-radius: 12px;
       margin-bottom: 20px;
@@ -51,20 +60,20 @@
     input {
       width: 100%;
       padding: 12px;
-      border: 2px solid #e0e0e0;
+      border: 2px solid #E0E0E0;
       border-radius: 8px;
       font-size: 1em;
       transition: all 0.3s;
     }
     input:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      border-color: #00A000;
+      box-shadow: 0 0 0 3px rgba(0, 160, 0, 0.1);
     }
     .btn {
       width: 100%;
       padding: 15px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #00A000, #007A00);
       color: white;
       border: none;
       border-radius: 10px;
@@ -81,10 +90,10 @@
       margin: 10px;
       font-size: 1em;
     }
-    .btn-win { background: linear-gradient(135deg, #11998e, #38ef7d); }
-    .btn-loss { background: linear-gradient(135deg, #eb3349, #f45c43); }
+    .btn-win { background: linear-gradient(135deg, #00C853, #009624); }
+    .btn-loss { background: linear-gradient(135deg, #D32F2F, #B71C1C); }
     .current-bet {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      background: linear-gradient(135deg, #FF6B35 0%, #6A0DAD 100%);
       color: white;
       padding: 25px;
       border-radius: 12px;
@@ -118,7 +127,7 @@
     .stat-value {
       font-size: 1.5em;
       font-weight: bold;
-      color: #667eea;
+      color: #00A000;
     }
     .history {
       margin-top: 20px;
@@ -133,40 +142,42 @@
       align-items: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .history-win { border-left: 5px solid #38ef7d; }
-    .history-loss { border-left: 5px solid #f45c43; }
+    .history-win { border-left: 5px solid #00C853; }
+    .history-loss { border-left: 5px solid #D32F2F; }
     .badge {
       padding: 5px 15px;
       border-radius: 20px;
       font-weight: 600;
       font-size: 0.9em;
     }
-    .badge-win { background: #38ef7d; color: white; }
-    .badge-loss { background: #f45c43; color: white; }
+    .badge-win { background: #00C853; color: white; }
+    .badge-loss { background: #D32F2F; color: white; }
     .hidden { display: none; }
     .warning {
-      background: #fff3cd;
-      border-left: 5px solid #ffc107;
+      background: #FFF3CD;
+      border-left: 5px solid #FFA000;
       padding: 15px;
       border-radius: 8px;
       margin: 20px 0;
     }
     .success {
-      background: #d4edda;
-      border-left: 5px solid #28a745;
+      background: #D4EDDA;
+      border-left: 5px solid #009624;
       padding: 15px;
       border-radius: 8px;
       margin: 20px 0;
       text-align: center;
     }
     .danger {
-      background: #f8d7da;
-      border-left: 5px solid #dc3545;
+      background: #F8D7DA;
+      border-left: 5px solid #B71C1C;
       padding: 15px;
       border-radius: 8px;
       margin: 20px 0;
       text-align: center;
     }
+	
+	
   </style>
 </head>
 <body>
@@ -235,7 +246,19 @@
       <button class="btn" onclick="resetMasaniello()" style="background:#6c757d;margin-top:20px;">🔄 Ricomincia da Capo</button>
     </div>
 
-    <div id="finalSection" class="hidden"></div>
+ 
+
+    <div style="text-align:center;margin-top:40px;">
+      
+    
+
+    <div style="text-align:center;margin-top:30px;padding-top:30px;border-top:2px solid #e0e0e0;color:#999;">
+      <p>📚 di Gerardo D | <a href="https://beneinst.github.io/tradingspot/masaniello/guida.html" class="btn-back" onclick="history.back(); return false;">Apri la Guida</a></p>
+      
+    </div>
+  </div>
+  
+   <div id="finalSection" class="hidden"></div>
   </div>
 
   <script>
