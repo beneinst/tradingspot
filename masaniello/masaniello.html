@@ -90,16 +90,29 @@
       margin: 10px;
       font-size: 1em;
     }
-    .btn-win { background: linear-gradient(135deg, #00C853, #009624); }
-    .btn-loss { background: linear-gradient(135deg, #D32F2F, #B71C1C); }
+    .btn-win { 
+  background: linear-gradient(135deg, #00C853, #009624);
+  border: 2px solid #00FF88;
+  box-shadow: inset 0 0 0 2px #007A00, 0 4px 15px rgba(0, 200, 83, 0.3);
+}
+
+.btn-loss { 
+  background: linear-gradient(135deg, #D32F2F, #B71C1C);
+  border: 2px solid #FF6B6B;
+  box-shadow: inset 0 0 0 2px #8B0000, 0 4px 15px rgba(211, 47, 47, 0.3);
+}
     .current-bet {
-      background: linear-gradient(135deg, #FF6B35 0%, #6A0DAD 100%);
-      color: white;
-      padding: 25px;
-      border-radius: 12px;
-      text-align: center;
-      margin: 20px 0;
-    }
+  background: linear-gradient(135deg, rgba(255, 228, 24, 0.8) 0%, rgba(0, 84, 64, 0.9) 60%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Per Safari */
+  color: white;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  margin: 20px 0;
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Bordo sottile */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
     .current-bet h2 { margin-bottom: 15px; font-size: 1.5em; }
     .bet-amount {
       font-size: 3em;
