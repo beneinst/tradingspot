@@ -200,33 +200,23 @@
 
     <div id="setupSection" class="section">
       <h2 style="margin-bottom:20px;">📝 Configurazione Iniziale</h2>
-      
-      <div id="recuperoSessione" class="hidden" style="background:#d4edda;padding:15px;border-radius:8px;margin-bottom:20px;border-left:5px solid #28a745;">
-        <strong>✅ Sessione trovata!</strong>
-        <p style="margin:10px 0;">Hai un piano Masaniello in corso.</p>
-        <button class="btn" onclick="continuaSessione()" style="margin:5px;background:linear-gradient(135deg,#28a745,#20c997);">Continua Piano</button>
-        <button class="btn" onclick="nuovoInizio()" style="margin:5px;background:#6c757d;">Ricomincia da Zero</button>
+      <div class="input-group">
+        <label for="bankroll">💰 Budget Iniziale (€)</label>
+        <input type="number" id="bankroll" placeholder="Es: 100" step="0.01" min="1">
       </div>
-      
-      <div id="formConfig">
-        <div class="input-group">
-          <label for="bankroll">💰 Budget Iniziale (€)</label>
-          <input type="number" id="bankroll" placeholder="Es: 100" step="0.01" min="1">
-        </div>
-        <div class="input-group">
-          <label for="totEventi">📊 Numero Totale di Eventi</label>
-          <input type="number" id="totEventi" placeholder="Es: 10" min="2" max="50">
-        </div>
-        <div class="input-group">
-          <label for="eventiVincenti">✅ Eventi Previsti Vincenti</label>
-          <input type="number" id="eventiVincenti" placeholder="Es: 7" min="1">
-        </div>
-        <div class="input-group">
-          <label for="quotaMedia">📈 Quota Media</label>
-          <input type="number" id="quotaMedia" placeholder="Es: 1.80" step="0.01" min="1.01">
-        </div>
-        <button class="btn" onclick="avviaMasaniello()">🚀 Avvia Masaniello</button>
+      <div class="input-group">
+        <label for="totEventi">📊 Numero Totale di Eventi</label>
+        <input type="number" id="totEventi" placeholder="Es: 10" min="2" max="50">
       </div>
+      <div class="input-group">
+        <label for="eventiVincenti">✅ Eventi Previsti Vincenti</label>
+        <input type="number" id="eventiVincenti" placeholder="Es: 7" min="1">
+      </div>
+      <div class="input-group">
+        <label for="quotaMedia">📈 Quota Media</label>
+        <input type="number" id="quotaMedia" placeholder="Es: 1.80" step="0.01" min="1.01">
+      </div>
+      <button class="btn" onclick="avviaMasaniello()">🚀 Avvia Masaniello</button>
     </div>
 
     <div id="gameSection" class="hidden">
@@ -266,7 +256,7 @@
         <div id="historyList"></div>
       </div>
 
-       <button class="btn" onclick="resetMasaniello()" style="background:#6c757d;margin-top:20px;">🔄 Ricomincia da Capo</button>
+      <button class="btn" onclick="resetMasaniello()" style="background:#6c757d;margin-top:20px;">🔄 Ricomincia da Capo</button>
     </div>
 
  
@@ -293,67 +283,6 @@
       sconfitte: 0,
       storico: []
     };
-
-    // Carica stato salvato all'avvio
-    window.addEventListener('DOMContentLoaded', function() {
-      verificaSessioneSalvata();
-    });
-
-    function verificaSessioneSalvata() {
-      const datiSalvati = localStorage.getItem('masaniello_stato');
-      if (datiSalvati) {
-        document.getElementById('recuperoSessione').classList.remove('hidden');
-        document.getElementById('formConfig').style.opacity = '0.5';
-        document.getElementById('formConfig').style.pointerEvents = 'none';
-      }
-    }
-
-    function continuaSessione() {
-      caricaStatoSalvato();
-    }
-
-    function nuovoInizio() {
-      cancellaStatoSalvato();
-      document.getElementById('recuperoSessione').classList.add('hidden');
-      document.getElementById('formConfig').style.opacity = '1';
-      document.getElementById('formConfig').style.pointerEvents = 'auto';
-    }
-
-    function salvaStato() {
-      const datiDaSalvare = {
-        config: config,
-        stato: stato,
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem('masaniello_stato', JSON.stringify(datiDaSalvare));
-    }
-
-    function caricaStatoSalvato() {
-      const datiSalvati = localStorage.getItem('masaniello_stato');
-      if (datiSalvati) {
-        try {
-          const dati = JSON.parse(datiSalvati);
-          config = dati.config;
-          stato = dati.stato;
-          
-          // Mostra la sezione gioco con i dati recuperati
-          document.getElementById('setupSection').classList.add('hidden');
-          document.getElementById('gameSection').classList.remove('hidden');
-          aggiornaInterfaccia();
-          
-          // Mostra messaggio di recupero
-          const warningInfo = document.getElementById('warningInfo');
-          const messaggioOriginale = warningInfo.innerHTML;
-          warningInfo.innerHTML = '<strong>✅ Sessione recuperata!</strong> Stai continuando il piano precedente. ' + messaggioOriginale;
-        } catch (e) {
-          console.error('Errore nel caricamento dello stato:', e);
-        }
-      }
-    }
-
-    function cancellaStatoSalvato() {
-      localStorage.removeItem('masaniello_stato');
-    }
 
     function comb(n, k) {
       if (k > n || k < 0) return 0;
@@ -420,10 +349,6 @@
 
       document.getElementById('setupSection').classList.add('hidden');
       document.getElementById('gameSection').classList.remove('hidden');
-      
-      // Salva lo stato iniziale
-      salvaStato();
-      
       aggiornaInterfaccia();
     }
 
@@ -490,9 +415,6 @@
 
       stato.eventiGiocati++;
 
-      // Salva lo stato dopo ogni evento
-      salvaStato();
-
       verificaFineProgramma();
     }
 
@@ -528,9 +450,6 @@
       document.getElementById('gameSection').classList.add('hidden');
       const finalSection = document.getElementById('finalSection');
       finalSection.classList.remove('hidden');
-
-      // Cancella lo stato salvato perché il piano è concluso
-      cancellaStatoSalvato();
 
       const profitto = stato.budgetCorrente - config.budgetIniziale;
       const roi = ((profitto / config.budgetIniziale) * 100).toFixed(2);
@@ -587,10 +506,6 @@
       document.getElementById('setupSection').classList.remove('hidden');
       document.getElementById('gameSection').classList.add('hidden');
       document.getElementById('finalSection').classList.add('hidden');
-      
-      // Cancella lo stato salvato
-      cancellaStatoSalvato();
-      
       document.getElementById('finalSection').innerHTML = '';
     }
   </script>
