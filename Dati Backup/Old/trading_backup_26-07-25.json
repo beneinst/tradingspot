@@ -1,0 +1,29 @@
+{
+  "currentMonthEntries": [],
+  "historicalEntries": [
+    {
+      "periodo": "dal 26.01.25 al 26.02.25",
+      "importo": 43.77
+    },
+    {
+      "periodo": "dal 27.02.25 al 26.03.25",
+      "importo": 39.36
+    },
+    {
+      "periodo": "dal 27.03.25 al 26.04.25",
+      "importo": 12.3
+    },
+    {
+      "periodo": "dal 27.04.25 al 26.05.25",
+      "importo": 50.25
+    },
+    {
+      "periodo": "dal 27.04.25 al 26.06.25",
+      "importo": 28.700000000000003
+    },
+    {
+      "periodo": "dal 27.06.25 al 24.07.25",
+      "importo": 25.67
+    }
+  ]
+}

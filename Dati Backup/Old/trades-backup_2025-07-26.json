@@ -1,0 +1,48 @@
+[
+  {
+    "id": 1753328351549,
+    "symbol": "ATOM",
+    "entries": [
+      {
+        "quantity": 12.62504679,
+        "investedAmount": 60,
+        "priceAtPurchase": 4.752457634258003,
+        "timestamp": "2025-07-24T03:39:11.549Z"
+      },
+      {
+        "quantity": 13.2906387,
+        "investedAmount": 60,
+        "priceAtPurchase": 4.5144557273985635,
+        "timestamp": "2025-07-24T06:45:10.695Z"
+      },
+      {
+        "quantity": 4.23468156,
+        "investedAmount": 20,
+        "priceAtPurchase": 4.722905303887832,
+        "timestamp": "2025-07-24T19:59:39.321Z"
+      }
+    ],
+    "createdAt": "2025-07-24T03:39:11.549Z",
+    "updatedAt": "2025-07-24T19:59:39.322Z"
+  },
+  {
+    "id": 1752954825350,
+    "symbol": "BTC",
+    "entries": [
+      {
+        "quantity": 0.00033664,
+        "investedAmount": 40,
+        "priceAtPurchase": 118821.29277566541,
+        "timestamp": "2025-07-19T19:53:45.350Z"
+      },
+      {
+        "quantity": 0.00016932,
+        "investedAmount": 20,
+        "priceAtPurchase": 118119.53697141506,
+        "timestamp": "2025-07-22T03:49:52.531Z"
+      }
+    ],
+    "createdAt": "2025-07-19T19:53:45.350Z",
+    "updatedAt": "2025-07-22T03:49:52.531Z"
+  }
+]

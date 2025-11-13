@@ -1,0 +1,440 @@
+{
+  "totaleIn": 11,
+  "capitale": 19,
+  "totaleTrade": 30,
+  "quotaPerTrade": 200,
+  "storicoCapitale": [
+    {
+      "data": "2024-12-10T00:00:00Z",
+      "coingecko": 0,
+      "binance": 0,
+      "totaleIn": 0,
+      "capitale": 0
+    },
+    {
+      "data": "2024-12-20T00:00:00Z",
+      "coingecko": 2,
+      "binance": 0,
+      "totaleIn": 2,
+      "capitale": 3
+    },
+    {
+      "data": "2024-12-30T00:00:00Z",
+      "coingecko": 3,
+      "binance": 0,
+      "totaleIn": 3,
+      "capitale": 5
+    },
+    {
+      "data": "2025-01-10T00:00:00Z",
+      "coingecko": 4,
+      "binance": 1,
+      "totaleIn": 5,
+      "capitale": 7
+    },
+    {
+      "data": "2025-01-20T00:00:00Z",
+      "coingecko": 6,
+      "binance": 1,
+      "totaleIn": 7,
+      "capitale": 9
+    },
+    {
+      "data": "2025-01-30T00:00:00Z",
+      "coingecko": 7,
+      "binance": 1,
+      "totaleIn": 8,
+      "capitale": 10
+    },
+    {
+      "data": "2025-02-05T00:00:00Z",
+      "coingecko": 7,
+      "binance": 2,
+      "totaleIn": 9,
+      "capitale": 11
+    },
+    {
+      "data": "2025-02-10T00:00:00Z",
+      "coingecko": 8,
+      "binance": 3,
+      "totaleIn": 11,
+      "capitale": 13
+    },
+    {
+      "data": "2025-02-15T00:00:00Z",
+      "coingecko": 9,
+      "binance": 2,
+      "totaleIn": 11,
+      "capitale": 14
+    },
+    {
+      "data": "2025-02-20T00:00:00Z",
+      "coingecko": 8,
+      "binance": 3,
+      "totaleIn": 11,
+      "capitale": 15
+    },
+    {
+      "data": "2025-02-28T00:00:00Z",
+      "coingecko": 10,
+      "binance": 3,
+      "totaleIn": 13,
+      "capitale": 16
+    },
+    {
+      "data": "2025-03-05T00:00:00Z",
+      "coingecko": 11,
+      "binance": 2,
+      "totaleIn": 13,
+      "capitale": 18
+    },
+    {
+      "data": "2025-03-10T00:00:00Z",
+      "coingecko": 13,
+      "binance": 3,
+      "totaleIn": 16,
+      "capitale": 19
+    },
+    {
+      "data": "2025-03-15T00:00:00Z",
+      "coingecko": 12,
+      "binance": 4,
+      "totaleIn": 16,
+      "capitale": 18
+    },
+    {
+      "data": "2025-03-20T00:00:00Z",
+      "coingecko": 14,
+      "binance": 3,
+      "totaleIn": 17,
+      "capitale": 20
+    },
+    {
+      "data": "2025-03-25T00:00:00Z",
+      "coingecko": 15,
+      "binance": 2,
+      "totaleIn": 17,
+      "capitale": 22
+    },
+    {
+      "data": "2025-03-30T00:00:00Z",
+      "coingecko": 16,
+      "binance": 3,
+      "totaleIn": 19,
+      "capitale": 23
+    },
+    {
+      "data": "2025-04-05T00:00:00Z",
+      "coingecko": 18,
+      "binance": 2,
+      "totaleIn": 20,
+      "capitale": 24
+    },
+    {
+      "data": "2025-04-10T00:00:00Z",
+      "coingecko": 19,
+      "binance": 4,
+      "totaleIn": 23,
+      "capitale": 25
+    },
+    {
+      "data": "2025-04-15T00:00:00Z",
+      "coingecko": 18,
+      "binance": 5,
+      "totaleIn": 23,
+      "capitale": 26
+    },
+    {
+      "data": "2025-04-20T00:00:00Z",
+      "coingecko": 20,
+      "binance": 4,
+      "totaleIn": 24,
+      "capitale": 27
+    },
+    {
+      "data": "2025-04-25T00:00:00Z",
+      "coingecko": 21,
+      "binance": 3,
+      "totaleIn": 24,
+      "capitale": 28
+    },
+    {
+      "data": "2025-04-30T00:00:00Z",
+      "coingecko": 23,
+      "binance": 5,
+      "totaleIn": 28,
+      "capitale": 29
+    },
+    {
+      "data": "2025-05-02T00:00:00Z",
+      "coingecko": 24,
+      "binance": 6,
+      "totaleIn": 30,
+      "capitale": 31
+    },
+    {
+      "data": "2025-05-05T00:00:00Z",
+      "coingecko": 22,
+      "binance": 5,
+      "totaleIn": 27,
+      "capitale": 32
+    },
+    {
+      "data": "2025-05-07T00:00:00Z",
+      "coingecko": 23,
+      "binance": 4,
+      "totaleIn": 27,
+      "capitale": 31
+    },
+    {
+      "data": "2025-05-09T18:48:29.911Z",
+      "coingecko": 22,
+      "binance": 4,
+      "totaleIn": 26,
+      "capitale": 30
+    },
+    {
+      "data": "2025-05-09T18:59:49.246Z",
+      "coingecko": 21,
+      "binance": 2,
+      "totaleIn": 23,
+      "capitale": 33
+    },
+    {
+      "data": "2025-05-12T10:53:43.968Z",
+      "coingecko": 20,
+      "binance": 2,
+      "totaleIn": 22,
+      "capitale": 34
+    },
+    {
+      "data": "2025-05-22T10:48:09.770Z",
+      "coingecko": 20,
+      "binance": 12,
+      "totaleIn": 32,
+      "capitale": 24
+    },
+    {
+      "data": "2025-05-23T03:18:06.287Z",
+      "coingecko": 20,
+      "binance": 7,
+      "totaleIn": 27,
+      "capitale": 29
+    },
+    {
+      "data": "2025-05-26T10:59:42.490Z",
+      "coingecko": 20,
+      "binance": 6,
+      "totaleIn": 26,
+      "capitale": 30
+    },
+    {
+      "data": "2025-05-31T03:26:31.169Z",
+      "coingecko": 20,
+      "binance": 11,
+      "totaleIn": 31,
+      "capitale": 25
+    },
+    {
+      "data": "2025-06-03T03:28:34.820Z",
+      "coingecko": 20,
+      "binance": 9,
+      "totaleIn": 29,
+      "capitale": 27
+    },
+    {
+      "data": "2025-06-05T03:28:12.361Z",
+      "coingecko": 20,
+      "binance": 12,
+      "totaleIn": 32,
+      "capitale": 24
+    },
+    {
+      "data": "2025-06-06T05:01:48.268Z",
+      "coingecko": 20,
+      "binance": 13,
+      "totaleIn": 33,
+      "capitale": 23
+    },
+    {
+      "data": "2025-06-07T10:49:46.591Z",
+      "coingecko": 20,
+      "binance": 12,
+      "totaleIn": 32,
+      "capitale": 24
+    },
+    {
+      "data": "2025-06-08T13:59:44.432Z",
+      "coingecko": 20,
+      "binance": 15,
+      "totaleIn": 35,
+      "capitale": 21
+    },
+    {
+      "data": "2025-06-09T11:09:58.711Z",
+      "coingecko": 20,
+      "binance": 9,
+      "totaleIn": 29,
+      "capitale": 27
+    },
+    {
+      "data": "2025-06-10T03:42:57.003Z",
+      "coingecko": 20,
+      "binance": 7,
+      "totaleIn": 27,
+      "capitale": 29
+    },
+    {
+      "data": "2025-06-12T05:26:55.914Z",
+      "coingecko": 20,
+      "binance": 10,
+      "totaleIn": 30,
+      "capitale": 26
+    },
+    {
+      "data": "2025-06-13T06:14:13.480Z",
+      "coingecko": 21,
+      "binance": 9,
+      "totaleIn": 30,
+      "capitale": 26
+    },
+    {
+      "data": "2025-06-16T10:38:09.863Z",
+      "coingecko": 21,
+      "binance": 8,
+      "totaleIn": 29,
+      "capitale": 27
+    },
+    {
+      "data": "2025-06-18T03:35:27.051Z",
+      "coingecko": 21,
+      "binance": 12,
+      "totaleIn": 33,
+      "capitale": 23
+    },
+    {
+      "data": "2025-06-19T10:41:41.695Z",
+      "coingecko": 21,
+      "binance": 11,
+      "totaleIn": 32,
+      "capitale": 24
+    },
+    {
+      "data": "2025-06-20T20:06:15.518Z",
+      "coingecko": 21,
+      "binance": 13,
+      "totaleIn": 34,
+      "capitale": 22
+    },
+    {
+      "data": "2025-06-21T21:34:26.828Z",
+      "coingecko": 21,
+      "binance": 15,
+      "totaleIn": 36,
+      "capitale": 20
+    },
+    {
+      "data": "2025-06-23T03:10:07.707Z",
+      "coingecko": 21,
+      "binance": 11,
+      "totaleIn": 32,
+      "capitale": 24
+    },
+    {
+      "data": "2025-06-28T14:00:25.372Z",
+      "coingecko": 21,
+      "binance": 10,
+      "totaleIn": 31,
+      "capitale": 25
+    },
+    {
+      "data": "2025-06-29T04:01:45.884Z",
+      "coingecko": 21,
+      "binance": 9,
+      "totaleIn": 30,
+      "capitale": 26
+    },
+    {
+      "data": "2025-07-02T05:05:11.892Z",
+      "coingecko": 21,
+      "binance": 9,
+      "totaleIn": 30,
+      "capitale": 26
+    },
+    {
+      "data": "2025-07-03T07:55:57.918Z",
+      "coingecko": 21,
+      "binance": 8,
+      "totaleIn": 29,
+      "capitale": 27
+    },
+    {
+      "data": "2025-07-04T05:36:03.547Z",
+      "coingecko": 21,
+      "binance": 8,
+      "totaleIn": 29,
+      "capitale": 27
+    },
+    {
+      "data": "2025-07-05T18:25:56.381Z",
+      "coingecko": 10,
+      "binance": 4,
+      "totaleIn": 14,
+      "capitale": 16
+    },
+    {
+      "data": "2025-07-06T10:50:46.539Z",
+      "coingecko": 10,
+      "binance": 5,
+      "totaleIn": 15,
+      "capitale": 15
+    },
+    {
+      "data": "2025-07-09T20:22:29.181Z",
+      "coingecko": 10,
+      "binance": 4,
+      "totaleIn": 14,
+      "capitale": 16
+    },
+    {
+      "data": "2025-07-10T14:22:04.728Z",
+      "coingecko": 10,
+      "binance": 3,
+      "totaleIn": 13,
+      "capitale": 17
+    },
+    {
+      "data": "2025-07-15T10:40:35.747Z",
+      "totaleIn": 14,
+      "capitale": 16
+    },
+    {
+      "data": "2025-07-16T18:12:14.437Z",
+      "totaleIn": 12,
+      "capitale": 18
+    },
+    {
+      "data": "2025-07-18T03:57:30.143Z",
+      "totaleIn": 11,
+      "capitale": 19
+    },
+    {
+      "data": "2025-07-20T07:29:43.637Z",
+      "totaleIn": 12,
+      "capitale": 18
+    },
+    {
+      "data": "2025-07-21T07:33:45.394Z",
+      "totaleIn": 11,
+      "capitale": 19
+    },
+    {
+      "data": "2025-07-24T05:13:44.863Z",
+      "totaleIn": 11,
+      "capitale": 19
+    }
+  ],
+  "ultimoAggiornamento": "2025-07-24T14:41:34.139Z",
+  "coingecko": 10,
+  "binance": 3
+}
