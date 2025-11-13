@@ -225,11 +225,15 @@
           <label for="quotaMedia">📈 Quota Media</label>
           <input type="number" id="quotaMedia" placeholder="Es: 1.80" step="0.01" min="1.01">
         </div>
-        <div class="input-group">
-          <label for="obiettivoCassa">🎯 Obiettivo Cassa Finale (€)</label>
-          <input type="number" id="obiettivoCassa" placeholder="Es: 150" step="0.01" min="1">
-          <small style="color:#666;display:block;margin-top:5px;">La cassa che vuoi raggiungere alla fine del piano</small>
+        
+        <div id="anteprima" class="hidden" style="background:#f0f8ff;padding:15px;border-radius:8px;margin-top:15px;border-left:4px solid #007bff;">
+          <strong>🎯 Obiettivo Calcolato:</strong>
+          <p style="margin:10px 0;font-size:1.1em;color:#007bff;">
+            Cassa Finale: <strong id="obiettivoCassaCalcolato">€ 0.00</strong>
+          </p>
+          <small style="color:#666;">Profitto previsto: <span id="profittoPrevisto">€ 0.00</span> (<span id="roiPrevisto">0%</span>)</small>
         </div>
+        
         <button class="btn" onclick="avviaMasaniello()">🚀 Avvia Masaniello</button>
       </div>
     </div>
@@ -281,12 +285,6 @@
      <button class="btn" onclick="resetMasaniello()" style="background:#6c757d;margin-top:20px;">🔄 Ricomincia da Capo</button>
     </div>
 
- 
-
-    <div style="text-align:center;margin-top:40px;">
-      
-    
-
     <div style="text-align:center;margin-top:30px;padding-top:30px;border-top:2px solid #e0e0e0;color:#999;">
       <p>📚 di Gerardo D | <a href="https://beneinst.github.io/tradingspot/masaniello/guida.html" class="btn-green" target="_blank">Apri la Guida</a></p>
       
@@ -297,7 +295,7 @@
   </div>
 
   <script>
-    let config = {};
+  let config = {};
 let stato = {
   budgetCorrente: 0,
   eventiGiocati: 0,
@@ -310,6 +308,7 @@ let stato = {
 window.addEventListener('DOMContentLoaded', function() {
   verificaSessioneSalvata();
   
+  // Listener per ricalcolo dinamico quando cambia la quota nel gioco
   const inputQuota = document.getElementById('quotaEvento');
   if (inputQuota) {
     inputQuota.addEventListener('input', function() {
@@ -318,6 +317,15 @@ window.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+  
+  // Listener per calcolare anteprima obiettivo nella configurazione
+  const campiConfig = ['bankroll', 'totEventi', 'eventiVincenti', 'quotaMedia'];
+  campiConfig.forEach(campo => {
+    const input = document.getElementById(campo);
+    if (input) {
+      input.addEventListener('input', calcolaAnteprimaObiettivo);
+    }
+  });
 });
 
 function verificaSessioneSalvata() {
@@ -384,7 +392,54 @@ function comb(n, k) {
   return res;
 }
 
-// FORMULA MASANIELLO CLASSICA - VERSIONE CORRETTA CON PUNTATE REALI
+// CALCOLO REALISTICO DELL'OBIETTIVO CASSA - FORMULA CORRETTA
+function calcolaObiettivoCassa(budgetIniziale, totEventi, eventiVincenti, quotaMedia) {
+  // Formula realistica basata sul profitto atteso con distribuzione Masaniello
+  // V = B × (1 + ((Q-1) × E) / N)
+  // Dove:
+  // B = Budget iniziale
+  // Q = Quota media
+  // E = Eventi vincenti previsti
+  // N = Totale eventi
+  
+  const guadagnoPerEvento = (quotaMedia - 1) / totEventi;
+  const fattoreMoltiplicativo = 1 + (guadagnoPerEvento * eventiVincenti);
+  const cassaFinale = budgetIniziale * fattoreMoltiplicativo;
+  
+  return Math.round(cassaFinale * 100) / 100;
+}
+
+// ANTEPRIMA OBIETTIVO IN TEMPO REALE
+function calcolaAnteprimaObiettivo() {
+  const bankroll = parseFloat(document.getElementById('bankroll').value);
+  const totEventi = parseInt(document.getElementById('totEventi').value);
+  const eventiVincenti = parseInt(document.getElementById('eventiVincenti').value);
+  const quotaMedia = parseFloat(document.getElementById('quotaMedia').value);
+  
+  const anteprima = document.getElementById('anteprima');
+  
+  if ([bankroll, totEventi, eventiVincenti, quotaMedia].some(v => isNaN(v))) {
+    anteprima.classList.add('hidden');
+    return;
+  }
+  
+  if (eventiVincenti > totEventi || eventiVincenti < 1) {
+    anteprima.classList.add('hidden');
+    return;
+  }
+  
+  const obiettivo = calcolaObiettivoCassa(bankroll, totEventi, eventiVincenti, quotaMedia);
+  const profitto = obiettivo - bankroll;
+  const roi = ((profitto / bankroll) * 100).toFixed(2);
+  
+  document.getElementById('obiettivoCassaCalcolato').textContent = '€ ' + obiettivo.toFixed(2);
+  document.getElementById('profittoPrevisto').textContent = '€ ' + profitto.toFixed(2);
+  document.getElementById('roiPrevisto').textContent = (roi > 0 ? '+' : '') + roi + '%';
+  
+  anteprima.classList.remove('hidden');
+}
+
+// FORMULA MASANIELLO CLASSICA CON TRIANGOLO DI TARTAGLIA
 function calcolaPuntata(quotaReale) {
   const eventiRimasti = config.totEventi - stato.eventiGiocati;
   const vittorieRimaste = config.eventiVincenti - stato.vittorie;
@@ -401,55 +456,37 @@ function calcolaPuntata(quotaReale) {
   const N = eventiRimasti;
   const E = vittorieRimaste;
 
-  // Calcolo sommatoria con tutti gli scenari possibili
+  // Calcolo sommatoria con Triangolo di Tartaglia (coefficienti binomiali)
   let sommatoria = 0;
   
   for (let j = 0; j <= sconfitteRimaste; j++) {
-    const C = comb(N - 1, j);
+    const C = comb(N - 1, j); // ← Triangolo di Tartaglia
     const termine = C * Math.pow(Qm - 1, j);
     sommatoria += termine;
   }
 
-  console.log('Debug Masaniello:', {
-    budgetCorrente: B,
-    obiettivo: V,
-    eventiRimasti: N,
-    vittorieRimaste: E,
-    quotaMedia: Qm,
-    quotaReale: Q,
-    sommatoria: sommatoria
-  });
-
   if (sommatoria === 0 || sommatoria < 0.0001) {
-    // Fallback: distribuzione proporzionale
     const puntataBase = B / eventiRimasti;
     console.warn('Sommatoria troppo piccola, uso distribuzione uniforme:', puntataBase);
     return Math.round(puntataBase * 100) / 100;
   }
 
-  // Formula Masaniello corretta: P = (V - B) / (Q × Qm^(E-1) × Sommatoria)
+  // Formula Masaniello: P = (V - B) / (Q × Qm^(E-1) × Sommatoria)
   const numeratore = V - B;
   const denominatore = Q * Math.pow(Qm, E - 1) * sommatoria;
   
   let puntata = numeratore / denominatore;
 
-  console.log('Calcolo puntata:', {
-    numeratore: numeratore,
-    denominatore: denominatore,
-    puntataGrezzo: puntata
-  });
-
-  // Se la puntata è ancora troppo bassa, forza una distribuzione minima
-  const puntataMinima = (B / eventiRimasti) * 0.8; // Almeno l'80% della distribuzione uniforme
+  // Se la puntata è troppo bassa, applica minimo
+  const puntataMinima = (B / eventiRimasti) * 0.8;
   
   if (puntata < puntataMinima) {
-    console.warn('Puntata troppo bassa, applico minimo:', puntataMinima);
     puntata = puntataMinima;
   }
 
   // Limiti di sicurezza
-  const minPuntata = 0.50; // Minimo assoluto 50 cent
-  const maxPuntata = B * 0.99; // Non oltre il 99% del budget
+  const minPuntata = 0.50;
+  const maxPuntata = B * 0.99;
   
   puntata = Math.max(minPuntata, Math.min(puntata, maxPuntata));
   
@@ -473,9 +510,8 @@ function avviaMasaniello() {
   const totEventi = parseInt(document.getElementById('totEventi').value);
   const eventiVincenti = parseInt(document.getElementById('eventiVincenti').value);
   const quotaMedia = parseFloat(document.getElementById('quotaMedia').value);
-  const obiettivoCassa = parseFloat(document.getElementById('obiettivoCassa').value);
 
-  if ([bankroll, totEventi, eventiVincenti, quotaMedia, obiettivoCassa].some(v => isNaN(v))) {
+  if ([bankroll, totEventi, eventiVincenti, quotaMedia].some(v => isNaN(v))) {
     return alert('⚠️ Compila tutti i campi!');
   }
 
@@ -487,27 +523,15 @@ function avviaMasaniello() {
     return alert('⚠️ Devi prevedere almeno 1 evento vincente!');
   }
 
-  if (obiettivoCassa <= bankroll) {
-    return alert('⚠️ L\'obiettivo di cassa deve essere maggiore del budget iniziale!');
-  }
-
-  // Validazione matematica: verifica se l'obiettivo è raggiungibile
-  const sconfitteMax = totEventi - eventiVincenti;
-  const profittoAtteso = eventiVincenti * (quotaMedia - 1) * (bankroll / totEventi);
-  const obiettivoProbabile = bankroll + (profittoAtteso * 0.7); // Stima conservativa
-  
-  if (obiettivoCassa > bankroll * 3) {
-    if (!confirm(`⚠️ Attenzione: l'obiettivo di €${obiettivoCassa} sembra molto ambizioso con un budget di €${bankroll}.\n\nCon ${eventiVincenti} vittorie su ${totEventi} eventi a quota ${quotaMedia}, un obiettivo più realistico sarebbe circa €${obiettivoProbabile.toFixed(2)}.\n\nVuoi continuare comunque?`)) {
-      return;
-    }
-  }
+  // CALCOLO AUTOMATICO DELL'OBIETTIVO CON FORMULA CORRETTA
+  const obiettivoCassa = calcolaObiettivoCassa(bankroll, totEventi, eventiVincenti, quotaMedia);
 
   config = {
     budgetIniziale: bankroll,
     totEventi: totEventi,
     eventiVincenti: eventiVincenti,
     quotaMedia: quotaMedia,
-    obiettivoCassa: obiettivoCassa
+    obiettivoCassa: obiettivoCassa // ← Calcolato automaticamente in modo realistico
   };
 
   stato = {
