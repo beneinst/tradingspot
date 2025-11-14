@@ -495,12 +495,15 @@ function calcolaPuntata(quotaReale) {
 
 function ricalcolaPuntata() {
   const inputQuota = document.getElementById('quotaEvento');
-  const quotaValue = inputQuota.value;
+  const quotaValue = parseFloat(inputQuota.value);
   
-  const quotaReale = (quotaValue && !isNaN(parseFloat(quotaValue))) ? parseFloat(quotaValue) : config.quotaMedia;
+  // Se la quota non è valida, usa la quota media
+  const quotaReale = (quotaValue && !isNaN(quotaValue) && quotaValue >= 1.01) ? quotaValue : config.quotaMedia;
   
+  // Ricalcola la puntata in base alla quota reale inserita
   const puntata = calcolaPuntata(quotaReale);
   const vincita = puntata * quotaReale;
+  
   document.getElementById('puntataCorrente').textContent = puntata.toFixed(2);
   document.getElementById('vincitaPotenziale').textContent = vincita.toFixed(2);
 }
