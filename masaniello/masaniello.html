@@ -471,7 +471,7 @@ function calcolaPuntata(quotaReale) {
     return Math.round(puntataBase * 100) / 100;
   }
 
-  // Formula Masaniello: P = (V - B) / (Q × Qm^(E-1) × Sommatoria)
+  // Formula Masaniello: P = (V - B) / (Q × Qm^(E-1) × Sommatoria)ger
   const numeratore = V - B;
   const denominatore = Q * Math.pow(Qm, E - 1) * sommatoria;
   
