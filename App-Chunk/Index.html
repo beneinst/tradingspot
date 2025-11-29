@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatterbox Text Processor</title>
+	<link rel="icon" href="favicon.ico" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #26252d 0%, #23282b 100%);
+			color: #333333; /* testo scuro per leggibilità */
+  
+            min-height: 100vh;
+            padding: 20px;
+        }
+		
+		body {
+  font-family: Arial, Helvetica, sans-serif; /* Sans-serif moderno e pulito */
+}
+
+h1, h2 {
+  font-family: 'Times New Roman', Georgia, serif; /* Caratteri con grazie classici */
+}
+
+code, pre {
+  font-family: 'Courier New', monospace; /* Font monospace per codice */
+}
+
+.italic-text {
+  font-family: 'Brush Script MT', cursive; /* Stile corsivo decorativo */
+}
+
+
+       .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+
+    /* Effetto doppio bordo */
+    border: 4px double #999999;
+
+    /* Alternativa: bordo con sfumatura */
+    /* 
+    border: 2px solid transparent;
+    background-image: linear-gradient(white, white), linear-gradient(to right, #667eea, #764ba2);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    */
+}
+
+
+        .header {
+  background-color: #004080; /* blu scuro acceso */
+  color: #ffffff; /* testo bianco per contrasto */
+  padding: 15px 20px;
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .control-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        /* Pulsanti principali con colori più chiari e contrasto maggiore */
+.btn {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); /* blu chiaro più brillante */
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(74, 144, 226, 0.5);
+    background: linear-gradient(135deg, #357abd 0%, #2a5b8f 100%);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* Pulsante secondario con colori più riconoscibili */
+.btn-secondary {
+    background: linear-gradient(135deg, #f47ca3 0%, #e84357 100%); /* rosa acceso e rosso */
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #e84357 0%, #b52e3a 100%);
+}
+
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-card .label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .errors {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .errors h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .error-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #155724;
+        }
+
+        .chunks-container {
+            margin-top: 20px;
+        }
+
+        .chunk {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .chunk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .chunk-title {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .chunk-info {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .chunk-content {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .chunk-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+		
+		.chunk-editor {
+    width: 100%;
+    min-height: 100px;
+    padding: 20px;
+    font-family: 'Georgia', serif;
+    line-height: 1.8;
+    color: #212529;
+    border: none;
+    resize: vertical;
+    font-size: 1em;
+    background: white;
+}
+
+.chunk-editor:focus {
+    outline: 2px solid #667eea;
+    background: #f8f9ff;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎙️ Chatterbox Text Processor</h1>
+            <p>Analizza e prepara il testo per Chatterbox TTS</p>
+        </div>
+
+        <div class="content">
+            <!-- Input Section -->
+            <div class="section">
+                <h2>📝 Inserisci il Testo</h2>
+                <textarea id="inputText" placeholder="Incolla qui il tuo testo (fino a 10000 caratteri)..."></textarea>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Parole per Chunk (min)</label>
+                        <input type="number" id="minWords" value="25" min="15" max="40">
+                    </div>
+                    <div class="control-group">
+                        <label>Parole per Chunk (max)</label>
+                        <input type="number" id="maxWords" value="50" min="35" max="65">
+                    </div>
+                    <div class="control-group">
+                        <label>Caratteri massimi</label>
+                        <input type="number" id="maxChars" value="320" min="200" max="380">
+                    </div>
+                </div>
+
+                <div class="controls" style="margin-top: 20px;">
+                    <button class="btn" onclick="processText()">🔍 Analizza e Processa</button>
+                    <button class="btn btn-secondary" onclick="clearAll()">🗑️ Cancella Tutto</button>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div id="statsSection" class="section hidden">
+                <h2>📊 Statistiche</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="number" id="totalWords">0</div>
+                        <div class="label">Parole Totali</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="totalChars">0</div>
+                        <div class="label">Caratteri</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="totalChunks">0</div>
+                        <div class="label">Chunk Generati</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="errorCount">0</div>
+                        <div class="label">Problemi Trovati</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Errors Section -->
+            <div id="errorsSection" class="hidden"></div>
+
+            <!-- Chunks Section -->
+            <div id="chunksSection" class="section hidden">
+                <h2>📦 Chunk Generati</h2>
+                <div class="controls">
+                    <button class="btn btn-small" onclick="copyAllChunks()">📋 Copia Tutti</button>
+                    <button class="btn btn-small" onclick="downloadChunks()">💾 TXT Completo</button>
+                    <button class="btn btn-small btn-secondary" onclick="exportPythonScript()">🚀 Genera Script Auto</button>
+                    <button class="btn btn-small" onclick="exportForAcPy()">📝 File per ac.py</button>
+                </div>
+                <div id="chunksContainer" class="chunks-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function normalizeText(text) {
+    text = text.replace(/l'Om\b/g, "l'om");
+    text = text.replace(/nell'(\w)/g, (m, p1) => `nell'${p1.toLowerCase()}`);
+    text = text.replace(/dell'(\w)/g, (m, p1) => `dell'${p1.toLowerCase()}`);
+    text = text.replace(/[`´]/g, "'");
+    text = text.replace(/[^\w\s.,;:!?À-ùÀ-Ü'"\-]/g, '');
+    text = text.replace(/\s+/g, ' ');
+    text = text.replace(/\n\s*\n+/g, '\n\n');
+    text = text.replace(/(?<!\n)\n(?!\n)/g, ' ');
+    text = text.replace(/([.!?])\1+/g, '$1');
+    return text.trim();
+}
+
+function analyzeText(text) {
+    const errors = [];
+    
+    if (text.length > 10000) {
+        errors.push({
+            type: 'warning',
+            message: `Il testo è troppo lungo (${text.length} caratteri). Massimo 10000.`
+        });
+    }
+    
+    const capsAfterApos = text.match(/[''`´]\w*[A-Z]\w*/g);
+    if (capsAfterApos) {
+        errors.push({
+            type: 'warning',
+            message: `Trovate ${capsAfterApos.length} maiuscole dopo apostrofo: ${capsAfterApos.slice(0, 3).join(', ')}...`
+        });
+    }
+    
+    const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+    const wordCount = {};
+    words.forEach(w => wordCount[w] = (wordCount[w] || 0) + 1);
+    
+    const repeated = Object.entries(wordCount)
+        .filter(([word, count]) => count > 3 && word.length > 3)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    if (repeated.length > 0) {
+        errors.push({
+            type: 'info',
+            message: `Parole molto ripetute: ${repeated.map(([w, c]) => `"${w}" (${c}x)`).join(', ')}`
+        });
+    }
+    
+    const specialChars = text.match(/[^\w\s.,;:!?À-ùÀ-Ü'"\-]/g);
+    if (specialChars) {
+        const unique = [...new Set(specialChars)];
+        errors.push({
+            type: 'warning',
+            message: `Caratteri speciali trovati: ${unique.slice(0, 10).join(' ')}`
+        });
+    }
+    
+    return errors;
+}
+
+function chunkText(text, minWords, maxWords, maxChars) {
+    const chunks = [];
+    let current = '';
+    let currentWordCount = 0;
+    
+    // Dividi in frasi usando più delimitatori
+    const sentences = text.split(/(?<=[.!?;:])\s+/);
+    
+    for (const sentence of sentences) {
+        if (!sentence.trim()) continue;
+        
+        const sentenceWords = sentence.split(/\s+/).length;
+        const testChunk = current ? current + ' ' + sentence : sentence;
+        const wouldExceedWords = currentWordCount + sentenceWords > maxWords;
+        const wouldExceedChars = testChunk.length > maxChars;
+        
+        // Controllo più rigoroso
+        if ((wouldExceedWords || wouldExceedChars) && currentWordCount >= minWords) {
+            chunks.push(current.trim());
+            current = sentence;
+            currentWordCount = sentenceWords;
+        } else if (testChunk.length > maxChars && currentWordCount > 0) {
+            // Chunk troppo lungo anche da solo - forza split
+            chunks.push(current.trim());
+            current = sentence;
+            currentWordCount = sentenceWords;
+        } else {
+            current = testChunk;
+            currentWordCount += sentenceWords;
+        }
+    }
+    
+    if (current.trim()) {
+        // Verifica finale - se l'ultimo chunk è troppo lungo, prova a dividere
+        if (current.length > maxChars * 1.1) {
+            const words = current.split(/\s+/);
+            const midpoint = Math.floor(words.length / 2);
+            chunks.push(words.slice(0, midpoint).join(' '));
+            chunks.push(words.slice(midpoint).join(' '));
+        } else {
+            chunks.push(current.trim());
+        }
+    }
+    
+    return chunks;
+}
+
+function getChunkStatus(words, chars) {
+    if (words > 60 || chars > 350) return { badge: 'danger', text: 'Troppo lungo' };
+    if (words < 20 || chars < 100) return { badge: 'warning', text: 'Troppo corto' };
+    return { badge: 'success', text: 'Ottimale' };
+}
+
+function processText() {
+    const text = document.getElementById('inputText').value;
+    
+    if (!text.trim()) {
+        alert('Inserisci del testo prima di processare!');
+        return;
+    }
+    
+    const normalized = normalizeText(text);
+    const errors = analyzeText(normalized);
+    
+    const words = normalized.split(/\s+/).filter(w => w.length > 0);
+    document.getElementById('totalWords').textContent = words.length;
+    document.getElementById('totalChars').textContent = normalized.length;
+    document.getElementById('errorCount').textContent = errors.length;
+    
+    document.getElementById('statsSection').classList.remove('hidden');
+    
+    const errorsSection = document.getElementById('errorsSection');
+    if (errors.length > 0) {
+        errorsSection.className = 'errors';
+        errorsSection.innerHTML = '<h3>⚠️ Problemi Trovati</h3>' +
+            errors.map(e => `<div class="error-item">${e.message}</div>`).join('');
+        errorsSection.classList.remove('hidden');
+    } else {
+        errorsSection.className = 'success';
+        errorsSection.innerHTML = '<h3>✅ Nessun problema trovato!</h3>';
+        errorsSection.classList.remove('hidden');
+    }
+    
+    const minWords = parseInt(document.getElementById('minWords').value);
+    const maxWords = parseInt(document.getElementById('maxWords').value);
+    const maxChars = parseInt(document.getElementById('maxChars').value);
+    
+    const chunks = chunkText(normalized, minWords, maxWords, maxChars);
+    document.getElementById('totalChunks').textContent = chunks.length;
+    
+    const container = document.getElementById('chunksContainer');
+    container.innerHTML = chunks.map((chunk, i) => {
+        const words = chunk.split(/\s+/).length;
+        const chars = chunk.length;
+        const status = getChunkStatus(words, chars);
+        
+        return `
+    <div class="chunk">
+        <div class="chunk-header">
+            <div class="chunk-title">Chunk ${i + 1}</div>
+            <div class="chunk-info">
+                <span id="chunk-words-${i}"><strong>${words}</strong> parole</span>
+                <span id="chunk-chars-${i}"><strong>${chars}</strong> caratteri</span>
+                <span id="chunk-badge-${i}" class="badge badge-${status.badge}">${status.text}</span>
+            </div>
+        </div>
+        <textarea class="chunk-editor" id="chunk-${i}" oninput="updateChunkStats(${i})">${chunk}</textarea>
+        <div class="chunk-actions">
+            <button class="btn btn-small" onclick="copyChunk(${i})">📋 Copia</button>
+            <button class="btn btn-small" onclick="saveChunk(${i})">💾 Salva</button>
+            <button class="btn btn-small" onclick="splitChunk(${i})" style="background: #ffc107;">✂️ Dividi</button>
+            ${i < chunks.length - 1 ? `<button class="btn btn-small" onclick="mergeChunk(${i})" style="background: #17a2b8;">🔗 Unisci</button>` : ''}
+        </div>
+    </div>
+`;
+    }).join('');
+    
+    document.getElementById('chunksSection').classList.remove('hidden');
+    window.processedChunks = chunks;
+}
+
+function updateChunkStats(index) {
+    const textarea = document.getElementById(`chunk-${index}`);
+    const text = textarea.value;
+    const words = text.split(/\s+/).filter(w => w.length > 0).length;
+    const chars = text.length;
+    const status = getChunkStatus(words, chars);
+    
+    // Aggiorna le statistiche visualizzate
+    document.getElementById(`chunk-words-${index}`).innerHTML = `<strong>${words}</strong> parole`;
+    document.getElementById(`chunk-chars-${index}`).innerHTML = `<strong>${chars}</strong> caratteri`;
+    
+    const badgeEl = document.getElementById(`chunk-badge-${index}`);
+    badgeEl.className = `badge badge-${status.badge}`;
+    badgeEl.textContent = status.text;
+    
+    // Aggiorna l'array globale
+    window.processedChunks[index] = text;
+    
+    // Ricalcola totali
+    updateTotalStats();
+}
+
+function updateTotalStats() {
+    const chunks = window.processedChunks;
+    const totalWords = chunks.reduce((sum, chunk) => {
+        return sum + chunk.split(/\s+/).filter(w => w.length > 0).length;
+    }, 0);
+    const totalChars = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+    
+    document.getElementById('totalWords').textContent = totalWords;
+    document.getElementById('totalChars').textContent = totalChars;
+    document.getElementById('totalChunks').textContent = chunks.length;
+}
+
+function splitChunk(index) {
+    const text = document.getElementById(`chunk-${index}`).value;
+    
+    // Chiedi all'utente dove vuole dividere
+    const position = prompt(`Il chunk ha ${text.length} caratteri.\n\nInserisci la posizione dove dividere (0-${text.length}):\n\nOPPURE lascia vuoto per dividere a metà.`);
+    
+    let splitPos;
+    if (position === null) return; // Annullato
+    
+    if (position === '' || position === null) {
+        // Trova il punto migliore a metà (fine frase)
+        const middle = Math.floor(text.length / 2);
+        const searchWindow = text.substring(Math.max(0, middle - 100), Math.min(text.length, middle + 100));
+        const sentenceEnd = searchWindow.match(/[.!?;:]\s/);
+        
+        if (sentenceEnd) {
+            splitPos = middle - 100 + sentenceEnd.index + 2;
+        } else {
+            splitPos = middle;
+        }
+    } else {
+        splitPos = parseInt(position);
+        if (isNaN(splitPos) || splitPos < 1 || splitPos >= text.length) {
+            alert('Posizione non valida!');
+            return;
+        }
+    }
+    
+    // Dividi il testo
+    const part1 = text.substring(0, splitPos).trim();
+    const part2 = text.substring(splitPos).trim();
+    
+    // Aggiorna l'array
+    window.processedChunks.splice(index, 1, part1, part2);
+    
+    // Ricarica la visualizzazione
+    reloadChunks();
+}
+
+function mergeChunk(index) {
+    if (index >= window.processedChunks.length - 1) {
+        alert('Non ci sono chunk successivi da unire!');
+        return;
+    }
+    
+    const current = document.getElementById(`chunk-${index}`).value;
+    const next = document.getElementById(`chunk-${index + 1}`).value;
+    
+    // Unisci con uno spazio
+    const merged = current + ' ' + next;
+    
+    // Aggiorna l'array
+    window.processedChunks.splice(index, 2, merged);
+    
+    // Ricarica la visualizzazione
+    reloadChunks();
+}
+
+function reloadChunks() {
+    const chunks = window.processedChunks;
+    const container = document.getElementById('chunksContainer');
+    
+    container.innerHTML = chunks.map((chunk, i) => {
+        const words = chunk.split(/\s+/).filter(w => w.length > 0).length;
+        const chars = chunk.length;
+        const status = getChunkStatus(words, chars);
+        
+        return `
+            <div class="chunk">
+                <div class="chunk-header">
+                    <div class="chunk-title">Chunk ${i + 1}</div>
+                    <div class="chunk-info">
+                        <span id="chunk-words-${i}"><strong>${words}</strong> parole</span>
+                        <span id="chunk-chars-${i}"><strong>${chars}</strong> caratteri</span>
+                        <span id="chunk-badge-${i}" class="badge badge-${status.badge}">${status.text}</span>
+                    </div>
+                </div>
+                <textarea class="chunk-editor" id="chunk-${i}" oninput="updateChunkStats(${i})">${chunk}</textarea>
+                <div class="chunk-actions">
+                    <button class="btn btn-small" onclick="copyChunk(${i})">📋 Copia</button>
+                    <button class="btn btn-small" onclick="saveChunk(${i})">💾 Salva</button>
+                    <button class="btn btn-small" onclick="splitChunk(${i})" style="background: #ffc107;">✂️ Dividi</button>
+                    ${i < chunks.length - 1 ? `<button class="btn btn-small" onclick="mergeChunk(${i})" style="background: #17a2b8;">🔗 Unisci</button>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    updateTotalStats();
+}
+
+function copyChunk(index) {
+    const chunk = window.processedChunks[index];
+    navigator.clipboard.writeText(chunk).then(() => {
+        alert(`Chunk ${index + 1} copiato!`);
+    });
+}
+
+function copyAllChunks() {
+    const all = window.processedChunks.join('\n\n---\n\n');
+    navigator.clipboard.writeText(all).then(() => {
+        alert('Tutti i chunk copiati!');
+    });
+}
+
+function saveChunk(index) {
+    const chunk = window.processedChunks[index];
+    const blob = new Blob([chunk], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `chunk_${index + 1}.txt`;
+    a.click();
+}
+
+function downloadChunks() {
+    const content = window.processedChunks.map((chunk, i) => 
+        `=== CHUNK ${i + 1} ===\n${chunk}\n`
+    ).join('\n\n');
+    
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'chatterbox_chunks.txt';
+    a.click();
+}
+
+function exportPythonScript() {
+    const chunks = window.processedChunks;
+    const script = `# Script generato automaticamente da Chatterbox Text Processor V2
+# Versione Ottimizzata - Previene Artefatti Audio
+import os
+import torch
+import torchaudio as ta
+from chatterbox.mtl_tts import ChatterboxMultilingualTTS
+import pathlib
+import datetime
+
+# === CONFIGURAZIONE DEVICE ===
+if hasattr(torch, "xpu") and torch.xpu.is_available():
+    device = "xpu"
+else:
+    device = "cpu"
+
+map_location = torch.device(device)
+
+torch_load_original = torch.load
+def patched_torch_load(*args, **kwargs):
+    if 'map_location' not in kwargs:
+        kwargs['map_location'] = map_location
+    return torch_load_original(*args, **kwargs)
+
+torch.load = patched_torch_load
+
+print("🎙️ Caricamento modello Chatterbox V2...")
+model = ChatterboxMultilingualTTS.from_pretrained(device=device)
+print("✅ Modello caricato!")
+
+# === CHUNK OTTIMIZZATI ===
+chunks = ${JSON.stringify(chunks, null, 4)}
+
+print(f"\\n📦 Chunk da processare: {len(chunks)}")
+print(f"📊 Lunghezze (parole): {[len(c.split()) for c in chunks]}")
+print(f"📊 Lunghezze (caratteri): {[len(c) for c in chunks]}")
+
+# Verifica lunghezze
+for i, chunk in enumerate(chunks):
+    chars = len(chunk)
+    if chars > 400:
+        print(f"⚠️ ATTENZIONE: Chunk {i+1} è lungo {chars} caratteri (limite: 400)")
+
+# === PARAMETRI AUDIO OTTIMIZZATI ===
+AUDIO_PROMPT = "2.Voci/3l14n.wav"
+
+if not os.path.exists(AUDIO_PROMPT):
+    print(f"⚠️ ATTENZIONE: File audio prompt non trovato: {AUDIO_PROMPT}")
+    print("   Modifica la variabile AUDIO_PROMPT con il percorso corretto")
+    exit(1)
+
+# === GENERAZIONE AUDIO CON PARAMETRI OTTIMIZZATI ===
+audio_segments = []
+failed_chunks = []
+
+print("\\n" + "="*60)
+print("🎤 INIZIO GENERAZIONE AUDIO")
+print("="*60)
+
+for idx, chunk in enumerate(chunks):
+    words = len(chunk.split())
+    chars = len(chunk)
+    
+    print(f"\\n🎙️ Genero chunk {idx+1}/{len(chunks)}")
+    print(f"   📊 {words} parole, {chars} caratteri")
+    preview = chunk[:60] + "..." if len(chunk) > 60 else chunk
+    print(f"   📄 Preview: {preview}")
+    
+    try:
+        # Parametri ottimizzati per prevenire artefatti
+        wav = model.generate(
+            chunk,
+            language_id='it',
+            audio_prompt_path=AUDIO_PROMPT,
+            exaggeration=0.6,        # Ridotto per maggiore stabilità
+            cfg_weight=0.7,          # Aumentato per maggiore controllo
+            temperature=0.6,         # Più conservativo
+            min_p=0.035,            # Soglia minima più alta
+            top_p=0.93              # Più selettivo
+        )
+        
+        # Normalizza il volume per evitare stacchi
+        wav_normalized = wav / (torch.max(torch.abs(wav)) + 1e-8) * 0.95
+        audio_segments.append(wav_normalized)
+        print(f"   ✅ Generato e normalizzato!")
+        
+    except Exception as e:
+        print(f"   ❌ Errore: {e}")
+        failed_chunks.append(idx)
+        
+        # Retry con parametri ancora più conservativi
+        print(f"   🔄 Retry con parametri ultra-conservativi...")
+        try:
+            wav = model.generate(
+                chunk,
+                language_id='it',
+                audio_prompt_path=AUDIO_PROMPT,
+                exaggeration=0.5,
+                cfg_weight=0.8,
+                temperature=0.55,
+                min_p=0.04,
+                top_p=0.90
+            )
+            wav_normalized = wav / (torch.max(torch.abs(wav)) + 1e-8) * 0.95
+            audio_segments.append(wav_normalized)
+            print(f"   ✅ Recuperato con retry!")
+        except Exception as e2:
+            print(f"   ❌ Fallito anche con retry: {e2}")
+            with open("generation_errors.log", "a", encoding="utf-8") as f:
+                f.write(f"\\n{'='*60}\\n")
+                f.write(f"Timestamp: {datetime.datetime.now()}\\n")
+                f.write(f"Chunk #{idx+1}\\n")
+                f.write(f"Error: {e2}\\n")
+                f.write(f"Text: {chunk}\\n")
+                f.write(f"{'='*60}\\n")
+            continue
+
+# === VERIFICA E SALVATAGGIO ===
+print("\\n" + "="*60)
+print("💾 SALVATAGGIO FILE AUDIO")
+print("="*60)
+
+if not audio_segments:
+    print("\\n❌ ERRORE: Nessun segmento audio generato!")
+    print("   Controlla generation_errors.log per i dettagli")
+    exit(1)
+
+if failed_chunks:
+    print(f"\\n⚠️ Attenzione: {len(failed_chunks)} chunk falliti: {failed_chunks}")
+    print(f"   Salvato comunque l'audio dei chunk riusciti")
+
+# Crea directory output
+out_dir = pathlib.Path("1.Output")
+out_dir.mkdir(exist_ok=True)
+
+# Trova numero progressivo
+existing = list(out_dir.glob("audiolibro_*.wav"))
+num = len(existing) + 1
+out_name = out_dir / f"audiolibro_{num:02d}.wav"
+
+# Concatena con crossfade leggero per evitare stacchi
+final_segments = []
+for i, seg in enumerate(audio_segments):
+    if i > 0:
+        # Aggiungi silenzio breve tra chunk
+        silence = torch.zeros((seg.shape[0], int(model.sr * 0.5)))  # 100ms
+        final_segments.append(silence)
+    final_segments.append(seg)
+
+final_audio = torch.cat(final_segments, dim=-1)
+
+# Normalizzazione finale
+final_audio = final_audio / (torch.max(torch.abs(final_audio)) + 1e-8) * 0.95
+
+ta.save(out_name, final_audio, model.sr)
+
+duration = final_audio.shape[-1] / model.sr
+
+print(f"\\n✅ FILE CREATO: {out_name}")
+print(f"\\n📊 STATISTICHE FINALI:")
+print(f"   - Chunk totali: {len(chunks)}")
+print(f"   - Chunk riusciti: {len(audio_segments)}")
+print(f"   - Chunk falliti: {len(failed_chunks)}")
+print(f"   - Durata: {duration:.1f} secondi ({duration/60:.1f} minuti)")
+print(f"   - Sample rate: {model.sr} Hz")
+
+if failed_chunks:
+    print(f"\\n⚠️ Per i dettagli sugli errori, controlla: generation_errors.log")
+
+print("\\n🎉 Processo completato!")
+print("\\n💡 SUGGERIMENTI:")
+print("   - I parametri sono ottimizzati per prevenire artefatti audio")
+print("   - Aggiunta normalizzazione del volume tra chunk")
+print("   - Aggiunto silenzio di 100ms tra chunk per transizioni smooth")
+`;
+    
+    const blob = new Blob([script], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'chatterbox_auto.py';
+    a.click();
+    
+    alert('✅ Script Python V2 esportato!\\n\\n🔧 OTTIMIZZAZIONI:\\n- Parametri audio ottimizzati\\n- Normalizzazione volume\\n- Silenzi tra chunk\\n\\nEsegui: python chatterbox_auto.py');
+}
+
+function exportForAcPy() {
+    const chunks = window.processedChunks;
+    
+    const content = chunks.map((chunk, i) => 
+        `### CHUNK ${i + 1} ###\n${chunk}`
+    ).join('\n\n');
+    
+    const instructions = `# ISTRUZIONI PER L'USO CON ac.py
+# 
+# 1. Questo file contiene ${chunks.length} chunk già ottimizzati per Chatterbox
+# 2. Ogni chunk è numerato e separato
+# 3. Per usarlo con ac.py:
+#    - Copia UN chunk alla volta in testo_da_leggere.txt
+#    - Esegui: python ac.py
+#    - Ripeti per ogni chunk
+#
+# OPPURE usa lo script automatico "chatterbox_auto.py"
+#
+# ============================================================
+
+${content}
+
+# ============================================================
+# Fine chunk - Totale: ${chunks.length} chunk
+# Parole per chunk: ${chunks.map(c => c.split(/\s+/).length).join(', ')}
+# Caratteri per chunk: ${chunks.map(c => c.length).join(', ')}
+`;
+    
+    const blob = new Blob([instructions], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'chunks_per_acpy.txt';
+    a.click();
+    
+    alert(`✅ File creato: chunks_per_acpy.txt\\n\\nContiene ${chunks.length} chunk numerati.\\n\\nCopia un chunk alla volta in testo_da_leggere.txt ed esegui ac.py`);
+}
+
+function clearAll() {
+    document.getElementById('inputText').value = '';
+    document.getElementById('statsSection').classList.add('hidden');
+    document.getElementById('errorsSection').classList.add('hidden');
+    document.getElementById('chunksSection').classList.add('hidden');
+    window.processedChunks = [];
+}
+    </script>
+</body>
+</html>

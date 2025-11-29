@@ -300,6 +300,54 @@ document.addEventListener('DOMContentLoaded', () => {
         // Controlla subito se mostrare il bottone
         toggleBackToTopButton();
     </script>
+	<script>
+	/**
+ * Scarica l'intero contenuto di localStorage in un unico file.
+ * Il nome del file contiene data e ora.
+ * @param {boolean} silenzioso - Se true, non mostra feedback visivo
+ */
+function scaricaBackupCompleto(silenzioso = false) {
+  const blob = new Blob([JSON.stringify(localStorage, null, 2)], {
+    type: 'application/json'
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  
+  // Nome file con data per rotazione settimanale
+  const oggi = new Date();
+  const giornoSettimana = oggi.toLocaleDateString('it-IT', { weekday: 'long' });
+  const dataOra = oggi.toISOString().slice(0, 19).replace(/:/g, '-');
+  
+  a.download = `backup-${giornoSettimana}-${dataOra}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  if (!silenzioso) {
+    console.log('✅ Backup manuale completato');
+  }
+}
+
+/**
+ * Verifica se è necessario fare un backup automatico giornaliero.
+ * Esegue il backup solo una volta al giorno.
+ */
+function verificaBackupAutomatico() {
+  const CHIAVE_ULTIMO_BACKUP = 'ultimoBackupAutomatico';
+  const oggi = new Date().toDateString();
+  const ultimoBackup = localStorage.getItem(CHIAVE_ULTIMO_BACKUP);
+  
+  // Se non c'è backup oggi, eseguilo
+  if (ultimoBackup !== oggi) {
+    console.log('🔄 Avvio backup automatico giornaliero...');
+    scaricaBackupCompleto(true);
+    localStorage.setItem(CHIAVE_ULTIMO_BACKUP, oggi);
+    console.log('✅ Backup automatico completato');
+  }
+}
+	</script>
 
 </body>
 </html>
