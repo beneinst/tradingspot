@@ -1110,3 +1110,121 @@ window.addEventListener('storage', e => {
 setInterval(() => {
   sincronizzaTradeAttivi();
 }, 3000);
+
+// ========================================
+// FUNZIONI DA AGGIUNGERE AL FILE PRINCIPALE
+// ========================================
+
+// 1. Funzione per salvare un trade chiuso
+function salvaTradeChiuso(trade, stats, currentPrice) {
+    const tradesChiusi = JSON.parse(localStorage.getItem('closedTrades') || '[]');
+    
+    const currentValue = stats.totalQuantity * currentPrice;
+    const pnl = currentValue - stats.totalInvestment;
+    const pnlPercent = stats.totalInvestment > 0 ? (pnl / stats.totalInvestment) * 100 : 0;
+    
+    const tradeChiuso = {
+        id: trade.id,
+        symbol: trade.symbol,
+        closedAt: new Date().toISOString(),
+        totalInvestment: stats.totalInvestment,
+        totalQuantity: stats.totalQuantity,
+        avgPrice: stats.avgPrice,
+        closePrice: currentPrice,
+        closeValue: currentValue,
+        finalPnL: pnl,
+        finalPnLPercent: pnlPercent,
+        giorniInPosizione: calcolaGiorniInPosizione(trade),
+        numeroEntries: trade.entries.length
+    };
+    
+    tradesChiusi.push(tradeChiuso);
+    localStorage.setItem('closedTrades', JSON.stringify(tradesChiusi));
+    
+    return tradeChiuso;
+}
+
+// 2. Funzione per calcolare giorni in posizione
+function calcolaGiorniInPosizione(trade) {
+    if (!trade.entries || trade.entries.length === 0) return 0;
+    
+    const primaEntry = new Date(trade.entries[0].timestamp);
+    const oggi = new Date();
+    const differenzaMs = oggi - primaEntry;
+    return Math.floor(differenzaMs / (1000 * 60 * 60 * 24));
+}
+
+// 3. MODIFICA della funzione deleteTrade esistente
+async function deleteTrade(id) {
+    if (!confirm('Sei sicuro di voler eliminare questo trade?')) {
+        return;
+    }
+    
+    const trades = JSON.parse(localStorage.getItem('singleTrades') || '[]');
+    const tradeIndex = trades.findIndex(t => t.id === id);
+    
+    if (tradeIndex === -1) {
+        alert('Trade non trovato');
+        return;
+    }
+    
+    const trade = trades[tradeIndex];
+    
+    // Calcola statistiche finali prima di eliminare
+    const stats = {
+        totalInvestment: 0,
+        totalQuantity: 0,
+        avgPrice: 0
+    };
+    
+    trade.entries.forEach(entry => {
+        stats.totalInvestment += entry.investedAmount;
+        stats.totalQuantity += entry.quantity;
+    });
+    
+    stats.avgPrice = stats.totalQuantity > 0 ? stats.totalInvestment / stats.totalQuantity : 0;
+    
+    try {
+        // Ottieni prezzo corrente
+        const currentPrice = await getPriceFromBinance(trade.symbol);
+        
+        if (currentPrice) {
+            // Salva il trade chiuso con i dati finali
+            const tradeChiuso = salvaTradeChiuso(trade, stats, currentPrice);
+            
+            console.log('Trade chiuso salvato:', tradeChiuso);
+            
+            // Mostra notifica con il risultato
+            const pnlText = tradeChiuso.finalPnL >= 0 
+                ? `+$${tradeChiuso.finalPnL.toFixed(2)} (+${tradeChiuso.finalPnLPercent.toFixed(2)}%)` 
+                : `-$${Math.abs(tradeChiuso.finalPnL).toFixed(2)} (${tradeChiuso.finalPnLPercent.toFixed(2)}%)`;
+            
+            alert(`Trade ${trade.symbol} chiuso!\nP&L finale: ${pnlText}`);
+        }
+    } catch (error) {
+        console.error('Errore nel recupero del prezzo:', error);
+        // Continua comunque con l'eliminazione
+    }
+    
+    // Elimina il trade dai trade attivi
+    trades.splice(tradeIndex, 1);
+    localStorage.setItem('singleTrades', JSON.stringify(trades));
+    
+    // Ricarica la pagina o aggiorna la vista
+    location.reload();
+}
+
+// 4. Funzione per ottenere il prezzo da Binance
+async function getPriceFromBinance(symbol) {
+    const pair = `${symbol.toUpperCase()}USDC`;
+    
+    try {
+        const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pair}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const data = await res.json();
+        return parseFloat(data.price);
+    } catch (error) {
+        console.error(`Errore nel recupero prezzo per ${symbol}:`, error);
+        return null;
+    }
+}

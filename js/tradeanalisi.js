@@ -134,16 +134,51 @@ function mostrarLoading() {
 // Aggiorna statistiche generali
 function aggiornaStatistiche(dati) {
     if (!dati || dati.length === 0) {
-        document.getElementById('statsGrid').innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">📊</div>
-                <h2>Nessun trade attivo</h2>
-                <p>Inizia a fare trading per vedere le statistiche</p>
-            </div>
-        `;
+        // Mostra comunque le statistiche dei trade chiusi se esistono
+        const statsChiusi = getStatisticheTradesChiusi();
+        
+        if (statsChiusi.totaleChiusi > 0) {
+            const statsHtml = `
+                <div class="empty-state" style="grid-column: 1 / -1; margin-bottom: 20px;">
+                    <div class="empty-state-icon">📊</div>
+                    <h2>Nessun trade attivo</h2>
+                    <p>Ma hai ${statsChiusi.totaleChiusi} trade nello storico</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">🏆 Trade Chiusi in Positivo</div>
+                    <div class="stat-value positive">${statsChiusi.chiusiPositivi}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">❌ Trade Chiusi in Negativo</div>
+                    <div class="stat-value negative">${statsChiusi.chiusiNegativi}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">📊 P&L Storico Totale</div>
+                    <div class="stat-value ${statsChiusi.totalePnLChiusi >= 0 ? 'positive' : 'negative'}">
+                        $${statsChiusi.totalePnLChiusi.toFixed(2)}
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">🎯 Win Rate Storico</div>
+                    <div class="stat-value ${statsChiusi.winRateChiusi >= 50 ? 'positive' : 'negative'}">
+                        ${statsChiusi.winRateChiusi.toFixed(1)}%
+                    </div>
+                </div>
+            `;
+            document.getElementById('statsGrid').innerHTML = statsHtml;
+        } else {
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <h2>Nessun trade attivo</h2>
+                    <p>Inizia a fare trading per vedere le statistiche</p>
+                </div>
+            `;
+        }
         return;
     }
 
+    // Statistiche trade attivi
     const totalePnl = dati.reduce((sum, t) => sum + t.pnl, 0);
     const totaleInvestito = dati.reduce((sum, t) => sum + t.totalInvestment, 0);
     const totaleValore = dati.reduce((sum, t) => sum + t.currentValue, 0);
@@ -151,6 +186,9 @@ function aggiornaStatistiche(dati) {
     const tradePositivi = dati.filter(t => t.pnl > 0).length;
     const tradeNegativi = dati.filter(t => t.pnl < 0).length;
     const giorniMedi = dati.reduce((sum, t) => sum + t.giorniInPosizione, 0) / dati.length;
+
+    // Statistiche trade chiusi
+    const statsChiusi = getStatisticheTradesChiusi();
 
     const statsHtml = `
         <div class="stat-card">
@@ -166,32 +204,89 @@ function aggiornaStatistiche(dati) {
             <div class="stat-value">$${totaleValore.toFixed(2)}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">📊 P&L Totale</div>
+            <div class="stat-label">📊 P&L Attivi</div>
             <div class="stat-value ${totalePnl >= 0 ? 'positive' : 'negative'}">
                 $${totalePnl.toFixed(2)} (${pnlPercent.toFixed(2)}%)
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">✅ Trade Positivi</div>
+            <div class="stat-label">✅ Trade Attivi Positivi</div>
             <div class="stat-value positive">${tradePositivi}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">❌ Trade Negativi</div>
+            <div class="stat-label">❌ Trade Attivi Negativi</div>
             <div class="stat-value negative">${tradeNegativi}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">🏆 Trade Chiusi in Positivo</div>
+            <div class="stat-value positive">${statsChiusi.chiusiPositivi}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">💀 Trade Chiusi in Negativo</div>
+            <div class="stat-value negative">${statsChiusi.chiusiNegativi}</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">⏱️ Giorni Medi in Posizione</div>
             <div class="stat-value">${giorniMedi.toFixed(1)}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">🎯 Win Rate</div>
+            <div class="stat-label">🎯 Win Rate Attivi</div>
             <div class="stat-value ${tradePositivi > tradeNegativi ? 'positive' : 'negative'}">
                 ${((tradePositivi / dati.length) * 100).toFixed(1)}%
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">🎯 Win Rate Storico</div>
+            <div class="stat-value ${statsChiusi.winRateChiusi >= 50 ? 'positive' : 'negative'}">
+                ${statsChiusi.totaleChiusi > 0 ? statsChiusi.winRateChiusi.toFixed(1) : '0.0'}%
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">📊 P&L Storico</div>
+            <div class="stat-value ${statsChiusi.totalePnLChiusi >= 0 ? 'positive' : 'negative'}">
+                $${statsChiusi.totalePnLChiusi.toFixed(2)}
             </div>
         </div>
     `;
 
     document.getElementById('statsGrid').innerHTML = statsHtml;
+}
+
+// ========================================
+// FUNZIONE BONUS: Visualizza storico completo
+// ========================================
+
+function mostraStoricoCompleto() {
+    const tradesChiusi = JSON.parse(localStorage.getItem('closedTrades') || '[]');
+    
+    if (tradesChiusi.length === 0) {
+        alert('Nessun trade chiuso nello storico');
+        return;
+    }
+    
+    console.table(tradesChiusi.map(t => ({
+        Symbol: t.symbol,
+        'Data Chiusura': new Date(t.closedAt).toLocaleDateString('it-IT'),
+        'P&L $': t.finalPnL.toFixed(2),
+        'P&L %': t.finalPnLPercent.toFixed(2) + '%',
+        'Giorni': t.giorniInPosizione,
+        'Investito': '$' + t.totalInvestment.toFixed(2),
+        'Valore Finale': '$' + t.closeValue.toFixed(2)
+    })));
+}
+
+// ========================================
+// FUNZIONE BONUS: Reset storico (usa con cautela!)
+// ========================================
+
+function resetStoricoTradesChiusi() {
+    if (confirm('ATTENZIONE: Vuoi cancellare TUTTO lo storico dei trade chiusi? Questa operazione è irreversibile!')) {
+        if (confirm('Sei DAVVERO sicuro? Tutti i dati storici saranno persi!')) {
+            localStorage.removeItem('closedTrades');
+            alert('Storico trade chiusi eliminato');
+            location.reload();
+        }
+    }
 }
 
 // Crea grafico P&L
@@ -524,3 +619,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Aggiorna automaticamente ogni 5 minuti
     setInterval(aggiornaGrafici, 5 * 60 * 1000);
 });
+// ========================================
+// FUNZIONI DA AGGIUNGERE A tradeAnalysis.js
+// ========================================
+
+// 5. Funzione per ottenere statistiche trade chiusi
+function getStatisticheTradesChiusi() {
+    const tradesChiusi = JSON.parse(localStorage.getItem('closedTrades') || '[]');
+    
+    const totaleChiusi = tradesChiusi.length;
+    const chiusiPositivi = tradesChiusi.filter(t => t.finalPnL > 0).length;
+    const chiusiNegativi = tradesChiusi.filter(t => t.finalPnL < 0).length;
+    const totalePnLChiusi = tradesChiusi.reduce((sum, t) => sum + t.finalPnL, 0);
+    
+    return {
+        totaleChiusi,
+        chiusiPositivi,
+        chiusiNegativi,
+        totalePnLChiusi,
+        winRateChiusi: totaleChiusi > 0 ? (chiusiPositivi / totaleChiusi) * 100 : 0
+    };
+}

@@ -163,8 +163,8 @@
   
   <!-- Intestazione Tabs -->
   <div class="ts-tab-header">
-    <button class="ts-tab-btn active" onclick="openTsTab(event, 'tab-distribuzione')">Distribuzione nel Tempo</button>
-    <button class="ts-tab-btn" onclick="openTsTab(event, 'tab-percentuale')">Analisi Percentuale</button>
+    <button class="btn-edit active" onclick="openTsTab(event, 'tab-distribuzione')">Distribuzione nel Tempo</button>
+    <button class="btn-edit" onclick="openTsTab(event, 'tab-percentuale')">Analisi Percentuale</button>
   </div>
 
   <!-- CONTENUTO TAB 1: DISTRIBUZIONE -->
@@ -177,14 +177,14 @@
 
     <!-- Selettore Tempo -->
     <div class="ts-time-selector" style="margin-top: 25px;">
-      <button class="ts-time-btn active" data-days="30" onclick="cambiaRangeTempo(this)">30 Giorni</button>
-      <button class="ts-time-btn" data-days="90" onclick="cambiaRangeTempo(this)">90 Giorni</button>
-      <button class="ts-time-btn" data-days="180" onclick="cambiaRangeTempo(this)">6 Mesi</button>
-      <button class="ts-time-btn" data-days="365" onclick="cambiaRangeTempo(this)">1 Anno</button>
-      <button class="ts-time-btn" data-days="all" onclick="cambiaRangeTempo(this)">Tutto</button>
+      <button class="btn-edit active" data-days="30" onclick="cambiaRangeTempo(this)">30 Giorni</button>
+      <button class="btn-edit" data-days="90" onclick="cambiaRangeTempo(this)">90 Giorni</button>
+      <button class="btn-edit" data-days="180" onclick="cambiaRangeTempo(this)">6 Mesi</button>
+      <button class="btn-edit" data-days="365" onclick="cambiaRangeTempo(this)">1 Anno</button>
+      <button class="btn-edit" data-days="all" onclick="cambiaRangeTempo(this)">Tutto</button>
       
       <!-- Pulsante Scarica -->
-      <button class="ts-btn-edit" onclick="scaricaGrafico()" style="margin-left: 15px;">
+      <button class="btn-edit" onclick="scaricaGrafico()" style="margin-left: 15px;">
         📷 Scarica Grafico
       </button>
     </div>
@@ -228,8 +228,8 @@
     </div>
 
     <!-- Pulsante Download -->
-    <div style="text-align: center; margin-top: 20px;">
-        <button onclick="scaricaGraficoPercentuale1()" class="ts-btn-base ts-btn-primary">
+    <div style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
+        <button onclick="scaricaGraficoPercentuale1()" class="btn-edit">
           <i class="fas fa-download"></i> Scarica Grafico Percentuale
         </button>
     </div>
@@ -388,6 +388,30 @@ function verificaBackupAutomatico() {
 document.addEventListener('DOMContentLoaded', verificaBackupAutomatico);
 </script>
 
+<script>
+function openTsTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+
+    // 1. Nascondi tutti i contenuti con classe 'ts-tab-content'
+    tabcontent = document.getElementsByClassName("ts-tab-content");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // 2. Rimuovi la classe 'active' da tutti i bottoni dentro l'header dei tab
+    // Nota: Usiamo querySelectorAll per prendere qualsiasi bottone dentro l'header
+    tablinks = document.querySelectorAll(".ts-tab-header button");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // 3. Mostra il tab corrente
+    document.getElementById(tabName).style.display = "block";
+    
+    // 4. Aggiungi la classe 'active' al bottone cliccato
+    evt.currentTarget.className += " active";
+}
+</script>
 
 </body>
 
