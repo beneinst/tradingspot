@@ -1,4 +1,4 @@
-// Sistema trade migliorato - inserimento per importo investito
+ // Sistema trade migliorato - inserimento per importo investito
 
 // Cache per i prezzi delle crypto
 let priceCache = {};
@@ -8,44 +8,91 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
 let trades = [];
 let editingTradeId = null;
 
-// ------------------------------------------------------------------
-//  Prezzi da Binance (Sostituisce CoinGecko)
-// ------------------------------------------------------------------
-async function getPriceFromBinance(symbol) {
-    // Normalizza il simbolo
-    const cleanSymbol = symbol.toUpperCase();
-    const now = Date.now();
-    
-    // Tentiamo prima con USDT (standard principale)
-    const pairUSDT = `${cleanSymbol}USDT`;
-    const pairUSDC = `${cleanSymbol}USDC`;
-    
-    // Controllo Cache per USDT
-    const cacheKey = cleanSymbol.toLowerCase();
-    if (priceCache[cacheKey] && (now - priceCache[cacheKey].timestamp) < CACHE_DURATION) {
-        return priceCache[cacheKey].price;
-    }
+// Mappa dei simboli crypto ai loro ID CoinGecko
+const coinGeckoIdMap = {
+    'BTC': 'bitcoin',
+    'ETH': 'ethereum',
+    'BNB': 'binancecoin',
+    'ADA': 'cardano',
+    'DOT': 'polkadot',
+    'LINK': 'chainlink',
+    'XRP': 'ripple',
+    'LTC': 'litecoin',
+    'BCH': 'bitcoin-cash',
+    'XLM': 'stellar',
+    'UNI': 'uniswap',
+    'AAVE': 'aave',
+    'SUSHI': 'sushi',
+    'COMP': 'compound-governance-token',
+    'MKR': 'maker',
+    'SNX': 'havven',
+    'YFI': 'yearn-finance',
+    'USDC': 'usd-coin',
+    'USDT': 'tether',
+    'DAI': 'dai',
+    'BUSD': 'binance-usd',
+    'MATIC': 'matic-network',
+    'AVAX': 'avalanche-2',
+    'SOL': 'solana',
+    'ATOM': 'cosmos',
+    'LUNA': 'terra-luna',
+    'FTT': 'ftx-token',
+    'ALGO': 'algorand',
+    'VET': 'vechain',
+    'ICP': 'internet-computer',
+    'TRX': 'tron',
+    'FIL': 'filecoin',
+    'ETC': 'ethereum-classic',
+    'XMR': 'monero',
+    'THETA': 'theta-token',
+    'CAKE': 'pancakeswap-token',
+    'FET': 'artificial-superintelligence-alliance',
+    'NEAR': 'near'
+};
 
+// Ottieni prezzo da CoinGecko
+async function getPriceFromCoinGecko(symbol) {
     try {
-        // Tenta prima USDT
-        let response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pairUSDT}`);
+        const cacheKey = symbol.toLowerCase();
+        const now = Date.now();
         
-        // Se USDT fallisce (es. 400 Bad Request), tenta USDC
-        if (!response.ok) {
-            response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pairUSDC}`);
+        // Controlla cache
+        if (priceCache[cacheKey] && (now - priceCache[cacheKey].timestamp) < CACHE_DURATION) {
+            return priceCache[cacheKey].price;
         }
 
-        if (!response.ok) throw new Error(`Coppia non trovata su Binance per ${cleanSymbol}`);
+        // Prima prova con la mappa dei simboli
+        const coinId = coinGeckoIdMap[symbol.toUpperCase()];
+        if (coinId) {
+            const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
+            const data = await response.json();
+            
+            if (data[coinId]?.usd) {
+                const price = data[coinId].usd;
+                priceCache[cacheKey] = { price, timestamp: now };
+                return price;
+            }
+        }
 
-        const data = await response.json();
-        const price = parseFloat(data.price);
+        // Fallback: cerca per symbol
+        const searchResponse = await fetch(`https://api.coingecko.com/api/v3/search?query=${symbol}`);
+        const searchData = await searchResponse.json();
         
-        // Salva in cache
-        priceCache[cacheKey] = { price, timestamp: now };
-        return price;
-
+        if (searchData.coins && searchData.coins.length > 0) {
+            const coinId = searchData.coins[0].id;
+            const priceResponse = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
+            const priceData = await priceResponse.json();
+            
+            if (priceData[coinId]?.usd) {
+                const price = priceData[coinId].usd;
+                priceCache[cacheKey] = { price, timestamp: now };
+                return price;
+            }
+        }
+        
+        throw new Error(`Prezzo non trovato per ${symbol}`);
     } catch (error) {
-        console.warn(`Binance: Prezzo non trovato per ${cleanSymbol}`, error);
+        console.error(`Errore nel recupero prezzo per ${symbol}:`, error);
         return null;
     }
 }
@@ -82,13 +129,13 @@ body {
     margin: 20px; 
     line-height: 1.6;
     color: #ececf1;
-    background-color: rgba(157, 149, 152, 0.8);
-    transition: background-color 0.6s ease;
+    background-color: rgba(157, 149, 152, 0.8); /* trasparente */
+    transition: background-color 0.6s ease; /* transizione lunga */
 }
 .header {
     text-align: center;
     margin-bottom: 20px;
-    padding: 15px 10px;
+    padding: 15px 10px; /* padding ridotto */
     background: linear-gradient(135deg, rgba(77,52,112,0.85) 0%, rgba(43,25,58,0.85) 100%);
     color: #ececf1;
     border-radius: 12px;
@@ -114,7 +161,7 @@ body {
 .trade-title {
     background: linear-gradient(135deg, rgba(24,70,54,0.85) 0%, rgba(20,83,45,0.85) 100%);
     color: #ececf1;
-    padding: 10px;
+    padding: 10px; /* padding ridotto */
     font-size: 1.3em;
     font-weight: 600;
     display: flex;
@@ -123,14 +170,14 @@ body {
     transition: background 0.6s ease, padding 0.6s ease;
 }
 .trade-content {
-    padding: 15px;
+    padding: 15px; /* padding ridotto */
 }
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
+    gap: 15px; /* gap leggermente ridotto */
     margin-bottom: 20px;
-    padding: 15px;
+    padding: 15px; /* padding ridotto */
     background: linear-gradient(135deg, rgba(36,38,45,0.85) 0%, rgba(45,49,58,0.85) 100%);
     border-radius: 8px;
     border-left: 4px solid rgba(34,147,250,0.8);
@@ -139,7 +186,7 @@ body {
 .summary-item {
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 10px; /* padding ridotto */
     background: rgba(34, 36, 42, 0.85);
     color: #ececf1;
     border-radius: 8px;
@@ -161,21 +208,21 @@ body {
 .positive { 
     color: #26c281; 
     background: linear-gradient(135deg, rgba(34,63,49,0.85) 0%, rgba(20,69,44,0.85) 100%);
-    padding: 5px 10px;
+    padding: 5px 10px; /* padding ridotto */
     border-radius: 6px;
     transition: background 0.6s ease, padding 0.6s ease;
 }
 .negative { 
     color: #ff4d6d; 
     background: linear-gradient(135deg, rgba(63,27,42,0.85) 0%, rgba(82,34,49,0.85) 100%);
-    padding: 5px 10px;
+    padding: 5px 10px; /* padding ridotto */
     border-radius: 6px;
     transition: background 0.6s ease, padding 0.6s ease;
 }
 .neutral { 
     color: #ececf1;
     background: linear-gradient(135deg, rgba(41,44,53,0.85) 0%, rgba(35,38,47,0.85) 100%);
-    padding: 5px 10px;
+    padding: 5px 10px; /* padding ridotto */
     border-radius: 6px;
     transition: background 0.6s ease, padding 0.6s ease;
 }
@@ -191,7 +238,7 @@ table {
     transition: background-color 0.6s ease;
 }
 th, td {
-    padding: 10px 8px;
+    padding: 10px 8px; /* padding ridotto */
     text-align: left;
     border-bottom: 1px solid rgba(45, 49, 58, 0.85);
     transition: background-color 0.6s ease;
@@ -214,14 +261,14 @@ tr:hover {
     font-size: 0.9em;
     color: #b0b3bd;
     border-top: 2px solid rgba(53, 56, 80, 0.85);
-    padding: 15px;
+    padding: 15px; /* padding ridotto */
     background: rgba(35, 38, 47, 0.85);
     border-radius: 12px;
     transition: background-color 0.6s ease, padding 0.6s ease;
 }
 .portfolio-summary {
     background: linear-gradient(135deg, rgba(31, 38, 50, 0.85) 0%, rgba(32, 71, 107, 0.85) 100%);
-    padding: 15px;
+    padding: 15px; /* padding ridotto */
     border-radius: 12px;
     margin-bottom: 20px;
     border-left: 6px solid rgba(34,147,250,0.8);
@@ -238,13 +285,13 @@ tr:hover {
     font-size: 0.85em;
     color: #b0b3bd;
     margin-top: 20px;
-    padding-top: 10px;
+    padding-top: 10px; /* padding ridotto */
     border-top: 1px solid rgba(45, 49, 58, 0.85);
     line-height: 2;
 }
 .trade-number {
     background: rgba(255,255,255,0.07);
-    padding: 3px 10px;
+    padding: 3px 10px; /* padding ridotto */
     border-radius: 20px;
     font-size: 0.9em;
     font-weight: 600;
@@ -299,7 +346,7 @@ tr:hover {
             <div style="width: 200px; height: 4px; background: #e9ecef; border-radius: 2px; overflow: hidden;">
                 <div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #4CAF50, #45a049); transition: width 0.3s;"></div>
             </div>
-            <div style="margin-top: 10px; font-size: 0.9em; color: #6c757d;">Elaborazione dati Binance...</div>
+            <div style="margin-top: 10px; font-size: 0.9em; color: #6c757d;">Elaborazione dati di mercato...</div>
         </div>
     `;
     document.body.appendChild(loadingDiv);
@@ -314,7 +361,7 @@ tr:hover {
         const stats = calcolaStatisticheTrade(trade.entries);
         const { totalInvestment, totalQuantity, avgPrice } = stats;
         
-        // Ottieni prezzo attuale da Binance con retry logic
+        // Ottieni prezzo attuale con retry logic
         let currentPrice = null;
         let attempts = 0;
         while (attempts < 3 && !currentPrice) {
@@ -503,7 +550,7 @@ tr:hover {
             <p>🕒 Timestamp: ${new Date().toLocaleString('it-IT')}</p>
             <p>💻 Sviluppato per il monitoraggio avanzato del portfolio crypto</p>
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #dee2e6;">
-                <small>⚠️ I dati di prezzo sono forniti da Binance API. Le performance passate non garantiscono risultati futuri.</small>
+                <small>⚠️ I dati di prezzo sono forniti da CoinGecko API. Le performance passate non garantiscono risultati futuri.</small>
             </div>
         </div>
     </body>
@@ -627,7 +674,7 @@ function loadTrades() {
 }
 
 
-// Render trade (SISTEMATO PER USARE BINANCE)
+// Render trade (RIMOSSO IL PULSANTE STAMPA INDIVIDUALE)
 async function renderTrades() {
     const container = document.getElementById('trades-container');
     container.innerHTML = '<div class="loading">Caricamento trade...</div>';
@@ -644,9 +691,7 @@ async function renderTrades() {
         const stats = calcolaStatisticheTrade(trade.entries);
         const { totalInvestment, totalQuantity, avgPrice } = stats;
         
-        // USA BINANCE INVECE DI COINGECKO
-        const currentPrice = await getPriceFromBinance(trade.symbol);
-        
+        const currentPrice = await getPriceFromCoinGecko(trade.symbol);
         const currentValue = currentPrice ? totalQuantity * currentPrice : 0;
         const pnl = currentValue - totalInvestment;
         const pnlPercent = totalInvestment > 0 ? (pnl / totalInvestment) * 100 : 0;
@@ -671,6 +716,9 @@ async function renderTrades() {
             <div class="note">
                 <h3>🪙 ${trade.symbol.toUpperCase()} | Trade #${String(trades.length - index).padStart(2, '0')}</h3>
                 
+  
+  
+
                 <div class="trade-summary">
                     
                     <div class="summary-grid">
@@ -766,10 +814,10 @@ document.getElementById('trade-form').addEventListener('submit', async function(
         return;
     }
     
-    // USA BINANCE PER IL PREZZO
-    const currentPrice = await getPriceFromBinance(symbol);
+    // Ottieni prezzo attuale per calcolare il prezzo di acquisto
+    const currentPrice = await getPriceFromCoinGecko(symbol);
     if (!currentPrice) {
-        alert('Impossibile ottenere il prezzo per ' + symbol + ' su Binance.');
+        alert('Impossibile ottenere il prezzo per ' + symbol);
         return;
     }
     
@@ -832,7 +880,6 @@ function validateTrades(tradesArray) {
 document.addEventListener('DOMContentLoaded', function() {
     loadTrades();
     renderTrades();
-    updateTradeCount();
 });
 
 // 🟢  EVENTI per apertura / chiusura trade
@@ -846,7 +893,6 @@ saveTrades = () => {
   const old = JSON.parse(localStorage.getItem('singleTrades') || '[]').length;
   _saveTrades();
   if (trades.length > old) emitTradeEvent(+1);        // APERTO
-  updateTradeCount();
 };
 
 // sovrascrivi deleteTrade
@@ -860,6 +906,41 @@ window.deleteTrade = id => {
   }
 };
 
+// ------------------------------------------------------------------
+//  Prezzi da Binance (nessuna API key richiesta)
+// ------------------------------------------------------------------
+async function getPriceFromBinance(symbol) {
+    const pair = `${symbol.toUpperCase()}USDC`;
+    const cacheKey = pair.toLowerCase();
+    const now = Date.now();
+
+    // cache 5 min
+    if (priceCache[cacheKey] && (now - priceCache[cacheKey].timestamp) < CACHE_DURATION) {
+        return priceCache[cacheKey].price;
+    }
+
+    try {
+        const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pair}`);
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        const price = parseFloat(data.price);
+        priceCache[cacheKey] = { price, timestamp: now };
+        return price;
+    } catch {
+        console.warn(`Binance: ${pair} non trovato`);
+        return null; // se vuoi un fallback, gestiscilo altrove
+    }
+}
+
+// 🧠 Aggiorna anche al caricamento pagina
+document.addEventListener('DOMContentLoaded', updateTradeCount);
+
+// Sovrascrivi saveTrades per aggiornare il contatore anche nella stessa pagina
+const originalSaveTrades = saveTrades;
+saveTrades = () => {
+  originalSaveTrades();
+  updateTradeCount(); // 👈 forza aggiornamento contatore
+};
 // 🔄 Contatore reattivo trade attivi
 function updateTradeCount() {
   const trades = JSON.parse(localStorage.getItem('singleTrades') || '[]');

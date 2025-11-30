@@ -347,6 +347,44 @@ window.addEventListener('storage', (e) => {
 document.addEventListener('DOMContentLoaded', updateTradeCount);
 </script>
 
+<script>
+// Mini versione per backup automatico dalla home
+function scaricaBackupSilenzioso() {
+  const blob = new Blob([JSON.stringify(localStorage, null, 2)], {
+    type: 'application/json'
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  
+  const oggi = new Date();
+  const giornoSettimana = oggi.toLocaleDateString('it-IT', { weekday: 'long' });
+  const dataOra = oggi.toISOString().slice(0, 19).replace(/:/g, '-');
+  
+  a.download = `backup-${giornoSettimana}-${dataOra}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function verificaBackupAutomatico() {
+  const CHIAVE_ULTIMO_BACKUP = 'ultimoBackupAutomatico';
+  const oggi = new Date().toDateString();
+  const ultimoBackup = localStorage.getItem(CHIAVE_ULTIMO_BACKUP);
+  
+  if (ultimoBackup !== oggi) {
+    console.log('🔄 Backup automatico dalla home...');
+    scaricaBackupSilenzioso();
+    localStorage.setItem(CHIAVE_ULTIMO_BACKUP, oggi);
+    console.log('✅ Backup completato');
+  }
+}
+
+// Avvia al caricamento della home
+document.addEventListener('DOMContentLoaded', verificaBackupAutomatico);
+</script>
+
 
 </body>
 
