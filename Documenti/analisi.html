@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="css/menusotto.css">
 	<link rel="stylesheet" href="css/operativita.css">
 	<link rel="stylesheet" href="css/style.css">
+	
     <style>
      
         .stats-grid {
@@ -208,22 +209,146 @@
   </div>       
   <div style="padding: 9px;"></div>
   
-        <div class="stats-grid" id="statsGrid"></div>
+  <div class="container">
+  <h5 class="section-title" style="color: #FFD801 !important;">🪔 Storico Distribuzione Capitale</h5>
 
+  <!-- CONTENITORE FLEX PRINCIPALE (Due Colonne) -->
+  <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+
+    <!-- COLONNA 1: STATISTICHE (Sinistra) -->
+    <div style="flex: 0 0 40%; display: flex; gap: 10px; min-width: 300px;">
+      
+      <!-- Statistica 1 -->
+      <div class="ts-stat-item" style="flex: 1;">
+        <div class="ts-stat-label">Totale in Cripto</div>
+        <div class="ts-stat-value ts-text-total" id="totaleIn">0</div>
+      </div>
+
+      <!-- Statistica 2 -->
+      <div class="ts-stat-item" style="flex: 1;">
+        <div class="ts-stat-label">Restanti in Dollari</div>
+        <div class="ts-stat-value ts-text-capital" id="capitale">30</div>
+      </div>
+
+    </div>
+
+    <!-- COLONNA 2: GRAFICO BARRA (Destra) -->
+    <div style="flex: 1; min-width: 300px;">
+      <div class="ts-chart-box" style="height: 150px; padding: 10px; position: relative; width: 100%;">
+        <canvas id="capitaleChart" style="width: 100%; height: 100%; display: block;"></canvas>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- =================================================================== -->
+<!-- BLOCCO NASCOSTO (PULITO) -->
+<!-- Abbiamo rimosso i canvas duplicati da qui per far funzionare quelli sotto -->
+<!-- =================================================================== -->
+<div style="display: none !important;">
+  <div id="totaleTrade"></div>
+  <div id="infoTotaleTrade"></div>
+  <input id="quotaPerTrade" type="number">
+  <input id="inputTotaleIn" type="number">
+  <div id="capitaleTotale"></div>
+  <div id="capitaleInDollari"></div>
+  <div id="totaleInDollari"></div>
+  <span id="mediaTradeTotaleIn"></span>
+  <span id="mediaDollariTrading"></span>
+  
+  <!-- NOTA: Ho rimosso <canvas id="storicoCapitaleChart"> e gli altri da qui! -->
+</div>
+<!-- =================================================================== -->
+
+<div style="padding: 10px;"></div>
+  
+<!-- NUOVA CARD: GRAFICI STORICI E PERCENTUALI -->
+<div class="container">
+   <div class="ts-dash-card">
+  
+    <!-- Intestazione Tabs -->
+    <div class="ts-tab-header">
+      <button class="btn-edit active" onclick="openTsTab(event, 'tab-distribuzione')">Distribuzione nel Tempo</button>
+      <button class="btn-edit" onclick="openTsTab(event, 'tab-percentuale')">Analisi Percentuale</button>
+    </div>
+
+    <!-- CONTENUTO TAB 1: DISTRIBUZIONE -->
+    <div id="tab-distribuzione" class="ts-tab-content active">
+      
+      <!-- Box Grafico Grande (Qui apparirà il grafico storico) -->
+      <div class="ts-chart-box-large" style="position: relative; width: 100%;">
+        <canvas id="storicoCapitaleChart" style="width: 100%; height: 100%;"></canvas>
+      </div>
+
+      <!-- Selettore Tempo -->
+      <div class="ts-time-selector" style="margin-top: 25px;">
+        <button class="btn-edit active" data-days="30" onclick="cambiaRangeTempo(this)">30 Giorni</button>
+        <button class="btn-edit" data-days="90" onclick="cambiaRangeTempo(this)">90 Giorni</button>
+        <button class="btn-edit" data-days="180" onclick="cambiaRangeTempo(this)">6 Mesi</button>
+        <button class="btn-edit" data-days="365" onclick="cambiaRangeTempo(this)">1 Anno</button>
+        <button class="btn-edit" data-days="all" onclick="cambiaRangeTempo(this)">Tutto</button>
+        <button class="btn-edit" onclick="scaricaGrafico()" style="margin-left: 15px;">📷 Scarica Grafico</button>
+      </div>
+    </div>
+
+    <!-- CONTENUTO TAB 2: PERCENTUALE -->
+    <div id="tab-percentuale" class="ts-tab-content" style="display: none;">
+      
+      <div class="ts-info-box">
+        Analisi del tempo in cui il capitale è stato allocato nelle seguenti percentuali in dollari.
+      </div>
+
+      <!-- Box Grafico Grande -->
+      <div class="ts-chart-box-large" style="position: relative; width: 100%;">
+        <canvas id="percentualeCapitaleChart" style="width: 100%; height: 100%;"></canvas>
+      </div>
+
+      <!-- Griglia Statistiche -->
+      <div class="ts-stats-grid" style="margin-top: 30px;">
+        <div class="ts-grid-item">
+          <div class="ts-stat-label">0-25% in Dollari</div>
+          <div class="ts-stat-value" style="color: #3BB9FF;" id="percentuale0_25">0 giorni</div>
+        </div>
+        <div class="ts-grid-item">
+          <div class="ts-stat-label">25-50% in Dollari</div>
+          <div class="ts-stat-value" style="color: #3BB9FF;" id="percentuale25_50">0 giorni</div>
+        </div>
+        <div class="ts-grid-item">
+          <div class="ts-stat-label">50-75% in Dollari</div>
+          <div class="ts-stat-value" style="color: #3BB9FF;" id="percentuale50_75">0 giorni</div>
+        </div>
+        <div class="ts-grid-item">
+          <div class="ts-stat-label">75-100% in Dollari</div>
+          <div class="ts-stat-value" style="color: #3BB9FF;" id="percentuale75_100">0 giorni</div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
+          <button onclick="scaricaGraficoPercentuale1()" class="btn-edit">
+            <i class="fas fa-download"></i> Scarica Grafico Percentuale
+          </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CARD AGGIUNTIVA P&L (Se serve) -->
+<div class="container" style="margin-top: 20px;">
+   <div class="ts-dash-card">
+        <div class="stats-grid" id="statsGrid"></div>
         <div class="chart-container">
-            <div class="chart-title">
-                📈 Distribuzione P&L per Trade
-            </div>
+            <div class="chart-title">📈 Distribuzione P&L per Trade</div>
             <div class="chart-wrapper">
                 <canvas id="pnlChart"></canvas>
             </div>
             <div class="btn-group">
-                <button class="btn btn-secondary" onclick="scaricaGrafico('pnlChart', 'distribuzione-pnl')">
+                <button class="btn-secondary" onclick="scaricaGrafico('pnlChart', 'distribuzione-pnl')">
                     📥 Scarica Grafico P&L
                 </button>
             </div>
         </div>
-
+  
         <div class="chart-container">
             <div class="chart-title">
                 📅 Timeline Entry per Trade
@@ -258,6 +383,24 @@
             </button>
         </div>
     </div>
+	<!-- Elemento di servizio nascosto (o visibile se serve debug) -->
+<div style="display:none;" id="infoTotaleTrade"></div>
+    
+    
+        </div>
+      </div>
+    </div>
+</div>
+<span id="infoTotaleTrade"></span></div></div>
+<div style="padding: 2px;"></div>
+</div>
+
+
+		
+		
+     
+		
+		
 	<!-- FOOTER -->
 
 <div style="padding: 4px;"></div>  
@@ -265,18 +408,30 @@
 <div class="container">
   <div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
     <div style="display: flex; align-items: center; justify-content: space-between;">
-      <img src="images/logoinvest2a3.svg"
-           alt="FlowChart"
-           style="height: 50px; width: auto; margin-right: 16px;" />
-		   <p style="margin: 0; color: #c3c3c3; text-align: left; height: 10px; line-height: 12px;">
-        © 2025 FlowChart by Gerardo D'Orrico. Tutti i diritti riservati.
+      <p style="margin: 0; color: #c3c3c3; text-align: left; height: 10px; line-height: 12px;">
+        © 2025 Invest Flow | Trading Spot di Gerardo D'Orrico – Tutti i diritti riservati.
       </p>
-    </div></div>
+      <img src="images/logoinvest2.svg"
+           alt="Invest Flow"
+           style="height: 40px; width: auto; margin-left: 16px;" />
+    </div>
+ 
+<div style="padding: 4px;"></div>
+ 
+
+
 
 
 <!-- Bottone torna sopra principale (con freccia CSS) -->
     <button class="back-to-top" id="backToTop" title="Torna in cima"></button>  
-
+ 
+<!-- Chart.js Core -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Adattatore Date (NECESSARIO per il grafico Timeline) -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="js/tradeanalisi.js"></script>
+	
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script src="js/panoramica.js"></script>
 </body>
 </html>
