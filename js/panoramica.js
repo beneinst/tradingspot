@@ -290,78 +290,108 @@ function aggiornaInterfaccia() {
 function creaGraficoCapitale() {
   const ctx = document.getElementById('capitaleChart').getContext('2d');
 
+  // Distruggi il grafico precedente se esiste per evitare sovrapposizioni
   if (capitaleChart) {
     capitaleChart.destroy();
   }
 
+  // Definiamo il totale fisso (o calcolato)
+  const totaleSlot = 30; // Il tuo tetto massimo
+
   capitaleChart = new Chart(ctx, {
-    type: 'doughnut',
+    type: 'bar', // Usiamo 'bar' invece di 'doughnut'
     data: {
-      labels: ['Totale In (Crypto)', 'A Capitale (USD)'],
-      datasets: [{
-        data: [
-          datiCapitale.totaleIn,
-          datiCapitale.capitale
-        ],
-        backgroundColor: [
-          '#F62817',
-          '#1AA6ED'
-        ],
-        borderColor: '#222',
-        borderWidth: 1,
-        hoverOffset: 22
-      }]
+      labels: ['Allocazione Capitale'], // Etichetta unica per la barra
+      datasets: [
+        {
+          label: 'Totale In (Crypto)',
+          data: [datiCapitale.totaleIn], // Valore Crypto
+          backgroundColor: '#8854d0',    // Rosso
+          borderColor: '#222',
+          borderWidth: 0,
+          barPercentage: 0.6,            // Spessore della barra (0.1 a 1.0)
+          borderRadius: { topLeft: 10, bottomLeft: 10 } // Arrotonda sinistra
+        },
+        {
+          label: 'A Capitale (USD)',
+          data: [datiCapitale.capitale], // Valore USD
+          backgroundColor: '#20bf6b',    // Blu
+          borderColor: '#222',
+          borderWidth: 0,
+          barPercentage: 0.6,
+          borderRadius: { topRight: 10, bottomRight: 10 } // Arrotonda destra
+        }
+      ]
     },
     options: {
+      indexAxis: 'y', // FONDAMENTALE: Ruota il grafico in orizzontale
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'right',
+          position: 'bottom', // Legenda sotto invece che a lato
           labels: {
             color: '#c3c3c3',
             font: {
-              size: 15,
-              family: 'Trebuchet MS'
+              size: 14,
+              family: 'Segoe UI'
             },
-            padding: 8,
-            boxWidth: 15,
-            boxHeight: 15,
             usePointStyle: true,
-            pointStyle: 'circle'
+            padding: 20
           }
         },
         tooltip: {
           backgroundColor: '#181c23',
-          titleColor: '#739bf2',
-          bodyColor: '#F0F8FF',
-          borderColor: '#2980b9',
-          borderWidth: 2,
-          cornerRadius: 10,
-          padding: 18,
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: '#555',
+          borderWidth: 1,
+          padding: 10,
           displayColors: true,
-          bodyFont: {
-            size: 18
-          },
           callbacks: {
-            label: function (context) {
-              const label = context.label || '';
-              const value = context.raw || 0;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percentage = ((value / total) * 100).toFixed(1);
+            // Personalizziamo il tooltip come nel tuo vecchio grafico
+            label: function(context) {
+              const value = context.raw;
               const dollari = (value * datiCapitale.quotaPerTrade).toFixed(2);
-              return `${label}: ${value} trade (${percentage}%) = $${dollari}`;
+              return ` ${context.dataset.label}: ${value} slot ($${dollari})`;
             }
           }
         }
       },
-      cutout: '45%',
+      scales: {
+        x: {
+          stacked: true, // Abilita l'impilamento sulla lunghezza
+          min: 0,
+          max: totaleSlot, // FISSA IL MASSIMO A 30
+          grid: {
+            color: '#444', // Colore griglia verticale
+            drawBorder: false
+          },
+          ticks: {
+            color: '#aaa',
+            stepSize: 5 // Mostra numeri ogni 5 unità (0, 5, 10... 30)
+          }
+        },
+        y: {
+          stacked: true, // Abilita l'impilamento sull'asse Y
+          display: false, // Nasconde l'etichetta "Allocazione Capitale" a sinistra per pulizia
+          grid: {
+            display: false // Nasconde righe orizzontali
+          }
+        }
+      },
       layout: {
-        padding: 18
+        padding: {
+          left: 10,
+          right: 20,
+          top: 0,
+          bottom: 0
+        }
       }
     }
   });
 }
+  
 
 // Funzione per scaricare il grafico percentuale
 // Funzione per scaricare il grafico percentuale con dimensioni HD e sfondo bianco

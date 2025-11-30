@@ -119,126 +119,129 @@
 <div class="container">
   <h5 class="section-title" style="color: #FFD801 !important;">🪔 Storico Distribuzione Capitale</h5>
   
-  <div style="display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; flex-wrap: nowrap;">
+ 
 
-    <!-- Colonna 1: larghezza 16.66% -->
-    <div style="flex: 0 0 12%; background-color: rgba(34, 34, 34, 0.2); border-radius: 8px; padding: 10px;">
-      <div style="display: flex; flex-direction: column; gap: 0px;">
-        <div class="header-stat-item">
-          <div class="stat-label">Totale in Cripto</div>
-          <div class="stat-value totale" style="color: #f62817; font-size: 36px;" id="totaleIn"></div>
-        </div>
-        <div class="header-stat-item">
-          <div class="stat-label">Restanti in Dollari</div>
-          <div class="stat-value capitale" style="color: #1AA6ED; font-size: 36px;" id="capitale"></div>
-        </div>
+  <!-- CONTENITORE FLEX PRINCIPALE (Due Colonne) -->
+  <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+
+    <!-- COLONNA 1: STATISTICHE (Sinistra) -->
+    <div style="flex: 0 0 40%; display: flex; gap: 10px; min-width: 300px;">
+      
+      <!-- Statistica 1 -->
+      <div class="ts-stat-item" style="flex: 1;">
+        <div class="ts-stat-label">Totale in Cripto</div>
+        <div class="ts-stat-value ts-text-total" id="totaleIn">0</div>
+      </div>
+
+      <!-- Statistica 2 -->
+      <div class="ts-stat-item" style="flex: 1;">
+        <div class="ts-stat-label">Restanti in Dollari</div>
+        <div class="ts-stat-value ts-text-capital" id="capitale">30</div>
+      </div>
+
+    </div>
+
+    <!-- COLONNA 2: GRAFICO (Destra) -->
+    <div style="flex: 1; min-width: 300px;">
+      <!-- Box Grafico con altezza ridotta a 150px per la barra orizzontale -->
+      <div class="ts-chart-box" style="height: 150px; padding: 10px; position: relative; width: 100%;">
+        <canvas id="capitaleChart" style="width: 100%; height: 100%; display: block;"></canvas>
       </div>
     </div>
 
-    <!-- Colonna 2: larghezza 41.66% -->
-    <div style="flex: 0 0 42%; background-color: rgba(34, 34, 34, 0.2); border-radius: 8px; padding: 10px;">
-      <table class="tabella-sintesi" style="width: 100%;">
-        <thead>
-          <tr>
-            <th>Trade</th>
-            <th>$ / Trade</th>
-            <th>Capitale Totale</th>
-            <th>Capitale Residuo</th>
-            <th>Investito in Cripto</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td id="totaleTrade">30</td>
-            <td>
-              <input type="number" id="quotaPerTrade" class="ts-input" value="0" min="1" oninput="aggiornaCapitale()">
-            </td>
-            <td id="capitaleTotale">—</td>
-            <td id="capitaleInDollari">—</td>
-            <td id="totaleInDollari">—</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Colonna 3: larghezza 41.66% -->
-	
-    <div style="flex: 0 0 46%; padding: 1px; border-radius: 8px; background-color: rgba(34, 34, 34, 0.2);">
-      <canvas id="capitaleChart" style="width: 80%; height: 80%;"></canvas>
-    </div>
-
   </div>
+
 </div>
+
 
 <div style="padding: 4px;"></div>
   
   
   <!-- Nuova card per il grafico storico -->
  <div class="container">
-   
+   <div class="ts-dash-card">
+  
+  <!-- Intestazione Tabs -->
+  <div class="ts-tab-header">
+    <button class="ts-tab-btn active" onclick="openTsTab(event, 'tab-distribuzione')">Distribuzione nel Tempo</button>
+    <button class="ts-tab-btn" onclick="openTsTab(event, 'tab-percentuale')">Analisi Percentuale</button>
+  </div>
+
+  <!-- CONTENUTO TAB 1: DISTRIBUZIONE -->
+  <div id="tab-distribuzione" class="ts-tab-content active">
     
-    <div class="tab-container">
-      <div class="tab-buttons">
-        <button class="tab-button active" onclick="cambiaTab(event, 'tab-distribuzione')">Distribuzione nel Tempo</button>
-        <button class="tab-button" onclick="cambiaTab(event, 'tab-percentuale')">Analisi Percentuale</button>
+    <!-- Box Grafico Grande (600px) -->
+    <div class="ts-chart-box-large" style="position: relative; width: 100%;">
+      <canvas id="storicoCapitaleChart" style="width: 100%; height: 100%;"></canvas>
+    </div>
+
+    <!-- Selettore Tempo -->
+    <div class="ts-time-selector" style="margin-top: 25px;">
+      <button class="ts-time-btn active" data-days="30" onclick="cambiaRangeTempo(this)">30 Giorni</button>
+      <button class="ts-time-btn" data-days="90" onclick="cambiaRangeTempo(this)">90 Giorni</button>
+      <button class="ts-time-btn" data-days="180" onclick="cambiaRangeTempo(this)">6 Mesi</button>
+      <button class="ts-time-btn" data-days="365" onclick="cambiaRangeTempo(this)">1 Anno</button>
+      <button class="ts-time-btn" data-days="all" onclick="cambiaRangeTempo(this)">Tutto</button>
+      
+      <!-- Pulsante Scarica -->
+      <button class="ts-btn-edit" onclick="scaricaGrafico()" style="margin-left: 15px;">
+        📷 Scarica Grafico
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENUTO TAB 2: PERCENTUALE -->
+  <div id="tab-percentuale" class="ts-tab-content" style="display: none;">
+    
+    <div class="ts-info-box">
+      Analisi del tempo in cui il capitale è stato allocato nelle seguenti percentuali in dollari.
+    </div>
+
+    <!-- Box Grafico Grande -->
+    <div class="ts-chart-box-large" style="position: relative; width: 100%;">
+      <canvas id="percentualeCapitaleChart" style="width: 100%; height: 100%;"></canvas>
+    </div>
+
+    <!-- Griglia Statistiche Percentuali -->
+    <div class="ts-stats-grid" style="margin-top: 30px;">
+      
+      <div class="ts-grid-item">
+        <div class="ts-stat-label">0-25% in Dollari</div>
+        <div class="ts-stat-value" style="color: #3BB9FF;" id="percentuale0_25">0 giorni</div>
       </div>
       
-      <div class="tab-content">
-        <div id="tab-distribuzione" class="tab-panel active">
-          <!-- GRAFICO PRIMA DEL MENU -->
-          <div class="storico-chart-container">
-            <canvas id="storicoCapitaleChart"></canvas>
-          </div>
-          
-          <!-- MENU TEMPORALE SOTTO IL GRAFICO -->
-          <div class="time-range-selector" style="margin-top: 30px;">
-            <button class="btn-danger active" data-days="30" onclick="cambiaRangeTempo(this)">30 Giorni</button>
-            <button class="btn-danger" data-days="90" onclick="cambiaRangeTempo(this)">90 Giorni</button>
-            <button class="btn-danger" data-days="180" onclick="cambiaRangeTempo(this)">6 Mesi</button>
-            <button class="btn-danger" data-days="365" onclick="cambiaRangeTempo(this)">1 Anno</button>
-            <button class="btn-danger" data-days="all" onclick="cambiaRangeTempo(this)">Tutto</button>
-            <!-- NUOVO PULSANTE -->
-            <button class="btn-edit" onclick="scaricaGrafico()" style="margin-left: 15px;">📷 Scarica Grafico</button>
-          </div>
-          
-         
+      <div class="ts-grid-item">
+        <div class="ts-stat-label">25-50% in Dollari</div>
+        <div class="ts-stat-value" style="color: #3BB9FF;" id="percentuale25_50">0 giorni</div>
+      </div>
+      
+      <div class="ts-grid-item">
+        <div class="ts-stat-label">50-75% in Dollari</div>
+        <div class="ts-stat-value" style="color: #3BB9FF;" id="percentuale50_75">0 giorni</div>
+      </div>
+      
+      <div class="ts-grid-item">
+        <div class="ts-stat-label">75-100% in Dollari</div>
+        <div class="ts-stat-value" style="color: #3BB9FF;" id="percentuale75_100">0 giorni</div>
+      </div>
 
-        </div>
-        
-        <div id="tab-percentuale" class="tab-panel">
-          <div class="info-box">
-            Analisi del tempo in cui il capitale è stato allocato nelle seguenti percentuali in dollari.
-          </div>
-          
-          <!-- GRAFICO PERCENTUALE SPOSTATO PRIMA DEI BOX -->
-          <div class="storico-chart-container">
-            <canvas id="percentualeCapitaleChart"></canvas>
-          </div>
-          
-          
-          
-          <!-- BOX PERCENTUALI SPOSTATI SOTTO IL GRAFICO -->
-          <div class="distribution-stats">
-            <div class="distribution-item">
-              <div class="distribution-label">0-25% in Dollari</div>
-              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale0_25">0 giorni</div>
-            </div>
-            <div class="distribution-item">
-              <div class="distribution-label">25-50% in Dollari</div>
-              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale25_50">0 giorni</div>
-            </div>
-            <div class="distribution-item">
-              <div class="distribution-label">50-75% in Dollari</div>
-              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale50_75">0 giorni</div>
-            </div>
-            <div class="distribution-item">
-              <div class="distribution-label">75-100% in Dollari</div>
-              <div class="distribution-value" style="color: #3BB9FF; font-size: 30px;" id="percentuale75_100">0 giorni</div>
-            </div>
-			<button onclick="scaricaGraficoPercentuale1()" class="header-stat-item" style="margin-top: 15px; margin-bottom: 20px;">
-            <i class="fas fa-download"></i> Scarica Grafico Percentuale
-          </button>
-          </div>
+    </div>
+
+    <!-- Pulsante Download -->
+    <div style="text-align: center; margin-top: 20px;">
+        <button onclick="scaricaGraficoPercentuale1()" class="ts-btn-base ts-btn-primary">
+          <i class="fas fa-download"></i> Scarica Grafico Percentuale
+        </button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Elemento di servizio nascosto (o visibile se serve debug) -->
+<div style="display:none;" id="infoTotaleTrade"></div>
+    
+    
         </div>
       </div>
     </div>

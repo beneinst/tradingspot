@@ -406,3 +406,131 @@ body::before {
             }
         }
 
+/* --- Variabili Locali Dashboard (se servono colori specifici chart) --- */
+.ts-dashboard-wrapper {
+  --color-dash-green: #00E396;
+  --color-dash-red: #FF4560;
+  --color-dash-blue: #008FFB;
+}
+
+/* --- Wrapper Statistiche Header (ex .header-stats) --- */
+.ts-header-stats {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+/* --- Card Statistica Singola (ex .header-stat-item) --- */
+.ts-stat-item {
+  background-color: var(--bg-deep); /* #2b2b2b */
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 140px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover Glow Effect */
+.ts-stat-item:hover {
+  transform: translateY(-5px);
+  border-color: var(--color-gold);
+  box-shadow: 0 8px 25px rgba(255, 208, 18, 0.15); /* Glow dorato */
+  background-color: #333;
+}
+
+/* Etichette e Valori */
+.ts-stat-label {
+  font-size: 0.85em;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ts-stat-value {
+  color: var(--color-profit); /* Verde default o override */
+  font-size: 1.5em;
+  font-weight: bold;
+  font-family: var(--font-heading-light);
+}
+
+/* Varianti speciali (ex _f e _c) */
+/* Usiamo classi modificatrici invece di duplicare tutto il CSS */
+.ts-stat-item.is-large {
+    height: 360px; /* Altezza fissa per allineamento grafici */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- Chart Containers (ex .chart-container) --- */
+.ts-chart-box {
+    height: 400px; /* Altezza standard */
+    margin-bottom: 30px;
+    position: relative;
+    padding: 20px;
+    background-color: var(--bg-deep); /* Sfondo scuro per il grafico */
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.ts-chart-box canvas {
+    /* Il canvas è trasparente, prende il colore del box */
+}
+
+/* Container Storico Grande */
+.ts-chart-box-large {
+    height: 600px; /* Più alto per storico */
+    width: 100%;
+}
+/* --- Dashboard Card (ex .card specifico dashboard) --- */
+.ts-dash-card {
+    background-color: var(--bg-container);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+}
+
+.ts-dash-card-header {
+   background-color: var(--bg-deep);
+   padding: 15px 20px;
+   border-radius: 8px 8px 0 0;
+   margin: -25px -25px 20px -25px; /* Hack per estendersi ai bordi */
+   border-bottom: 1px solid var(--border-color);
+}
+.ts-dash-card-header h2 {
+    color: var(--color-gold);
+    font-size: 1.2em;
+    margin: 0;
+    text-transform: uppercase;
+}
+/* --- Tabella Sintesi Rapida (ex .tabella-sintesi) --- */
+.ts-quick-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: rgba(60, 60, 60, 0.6); /* Semi-trasparente */
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.ts-quick-table th, .ts-quick-table td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+}
+.ts-quick-table th {
+  background-color: rgba(0,0,0,0.3);
+  color: var(--color-gold);
+}
