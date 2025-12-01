@@ -248,11 +248,18 @@ input::placeholder, textarea::placeholder {
     box-sizing: border-box;
 }
 
-/* Trade Summary */
 .trade-summary {
-    background: linear-gradient(135deg, var(--color-card-bg) 0%, var(--color-surface) 100%);
+    /* Sfondo scuro con Opacità al 80% (0.8) */
+    background: rgba(44, 44, 44, 0.8) !important; 
+    
+    /* Effetto sfocatura sullo sfondo (opzionale, rende la trasparenza più elegante) */
+    backdrop-filter: blur(4px);
+    
     color: var(--color-heading);
-    padding: 30px;
+    
+    /* Padding ridotto da 30px a 15px */
+    padding: 15px; 
+    
     border-radius: 8px;
     margin: 25px 0;
     border: 1px solid var(--color-border);

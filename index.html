@@ -83,28 +83,43 @@
       
    <div class="container">
 
-        <div class="card">
-            <h5 class="section-title" style="color: #FFD801 !important;">💱 Aggiungi Entry al Trade</h5>
-            <form id="trade-form" class="trade-form">
-                <div class="form-row">
-                    <label for="crypto-symbol" style="color: #BCC6CC !important;">SIMBOLO CRIPTO</label>
-                    <input type="text" id="crypto-symbol" placeholder="BTC" required>
-                </div>
-                <div class="form-row">
-                    <label for="trade-quantity" style="color: #BCC6CC !important;">QUANTITA'</label>
-                    <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required>
-                </div>
-                <div class="form-row">
-                    <label for="trade-price" style="color: #BCC6CC !important;">IMPORTO ENTRY(USDC):</label>
-                    <input type="number" id="invested-amount" placeholder="Importo investito ($)" step="0.01" required>
-                </div>
-                <div class="form-row">
-                    <label></label>
-                    <button type="submit" class="btn-edit" style="font-size:1.1rem; padding:9px 22px;min-width:220px;margin-right:20px;">➕ Aggiungi Entry</button>
-                </div>
-                <input type="hidden" id="edit-trade-id">
-            </form>
+    <!-- Wrapper Flex -->
+    <div class="ts-split-row">
+        
+        <!-- COLONNA SINISTRA (66%) - Contiene il Form -->
+        <div class="ts-col-66">
+            <div class="note"> <!-- Inizia la tua card originale -->
+                <h5 class="section-title" style="color: #FFD801 !important;">💱 Aggiungi Entry al Trade</h5>
+                <form id="trade-form" class="trade-form">
+                    <div class="form-row">
+                        <label for="crypto-symbol" style="color: #BCC6CC !important;">SIMBOLO CRIPTO</label>
+                        <input type="text" id="crypto-symbol" placeholder="BTC" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="trade-quantity" style="color: #BCC6CC !important;">QUANTITA'</label>
+                        <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="trade-price" style="color: #BCC6CC !important;">IMPORTO ENTRY(USDC):</label>
+                        <input type="number" id="invested-amount" placeholder="USDC" step="0.01" required>
+                    </div>
+                    <div class="form-row">
+                        <label></label>
+                        <button type="submit" class="btn-edit" style="font-size:1.1rem; padding:9px 22px;min-width:220px;margin-right:20px;">➕ Aggiungi Entry</button>
+                    </div>
+                    <input type="hidden" id="edit-trade-id">
+                </form>
+            </div> <!-- Fine card -->
         </div>
+
+        <!-- COLONNA DESTRA (33%) - Vuota e scompare su mobile -->
+        <div class="ts-col-33">
+            <!-- Spazio vuoto o contenuto futuro -->
+        </div>
+
+    </div>
+
+</div>
 </div> <div style="padding: 4px;"></div>
         <div class="container">
             <h4 class="section-title" style="color: #FFD801 !important;">🎯 I tuoi Trade Attivi</h4>

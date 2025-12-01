@@ -128,7 +128,7 @@ body::before {
   top: 0; left: 0; width: 100%; height: 100%;
   
   /* MODIFICATO: Grigio #3c3c3c con 90% opacità */
-  background: rgba(8, 8, 8, 0.56) !important; 
+  background: rgba(60, 60, 60, 0.4) !important; 
   
   z-index: -1;
   pointer-events: none;
@@ -637,4 +637,35 @@ body::before {
     gap: 10px;
     margin-bottom: 20px;
     flex-wrap: wrap;
+}
+
+/* Layout 2 Colonne (66% - 33%) */
+.ts-split-row {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start; /* Allinea in alto */
+    flex-wrap: wrap;
+}
+
+.ts-col-66 {
+    flex: 2; /* Prende 2 parti dello spazio (circa 66%) */
+    min-width: 300px; /* Larghezza minima per non schiacciarsi troppo */
+}
+
+.ts-col-33 {
+    flex: 1; /* Prende 1 parte dello spazio (circa 33%) */
+    background: transparent; /* Vuoto come richiesto */
+    min-height: 100px; /* Solo per debug, puoi toglierlo */
+    display: block;
+}
+
+/* Regola per Mobile: Nascondi la destra e allarga la sinistra */
+@media (max-width: 991px) {
+    .ts-col-33 {
+        display: none; /* Scompare */
+    }
+    .ts-col-66 {
+        flex: 0 0 100%; /* Diventa larga 100% */
+        min-width: 100%;
+    }
 }
