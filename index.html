@@ -88,21 +88,22 @@
         
         <!-- COLONNA SINISTRA (66%) - Contiene il Form -->
         <div class="ts-col-66">
-            <div class="note"> <!-- Inizia la tua card originale -->
+            <div class="note1"> <!-- Inizia la tua card originale -->
                 <h5 class="section-title" style="color: #FFD801 !important;">💱 Aggiungi Entry al Trade</h5>
-                <form id="trade-form" class="trade-form">
+                <form id="trade-form" class="trade-form1">
                     <div class="form-row">
                         <label for="crypto-symbol" style="color: #BCC6CC !important;">SIMBOLO CRIPTO</label>
                         <input type="text" id="crypto-symbol" placeholder="BTC" required>
                     </div>
                     <div class="form-row">
-                        <label for="trade-quantity" style="color: #BCC6CC !important;">QUANTITA'</label>
-                        <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required>
-                    </div>
-                    <div class="form-row">
-                        <label for="trade-price" style="color: #BCC6CC !important;">IMPORTO ENTRY(USDC):</label>
-                        <input type="number" id="invested-amount" placeholder="USDC" step="0.01" required>
-                    </div>
+    <label for="trade-quantity" style="color: #BCC6CC !important;">QUANTITA'</label>
+    <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required style="width: 180px;">
+</div>
+<div class="form-row">
+    <label for="trade-price" style="color: #BCC6CC !important;">IMPORTO ENTRY(USDC):</label>
+    <input type="number" id="invested-amount" placeholder="USDC" step="0.01" required style="width: 180px;">
+</div>
+
                     <div class="form-row">
                         <label></label>
                         <button type="submit" class="btn-edit" style="font-size:1.1rem; padding:9px 22px;min-width:220px;margin-right:20px;">➕ Aggiungi Entry</button>
