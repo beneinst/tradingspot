@@ -74,7 +74,7 @@ async function render_1() {
         <td>$${e_1.priceAtBuy.toFixed(4)}</td>
         <td>$${entryVal_1}</td>
         <td>${e_1.note || '-'}</td>
-        <td><button onclick="deleteEntry_1(${i_1})" class="btn-del">↪</button></td>
+        <td><button onclick="deleteEntry_1(${i_1})" class="btn-icon-muted">🗑️</button></td>
       </tr>`;
   });
 
