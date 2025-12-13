@@ -3,14 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧿 Panoramica</title>
-	<link rel="icon" type="image/png" href="favicon.png"> 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-	 <link rel="stylesheet" href="css/menusotto.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/trade.css">
-<style>
-/* Base styles */
+    <title>💼 Crypto Portfolio Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
 :root {
     --color-primary: #4a90e2;
     --color-secondary: #667eea;
@@ -26,7 +21,19 @@
     box-sizing: border-box;
 }
 
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #1a1a2e;
+    color: var(--color-text);
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+}
 
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
 
 /* Header */
 .header-section {
@@ -73,6 +80,97 @@
     color: var(--color-muted);
 }
 
+/* Backup Section */
+.backup-section {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid #2ecc71;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+}
+
+.backup-section h2 {
+    color: #F2BB66;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+    font-weight: 500;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+.backup-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95em;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+    box-shadow: 0 6px 30px rgba(74, 144, 226, 0.6);
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #27ae60, #229954);
+    box-shadow: 0 6px 25px rgba(46, 204, 113, 0.6);
+    transform: translateY(-2px);
+}
+
+.btn-purple {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+.btn-purple:hover {
+    background: linear-gradient(135deg, #8e44ad, #7d3c98);
+    box-shadow: 0 6px 25px rgba(155, 89, 182, 0.6);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #7f8c8d, #6c757d);
+    box-shadow: 0 6px 25px rgba(149, 165, 166, 0.6);
+    transform: translateY(-2px);
+}
+
+.file-input-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.file-input {
+    display: none;
+}
+
 /* Summary Cards */
 .summary-cards {
     display: grid;
@@ -112,7 +210,7 @@
 .card h3 {
     color: #F2BB66;
     margin-bottom: 14px;
-    font-size: 1.3em;
+    font-size: 1.1em;
     font-weight: 500;
     opacity: 0.95;
     text-transform: uppercase;
@@ -140,8 +238,8 @@
     border-top: 3px solid var(--color-primary);
     border-radius: 8px;
     padding: 25px;
-    margin-bottom: 20px;
     box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
 }
 
 .form-section h2 {
@@ -162,7 +260,7 @@
 
 .input-field {
     flex: 1;
-    min-width: 200px;
+    min-width: 220px;
 }
 
 .input-field label {
@@ -215,73 +313,34 @@
     line-height: 1.1;
 }
 
-/* Lists */
-.deposits-list {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.deposit-item, .staking-item {
+/* List Items */
+.list-item {
     background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
     border: 1px solid var(--color-border);
     border-top: 3px solid var(--color-primary);
     border-radius: 8px;
-    padding: 25px;
+    padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    margin-bottom: 15px;
     transition: all 0.3s ease;
 }
 
-.deposit-item:hover, .staking-item:hover {
+.list-item:hover {
     box-shadow: 0 8px 40px rgba(74, 144, 226, 0.2);
     transform: translateX(2px);
 }
 
-/* Buttons */
-button {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-    border: none;
-    border-radius: 8px;
-    padding: 15px 25px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(74, 144, 226, 0.4);
-    margin-right: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+.list-details strong {
+    color: var(--color-text);
 }
 
-button:hover {
-    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
-    box-shadow: 0 6px 30px rgba(74, 144, 226, 0.6);
-    transform: translateY(-2px);
-}
-
-.refresh-btn {
-    background: linear-gradient(135deg, #2ecc71, #27ae60);
-}
-
-.refresh-btn:hover {
-    background: linear-gradient(135deg, #27ae60, #229954);
-    box-shadow: 0 6px 25px rgba(46, 204, 113, 0.6);
-}
-
-.delete-btn {
-    background: linear-gradient(135deg, #ff4757, #ff3838);
-    padding: 8px 18px;
-    font-size: 14px;
-}
-
-.delete-btn:hover {
-    background: linear-gradient(135deg, #ff3838, #ff1f1f);
-    box-shadow: 0 4px 20px rgba(255,71,87,0.5);
+.list-details .note {
+    color: var(--color-muted);
+    font-size: 0.9em;
+    margin-top: 4px;
 }
 
 /* Chart */
@@ -303,32 +362,12 @@ button:hover {
     overflow: hidden;
 }
 
-/* Utilities */
-.profit-positive {
-    color: #2ecc71 !important;
-    font-weight: bold;
-}
-
-.profit-negative {
-    color: #e74c3c !important;
-    font-weight: bold;
-}
-
+/* Empty states */
 .empty-state {
     text-align: center;
     color: var(--color-muted);
     padding: 40px;
     font-style: italic;
-}
-
-.list-details strong {
-    color: var(--color-text);
-}
-
-.list-details .note {
-    color: var(--color-muted);
-    font-size: 0.9em;
-    margin-top: 4px;
 }
 
 /* Responsive */
@@ -344,83 +383,52 @@ button:hover {
     .input-field {
         min-width: 100%;
     }
+    
+    .backup-buttons {
+        flex-direction: column;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
 }
     </style>
-
 </head>
 <body>
-<div style="padding: 4px;"></div>
-<div class="container">
-<!-- Titolo a sinistra, sottotitolo a destra -->
-
-<div class="container-f" style="display:flex; align-items:center; justify-content:space-between; padding:4px 0;">
-  <h1 style="margin:0; font-size:1.75rem; line-height:1.8;">🧿 Panoramica</h1>
-
- <div >
-            <p><strong>*Dati di backup:</strong> ultimo agg:</strong> <span id="lastUpdate">-</span></p>
-			<p><strong>💹 Prezzo ATOM:</strong> <span id="atomPrice">Caricamento...</span></p>
-			<div class="price-info">
+    <div class="container">
+        <!-- Header -->
+        <div class="header-section">
+            <div class="header-content">
+                <h1 class="header-title">💼 Crypto Portfolio Tracker</h1>
+                <div class="price-info">
                     <div class="price-value" id="atomPrice">$0.0000</div>
                     <div class="price-update" id="lastUpdate">Caricamento...</div>
                 </div>
+            </div>
         </div>
-</div>
 
-</div>
-<div style="padding: 4px;"></div> 
-<div class="container">
+        <!-- Backup Section -->
+        <div class="backup-section">
+            <h2>💾 Backup & Ripristino</h2>
+            <div class="backup-buttons">
+                <button class="btn btn-success" onclick="scaricaBackupCompleto()">
+                    📥 Scarica Backup JSON Completo
+                </button>
+                <label class="btn btn-primary file-input-wrapper">
+                    📤 Carica Backup JSON
+                    <input type="file" class="file-input" accept=".json" onchange="importFromJSON(event)">
+                </label>
+                <button class="btn btn-purple" onclick="exportChartToHTML()">
+                    📊 Esporta Grafico HTML
+                </button>
+                <button class="btn btn-secondary" onclick="loadAtomPrice()">
+                    🔄 Aggiorna Prezzo ATOM
+                </button>
+            </div>
+        </div>
 
- <div class="container" style="padding-top: 12px; padding-bottom: 12px;">
- <!-- BLOCCO MENU -->
-  <div class="iflow-body">
-    <nav class="iflow-custom-menu">
-      <ul>
-        <li>
-          <div class="iflow-menu-label">Trade</div>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/">Trade attivi</a></li>
-			<li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
-			<li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
-          </ul>
-        </li>
-		 
-        <li>
-          <div class="iflow-menu-label">Capitale</div>
-          <ul>
-           
-			<li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Panoramica</a></li>
-			<li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
-			<li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
-			<li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
-			
-          </ul>
-        </li>
-       
-        <li>
-          <div class="iflow-menu-label">Strategia</div>
-          <ul>
-		  <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
-		  <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
-           
-          </ul>
-        </li>
-       
-		<li>
-          <div class="iflow-menu-label">Backup</div>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
-          </ul>
-        </li>
-		
-      </ul>
-    </nav>
-  </div>
-  </div>       
- <div style="padding: 6px;"></div> 
-   
-     
-          <!-- Summary Cards -->
+        <!-- Summary Cards -->
         <div class="summary-cards">
             <div class="card">
                 <h3>Totale Depositato</h3>
@@ -468,7 +476,7 @@ button:hover {
             </div>
             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                 <button class="btn btn-primary" onclick="addDeposit()">➕ Aggiungi Deposito</button>
-                <button class="btn btn-success" onclick="loadAllData()">🔄 Ricarica Dati</button>
+                <button class="btn btn-success refresh-btn" onclick="loadAllData()">🔄 Ricarica Dati</button>
             </div>
             <div class="deposits-list" id="depositsList"></div>
         </div>
@@ -514,25 +522,6 @@ button:hover {
             </div>
         </div>
     </div>
-	
-	<!-- FOOTER -->
-
-<div style="padding: 4px;"></div>  
-
-<div class="container">
-  <div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-      
-      <img src="images/logoinvest2a3.svg"
-           alt="FlowChart"
-           style="height: 50px; width: auto; margin-right: 16px;" />
-		   <p style="margin: 0; color: #c3c3c3; text-align: left; height: 10px; line-height: 12px;">
-        © 2025 FlowChart by Gerardo D'Orrico. Tutti i diritti riservati.
-      </p>
-    </div></div>
-
-<!-- Bottone torna sopra principale (con freccia CSS) -->
-    <button class="back-to-top" id="backToTop" title="Torna in cima"></button>  
 
     <script>
 let deposits = JSON.parse(localStorage.getItem('cryptoDeposits')) || [];
@@ -542,11 +531,12 @@ let atomPrice = 0;
 let lastUpdate = '';
 let chart = null;
 
+// Carica prezzo ATOM all'avvio e ogni 5 minuti
 function init() {
-    document.getElementById('depositDate').value = new Date().toISOString().split('T')[0];
     loadAtomPrice();
     setInterval(loadAtomPrice, 5 * 60 * 1000);
     loadAllData();
+    verificaBackupAutomatico();
 }
 
 async function loadAtomPrice() {
@@ -650,7 +640,7 @@ function updateDisplays() {
     document.getElementById('atomQuantityDisplay').textContent = atomQuantity.toFixed(6);
     document.getElementById('atomValueDisplay').textContent = `Valore: $${stakingValue.toFixed(2)}`;
     document.getElementById('tradingProfitDisplay').textContent = `$${tradingProfit.toFixed(2)}`;
-    document.getElementById('tradingProfitDisplay').parentElement.className = tradingProfit >= 0 ? 'stat-value profit-positive' : 'stat-value';
+    document.getElementById('tradingProfitDisplay').parentElement.className = tradingProfit >= 0 ? 'stat-value profit-positive' : 'stat-value profit-negative';
 
     updateChart();
 }
@@ -668,7 +658,7 @@ function updateDepositsList() {
                 <div><strong>${new Date(d.date).toLocaleDateString('it-IT')}</strong> - ${d.amount.toFixed(2)} ${d.currency}</div>
                 ${d.note ? `<div class="note">${d.note}</div>` : ''}
             </div>
-            <button class="btn btn-danger" onclick="removeDeposit(${d.id})">🗑️ Elimina</button>
+            <button class="btn btn-danger" onclick="removeDeposit(${d.id})" style="padding: 8px 16px; font-size: 0.9em;">🗑️ Elimina</button>
         </div>
     `).join('');
 }
@@ -747,7 +737,125 @@ function updateChart() {
     });
 }
 
-// Inizializzazione
+// Backup functions (integrate with existing site backup)
+function scaricaBackupCompleto(silenzioso = false) {
+    const blob = new Blob([JSON.stringify(localStorage, null, 2)], {
+        type: 'application/json'
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    
+    const oggi = new Date();
+    const giornoSettimana = oggi.toLocaleDateString('it-IT', { weekday: 'long' });
+    const dataOra = oggi.toISOString().slice(0, 19).replace(/:/g, '-');
+    
+    a.download = `backup-${giornoSettimana}-${dataOra}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    if (!silenzioso) {
+        console.log('✅ Backup manuale completato');
+        alert('✅ Backup JSON completo scaricato!');
+    }
+}
+
+function verificaBackupAutomatico() {
+    const CHIAVE_ULTIMO_BACKUP = 'ultimoBackupAutomatico';
+    const oggi = new Date().toDateString();
+    const ultimoBackup = localStorage.getItem(CHIAVE_ULTIMO_BACKUP);
+    
+    if (ultimoBackup !== oggi) {
+        console.log('🔄 Avvio backup automatico giornaliero...');
+        scaricaBackupCompleto(true);
+        localStorage.setItem(CHIAVE_ULTIMO_BACKUP, oggi);
+        console.log('✅ Backup automatico completato');
+    }
+}
+
+function importFromJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+            Object.keys(data).forEach(key => {
+                localStorage.setItem(key, data[key]);
+            });
+            location.reload();
+        } catch (error) {
+            alert('❌ Errore nel caricamento del file JSON');
+            console.error(error);
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+function exportChartToHTML() {
+    // Same chart export logic as React version
+    const totalDeposits = deposits.reduce((sum, d) => sum + d.amount, 0);
+    const stakingValue = atomQuantity * atomPrice;
+    const totalEquity = totalDeposits + tradingProfit + stakingValue;
+
+    const chartData = [];
+    let cumulativeDeposits = 0;
+    
+    deposits.forEach(d => {
+        cumulativeDeposits += d.amount;
+        chartData.push({
+            date: new Date(d.date).toLocaleDateString('it-IT'),
+            deposits: cumulativeDeposits,
+            equity: cumulativeDeposits + tradingProfit + stakingValue
+        });
+    });
+    
+    if (chartData.length === 0 || chartData[chartData.length - 1]?.date !== new Date().toLocaleDateString('it-IT')) {
+        chartData.push({
+            date: new Date().toLocaleDateString('it-IT'),
+            deposits: cumulativeDeposits,
+            equity: totalEquity
+        });
+    }
+
+    const html = `<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Portfolio Chart - ${new Date().toLocaleDateString('it-IT')}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>/* Same chart HTML styles */</style>
+</head>
+<body>
+    <!-- Chart HTML content -->
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const chartData = ${JSON.stringify(chartData)};
+        // Chart configuration
+    </script>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `crypto-portfolio-chart-${new Date().toISOString().split('T')[0]}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    alert('✅ Grafico HTML scaricato!');
+}
+
+// Initialize
+document.getElementById('depositDate').value = new Date().toISOString().split('T')[0];
 init();
     </script>
 </body>
