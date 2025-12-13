@@ -9,158 +9,21 @@
 	 <link rel="stylesheet" href="css/menusotto.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/trade.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-       
-        
-       
-        
-      
-        
-        .section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        h2 {
-            color: #764ba2;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-        
-        .input-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .input-field {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        label {
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        input, select {
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: transform 0.2s;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-        }
-        
-    .deposits-list, .staking-list {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+ <style>
+/* Base styles */
+:root {
+    --color-primary: #4a90e2;
+    --color-secondary: #667eea;
+    --color-border: rgba(255,255,255,0.1);
+    --color-text: #e0e0e0;
+    --color-muted: #a0a0a0;
+    --color-surface: rgba(35,35,59,0.6);
+    --color-card-bg: rgba(58,58,58,0.15);
+    --color-header-bg: rgba(96,96,96,0.3);
 }
 
-.deposit-item, .staking-item {
-    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
-    border: 1px solid var(--color-border);
-    border-top: 3px solid var(--color-primary);
-    border-radius: 8px;
-    padding: 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.deposit-item::before,
-.staking-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
-}
-
-.deposit-item:hover,
-.staking-item:hover {
-    box-shadow: 0 8px 40px rgba(74, 144, 226, 0.2);
-    transform: translateX(2px);
-}
-
-.deposit-item .deposit-details,
-.staking-item .staking-details {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.deposit-item .amount,
-.staking-item .amount {
-    font-size: 1.3em;
-    font-weight: 600;
-    color: var(--color-text);
-}
-
-.deposit-item .date,
-.staking-item .date {
-    color: var(--color-muted);
-    font-size: 0.95em;
-}
-
-.deposit-item .currency,
-.staking-item .currency {
-    color: #F2BB66;
-    font-weight: 500;
-}
-
-.deposit-item .note,
-.staking-item .note {
-    color: var(--color-text);
-    font-size: 0.9em;
-    font-style: italic;
-}
-
-        .delete-btn {
-            background: #ff4757;
-            padding: 5px 15px;
-            font-size: 14px;
-        }
-        
-      .summary-cards {
+/* Summary Cards */
+.summary-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
@@ -177,6 +40,7 @@
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    text-align: center;
 }
 
 .card::before {
@@ -208,55 +72,17 @@
     font-size: 32px;
     font-weight: 700;
     color: var(--color-text);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     line-height: 1.2;
 }
 
-.refresh-btn {
-    background: linear-gradient(135deg, #2ecc71, #27ae60);
-    border: none;
-    border-radius: 6px;
-    padding: 12px 20px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 15px rgba(46, 204, 113, 0.4);
-    margin-left: 10px;
+.card .subvalue {
+    font-size: 14px;
+    color: var(--color-muted);
+    font-weight: 500;
 }
 
-.refresh-btn:hover {
-    background: linear-gradient(135deg, #27ae60, #229954);
-    box-shadow: 0 6px 25px rgba(46, 204, 113, 0.6);
-    transform: translateY(-2px);
-}
-
-.profit-positive {
-    color: #2ecc71 !important;
-}
-
-.profit-negative {
-    color: #e74c3c !important;
-}
-
-.info-box {
-    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
-    border: 1px solid var(--color-border);
-    border-top: 3px solid #2196f3;
-    border-radius: 8px;
-    padding: 25px;
-    margin-bottom: 20px;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-}
-
-.info-box p {
-    margin: 10px 0;
-    color: var(--color-text);
-    font-size: 0.95em;
-    line-height: 1.6;
-}
-
-/* Section styling to match */
+/* Sections */
 .section {
     background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
     border: 1px solid var(--color-border);
@@ -276,7 +102,41 @@
     padding-bottom: 10px;
 }
 
-/* Input groups harmonized */
+.tax-section {
+    border-top-color: #764ba2;
+}
+
+.tax-section h2 {
+    color: #764ba2;
+}
+
+#taxInfo {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid #764ba2;
+    border-radius: 8px;
+    padding: 25px;
+    margin-top: 20px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+}
+
+#taxInfo h3 {
+    color: #764ba2;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    font-weight: 500;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+#taxInfo div {
+    padding: 12px;
+    background: rgba(35, 35, 59, 0.4);
+    border-radius: 6px;
+    border-left: 3px solid var(--color-primary);
+}
+
+/* Input Groups */
 .input-group {
     display: flex;
     flex-wrap: wrap;
@@ -317,8 +177,8 @@
     background: rgba(35, 35, 59, 0.6);
 }
 
-/* Button base styling */
-button:not(.refresh-btn) {
+/* Buttons */
+button {
     background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
     border: none;
     border-radius: 8px;
@@ -331,49 +191,141 @@ button:not(.refresh-btn) {
     margin-right: 10px;
 }
 
-button:not(.refresh-btn):hover {
+button:hover {
     background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
     box-shadow: 0 6px 30px rgba(74, 144, 226, 0.6);
     transform: translateY(-2px);
 }
 
-        
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin-top: 20px;
-        }
-        
-        .staking-info {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            font-size: 14px;
-        }
-        
-        .staking-info div {
-            padding: 5px;
-        }
-        
-        .profit-positive {
-            color: #2ecc71;
-            font-weight: bold;
-        }
-        
-        .profit-negative {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        
-       
-        
-        .refresh-btn {
-            background: #2ecc71;
-            margin-left: 10px;
-        }
-        
-      
-    </style>
+.refresh-btn {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.refresh-btn:hover {
+    background: linear-gradient(135deg, #27ae60, #229954);
+    box-shadow: 0 6px 25px rgba(46, 204, 113, 0.6);
+}
+
+.delete-btn {
+    background: linear-gradient(135deg, #ff4757, #ff3838);
+    padding: 8px 18px;
+    font-size: 14px;
+}
+
+.delete-btn:hover {
+    background: linear-gradient(135deg, #ff3838, #ff1f1f);
+    box-shadow: 0 4px 20px rgba(255,71,87,0.5);
+}
+
+/* Lists */
+.deposits-list, .staking-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.deposit-item, .staking-item {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+}
+
+.deposit-item:hover, .staking-item:hover {
+    box-shadow: 0 8px 40px rgba(74, 144, 226, 0.2);
+    transform: translateX(2px);
+}
+
+/* Tax Info */
+#taxInfo {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid #764ba2;
+    border-radius: 8px;
+    padding: 25px;
+    margin-top: 20px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+}
+
+#taxInfo h3 {
+    color: #764ba2;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    font-weight: 500;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+#taxInfo > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+}
+
+#taxInfo > div > div {
+    padding: 12px;
+    background: rgba(35, 35, 59, 0.4);
+    border-radius: 6px;
+    border-left: 3px solid var(--color-primary);
+}
+
+/* Chart */
+.chart-container {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    height: 400px;
+    position: relative;
+    margin-top: 20px;
+}
+
+/* Utilities */
+.profit-positive {
+    color: #2ecc71 !important;
+    font-weight: bold;
+}
+
+.profit-negative {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+.warning-box {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid #ffc107;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+}
+
+.warning-box p {
+    color: var(--color-text);
+    margin: 10px 0;
+}
+
+.loading {
+    text-align: center;
+    color: var(--color-primary);
+    font-size: 18px;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border-radius: 8px;
+    border-top: 3px solid var(--color-primary);
+}
+</style>
+
 </head>
 <body>
 <div style="padding: 4px;"></div>
@@ -385,6 +337,7 @@ button:not(.refresh-btn):hover {
 
  <div >
             <p><strong>*Dati di backup:</strong> ultimo agg:</strong> <span id="lastUpdate">-</span></p>
+			<p><strong>💹 Prezzo ATOM:</strong> <span id="atomPrice">Caricamento...</span></p>
         </div>
 </div>
 
@@ -442,7 +395,7 @@ button:not(.refresh-btn):hover {
  <div style="padding: 6px;"></div> 
    
      
-        <div class="summary-cards">
+         <div class="summary-cards">
             <div class="card">
                 <h3>Totale Depositato</h3>
                 <div class="value" id="totalDeposits">$0.00</div>
@@ -450,10 +403,12 @@ button:not(.refresh-btn):hover {
             <div class="card">
                 <h3>Profitto Trading</h3>
                 <div class="value" id="tradingProfit">$0.00</div>
+                <div class="subvalue" id="tradingCount">0 operazioni</div>
             </div>
             <div class="card">
                 <h3>Valore Staking</h3>
                 <div class="value" id="stakingValue">$0.00</div>
+                <div class="subvalue" id="stakingAmount">0 ATOM</div>
             </div>
             <div class="card">
                 <h3>Totale Patrimonio</h3>
@@ -490,6 +445,33 @@ button:not(.refresh-btn):hover {
             <div class="deposits-list" id="depositsList"></div>
         </div>
         
+        <div class="section tax-section">
+            <h2>🪙 ATOM Non Depositati (Staking Rewards)</h2>
+            <p style="margin-bottom: 15px; color: #555;">Inserisci la quantità di ATOM ricevuti dallo staking che non sono stati registrati come deposito in USDC. Questo valore serve per calcolare le plusvalenze fiscali.</p>
+            
+            <div class="input-group">
+                <div class="input-field">
+                    <label>ATOM da Staking (non depositati)</label>
+                    <input type="number" id="unrecordedAtom" step="0.000001" placeholder="0.000000">
+                </div>
+                <div class="input-field">
+                    <label>Prezzo Medio di Acquisizione ($)</label>
+                    <input type="number" id="atomAvgPrice" step="0.0001" placeholder="0.0000">
+                </div>
+            </div>
+            <button onclick="saveUnrecordedAtom()">💾 Salva ATOM Non Depositati</button>
+            
+            <div id="taxInfo" style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                <h3 style="color: #764ba2; margin-bottom: 10px;">📊 Calcolo Plusvalenza Fiscale</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    <div><strong>ATOM Non Depositati:</strong> <span id="taxAtomAmount">0.000000</span></div>
+                    <div><strong>Costo Medio:</strong> $<span id="taxCostBasis">0.00</span></div>
+                    <div><strong>Valore Attuale:</strong> $<span id="taxCurrentValue">0.00</span></div>
+                    <div class="profit-positive"><strong>Plusvalenza:</strong> $<span id="taxCapitalGain">0.00</span></div>
+                </div>
+            </div>
+        </div>
+        
         <div class="section">
             <h2>🪙 Gestione Staking</h2>
             <div class="staking-list" id="stakingList"></div>
@@ -504,11 +486,6 @@ button:not(.refresh-btn):hover {
     </div>
 	
 	<div style="padding: 1px;"></div> 
-
-		
- 
-
-
 
   	
         
@@ -531,11 +508,85 @@ button:not(.refresh-btn):hover {
  <!-- Bottone torna sopra principale (con freccia CSS) -->
     <button class="back-to-top" id="backToTop" title="Torna in cima"></button>  
     
-    <script>
+     <script>
         let deposits = [];
         let tradingData = null;
         let stakingData = {};
         let chart = null;
+        let atomPrice = 0;
+        let unrecordedAtomData = { amount: 0, avgPrice: 0 };
+        
+        // Cache per prezzi Binance
+        const priceCache = {};
+        const CACHE_DURATION = 60000; // 1 minuto
+        
+        // ------------------------------------------------------------------
+        //  Prezzi da Binance
+        // ------------------------------------------------------------------
+        async function getPriceFromBinance(symbol) {
+            const cleanSymbol = symbol.toUpperCase();
+            const now = Date.now();
+            
+            const pairUSDT = `${cleanSymbol}USDT`;
+            const pairUSDC = `${cleanSymbol}USDC`;
+            
+            const cacheKey = cleanSymbol.toLowerCase();
+            if (priceCache[cacheKey] && (now - priceCache[cacheKey].timestamp) < CACHE_DURATION) {
+                return priceCache[cacheKey].price;
+            }
+            
+            try {
+                let response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pairUSDT}`);
+                
+                if (!response.ok) {
+                    response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pairUSDC}`);
+                }
+                
+                if (!response.ok) throw new Error(`Coppia non trovata su Binance per ${cleanSymbol}`);
+                
+                const data = await response.json();
+                const price = parseFloat(data.price);
+                
+                priceCache[cacheKey] = { price, timestamp: now };
+                return price;
+            } catch (error) {
+                console.warn(`Binance: Prezzo non trovato per ${cleanSymbol}`, error);
+                return null;
+            }
+        }
+        
+        // Carica prezzo ATOM
+        async function loadAtomPrice() {
+            try {
+                const price = await getPriceFromBinance('ATOM');
+                if (price) {
+                    atomPrice = price;
+                    document.getElementById('atomPrice').textContent = `$${price.toFixed(4)} (Binance)`;
+                    updateAllPrices();
+                } else {
+                    document.getElementById('atomPrice').textContent = 'Non disponibile';
+                }
+            } catch (error) {
+                console.error('Errore caricamento prezzo ATOM:', error);
+                document.getElementById('atomPrice').textContent = 'Errore';
+            }
+        }
+        
+        // Aggiorna tutti i prezzi
+        function updateAllPrices() {
+            // Aggiorna prezzi nei portfolio staking
+            if (stakingData.atomPortfolio_1) {
+                stakingData.atomPortfolio_1.currentPrice = atomPrice;
+            }
+            if (stakingData.atomPortfolio) {
+                stakingData.atomPortfolio.currentPrice = atomPrice;
+            }
+            
+            renderStakingList();
+            updateSummary();
+            updateTaxInfo();
+            updateChart();
+        }
         
         // Carica tutti i dati dal localStorage
         function loadAllData() {
@@ -553,53 +604,123 @@ button:not(.refresh-btn):hover {
                 }
             }
             
-            // Carica dati trading (closedTrades, datiCapitale, singleTrades)
-            const closedTrades = localStorage.getItem('closedTrades');
-            const datiCapitale = localStorage.getItem('datiCapitale');
-            const singleTrades = localStorage.getItem('singleTrades');
+            // Carica ATOM non depositati
+            const savedUnrecorded = localStorage.getItem('unrecordedAtomData');
+            if (savedUnrecorded) {
+                try {
+                    unrecordedAtomData = JSON.parse(savedUnrecorded);
+                    document.getElementById('unrecordedAtom').value = unrecordedAtomData.amount;
+                    document.getElementById('atomAvgPrice').value = unrecordedAtomData.avgPrice;
+                    console.log('✅ ATOM non depositati caricati:', unrecordedAtomData);
+                } catch (e) {
+                    console.error('❌ Errore caricamento ATOM non depositati:', e);
+                }
+            }
             
-            tradingData = {
-                closedTrades: closedTrades ? safeParseJSON(closedTrades, []) : [],
-                datiCapitale: datiCapitale ? safeParseJSON(datiCapitale, {}) : {},
-                singleTrades: singleTrades ? safeParseJSON(singleTrades, []) : []
-            };
-            
-            console.log('✅ Dati trading caricati:', {
-                closedTrades: tradingData.closedTrades.length,
-                singleTrades: tradingData.singleTrades.length
-            });
+            // Carica dati trading
+            loadTradingData();
             
             // Carica dati staking
-            const atomPortfolio1 = localStorage.getItem('atomPortfolio_1');
-            const atomPortfolio = localStorage.getItem('atomPortfolio');
-            const currentMonthEntries = localStorage.getItem('currentMonthEntries');
-            const historicalEntries = localStorage.getItem('historicalEntries');
-            
-            stakingData = {
-                atomPortfolio_1: atomPortfolio1 ? safeParseJSON(atomPortfolio1, null) : null,
-                atomPortfolio: atomPortfolio ? safeParseJSON(atomPortfolio, null) : null,
-                currentMonthEntries: currentMonthEntries ? safeParseJSON(currentMonthEntries, []) : [],
-                historicalEntries: historicalEntries ? safeParseJSON(historicalEntries, []) : []
-            };
-            
-            console.log('✅ Dati staking caricati');
+            loadStakingData();
             
             // Aggiorna interfaccia
             renderDeposits();
             renderStakingList();
             updateSummary();
+            updateTaxInfo();
             updateChart();
             updateLastUpdate();
+            
+            // Carica prezzo ATOM
+            loadAtomPrice();
         }
         
-        // Parse JSON sicuro
-        function safeParseJSON(str, defaultValue) {
-            try {
-                const parsed = JSON.parse(str);
-                return parsed !== null ? parsed : defaultValue;
-            } catch (e) {
-                console.warn('Parse JSON fallito, uso valore di default:', e);
-                return defaultValue;
+        // Carica dati trading
+        function loadTradingData() {
+            tradingData = { closedTrades: [], datiCapitale: {}, singleTrades: [] };
+            
+            // Prova a caricare closedTrades
+            const closedTradesStr = localStorage.getItem('closedTrades');
+            if (closedTradesStr) {
+                try {
+                    const parsed = JSON.parse(closedTradesStr);
+                    tradingData.closedTrades = Array.isArray(parsed) ? parsed : [];
+                    console.log('✅ closedTrades caricati:', tradingData.closedTrades.length);
+                } catch (e) {
+                    console.warn('⚠️ Errore parsing closedTrades:', e);
+                }
+            }
+            
+            // Prova a caricare datiCapitale
+            const datiCapitaleStr = localStorage.getItem('datiCapitale');
+            if (datiCapitaleStr) {
+                try {
+                    tradingData.datiCapitale = JSON.parse(datiCapitaleStr) || {};
+                    console.log('✅ datiCapitale caricati');
+                } catch (e) {
+                    console.warn('⚠️ Errore parsing datiCapitale:', e);
+                }
+            }
+            
+            // Prova a caricare singleTrades
+            const singleTradesStr = localStorage.getItem('singleTrades');
+            if (singleTradesStr) {
+                try {
+                    const parsed = JSON.parse(singleTradesStr);
+                    tradingData.singleTrades = Array.isArray(parsed) ? parsed : [];
+                    console.log('✅ singleTrades caricati:', tradingData.singleTrades.length);
+                } catch (e) {
+                    console.warn('⚠️ Errore parsing singleTrades:', e);
+                }
+            }
+        }
+        
+        // Carica dati staking
+        function loadStakingData() {
+            stakingData = {};
+            
+            // atomPortfolio_1
+            const ap1Str = localStorage.getItem('atomPortfolio_1');
+            if (ap1Str) {
+                try {
+                    stakingData.atomPortfolio_1 = JSON.parse(ap1Str);
+                    console.log('✅ atomPortfolio_1 caricato');
+                } catch (e) {
+                    console.warn('⚠️ Errore parsing atomPortfolio_1:', e);
+                }
+            }
+            
+            // atomPortfolio
+            const apStr = localStorage.getItem('atomPortfolio');
+            if (apStr) {
+                try {
+                    stakingData.atomPortfolio = JSON.parse(apStr);
+                    console.log('✅ atomPortfolio caricato');
+                } catch (e) {
+                    console.warn('⚠️ Errore parsing atomPortfolio:', e);
+                }
+            }
+            
+            // currentMonthEntries
+            const cmeStr = localStorage.getItem('currentMonthEntries');
+            if (cmeStr) {
+                try {
+                    stakingData.currentMonthEntries = JSON.parse(cmeStr);
+                    console.log('✅ currentMonthEntries caricati');
+                } catch (e) {
+                    console.warn('⚠️ Errore parsing currentMonthEntries:', e);
+                }
+            }
+            
+            // historicalEntries
+            const heStr = localStorage.getItem('historicalEntries');
+            if (heStr) {
+                try {
+                    stakingData.historicalEntries = JSON.parse(heStr);
+                    console.log('✅ historicalEntries caricati');
+                } catch (e) {
+                    console.warn('⚠️ Errore parsing historicalEntries:', e);
+                }
             }
         }
         
@@ -607,6 +728,43 @@ button:not(.refresh-btn):hover {
         function saveDeposits() {
             localStorage.setItem('portfolioDeposits', JSON.stringify(deposits));
             updateLastUpdate();
+        }
+        
+        // Salva ATOM non depositati
+        function saveUnrecordedAtom() {
+            const amount = parseFloat(document.getElementById('unrecordedAtom').value) || 0;
+            const avgPrice = parseFloat(document.getElementById('atomAvgPrice').value) || 0;
+            
+            unrecordedAtomData = { amount, avgPrice };
+            localStorage.setItem('unrecordedAtomData', JSON.stringify(unrecordedAtomData));
+            
+            updateTaxInfo();
+            updateSummary();
+            updateChart();
+            
+            alert('✅ ATOM non depositati salvati con successo!');
+        }
+        
+        // Aggiorna info fiscali
+        function updateTaxInfo() {
+            const amount = unrecordedAtomData.amount || 0;
+            const avgPrice = unrecordedAtomData.avgPrice || 0;
+            const costBasis = amount * avgPrice;
+            const currentValue = amount * atomPrice;
+            const capitalGain = currentValue - costBasis;
+            
+            document.getElementById('taxAtomAmount').textContent = amount.toFixed(6);
+            document.getElementById('taxCostBasis').textContent = costBasis.toFixed(2);
+            document.getElementById('taxCurrentValue').textContent = currentValue.toFixed(2);
+            document.getElementById('taxCapitalGain').textContent = capitalGain.toFixed(2);
+            
+            // Colora in base al guadagno/perdita
+            const gainElement = document.getElementById('taxCapitalGain').parentElement;
+            if (capitalGain >= 0) {
+                gainElement.className = 'profit-positive';
+            } else {
+                gainElement.className = 'profit-negative';
+            }
         }
         
         // Salva dati staking aggiornati
@@ -653,7 +811,6 @@ button:not(.refresh-btn):hover {
             updateSummary();
             updateChart();
             
-            // Reset form
             document.getElementById('depositAmount').value = '';
             document.getElementById('depositNote').value = '';
             
@@ -701,45 +858,41 @@ button:not(.refresh-btn):hover {
             }, 0);
         }
         
-        // Calcola valore staking
+        // Calcola valore staking totale
         function calculateStakingValue() {
             let total = 0;
             
             if (stakingData.atomPortfolio_1) {
-                const portfolio = stakingData.atomPortfolio_1;
-                const currentPrice = parseFloat(portfolio.currentPrice) || 0;
-                const holdings = parseFloat(portfolio.currentHoldings) || 0;
-                total += holdings * currentPrice;
+                const holdings = parseFloat(stakingData.atomPortfolio_1.currentHoldings) || 0;
+                total += holdings * atomPrice;
             }
             
             if (stakingData.atomPortfolio) {
-                const portfolio = stakingData.atomPortfolio;
-                const currentPrice = parseFloat(portfolio.currentPrice) || 0;
-                const holdings = parseFloat(portfolio.currentHoldings) || 0;
-                total += holdings * currentPrice;
+                const holdings = parseFloat(stakingData.atomPortfolio.currentHoldings) || 0;
+                total += holdings * atomPrice;
             }
+            
+            // Aggiungi valore ATOM non depositati
+            total += (unrecordedAtomData.amount || 0) * atomPrice;
             
             return total;
         }
         
-        // Calcola profitto/perdita staking
-        function calculateStakingPL() {
-            let totalInvested = 0;
-            let totalValue = 0;
+        // Calcola totale ATOM
+        function calculateTotalAtom() {
+            let total = 0;
             
             if (stakingData.atomPortfolio_1) {
-                const p = stakingData.atomPortfolio_1;
-                totalInvested += parseFloat(p.totalInvested) || 0;
-                totalValue += (parseFloat(p.currentHoldings) || 0) * (parseFloat(p.currentPrice) || 0);
+                total += parseFloat(stakingData.atomPortfolio_1.currentHoldings) || 0;
             }
             
             if (stakingData.atomPortfolio) {
-                const p = stakingData.atomPortfolio;
-                totalInvested += parseFloat(p.totalInvested) || 0;
-                totalValue += (parseFloat(p.currentHoldings) || 0) * (parseFloat(p.currentPrice) || 0);
+                total += parseFloat(stakingData.atomPortfolio.currentHoldings) || 0;
             }
             
-            return totalValue - totalInvested;
+            total += unrecordedAtomData.amount || 0;
+            
+            return total;
         }
         
         // Renderizza lista staking
@@ -756,7 +909,7 @@ button:not(.refresh-btn):hover {
             }
             
             if (!html) {
-                html = '<p style="text-align: center; color: #999;">Nessun dato di staking disponibile nel localStorage</p>';
+                html = '<p style="text-align: center; color: #999;">Nessun dato di staking disponibile</p>';
             }
             
             list.innerHTML = html;
@@ -767,8 +920,7 @@ button:not(.refresh-btn):hover {
             const invested = parseFloat(portfolio.totalInvested) || 0;
             const holdings = parseFloat(portfolio.currentHoldings) || 0;
             const avgPrice = parseFloat(portfolio.averagePrice) || 0;
-            const currentPrice = parseFloat(portfolio.currentPrice) || 0;
-            const currentValue = holdings * currentPrice;
+            const currentValue = holdings * atomPrice;
             const profit = currentValue - invested;
             const profitPercent = invested > 0 ? (profit / invested * 100) : 0;
             
@@ -780,19 +932,17 @@ button:not(.refresh-btn):hover {
                             <div><strong>💰 Investito USDC:</strong> $${invested.toFixed(2)}</div>
                             <div><strong>🪙 Detenuto ATOM:</strong> ${holdings.toFixed(6)}</div>
                             <div><strong>📊 Prezzo Medio:</strong> $${avgPrice.toFixed(4)}</div>
-                            <div><strong>💹 Prezzo Attuale:</strong> $${currentPrice.toFixed(4)}</div>
+                            <div><strong>💹 Prezzo Attuale:</strong> $${atomPrice.toFixed(4)}</div>
                             <div><strong>💵 Valore Attuale:</strong> $${currentValue.toFixed(2)}</div>
                             <div class="${profit >= 0 ? 'profit-positive' : 'profit-negative'}">
-                                <strong>📈 P/L:</strong> $${profit.toFixed(2)} (${profitPercent.toFixed(2)}%)
+                                <strong>📈 P/L:</strong> ${profit.toFixed(2)} (${profitPercent.toFixed(2)}%)
                             </div>
                         </div>
                         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Aggiorna Dati Staking:</label>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Aggiorna Holdings:</label>
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                                 <input type="number" id="${key}_holdings" step="0.000001" 
                                        placeholder="Nuovi ATOM totali" style="flex: 1; min-width: 150px;">
-                                <input type="number" id="${key}_price" step="0.0001" 
-                                       placeholder="Prezzo attuale ATOM" style="flex: 1; min-width: 150px;">
                                 <button onclick="updateStaking('${key}')">✅ Aggiorna</button>
                             </div>
                         </div>
@@ -804,29 +954,18 @@ button:not(.refresh-btn):hover {
         // Aggiorna staking
         function updateStaking(key) {
             const newHoldings = parseFloat(document.getElementById(key + '_holdings').value);
-            const newPrice = parseFloat(document.getElementById(key + '_price').value);
             
             if (!stakingData[key]) {
                 alert('❌ Portfolio non trovato');
                 return;
             }
             
-            let updated = false;
-            
-            if (!isNaN(newHoldings) && newHoldings > 0) {
-                stakingData[key].currentHoldings = newHoldings;
-                updated = true;
-            }
-            
-            if (!isNaN(newPrice) && newPrice > 0) {
-                stakingData[key].currentPrice = newPrice;
-                updated = true;
-            }
-            
-            if (!updated) {
-                alert('⚠️ Inserisci almeno un valore valido');
+            if (isNaN(newHoldings) || newHoldings <= 0) {
+                alert('⚠️ Inserisci una quantità valida di ATOM');
                 return;
             }
+            
+            stakingData[key].currentHoldings = newHoldings;
             
             saveStakingData();
             renderStakingList();
@@ -834,7 +973,6 @@ button:not(.refresh-btn):hover {
             updateChart();
             
             document.getElementById(key + '_holdings').value = '';
-            document.getElementById(key + '_price').value = '';
             
             alert('✅ Staking aggiornato con successo!');
         }
@@ -845,11 +983,14 @@ button:not(.refresh-btn):hover {
             const tradingProfit = calculateTradingProfit();
             const stakingValue = calculateStakingValue();
             const totalEquity = totalDeposits + tradingProfit + stakingValue;
+            const totalAtom = calculateTotalAtom();
             
-            document.getElementById('totalDeposits').textContent = '$' + totalDeposits.toFixed(2);
-            document.getElementById('tradingProfit').textContent = '$' + tradingProfit.toFixed(2);
-            document.getElementById('stakingValue').textContent = '$' + stakingValue.toFixed(2);
-            document.getElementById('totalEquity').textContent = '$' + totalEquity.toFixed(2);
+            document.getElementById('totalDeposits').textContent = ' + totalDeposits.toFixed(2);
+            document.getElementById('tradingProfit').textContent = ' + tradingProfit.toFixed(2);
+            document.getElementById('tradingCount').textContent = (tradingData?.closedTrades?.length || 0) + ' operazioni';
+            document.getElementById('stakingValue').textContent = ' + stakingValue.toFixed(2);
+            document.getElementById('stakingAmount').textContent = totalAtom.toFixed(6) + ' ATOM';
+            document.getElementById('totalEquity').textContent = ' + totalEquity.toFixed(2);
         }
         
         // Aggiorna grafico
@@ -860,13 +1001,11 @@ button:not(.refresh-btn):hover {
                 chart.destroy();
             }
             
-            // Crea serie temporale
             const dataPoints = [];
             let cumulativeDeposits = 0;
             const tradingProfit = calculateTradingProfit();
             const stakingValue = calculateStakingValue();
             
-            // Aggiungi punti per ogni deposito
             deposits.forEach(d => {
                 cumulativeDeposits += d.amount;
                 dataPoints.push({
@@ -876,7 +1015,6 @@ button:not(.refresh-btn):hover {
                 });
             });
             
-            // Aggiungi punto corrente se ci sono dati
             if (dataPoints.length > 0 || tradingData || Object.keys(stakingData).length > 0) {
                 dataPoints.push({
                     date: new Date(),
@@ -885,7 +1023,6 @@ button:not(.refresh-btn):hover {
                 });
             }
             
-            // Se non ci sono dati, mostra grafico vuoto
             if (dataPoints.length === 0) {
                 dataPoints.push(
                     { date: new Date(Date.now() - 30*24*60*60*1000), deposits: 0, equity: 0 },
@@ -932,7 +1069,7 @@ button:not(.refresh-btn):hover {
                             intersect: false,
                             callbacks: {
                                 label: function(context) {
-                                    return context.dataset.label + ': $' + context.parsed.y.toFixed(2);
+                                    return context.dataset.label + ':  + context.parsed.y.toFixed(2);
                                 }
                             }
                         }
@@ -942,7 +1079,7 @@ button:not(.refresh-btn):hover {
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
-                                    return '$' + value.toFixed(0);
+                                    return ' + value.toFixed(0);
                                 }
                             }
                         }
@@ -978,6 +1115,9 @@ button:not(.refresh-btn):hover {
         // Carica tutti i dati all'avvio
         loadAllData();
         toggleBackToTopButton();
+        
+        // Aggiorna prezzo ATOM ogni 5 minuti
+        setInterval(loadAtomPrice, 5 * 60 * 1000);
         
         console.log('✅ Crypto Portfolio Tracker caricato completamente');
     </script>
