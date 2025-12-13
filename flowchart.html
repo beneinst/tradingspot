@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧿 Panoramica</title>
+    <title>Panoramica</title>
 	<link rel="icon" type="image/png" href="favicon.png"> 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-	 <link rel="stylesheet" href="css/menusotto.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/trade.css">
-<style>
-/* Base styles */
+    <link rel="stylesheet" href="css/trade.css">
+	<link rel="stylesheet" href="css/panoramica.css">
+    <link rel="stylesheet" href="css/menusotto.css">
+	<link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
 :root {
     --color-primary: #4a90e2;
     --color-secondary: #667eea;
@@ -22,9 +22,7 @@
     --color-header-bg: rgba(96,96,96,0.3);
 }
 
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 
 
@@ -57,94 +55,22 @@
     margin: 0;
 }
 
-.price-info {
-    text-align: right;
-}
+.price-info { text-align: right; }
+.price-value { font-size: 1.8em; font-weight: 700; color: var(--color-primary); margin-bottom: 4px; }
+.price-update { font-size: 0.9em; color: var(--color-muted); }
 
-.price-value {
-    font-size: 1.8em;
-    font-weight: 700;
-    color: var(--color-primary);
-    margin-bottom: 4px;
-}
-
-.price-update {
-    font-size: 0.9em;
-    color: var(--color-muted);
-}
-
-/* Summary Cards */
-.summary-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.card {
+/* Input Section */
+.input-section {
     background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
     border: 1px solid var(--color-border);
     border-top: 3px solid var(--color-primary);
     border-radius: 8px;
     padding: 25px;
     box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    text-align: center;
-}
-
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
-}
-
-.card:hover {
-    box-shadow: 0 8px 40px rgba(74, 144, 226, 0.3);
-    transform: translateY(-5px);
-}
-
-.card h3 {
-    color: #F2BB66;
-    margin-bottom: 14px;
-    font-size: 1.3em;
-    font-weight: 500;
-    opacity: 0.95;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.card .value {
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--color-text);
-    margin-bottom: 8px;
-    line-height: 1.2;
-}
-
-.card .subvalue {
-    font-size: 14px;
-    color: var(--color-muted);
-    font-weight: 500;
-}
-
-/* Form Sections */
-.form-section {
-    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
-    border: 1px solid var(--color-border);
-    border-top: 3px solid var(--color-primary);
-    border-radius: 8px;
-    padding: 25px;
     margin-bottom: 20px;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
 }
 
-.form-section h2 {
+.input-section h2 {
     color: #F2BB66;
     margin-bottom: 20px;
     font-size: 1.4em;
@@ -153,139 +79,19 @@
     padding-bottom: 10px;
 }
 
-.input-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 20px;
+.input-group { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+.input-field { flex: 1; min-width: 200px; }
+.input-field label { display: block; color: #F2BB66; margin-bottom: 8px; font-weight: 500; font-size: 0.95em; }
+.input-field input, .input-field select {
+    width: 100%; padding: 12px 15px; border: 1px solid var(--color-border); border-radius: 6px;
+    background: rgba(35, 35, 59, 0.4); color: var(--color-text); font-size: 1em; transition: all 0.3s ease;
 }
-
-.input-field {
-    flex: 1;
-    min-width: 200px;
-}
-
-.input-field label {
-    display: block;
-    color: #F2BB66;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 0.95em;
-}
-
-.input-field input,
-.input-field select {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    background: rgba(35, 35, 59, 0.4);
-    color: var(--color-text);
-    font-size: 1em;
-    transition: all 0.3s ease;
-}
-
-.input-field input:focus,
-.input-field select:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+.input-field input:focus, .input-field select:focus {
+    outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
     background: rgba(35, 35, 59, 0.6);
 }
 
-.stat-box {
-    background: rgba(35, 35, 59, 0.4);
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 4px solid var(--color-primary);
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.stat-box .stat-label {
-    color: var(--color-muted);
-    font-size: 0.95em;
-    margin-bottom: 8px;
-}
-
-.stat-box .stat-value {
-    font-size: 2.5em;
-    font-weight: 700;
-    color: var(--color-primary);
-    line-height: 1.1;
-}
-
-
-/* Lists */
-.deposits-list {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.deposit-item, .staking-item {
-    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
-    border: 1px solid var(--color-border);
-    border-top: 3px solid var(--color-primary);
-    border-radius: 8px;
-    padding: 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-    transition: all 0.3s ease;
-}
-
-.deposit-item:hover, .staking-item:hover {
-    box-shadow: 0 8px 40px rgba(74, 144, 226, 0.2);
-    transform: translateX(2px);
-}
-
-/* Buttons */
-button {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-    border: none;
-    border-radius: 8px;
-    padding: 15px 25px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(74, 144, 226, 0.4);
-    margin-right: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-button:hover {
-    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
-    box-shadow: 0 6px 30px rgba(74, 144, 226, 0.6);
-    transform: translateY(-2px);
-}
-
-.refresh-btn {
-    background: linear-gradient(135deg, #2ecc71, #27ae60);
-}
-
-.refresh-btn:hover {
-    background: linear-gradient(135deg, #27ae60, #229954);
-    box-shadow: 0 6px 25px rgba(46, 204, 113, 0.6);
-}
-
-.delete-btn {
-    background: linear-gradient(135deg, #ff4757, #ff3838);
-    padding: 8px 18px;
-    font-size: 14px;
-}
-
-.delete-btn:hover {
-    background: linear-gradient(135deg, #ff3838, #ff1f1f);
-    box-shadow: 0 4px 20px rgba(255,71,87,0.5);
-}
-
-/* Chart */
+/* Chart & Totals */
 .chart-section {
     background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
     border: 1px solid var(--color-border);
@@ -296,58 +102,86 @@ button:hover {
     margin-bottom: 20px;
 }
 
-.chart-container {
-    position: relative;
-    height: 400px;
-    background: rgba(35, 35, 59, 0.3);
+.chart-container { position: relative; height: 400px; background: rgba(35, 35, 59, 0.3); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+
+.totals-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.total-box {
+    background: rgba(35, 35, 59, 0.4);
+    padding: 20px;
     border-radius: 8px;
-    overflow: hidden;
-}
-
-/* Utilities */
-.profit-positive {
-    color: #2ecc71 !important;
-    font-weight: bold;
-}
-
-.profit-negative {
-    color: #e74c3c !important;
-    font-weight: bold;
-}
-
-.empty-state {
+    border-left: 4px solid var(--color-primary);
     text-align: center;
-    color: var(--color-muted);
-    padding: 40px;
-    font-style: italic;
 }
 
-.list-details strong {
-    color: var(--color-text);
+.total-box h4 { color: #F2BB66; margin: 0 0 10px 0; font-size: 1em; }
+.total-box .value { font-size: 1.8em; font-weight: 700; margin-bottom: 5px; }
+.total-box .subvalue { font-size: 0.9em; color: var(--color-muted); }
+
+.export-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+
+/* Data Lists */
+.data-section {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
 }
 
-.list-details .note {
-    color: var(--color-muted);
-    font-size: 0.9em;
-    margin-top: 4px;
+.data-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+
+.data-item {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
 }
 
-/* Responsive */
+.data-item:hover { box-shadow: 0 8px 40px rgba(74, 144, 226, 0.2); transform: translateX(2px); }
+
+.item-details strong { color: var(--color-text); }
+.item-details .note { color: var(--color-muted); font-size: 0.9em; margin-top: 4px; }
+
+/* Buttons */
+.btn {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    border: none; border-radius: 8px; padding: 12px 24px; color: white; font-weight: 600;
+    cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(74, 144, 226, 0.4);
+    display: inline-flex; align-items: center; gap: 8px;
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+    box-shadow: 0 6px 30px rgba(74, 144, 226, 0.6); transform: translateY(-2px);
+}
+
+.btn-success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+.btn-success:hover { background: linear-gradient(135deg, #27ae60, #229954); box-shadow: 0 6px 25px rgba(46, 204, 113, 0.6); }
+.btn-danger { background: linear-gradient(135deg, #ff4757, #ff3838); padding: 8px 16px; font-size: 0.9em; }
+.btn-danger:hover { background: linear-gradient(135deg, #ff3838, #ff1f1f); box-shadow: 0 4px 20px rgba(255,71,87,0.5); }
+
+.profit-positive { color: #2ecc71 !important; font-weight: bold; }
+.profit-negative { color: #e74c3c !important; font-weight: bold; }
+.empty-state { text-align: center; color: var(--color-muted); padding: 40px; font-style: italic; }
+
 @media (max-width: 768px) {
-    .summary-cards {
-        grid-template-columns: 1fr;
-    }
-    
-    .input-group {
-        flex-direction: column;
-    }
-    
-    .input-field {
-        min-width: 100%;
-    }
+    .input-group, .totals-section, .export-buttons { flex-direction: column; }
+    .input-field { min-width: 100%; }
 }
     </style>
-
 </head>
 <body>
 <div style="padding: 4px;"></div>
@@ -355,16 +189,11 @@ button:hover {
 <!-- Titolo a sinistra, sottotitolo a destra -->
 
 <div class="container-f" style="display:flex; align-items:center; justify-content:space-between; padding:4px 0;">
-  <h1 style="margin:0; font-size:1.75rem; line-height:1.8;">🧿 Panoramica</h1>
+  <h1 class="header-title">💼 Panoramica</h1>
 
- <div >
-            <p><strong>*Dati di backup:</strong> ultimo agg:</strong> <span id="lastUpdate">-</span></p>
-			<p><strong>💹 Prezzo ATOM:</strong> <span id="atomPrice">Caricamento...</span></p>
-			<div class="price-info">
-                    <div class="price-value" id="atomPrice">$0.0000</div>
-                    <div class="price-update" id="lastUpdate">Caricamento...</div>
-                </div>
-        </div>
+  <div style="font-size:0.9rem; line-height:1.3; color:#fff; text-align:right; padding-right: 10px;">
+    <em>*Gestione <strong>Trade</strong> Singoli con Accumulo e Prezzo Medio.</em>
+  </div>
 </div>
 
 </div>
@@ -418,105 +247,102 @@ button:hover {
     </nav>
   </div>
   </div>       
- <div style="padding: 6px;"></div> 
-   
-     
-          <!-- Summary Cards -->
-        <div class="summary-cards">
-            <div class="card">
-                <h3>Totale Depositato</h3>
-                <div class="value" id="totalDeposits">$0.00</div>
-            </div>
-            <div class="card">
-                <h3>Profitto Trading</h3>
-                <div class="value" id="tradingProfit">$0.00</div>
-                <div class="subvalue" id="tradingCount">0 operazioni</div>
-            </div>
-            <div class="card">
-                <h3>Valore Staking</h3>
-                <div class="value" id="stakingValue">$0.00</div>
-                <div class="subvalue" id="stakingAmount">0 ATOM</div>
-            </div>
-            <div class="card">
-                <h3>Totale Patrimonio</h3>
-                <div class="value" id="totalEquity">$0.00</div>
+   <div style="padding: 4px;"></div>         
+    <div class="container">
+        <!-- Header -->
+        <div class="header-section">
+            <div class="header-content">
+                <h1 class="header-title">💼 Crypto Portfolio Tracker</h1>
+                <div class="price-info">
+                    <div class="price-value" id="atomPrice">$0.0000</div>
+                    <div class="price-update" id="lastUpdate">Caricamento...</div>
+                </div>
             </div>
         </div>
 
-        <!-- Add Deposit -->
-        <div class="form-section">
-            <h2>💰 Aggiungi Deposito</h2>
+        <!-- 1. Input Section -->
+        <div class="input-section">
+            <h2>➕ Inserisci Operazione</h2>
             <div class="input-group">
                 <div class="input-field">
                     <label>Data</label>
-                    <input type="date" id="depositDate">
+                    <input type="date" id="operationDate">
                 </div>
                 <div class="input-field">
-                    <label>Importo ($)</label>
-                    <input type="number" id="depositAmount" step="0.01" placeholder="1000.00">
+                    <label>Importo</label>
+                    <input type="number" id="operationAmount" step="0.01" placeholder="1000.00">
                 </div>
                 <div class="input-field">
-                    <label>Valuta</label>
-                    <select id="depositCurrency">
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
+                    <label>Tipo</label>
+                    <select id="operationType">
+                        <option value="EUR">💶 Deposito Euro (- Capitale iniziale)</option>
+                        <option value="ATOM">🪙 ATOM acquistati (+ Investimento)</option>
+                        <option value="Trading">📈 Profitto Trading (+ Guadagno)</option>
                     </select>
                 </div>
                 <div class="input-field">
                     <label>Note</label>
-                    <input type="text" id="depositNote" placeholder="Deposito iniziale">
+                    <input type="text" id="operationNote" placeholder="Descrizione operazione">
                 </div>
             </div>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <button class="btn btn-primary" onclick="addDeposit()">➕ Aggiungi Deposito</button>
-                <button class="btn btn-success" onclick="loadAllData()">🔄 Ricarica Dati</button>
-            </div>
-            <div class="deposits-list" id="depositsList"></div>
+            <button class="btn btn-primary" onclick="addOperation()">➕ Aggiungi Operazione</button>
         </div>
 
-        <!-- ATOM Management -->
-        <div class="form-section">
-            <h2>🪙 Gestione ATOM</h2>
-            <div class="stat-box">
-                <div class="stat-label">ATOM Totali Detenuti</div>
-                <div class="stat-value" id="atomQuantityDisplay">0.000000</div>
-                <div class="stat-label" id="atomValueDisplay">Valore: $0.00</div>
-            </div>
-            <div class="input-group" style="align-items: end;">
-                <div class="input-field" style="flex: 1;">
-                    <label>Aggiungi ATOM (si sommeranno al totale)</label>
-                    <input type="number" id="newAtomQuantity" step="0.000001" placeholder="0.000000">
-                </div>
-                <button class="btn btn-primary" onclick="addAtom()">➕ Aggiungi ATOM</button>
-            </div>
-        </div>
-
-        <!-- Trading Profit -->
-        <div class="form-section">
-            <h2>📈 Profitto Trading</h2>
-            <div class="stat-box" id="tradingProfitBox">
-                <div class="stat-label">Profitto Attuale</div>
-                <div class="stat-value" id="tradingProfitDisplay">$0.00</div>
-            </div>
-            <div class="input-group" style="align-items: end;">
-                <div class="input-field" style="flex: 1;">
-                    <label>Aggiorna Profitto Trading ($)</label>
-                    <input type="number" id="newTradingProfit" step="0.01" placeholder="0.00">
-                </div>
-                <button class="btn btn-success" onclick="updateTradingProfit()">✅ Aggiorna Profitto</button>
-            </div>
-        </div>
-
-        <!-- Chart -->
+        <!-- 2. Chart + Totals + Export -->
         <div class="chart-section">
-            <h2>📊 Grafico Patrimonio</h2>
+            <h2>📊 Evoluzione Patrimonio</h2>
             <div class="chart-container">
                 <canvas id="equityChart"></canvas>
+            </div>
+            
+            <div class="totals-section">
+                <div class="total-box">
+                    <h4>💶 Capitale Depositato</h4>
+                    <div class="value profit-negative" id="totalEur">€0.00</div>
+                </div>
+                <div class="total-box">
+                    <h4>🪙 Valore ATOM</h4>
+                    <div class="value profit-positive" id="totalAtomValue">$0.00</div>
+                    <div class="subvalue" id="totalAtomQty">0 ATOM</div>
+                </div>
+                <div class="total-box">
+                    <h4>📈 Profitto Trading</h4>
+                    <div class="value" id="totalTrading">$0.00</div>
+                </div>
+                <div class="total-box">
+                    <h4>💎 RENDIMENTO NETTO</h4>
+                    <div class="value" id="totalEquity">$0.00</div>
+                </div>
+            </div>
+            
+            <div class="export-buttons">
+                <button class="btn btn-success" onclick="exportDataHTML()">📊 Esporta Dati</button>
+                <button class="btn btn-primary" onclick="exportChartHTML()">📈 Esporta Grafico</button>
+                <button class="btn btn-success" onclick="loadAllData()">🔄 Aggiorna</button>
+            </div>
+        </div>
+
+        <!-- 3. Data Lists by Type -->
+        <div class="data-section">
+            <h2>📋 Operazioni Registrate</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+                <div>
+                    <h3 style="color: #F2BB66; margin-bottom: 15px;">💶 Depositi Euro (Capitale -)</h3>
+                    <div class="data-list" id="eurList"></div>
+                </div>
+                <div>
+                    <h3 style="color: #F2BB66; margin-bottom: 15px;">🪙 ATOM Acquistati (+)</h3>
+                    <div class="data-list" id="atomList"></div>
+                </div>
+                <div>
+                    <h3 style="color: #F2BB66; margin-bottom: 15px;">📈 Profitti Trading (+)</h3>
+                    <div class="data-list" id="tradingList"></div>
+                </div>
             </div>
         </div>
     </div>
 	
-	<!-- FOOTER -->
+		<!-- FOOTER -->
 
 <div style="padding: 4px;"></div>  
 
@@ -534,17 +360,47 @@ button:hover {
 
 <!-- Bottone torna sopra principale (con freccia CSS) -->
     <button class="back-to-top" id="backToTop" title="Torna in cima"></button>  
+    
+    <script>
+        // Funzione per mostrare/nascondere il bottone
+        function toggleBackToTopButton() {
+            const backToTop = document.getElementById('backToTop');
+            const backToTopAlt = document.getElementById('backToTopAlt');
+            
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+                backToTopAlt.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+                backToTopAlt.classList.remove('show');
+            }
+        }
+        
+        // Funzione per tornare in cima con animazione smooth
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Event listeners
+        window.addEventListener('scroll', toggleBackToTopButton);
+        
+        document.getElementById('backToTop').addEventListener('click', scrollToTop);
+        document.getElementById('backToTopAlt').addEventListener('click', scrollToTop);
+        
+        // Controlla subito se mostrare il bottone
+        toggleBackToTopButton();
+    </script>
 
     <script>
-let deposits = JSON.parse(localStorage.getItem('cryptoDeposits')) || [];
-let atomQuantity = parseFloat(localStorage.getItem('atomQuantity')) || 0;
-let tradingProfit = parseFloat(localStorage.getItem('tradingProfit')) || 0;
+let operations = JSON.parse(localStorage.getItem('cryptoOperations')) || [];
 let atomPrice = 0;
-let lastUpdate = '';
 let chart = null;
 
 function init() {
-    document.getElementById('depositDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('operationDate').value = new Date().toISOString().split('T')[0];
     loadAtomPrice();
     setInterval(loadAtomPrice, 5 * 60 * 1000);
     loadAllData();
@@ -565,166 +421,145 @@ async function loadAtomPrice() {
     }
 }
 
-function loadAllData() {
-    updateDepositsList();
-    updateDisplays();
-}
+function addOperation() {
+    const date = document.getElementById('operationDate').value;
+    const amount = parseFloat(document.getElementById('operationAmount').value);
+    const type = document.getElementById('operationType').value;
+    const note = document.getElementById('operationNote').value;
 
-function addDeposit() {
-    const depositDate = document.getElementById('depositDate').value;
-    const depositAmount = parseFloat(document.getElementById('depositAmount').value);
-    const depositCurrency = document.getElementById('depositCurrency').value;
-    const depositNote = document.getElementById('depositNote').value;
-
-    if (!depositDate || !depositAmount || isNaN(depositAmount)) {
+    if (!date || !amount || isNaN(amount)) {
         alert('⚠️ Inserisci data e importo validi');
         return;
     }
 
-    const newDeposit = {
-        id: Date.now(),
-        date: depositDate,
-        amount: depositAmount,
-        currency: depositCurrency,
-        note: depositNote
-    };
-
-    deposits = [...deposits, newDeposit].sort((a, b) => new Date(a.date) - new Date(b.date));
-    localStorage.setItem('cryptoDeposits', JSON.stringify(deposits));
+    const operation = { id: Date.now(), date, amount, type, note };
+    operations = [...operations, operation].sort((a, b) => new Date(a.date) - new Date(b.date));
+    localStorage.setItem('cryptoOperations', JSON.stringify(operations));
     
-    document.getElementById('depositAmount').value = '';
-    document.getElementById('depositNote').value = '';
-    document.getElementById('depositDate').value = new Date().toISOString().split('T')[0];
-    
-    updateDepositsList();
-    updateDisplays();
-    alert('✅ Deposito aggiunto con successo!');
+    document.getElementById('operationAmount').value = '';
+    document.getElementById('operationNote').value = '';
+    loadAllData();
+    alert('✅ Operazione aggiunta!');
 }
 
-function removeDeposit(id) {
-    if (!confirm('⚠️ Sei sicuro di voler eliminare questo deposito?')) return;
-    deposits = deposits.filter(d => d.id !== id);
-    localStorage.setItem('cryptoDeposits', JSON.stringify(deposits));
-    updateDepositsList();
-    updateDisplays();
-}
-
-function addAtom() {
-    const quantity = parseFloat(document.getElementById('newAtomQuantity').value);
-    if (isNaN(quantity) || quantity <= 0) {
-        alert('⚠️ Inserisci una quantità valida di ATOM');
-        return;
-    }
-
-    atomQuantity += quantity;
-    localStorage.setItem('atomQuantity', atomQuantity);
-    document.getElementById('newAtomQuantity').value = '';
-    updateDisplays();
-    alert(`✅ Aggiunti ${quantity.toFixed(6)} ATOM! Totale: ${atomQuantity.toFixed(6)} ATOM`);
-}
-
-function updateTradingProfit() {
-    const profit = parseFloat(document.getElementById('newTradingProfit').value);
-    if (isNaN(profit)) {
-        alert('⚠️ Inserisci un valore valido');
-        return;
-    }
-
-    tradingProfit = profit;
-    localStorage.setItem('tradingProfit', tradingProfit);
-    document.getElementById('newTradingProfit').value = '';
-    updateDisplays();
-    alert('✅ Profitto trading aggiornato!');
+function removeOperation(id) {
+    if (!confirm('⚠️ Elimina operazione?')) return;
+    operations = operations.filter(op => op.id !== id);
+    localStorage.setItem('cryptoOperations', JSON.stringify(operations));
+    loadAllData();
 }
 
 function updateDisplays() {
-    const totalDeposits = deposits.reduce((sum, d) => sum + d.amount, 0);
-    const stakingValue = atomQuantity * atomPrice;
-    const totalEquity = totalDeposits + tradingProfit + stakingValue;
-
-    document.getElementById('totalDeposits').textContent = `$${totalDeposits.toFixed(2)}`;
-    document.getElementById('tradingProfit').textContent = `$${tradingProfit.toFixed(2)}`;
-    document.getElementById('tradingProfit').className = tradingProfit >= 0 ? 'value profit-positive' : 'value profit-negative';
-    document.getElementById('stakingValue').textContent = `$${stakingValue.toFixed(2)}`;
-    document.getElementById('stakingAmount').textContent = `${atomQuantity.toFixed(6)} ATOM`;
-    document.getElementById('totalEquity').textContent = `$${totalEquity.toFixed(2)}`;
-    document.getElementById('atomQuantityDisplay').textContent = atomQuantity.toFixed(6);
-    document.getElementById('atomValueDisplay').textContent = `Valore: $${stakingValue.toFixed(2)}`;
-    document.getElementById('tradingProfitDisplay').textContent = `$${tradingProfit.toFixed(2)}`;
-    document.getElementById('tradingProfitDisplay').parentElement.className = tradingProfit >= 0 ? 'stat-value profit-positive' : 'stat-value';
-
-    updateChart();
+    const eurDeposits = operations.filter(op => op.type === 'EUR');
+    const atomBuys = operations.filter(op => op.type === 'ATOM');
+    const tradingProfits = operations.filter(op => op.type === 'Trading');
+    
+    // EUR è il CAPITALE USCITO (negativo)
+    const totalEurOut = eurDeposits.reduce((sum, op) => sum + op.amount, 0);
+    const totalAtomQty = atomBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalAtomValue = totalAtomQty * atomPrice;
+    const totalTrading = tradingProfits.reduce((sum, op) => sum + op.amount, 0);
+    
+    // RENDIMENTO NETTO = (ATOM + Trading) - Capitale depositato
+    const netEquity = totalAtomValue + totalTrading - totalEurOut;
+    
+    document.getElementById('totalEur').textContent = `-€${totalEurOut.toFixed(2)}`;
+    document.getElementById('totalAtomValue').textContent = `+$${totalAtomValue.toFixed(2)}`;
+    document.getElementById('totalAtomQty').textContent = `${totalAtomQty.toFixed(6)} ATOM`;
+    document.getElementById('totalTrading').textContent = `+$${totalTrading.toFixed(2)}`;
+    document.getElementById('totalEquity').textContent = `${netEquity >= 0 ? '+' : ''}$${Math.abs(netEquity).toFixed(2)}`;
+    document.getElementById('totalEquity').className = netEquity >= 0 ? 'value profit-positive' : 'value profit-negative';
+    
+    updateChart(totalEurOut, totalAtomValue, totalTrading, netEquity);
 }
 
-function updateDepositsList() {
-    const container = document.getElementById('depositsList');
-    if (deposits.length === 0) {
-        container.innerHTML = '<div class="empty-state">Nessun deposito inserito</div>';
+function updateAllLists() {
+    updateList('eurList', 'EUR');
+    updateList('atomList', 'ATOM');
+    updateList('tradingList', 'Trading');
+}
+
+function updateList(containerId, type) {
+    const container = document.getElementById(containerId);
+    const typeOps = operations.filter(op => op.type === type);
+    
+    if (typeOps.length === 0) {
+        container.innerHTML = `<div class="empty-state">Nessuna operazione ${type}</div>`;
         return;
     }
-
-    container.innerHTML = deposits.map(d => `
-        <div class="list-item">
-            <div class="list-details">
-                <div><strong>${new Date(d.date).toLocaleDateString('it-IT')}</strong> - ${d.amount.toFixed(2)} ${d.currency}</div>
-                ${d.note ? `<div class="note">${d.note}</div>` : ''}
+    
+    container.innerHTML = typeOps.map(op => `
+        <div class="data-item">
+            <div class="item-details">
+                <div><strong>${new Date(op.date).toLocaleDateString('it-IT')}</strong></div>
+                <div>${(type === 'EUR' ? '-' : '+')}${op.amount.toFixed(type === 'ATOM' ? 6 : 2)} ${type === 'EUR' ? '€' : type === 'ATOM' ? 'ATOM' : '$'}</div>
+                ${op.note ? `<div class="note">${op.note}</div>` : ''}
             </div>
-            <button class="btn btn-danger" onclick="removeDeposit(${d.id})">🗑️ Elimina</button>
+            <button class="btn btn-danger" onclick="removeOperation(${op.id})">🗑️</button>
         </div>
     `).join('');
 }
 
-function updateChart() {
-    const totalDeposits = deposits.reduce((sum, d) => sum + d.amount, 0);
-    const stakingValue = atomQuantity * atomPrice;
-    const totalEquity = totalDeposits + tradingProfit + stakingValue;
-
+function updateChart(totalEurOut, totalAtomValue, totalTrading, netEquity) {
     const chartData = [];
-    let cumulativeDeposits = 0;
+    let cumulativeEurOut = 0, cumulativeAtomValue = 0, cumulativeTrading = 0;
     
-    deposits.forEach(d => {
-        cumulativeDeposits += d.amount;
+    const sortedOperations = operations.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    sortedOperations.forEach(op => {
+        if (op.type === 'EUR') cumulativeEurOut += op.amount;
+        else if (op.type === 'ATOM') cumulativeAtomValue += op.amount * atomPrice;
+        else if (op.type === 'Trading') cumulativeTrading += op.amount;
+        
         chartData.push({
-            date: new Date(d.date).toLocaleDateString('it-IT'),
-            deposits: cumulativeDeposits,
-            equity: cumulativeDeposits + tradingProfit + stakingValue
+            date: new Date(op.date).toLocaleDateString('it-IT'),
+            eurOut: -cumulativeEurOut,  // Negativo
+            atomValue: cumulativeAtomValue,
+            trading: cumulativeTrading,
+            netEquity: cumulativeAtomValue + cumulativeTrading - cumulativeEurOut
         });
     });
     
-    if (chartData.length === 0 || chartData[chartData.length - 1]?.date !== new Date().toLocaleDateString('it-IT')) {
-        chartData.push({
-            date: new Date().toLocaleDateString('it-IT'),
-            deposits: cumulativeDeposits,
-            equity: totalEquity
-        });
-    }
-
     const ctx = document.getElementById('equityChart').getContext('2d');
+    if (chart) chart.destroy();
     
-    if (chart) {
-        chart.destroy();
-    }
-
     chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: chartData.map(d => d.date),
             datasets: [
                 {
-                    label: 'Depositi Cumulativi',
-                    data: chartData.map(d => d.deposits),
-                    borderColor: '#764ba2',
-                    backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                    label: 'Capitale Depositato (-)',
+                    data: chartData.map(d => d.eurOut),
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
                     tension: 0.4,
-                    fill: true
+                    fill: false
                 },
                 {
-                    label: 'Patrimonio Totale',
-                    data: chartData.map(d => d.equity),
-                    borderColor: '#4a90e2',
-                    backgroundColor: 'rgba(74, 144, 226, 0.1)',
+                    label: 'Valore ATOM (+)',
+                    data: chartData.map(d => d.atomValue),
+                    borderColor: '#2ecc71',
+                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
                     tension: 0.4,
-                    fill: true
+                    fill: false
+                },
+                {
+                    label: 'Trading Profit (+)',
+                    data: chartData.map(d => d.trading),
+                    borderColor: '#f39c12',
+                    backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'RENDIMENTO NETTO',
+                    data: chartData.map(d => d.netEquity),
+                    borderColor: '#9b59b6',
+                    backgroundColor: 'rgba(155, 89, 182, 0.2)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3
                 }
             ]
         },
@@ -734,21 +569,61 @@ function updateChart() {
             plugins: {
                 legend: { position: 'top' }
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value.toLocaleString();
-                        }
-                    }
+            scales: { 
+                y: { 
+                    ticks: { callback: function(value) { return '$' + value.toLocaleString(); } }
                 }
             }
         }
     });
 }
 
-// Inizializzazione
+function loadAllData() {
+    updateAllLists();
+    updateDisplays();
+}
+
+function exportDataHTML() {
+    const data = {
+        operations,
+        atomPrice,
+        totals: {
+            capitaleDepositato: operations.filter(op => op.type === 'EUR').reduce((sum, op) => sum + op.amount, 0),
+            atomQty: operations.filter(op => op.type === 'ATOM').reduce((sum, op) => sum + op.amount, 0),
+            atomValue: operations.filter(op => op.type === 'ATOM').reduce((sum, op) => sum + op.amount, 0) * atomPrice,
+            tradingProfit: operations.filter(op => op.type === 'Trading').reduce((sum, op) => sum + op.amount, 0),
+            rendimentoNetto: (operations.filter(op => op.type === 'ATOM').reduce((sum, op) => sum + op.amount, 0) * atomPrice) + 
+                            operations.filter(op => op.type === 'Trading').reduce((sum, op) => sum + op.amount, 0) - 
+                            operations.filter(op => op.type === 'EUR').reduce((sum, op) => sum + op.amount, 0)
+        }
+    };
+    
+    const html = `
+        <!DOCTYPE html>
+        <html><head><title>Portfolio Analysis</title></head>
+        <body style="font-family: Arial; padding: 20px;">
+            <h1>📊 Portfolio Analysis - ${new Date().toLocaleDateString('it-IT')}</h1>
+            <h2>📈 Totali</h2>
+            <pre>${JSON.stringify(data.totals, null, 2)}</pre>
+            <h2>📋 Operazioni (${data.operations.length})</h2>
+            <pre>${JSON.stringify(data.operations, null, 2)}</pre>
+        </body></html>`;
+    
+    downloadFile(html, `portfolio-analysis-${new Date().toISOString().split('T')[0]}.html`);
+}
+
+function exportChartHTML() {
+    downloadFile(`<h1>Grafico generato: ${new Date().toLocaleString('it-IT')}</h1>`, 'portfolio-chart.html');
+}
+
+function downloadFile(content, filename) {
+    const blob = new Blob([content], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+}
+
 init();
     </script>
 </body>
