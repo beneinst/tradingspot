@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Portfolio Tracker</title>
+    <title>🧿 Panoramica</title>
+	<link rel="icon" type="image/png" href="favicon.png"> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 	 <link rel="stylesheet" href="css/menusotto.css">
   <link rel="stylesheet" href="css/style.css">
@@ -81,21 +82,78 @@
             transform: translateY(-2px);
         }
         
-        .deposits-list, .staking-list {
-            margin-top: 20px;
-        }
-        
-        .deposit-item, .staking-item {
-            background: white;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
+    .deposits-list, .staking-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.deposit-item, .staking-item {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.deposit-item::before,
+.staking-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+}
+
+.deposit-item:hover,
+.staking-item:hover {
+    box-shadow: 0 8px 40px rgba(74, 144, 226, 0.2);
+    transform: translateX(2px);
+}
+
+.deposit-item .deposit-details,
+.staking-item .staking-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.deposit-item .amount,
+.staking-item .amount {
+    font-size: 1.3em;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.deposit-item .date,
+.staking-item .date {
+    color: var(--color-muted);
+    font-size: 0.95em;
+}
+
+.deposit-item .currency,
+.staking-item .currency {
+    color: #F2BB66;
+    font-weight: 500;
+}
+
+.deposit-item .note,
+.staking-item .note {
+    color: var(--color-text);
+    font-size: 0.9em;
+    font-style: italic;
+}
+
         .delete-btn {
             background: #ff4757;
             padding: 5px 15px;
@@ -323,10 +381,10 @@ button:not(.refresh-btn):hover {
 <!-- Titolo a sinistra, sottotitolo a destra -->
 
 <div class="container-f" style="display:flex; align-items:center; justify-content:space-between; padding:4px 0;">
-  <h1 style="margin:0; font-size:1.75rem; line-height:1.8;">📈 Crypto Portfolio Tracker</h1>
+  <h1 style="margin:0; font-size:1.75rem; line-height:1.8;">🧿 Panoramica</h1>
 
  <div >
-            <p><strong>ℹ️ Dati di backup:</strong> ultimo agg:</strong> <span id="lastUpdate">-</span></p>
+            <p><strong>*Dati di backup:</strong> ultimo agg:</strong> <span id="lastUpdate">-</span></p>
         </div>
 </div>
 
@@ -352,9 +410,11 @@ button:not(.refresh-btn):hover {
           <div class="iflow-menu-label">Capitale</div>
           <ul>
            
+			<li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Panoramica</a></li>
+			<li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
 			<li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
 			<li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
-			<li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
+			
           </ul>
         </li>
        
@@ -362,19 +422,12 @@ button:not(.refresh-btn):hover {
           <div class="iflow-menu-label">Strategia</div>
           <ul>
 		  <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
-            
-            <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/chartflow/index.html">Segnali</a></li>
-          </ul>
-        </li>
-        <li>
-          <div class="iflow-menu-label">Fondamenti</div>
-          <ul>
 		  <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/cheat-sheet.html">Patterns</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/candlestick.html">Candlestick</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+           
           </ul>
         </li>
+       
 		<li>
           <div class="iflow-menu-label">Backup</div>
           <ul>

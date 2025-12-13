@@ -8,6 +8,113 @@
   <link rel="stylesheet" href="css/menusotto.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/trade.css">
+ <style>
+ .welcome-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.welcome-section .note {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+}
+
+.welcome-section .note:hover {
+    box-shadow: 0 8px 40px rgba(74, 144, 226, 0.2);
+    transform: translateX(2px);
+}
+
+.welcome-section .note h3,
+.welcome-section .note h4 {
+    color: inherit;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+    font-weight: 500;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+.welcome-section .note ul {
+    margin: 15px 0;
+    padding-left: 25px;
+}
+
+.welcome-section .note li {
+    margin-bottom: 12px;
+    color: var(--color-text);
+    line-height: 1.6;
+    font-size: 1em;
+}
+
+.archive-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.archive-links li {
+    margin-bottom: 15px;
+}
+
+.archive-links a {
+    display: inline-block;
+    background: transparent;
+    color: var(--color-primary);
+    padding: 12px 20px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.archive-links a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.archive-links a:hover {
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.archive-links a:hover::before {
+    opacity: 1;
+}
+
+.archive-links a:hover {
+    box-shadow: 0 6px 25px rgba(74, 144, 226, 0.4);
+    transform: translateY(-2px);
+}
+
+
+.welcome-section .note p {
+    margin-bottom: 15px;
+    color: var(--color-text);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+</style>
 </head>
 <body>
 <div style="padding: 4px;"></div>
@@ -27,7 +134,7 @@
 <div class="container">
 
  <div class="container" style="padding-top: 12px; padding-bottom: 12px;">
- <!-- BLOCCO MENU -->
+  <!-- BLOCCO MENU -->
   <div class="iflow-body">
     <nav class="iflow-custom-menu">
       <ul>
@@ -44,9 +151,11 @@
           <div class="iflow-menu-label">Capitale</div>
           <ul>
            
+			<li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Panoramica</a></li>
+			<li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
 			<li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
 			<li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
-			<li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
+			
           </ul>
         </li>
        
@@ -54,19 +163,12 @@
           <div class="iflow-menu-label">Strategia</div>
           <ul>
 		  <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
-            
-            <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/chartflow/index.html">Segnali</a></li>
-          </ul>
-        </li>
-        <li>
-          <div class="iflow-menu-label">Fondamenti</div>
-          <ul>
 		  <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/cheat-sheet.html">Patterns</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/candlestick.html">Candlestick</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+           
           </ul>
         </li>
+       
 		<li>
           <div class="iflow-menu-label">Backup</div>
           <ul>
@@ -77,7 +179,7 @@
       </ul>
     </nav>
   </div>
-  </div>       
+  </div>                
  <div style="padding: 6px;"></div> 
    <div class="container">
 
@@ -128,37 +230,52 @@
 
   </div>
   <div style="padding: 7px;"></div>-->
-  
+   <div class="container">
    
-  <div class="container">
-  
-  <div class="container" style="padding-left: 30px; padding-right: 30px; padding-bottom: 20px; padding-top: 20px; text-align: justify; line-height: 1.8;">
-    <h3 style="color: #FFD012;">🎉 Benvenuto su Invest Flow</h3>
-    <div>
-      Nell'app trovi strumenti concreti per la gestione del capitale e la crescita nel trading spot:<br>
-      <ul >
-        <li><p><b>Gestione del capitale</b>: monitora il capitale totale, l'andamento nel tempo e i dettagli dei singoli trade.</li></p>
-        <li><b>Strategia 4H</b>: la strategia principale è pensata sul time frame a 4 ore, ideale per ridurre lo stress, migliorare la visione d'insieme e ottimizzare la gestione del rischio.</li>
-        <li><b>Regole operative</b>: puoi consultare e personalizzare le regole che guidano la tua operatività, prendendo spunto dalle best practice del trading professionale.</li>
-        <li><b>Indicatore Pine Script open source</b>: l’app offre un indicatore personalizzato per implementare la strategia direttamente sui tuoi grafici.</li>
-        <li><b>Blocco note appunti</b>: uno spazio dedicato per annotare idee, osservazioni e spunti operativi.</li>
-        <li><b>Blocco note regole personali</b>: salva e aggiorna le regole che vuoi seguire, così da poterle consultare e modificare facilmente nel tempo.</li>
-      </ul>
-    </div></div><div style="padding: 7px;"></div>
-<div class="container" style="padding-left: 30px; padding-right: 30px; padding-bottom: 20px; padding-top: 20px; text-align: justify; line-height: 1.8;">
-    <div style="color: #359350;">
-      <strong><h4>📊 Perché il Time Frame a 4H è Ideale per il Trading Spot</h4></strong>
+  <div class="welcome-section">
+    <div class="note">
+        <h3 style="color: #FFD012;">🎉 Benvenuto su Invest Flow</h3>
+        <div class="note-content">
+            <p>Nell'app trovi strumenti concreti per la gestione del capitale e la crescita nel trading spot:</p>
+            <ul>
+                <li><strong>Gestione del capitale</strong>: monitora il capitale totale, l'andamento nel tempo e i dettagli dei singoli trade.</li>
+                <li><strong>Strategia 4H</strong>: la strategia principale è pensata sul time frame a 4 ore, ideale per ridurre lo stress, migliorare la visione d'insieme e ottimizzare la gestione del rischio.</li>
+                <li><strong>Regole operative</strong>: puoi consultare e personalizzare le regole che guidano la tua operatività, prendendo spunto dalle best practice del trading professionale.</li>
+                <li><strong>Indicatore Pine Script open source</strong>: l'app offre un indicatore personalizzato per implementare la strategia direttamente sui tuoi grafici.</li>
+                <li><strong>Blocco note appunti</strong>: uno spazio dedicato per annotare idee, osservazioni e spunti operativi.</li>
+                <li><strong>Blocco note regole personali</strong>: salva e aggiorna le regole che vuoi seguire, così da poterle consultare e modificare facilmente nel tempo.</li>
+            </ul>
+        </div>
     </div>
-    <div style="font-size:0.98em; line-height: 1.3;"><br>	
-      Il passaggio al 4H segna un punto di svolta nell'operatività di trading. È qui che l’analisi, unita a una gestione attenta del capitale, offre maggiore certezza operativa.<br><br>
-      <b>Minore frequenza di controllo e maggiore recuperabilità:</b> ogni candela di 4 ore consente di gestire meglio le variazioni di prezzo e recuperare eventuali errori, riducendo la necessità di monitoraggio costante.<br><br>
-      <b>Precisione e visione a lungo termine:</b> il 4H filtra il rumore del mercato, rendendo più chiari i trend e i pattern realmente significativi.<br><br>
-      <b>Gestione del rischio e degli importi:</b> partire dal 4H ti permette di costruire una base solida per strategie di rischio più robuste e consapevoli.<br><br>
-      In sintesi, il 4H è lo standard per chi vuole un trading spot più professionale, meno stressante e con maggiori probabilità di successo a lungo termine.
+
+    <div class="note">
+        <h4 style="color: #359350;">📊 Perché il Time Frame a 4H è Ideale per il Trading Spot</h4>
+        <div class="note-content">
+            <p>Il passaggio al 4H segna un punto di svolta nell'operatività di trading. È qui che l'analisi, unita a una gestione attenta del capitale, offre maggiore certezza operativa.</p>
+            
+            <p><strong>Minore frequenza di controllo e maggiore recuperabilità:</strong> ogni candela di 4 ore consente di gestire meglio le variazioni di prezzo e recuperare eventuali errori, riducendo la necessità di monitoraggio costante.</p>
+            
+            <p><strong>Precisione e visione a lungo termine:</strong> il 4H filtra il rumore del mercato, rendendo più chiari i trend e i pattern realmente significativi.</p>
+            
+            <p><strong>Gestione del rischio e degli importi:</strong> partire dal 4H ti permette di costruire una base solida per strategie di rischio più robuste e consapevoli.</p>
+            
+            <p>In sintesi, il 4H è lo standard per chi vuole un trading spot più professionale, meno stressante e con maggiori probabilità di successo a lungo termine.</p>
+        </div>
     </div>
-  </div>
+
+    <div class="note">
+        <h3 style="color: #F2BB66;">📁 Progetti in Archivio</h3>
+        <div class="note-content">
+            <ul class="archive-links">
+                <li><a href="https://beneinst.github.io/tradingspot/chartflow/index.html" target="_blank">📈 Segnali</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/chartflow/cheat-sheet.html" target="_blank">📋 Patterns</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/chartflow/candlestick.html" target="_blank">🕯️ Candlestick</a></li>
+            </ul>
+        </div>
+    </div>
 </div>
-</div>
+
+</div></div>
 <div style="padding: 1px;"></div> 
 
 		
