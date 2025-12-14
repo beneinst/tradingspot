@@ -80,18 +80,18 @@
   </div>       
    <div style="padding: 4px;"></div>             
       
-  <div class="container">
-  <form id="trade-form" class="container-f">
+ <div class="ts-col-66">
+  <form id="trade-form" class="input-section">
     <h2>💱 Aggiungi Entry al Trade</h2>
 
     <div class="input-group input-group-row">
       <div class="input-field">
-        <label for="crypto-symbol">Simbolo cripto</label>
+        <label for="crypto-symbol">SIMBOLO CRIPTO</label>
         <input type="text" id="crypto-symbol" placeholder="BTC" required>
       </div>
 
       <div class="input-field">
-        <label for="trade-quantity">Quantità</label>
+        <label for="trade-quantity">QUANTITA'</label>
         <input type="number"
                id="trade-quantity"
                step="0.00000001"
@@ -100,31 +100,27 @@
       </div>
 
       <div class="input-field">
-        <label for="invested-amount">Importo entry (USDC)</label>
+        <label for="invested-amount">IMPORTO ENTRY (USDC)</label>
         <input type="number"
                id="invested-amount"
+               placeholder="USDC"
                step="0.01"
-               placeholder="100.00"
                required>
       </div>
     </div>
 
     <div class="input-actions">
-      <button type="submit" class="btn btn-primary">
+      <button type="submit"
+              class="btn-edit"
+              style="font-size:1.1rem; padding:9px 22px; min-width:220px; margin-right:20px;">
         ➕ Aggiungi Entry
       </button>
     </div>
-	
+
+    <input type="hidden" id="edit-trade-id">
   </form>
-
 </div>
 
-
-
-
-    </div>
-
-</div>
 </div> <div style="padding: 4px;"></div>
         <div class="container">
             <h4 class="section-title" style="color: #ffe4b5 !important;">🎯 I tuoi Trade Attivi</h4>
