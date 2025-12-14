@@ -417,13 +417,13 @@
       </ul>
     </nav>
   </div>
-  </div>       
+  </div>      
    <div style="padding: 4px;"></div>         
     <div class="container">
         
 
         <!-- 1. Input Section -->
-   <div class="input-section">
+   <div class="container-f">
     <h2>➕ Inserisci Operazione</h2>
     <div class="input-group input-group-row">
         <div class="input-field">
@@ -452,42 +452,47 @@
         <button class="btn btn-primary" onclick="addOperation()">➕ Aggiungi Operazione</button>
     </div>
 </div>
+</div>
+<div style="padding: 4px;"></div>   
+<div class="container">
+       <div class="ts-dash-card">
 
-
-
-        <!-- 2. Chart + Totals + Export -->
-        <div class="chart-section">
-            <h2>📊 Evoluzione Patrimonio</h2>
-            <div class="chart-container">
-                <canvas id="equityChart"></canvas>
+  <div class="ts-dash-card-header">
+    <h2>Evoluzione Patrimonio</h2>
+          <div class="ts-chart-box ts-chart-box-large">
+    <canvas id="equityChart"></canvas>
             </div>
             
-            <div class="totals-section">
-                <div class="total-box">
-                    <h4>💶 Capitale Depositato</h4>
-                    <div class="value profit-negative" id="totalEur">€0.00</div>
-                </div>
-                <div class="total-box">
-                    <h4>🪙 Valore ATOM</h4>
-                    <div class="value profit-positive" id="totalAtomValue">$0.00</div>
-                    <div class="subvalue" id="totalAtomQty">0 ATOM</div>
-                </div>
-                <div class="total-box">
-                    <h4>📈 Profitto Trading</h4>
-                    <div class="value" id="totalTrading">$0.00</div>
-                </div>
-                <div class="total-box">
-                    <h4>💎 RENDIMENTO NETTO</h4>
-                    <div class="value" id="totalEquity">$0.00</div>
-                </div>
-            </div>
+          <div class="ts-stats-grid">
+  <div class="ts-grid-item">
+    <h4>💶 Capitale Depositato</h4>
+    <div class="value profit-negative" id="totalEur">€0.00</div>
+  </div>
+
+  <div class="ts-grid-item">
+    <h4>🪙 Valore ATOM</h4>
+    <div class="value profit-positive" id="totalAtomValue">$0.00</div>
+    <div class="subvalue" id="totalAtomQty">0 ATOM</div>
+  </div>
+
+  <div class="ts-grid-item">
+    <h4>📈 Profitto Trading</h4>
+    <div class="value" id="totalTrading">$0.00</div>
+  </div>
+
+  <div class="ts-grid-item">
+    <h4>💎 RENDIMENTO NETTO</h4>
+    <div class="value" id="totalEquity">$0.00</div>
+  </div>
+</div>
+
             
             <div class="export-buttons">
                 <button class="btn btn-success" onclick="exportDataHTML()">📊 Esporta Dati</button>
                 <button class="btn btn-primary" onclick="exportChartHTML()">📈 Esporta Grafico</button>
                 <button class="btn btn-success" onclick="loadAllData()">🔄 Aggiorna</button>
             </div>
-        </div>
+        </div> </div>
  
 
         <!-- 3. Data Lists by Type -->

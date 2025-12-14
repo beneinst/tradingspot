@@ -685,3 +685,100 @@ body::before {
     /* Rimuovi background, mantieni solo padding e struttura */
     padding: 15px 0;
 }
+
+	/* Input Section */
+.input-section {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+}
+
+.input-section h2 {
+    color: #F2BB66;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+    font-weight: 500;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+/* Gruppo input generico (per altre sezioni, se le hai) */
+.input-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.input-field { 
+    flex: 1; 
+    min-width: 200px; 
+}
+
+.input-field label { 
+    display: block; 
+    color: #F2BB66; 
+    margin-bottom: 8px; 
+    font-weight: 500; 
+    font-size: 0.95em; 
+}
+
+.input-field input,
+.input-field select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: rgba(35, 35, 59, 0.4);
+    color: var(--color-text);
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.input-field input:focus,
+.input-field select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    background: rgba(35, 35, 59, 0.6);
+}
+
+/* piccolo aggiustamento per il label del simbolo */
+.input-field label[for="crypto-symbol"] {
+    margin-top: 10px;
+}
+
+/* Gruppo input su UNA riga (3 colonne) con 230px di spazio */
+.input-group-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 colonne */
+    column-gap: 230px;   /* spazio orizzontale tra le colonne */
+    row-gap: 10px;
+}
+
+/* Contenitore del pulsante sotto la riga di input */
+.input-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* Su mobile: una colonna sola */
+@media (max-width: 768px) {
+    .input-group-row {
+        grid-template-columns: 1fr;
+        column-gap: 0;
+    }
+
+    .input-actions {
+        justify-content: stretch;
+    }
+
+    .input-actions .btn {
+        width: 100%;
+    }
+}
