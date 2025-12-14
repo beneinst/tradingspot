@@ -6,11 +6,13 @@
     <title>Panoramica</title>
 	<link rel="icon" type="image/png" href="favicon.png"> 
     <link rel="stylesheet" href="css/trade.css">
+	<link rel="stylesheet" href="css/tracker.css">
 	<link rel="stylesheet" href="css/panoramica.css">
     <link rel="stylesheet" href="css/menusotto.css">
 	<link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
+	<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+	<style>
 :root {
     --color-primary: #4a90e2;
     --color-secondary: #667eea;
@@ -337,23 +339,33 @@
     transform: translateY(-1px);
     box-shadow: 0 3px 14px rgba(0,0,0,0.5);
 }
-
-
-
-    </style>
+</style>
 </head>
 <body>
 <div style="padding: 4px;"></div>
 <div class="container">
+
+<!-- Header -->
+        <div class="container-f">
+            <div class="header-content">
+                <h1 >💼 Panoramica</h1>
+                <div class="price-info">
+                    <div class="price-value" id="atomPrice">$0.0000</div>
+                    <div class="price-update" id="lastUpdate">Caricamento...</div>
+                </div>
+            </div>
+        </div>
+		
+		
 <!-- Titolo a sinistra, sottotitolo a destra -->
 
-<div class="container-f" style="display:flex; align-items:center; justify-content:space-between; padding:4px 0;">
+<!-- BLOCCO MENU <div class="container-f" style="display:flex; align-items:center; justify-content:space-between; padding:4px 0;">
   <h1 class="header-title">💼 Panoramica</h1>
 
   <div style="font-size:0.9rem; line-height:1.3; color:#fff; text-align:right; padding-right: 10px;">
     <em>*Gestione <strong>Trade</strong> Singoli con Accumulo e Prezzo Medio.</em>
   </div>
-</div>
+</div>-->
 
 </div>
 <div style="padding: 4px;"></div> 
@@ -408,16 +420,7 @@
   </div>       
    <div style="padding: 4px;"></div>         
     <div class="container">
-        <!-- Header -->
-        <div class="header-section">
-            <div class="header-content">
-                <h1 class="header-title">💼 Crypto Portfolio Tracker</h1>
-                <div class="price-info">
-                    <div class="price-value" id="atomPrice">$0.0000</div>
-                    <div class="price-update" id="lastUpdate">Caricamento...</div>
-                </div>
-            </div>
-        </div>
+        
 
         <!-- 1. Input Section -->
    <div class="input-section">
@@ -488,55 +491,56 @@
  
 
         <!-- 3. Data Lists by Type -->
-        <div class="data-section">
-    <h2>📋 Operazioni Registrate</h2>
-    <div class="data-tables-grid">
-        <div>
-            <h3 class="data-title">💶 Depositi Euro (Capitale -)</h3>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Importo</th>
-                        <th>Note</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="eurList"></tbody>
-            </table>
-        </div>
-
-        <div>
-            <h3 class="data-title">🪙 ATOM Acquistati (+)</h3>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Quantità</th>
-                        <th>Note</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="atomList"></tbody>
-            </table>
-        </div>
-
-        <div>
-            <h3 class="data-title">📈 Profitti Trading (+)</h3>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Importo</th>
-                        <th>Note</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="tradingList"></tbody>
-            </table>
-        </div>
+      <div class="data-section">
+  <h2>📋 Operazioni Registrate</h2>
+  <div class="data-tables-grid">
+    <div>
+      <h3 class="data-title">💶 Depositi Euro (Capitale -)</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Importo</th>
+            <th>Note</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="eurList"></tbody>
+      </table>
     </div>
-</div>
+
+    <div>
+      <h3 class="data-title">🪙 ATOM Acquistati (+)</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Quantità</th>
+            <th>Note</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="atomList"></tbody>
+      </table>
+    </div>
+
+    <div>
+      <h3 class="data-title">📈 Profitti Trading (+)</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Importo</th>
+            <th>Note</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tradingList"></tbody>
+      </table>
+    </div>
+  </div>
+</div></div>
+
 
 	
 		<!-- FOOTER -->
@@ -596,17 +600,38 @@ if (backToTopAlt) {
         toggleBackToTopButton();
     </script>
 
-    <script>
+   <script>
 let operations = JSON.parse(localStorage.getItem('cryptoOperations')) || [];
 let atomPrice = 0;
 let chart = null;
 
+/* === UTIL === */
+
+function formatEuro(value) {
+    return value.toLocaleString('it-IT', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function monthKey(dateStr) {
+    const d = new Date(dateStr);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/* === INIT === */
+
 function init() {
-    document.getElementById('operationDate').value = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('operationDate');
+    if (dateInput) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+    }
     loadAtomPrice();
     setInterval(loadAtomPrice, 5 * 60 * 1000);
     loadAllData();
 }
+
+/* === PREZZO ATOM === */
 
 async function loadAtomPrice() {
     try {
@@ -614,8 +639,10 @@ async function loadAtomPrice() {
         if (response.ok) {
             const data = await response.json();
             atomPrice = parseFloat(data.price);
-            document.getElementById('atomPrice').textContent = `$${atomPrice.toFixed(4)}`;
-            document.getElementById('lastUpdate').textContent = `Aggiornato: ${new Date().toLocaleString('it-IT')}`;
+            const priceEl = document.getElementById('atomPrice');
+            const updEl   = document.getElementById('lastUpdate');
+            if (priceEl) priceEl.textContent = `$${atomPrice.toFixed(4)}`;
+            if (updEl)   updEl.textContent   = `Aggiornato: ${new Date().toLocaleString('it-IT')}`;
             updateDisplays();
         }
     } catch (error) {
@@ -623,11 +650,13 @@ async function loadAtomPrice() {
     }
 }
 
+/* === CRUD OPERAZIONI === */
+
 function addOperation() {
-    const date = document.getElementById('operationDate').value;
+    const date  = document.getElementById('operationDate').value;
     const amount = parseFloat(document.getElementById('operationAmount').value);
-    const type = document.getElementById('operationType').value;
-    const note = document.getElementById('operationNote').value;
+    const type  = document.getElementById('operationType').value;
+    const note  = document.getElementById('operationNote').value;
 
     if (!date || !amount || isNaN(amount)) {
         alert('⚠️ Inserisci data e importo validi');
@@ -637,9 +666,9 @@ function addOperation() {
     const operation = { id: Date.now(), date, amount, type, note };
     operations = [...operations, operation].sort((a, b) => new Date(a.date) - new Date(b.date));
     localStorage.setItem('cryptoOperations', JSON.stringify(operations));
-    
+
     document.getElementById('operationAmount').value = '';
-    document.getElementById('operationNote').value = '';
+    document.getElementById('operationNote').value   = '';
     loadAllData();
     alert('✅ Operazione aggiunta!');
 }
@@ -651,29 +680,39 @@ function removeOperation(id) {
     loadAllData();
 }
 
+/* === DISPLAY CARD + GRAFICO === */
+
 function updateDisplays() {
-    const eurDeposits = operations.filter(op => op.type === 'EUR');
-    const atomBuys = operations.filter(op => op.type === 'ATOM');
-    const tradingProfits = operations.filter(op => op.type === 'Trading');
-    
-    // EUR è il CAPITALE USCITO (negativo)
-    const totalEurOut = eurDeposits.reduce((sum, op) => sum + op.amount, 0);
-    const totalAtomQty = atomBuys.reduce((sum, op) => sum + op.amount, 0);
-    const totalAtomValue = totalAtomQty * atomPrice;
-    const totalTrading = tradingProfits.reduce((sum, op) => sum + op.amount, 0);
-    
-    // RENDIMENTO NETTO = (ATOM + Trading) - Capitale depositato
+    const eurDeposits     = operations.filter(op => op.type === 'EUR');
+    const atomBuys        = operations.filter(op => op.type === 'ATOM');
+    const tradingProfits  = operations.filter(op => op.type === 'Trading');
+
+    const totalEurOut   = eurDeposits.reduce( (sum, op) => sum + op.amount, 0);
+    const totalAtomQty  = atomBuys.reduce( (sum, op) => sum + op.amount, 0);
+    const totalAtomValue= totalAtomQty * atomPrice;
+    const totalTrading  = tradingProfits.reduce( (sum, op) => sum + op.amount, 0);
+
     const netEquity = totalAtomValue + totalTrading - totalEurOut;
-    
-    document.getElementById('totalEur').textContent = `-€${totalEurOut.toFixed(2)}`;
-    document.getElementById('totalAtomValue').textContent = `+$${totalAtomValue.toFixed(2)}`;
-    document.getElementById('totalAtomQty').textContent = `${totalAtomQty.toFixed(6)} ATOM`;
-    document.getElementById('totalTrading').textContent = `+$${totalTrading.toFixed(2)}`;
-    document.getElementById('totalEquity').textContent = `${netEquity >= 0 ? '+' : ''}$${Math.abs(netEquity).toFixed(2)}`;
-    document.getElementById('totalEquity').className = netEquity >= 0 ? 'value profit-positive' : 'value profit-negative';
-    
-    updateChart(totalEurOut, totalAtomValue, totalTrading, netEquity);
+
+    const elEur      = document.getElementById('totalEur');
+    const elAtomVal  = document.getElementById('totalAtomValue');
+    const elAtomQty  = document.getElementById('totalAtomQty');
+    const elTrading  = document.getElementById('totalTrading');
+    const elEquity   = document.getElementById('totalEquity');
+
+    if (elEur)     elEur.textContent     = `-€${totalEurOut.toFixed(2)}`;
+    if (elAtomVal) elAtomVal.textContent = `+$${totalAtomValue.toFixed(2)}`;
+    if (elAtomQty) elAtomQty.textContent = `${totalAtomQty.toFixed(6)} ATOM`;
+    if (elTrading) elTrading.textContent = `+$${totalTrading.toFixed(2)}`;
+    if (elEquity) {
+        elEquity.textContent = `${netEquity >= 0 ? '+' : ''}$${Math.abs(netEquity).toFixed(2)}`;
+        elEquity.className   = netEquity >= 0 ? 'value profit-positive' : 'value profit-negative';
+    }
+
+    updateChart();
 }
+
+/* === LISTE OPERAZIONI (BOX) === */
 
 function updateAllLists() {
     updateList('eurList', 'EUR');
@@ -698,9 +737,9 @@ function updateList(containerId, type) {
     }
 
     tbody.innerHTML = typeOps.map(op => {
-        const dateStr = new Date(op.date).toLocaleDateString('it-IT');
+        const dateStr   = new Date(op.date).toLocaleDateString('it-IT');
         const amountStr = op.amount.toFixed(type === 'ATOM' ? 6 : 2);
-        const symbol = type === 'EUR' ? '€' : type === 'ATOM' ? 'ATOM' : '€';
+        const symbol    = type === 'EUR' ? '€' : type === 'ATOM' ? 'ATOM' : '€';
 
         return `
             <tr>
@@ -716,29 +755,35 @@ function updateList(containerId, type) {
 }
 
 
-function updateChart(totalEurOut, totalAtomValue, totalTrading, netEquity) {
+/* === GRAFICO PATRIMONIO === */
+
+function updateChart() {
     const chartData = [];
-    let cumulativeEurOut = 0, cumulativeAtomValue = 0, cumulativeTrading = 0;
-    
-    const sortedOperations = operations.sort((a, b) => new Date(a.date) - new Date(b.date));
-    
+    let cumulativeEurOut = 0;
+    let cumulativeAtomValue = 0;
+    let cumulativeTrading = 0;
+
+    const sortedOperations = [...operations].sort((a, b) => new Date(a.date) - new Date(b.date));
+
     sortedOperations.forEach(op => {
-        if (op.type === 'EUR') cumulativeEurOut += op.amount;
-        else if (op.type === 'ATOM') cumulativeAtomValue += op.amount * atomPrice;
-        else if (op.type === 'Trading') cumulativeTrading += op.amount;
-        
+        if (op.type === 'EUR')       cumulativeEurOut   += op.amount;
+        else if (op.type === 'ATOM') cumulativeAtomValue+= op.amount * atomPrice;
+        else if (op.type === 'Trading') cumulativeTrading+= op.amount;
+
         chartData.push({
             date: new Date(op.date).toLocaleDateString('it-IT'),
-            eurOut: -cumulativeEurOut,  // Negativo
+            eurOut: -cumulativeEurOut,
             atomValue: cumulativeAtomValue,
             trading: cumulativeTrading,
             netEquity: cumulativeAtomValue + cumulativeTrading - cumulativeEurOut
         });
     });
-    
-    const ctx = document.getElementById('equityChart').getContext('2d');
+
+    const canvas = document.getElementById('equityChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
     if (chart) chart.destroy();
-    
+
     chart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -748,7 +793,7 @@ function updateChart(totalEurOut, totalAtomValue, totalTrading, netEquity) {
                     label: 'Capitale Depositato (-)',
                     data: chartData.map(d => d.eurOut),
                     borderColor: '#e74c3c',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    backgroundColor: 'rgba(231,76,60,0.1)',
                     tension: 0.4,
                     fill: false
                 },
@@ -756,7 +801,7 @@ function updateChart(totalEurOut, totalAtomValue, totalTrading, netEquity) {
                     label: 'Valore ATOM (+)',
                     data: chartData.map(d => d.atomValue),
                     borderColor: '#2ecc71',
-                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                    backgroundColor: 'rgba(46,204,113,0.1)',
                     tension: 0.4,
                     fill: false
                 },
@@ -764,7 +809,7 @@ function updateChart(totalEurOut, totalAtomValue, totalTrading, netEquity) {
                     label: 'Trading Profit (+)',
                     data: chartData.map(d => d.trading),
                     borderColor: '#f39c12',
-                    backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                    backgroundColor: 'rgba(243,156,18,0.1)',
                     tension: 0.4,
                     fill: false
                 },
@@ -772,7 +817,7 @@ function updateChart(totalEurOut, totalAtomValue, totalTrading, netEquity) {
                     label: 'RENDIMENTO NETTO',
                     data: chartData.map(d => d.netEquity),
                     borderColor: '#9b59b6',
-                    backgroundColor: 'rgba(155, 89, 182, 0.2)',
+                    backgroundColor: 'rgba(155,89,182,0.2)',
                     tension: 0.4,
                     fill: true,
                     borderWidth: 3
@@ -782,65 +827,253 @@ function updateChart(totalEurOut, totalAtomValue, totalTrading, netEquity) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'top' }
-            },
-            scales: { 
-                y: { 
-                    ticks: { callback: function(value) { return '$' + value.toLocaleString(); } }
+            plugins: { legend: { position: 'top' } },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function (value) {
+                            return '€' + value.toLocaleString('it-IT');
+                        }
+                    }
                 }
             }
         }
     });
 }
 
+/* === REPORT STILE TABELLA (WEB) === */
+
+function buildReportTables() {
+    const now = new Date();
+    const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+    // Puoi usare solo Trading oppure EUR+Trading, qui uso Trading
+    const reportOps = operations.filter(op => op.type === 'Trading');
+    const groups = {};
+
+    reportOps.forEach(op => {
+        const key = monthKey(op.date);
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(op);
+    });
+
+    // Mese corrente
+    const currentBody = document.getElementById('currentMonthBody');
+    const currentTotalCell = document.getElementById('currentMonthTotal');
+    if (currentBody && currentTotalCell) {
+        currentBody.innerHTML = '';
+        let currentTotal = 0;
+
+        (groups[currentKey] || []).forEach(op => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+                <td>${op.type}</td>
+                <td class="right">${formatEuro(op.amount)}</td>
+            `;
+            currentBody.appendChild(tr);
+            currentTotal += op.amount;
+        });
+        currentTotalCell.textContent = formatEuro(currentTotal);
+    }
+
+    // Storico mensile
+    const historyContainer = document.getElementById('monthlyHistory');
+    if (!historyContainer) return;
+    historyContainer.innerHTML = '<h3>Storico Mensile (con dettagli)</h3>';
+
+    Object.keys(groups).sort().forEach(key => {
+        const list = groups[key];
+        let total = 0;
+        const labelDate = new Date(key + '-01');
+        const label = labelDate.toLocaleDateString('it-IT', { month: '2-digit', year: 'numeric' });
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'report-block';
+        wrapper.innerHTML = `
+            <div style="margin:10px 0;">
+                <strong>dal ${label} - Totale: ${formatEuro(list.reduce((s,o)=>s+o.amount,0))}</strong>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Importo (€)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="right">TOTALE PERIODO</td>
+                        <td class="right total-cell"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        `;
+
+        const tbody = wrapper.querySelector('tbody');
+        const tfootCell = wrapper.querySelector('.total-cell');
+
+        list.forEach(op => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+                <td>${op.type}</td>
+                <td class="right">${formatEuro(op.amount)}</td>
+            `;
+            tbody.appendChild(tr);
+            total += op.amount;
+        });
+
+        tfootCell.textContent = formatEuro(total);
+        historyContainer.appendChild(wrapper);
+    });
+}
+
+/* === LOAD ALL === */
+
 function loadAllData() {
     updateAllLists();
     updateDisplays();
+    buildReportTables();
 }
+
+/* === EXPORT HTML REPORT === */
 
 function exportDataHTML() {
-    const data = {
-        operations,
-        atomPrice,
-        totals: {
-            capitaleDepositato: operations.filter(op => op.type === 'EUR').reduce((sum, op) => sum + op.amount, 0),
-            atomQty: operations.filter(op => op.type === 'ATOM').reduce((sum, op) => sum + op.amount, 0),
-            atomValue: operations.filter(op => op.type === 'ATOM').reduce((sum, op) => sum + op.amount, 0) * atomPrice,
-            tradingProfit: operations.filter(op => op.type === 'Trading').reduce((sum, op) => sum + op.amount, 0),
-            rendimentoNetto: (operations.filter(op => op.type === 'ATOM').reduce((sum, op) => sum + op.amount, 0) * atomPrice) + 
-                            operations.filter(op => op.type === 'Trading').reduce((sum, op) => sum + op.amount, 0) - 
-                            operations.filter(op => op.type === 'EUR').reduce((sum, op) => sum + op.amount, 0)
-        }
-    };
-    
-    const html = `
-        <!DOCTYPE html>
-        <html><head><title>Portfolio Analysis</title></head>
-        <body style="font-family: Arial; padding: 20px;">
-            <h1>📊 Portfolio Analysis - ${new Date().toLocaleDateString('it-IT')}</h1>
-            <h2>📈 Totali</h2>
-            <pre>${JSON.stringify(data.totals, null, 2)}</pre>
-            <h2>📋 Operazioni (${data.operations.length})</h2>
-            <pre>${JSON.stringify(data.operations, null, 2)}</pre>
-        </body></html>`;
-    
-    downloadFile(html, `portfolio-analysis-${new Date().toISOString().split('T')[0]}.html`);
+    const now = new Date();
+
+    // Usa TUTTE le operazioni, non solo Trading
+    const groups = {};
+    operations.forEach(op => {
+        const key = monthKey(op.date);
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(op);
+    });
+
+    const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const currentList = groups[currentKey] || [];
+
+    let html = `<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Report Completo - ${now.toLocaleDateString('it-IT')}</title>
+<style>
+body { font-family: Arial, sans-serif; font-size: 13px; padding:20px; }
+h1 { font-size: 20px; margin-bottom: 15px; }
+h2 { font-size: 16px; margin-top: 25px; margin-bottom: 10px; }
+table { width:100%; border-collapse:collapse; margin-bottom:15px; }
+thead th { background:#3ca44a; color:#fff; padding:6px; text-align:left; }
+td { padding:4px 6px; border-bottom:1px solid #ddd; }
+tfoot td { background:#eef5ff; font-weight:bold; }
+.right { text-align:right; }
+</style>
+</head>
+<body>
+<h1>Report Operazioni Completo</h1>
+<h2>Mese Corrente</h2>
+<table>
+<thead><tr><th>Data</th><th>Tipo</th><th>Importo</th><th>Note</th></tr></thead>
+<tbody>`;
+
+    let currentTot = 0;
+    currentList.forEach(op => {
+        currentTot += op.amount;
+        const sign = op.type === 'EUR' ? '-' : '+';
+        const symbol = op.type === 'ATOM' ? ' ATOM' : '€';
+        html += `
+<tr>
+  <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+  <td>${op.type}</td>
+  <td class="right">${sign}${formatEuro(op.amount)}${symbol}</td>
+  <td>${op.note || ''}</td>
+</tr>`;
+    });
+
+    html += `</tbody>
+<tfoot><tr><td colspan="2" class="right">Totale</td><td class="right">${formatEuro(currentTot)}</td><td></td></tr></tfoot>
+</table>
+
+<h2>Storico Mensile</h2>
+`;
+
+    Object.keys(groups).sort().forEach(key => {
+        const list = groups[key];
+        const label = new Date(key + '-01').toLocaleDateString('it-IT', { month: '2-digit', year: 'numeric' });
+        let tot = 0;
+
+        html += `<p><strong>Mese ${label}</strong></p>
+<table>
+<thead><tr><th>Data</th><th>Tipo</th><th>Importo</th><th>Note</th></tr></thead>
+<tbody>`;
+
+        list.forEach(op => {
+            tot += op.amount;
+            const sign = op.type === 'EUR' ? '-' : '+';
+            const symbol = op.type === 'ATOM' ? ' ATOM' : '€';
+            html += `
+<tr>
+  <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+  <td>${op.type}</td>
+  <td class="right">${sign}${formatEuro(op.amount)}${symbol}</td>
+  <td>${op.note || ''}</td>
+</tr>`;
+        });
+
+        html += `</tbody>
+<tfoot><tr><td colspan="2" class="right">TOTALE PERIODO</td><td class="right">${formatEuro(tot)}</td><td></td></tr></tfoot>
+</table>`;
+    });
+
+    html += `</body></html>`;
+
+    downloadFile(html, `report-completo-${now.toISOString().split('T')[0]}.html`);
 }
 
+/* === EXPORT CHART PLACEHOLDER === */
+
 function exportChartHTML() {
-    downloadFile(`<h1>Grafico generato: ${new Date().toLocaleString('it-IT')}</h1>`, 'portfolio-chart.html');
+    const canvas = document.getElementById('equityChart');
+    const container = canvas.closest('.chart-container');
+    if (!canvas || !container) {
+        alert('Grafico non trovato');
+        return;
+    }
+
+    // Temporaneamente rimuovi overflow:hidden
+    const originalOverflow = container.style.overflow;
+    container.style.overflow = 'visible';
+
+    html2canvas(canvas, {
+        backgroundColor: '#232335', // colore di sfondo coerente
+        scale: 2 // qualità alta
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `grafico-portfolio-${new Date().toISOString().split('T')[0]}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+
+        // Ripristina overflow
+        container.style.overflow = originalOverflow;
+    });
 }
+
+/* === DOWNLOAD HELP === */
 
 function downloadFile(content, filename) {
     const blob = new Blob([content], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename; a.click();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
     URL.revokeObjectURL(url);
 }
 
 init();
-    </script>
+</script>
+
 </body>
 </html>

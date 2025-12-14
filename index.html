@@ -9,6 +9,44 @@
 	<link rel="stylesheet" href="css/panoramica.css">
     <link rel="stylesheet" href="css/menusotto.css">
 	<link rel="stylesheet" href="css/style.css">
+	<style>
+	/* Input Section */
+.input-section {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+}
+
+.input-section h2 {
+    color: #F2BB66;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+    font-weight: 500;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+.input-group { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+.input-field { flex: 1; min-width: 200px; }
+.input-field label { display: block; color: #F2BB66; margin-bottom: 8px; font-weight: 500; font-size: 0.95em; }
+.input-field input, .input-field select {
+    width: 100%; padding: 12px 15px; border: 1px solid var(--color-border); border-radius: 6px;
+    background: rgba(35, 35, 59, 0.4); color: var(--color-text); font-size: 1em; transition: all 0.3s ease;
+}
+.input-field input:focus, .input-field select:focus {
+    outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    background: rgba(35, 35, 59, 0.6);
+}
+.input-field label[for="crypto-symbol"] {
+    margin-top: 5px;
+    display: block;
+}
+
+</style>
 </head>
 <body>
 <div style="padding: 4px;"></div>
@@ -76,42 +114,46 @@
   </div>       
    <div style="padding: 4px;"></div>             
       
-   <div class="container">
+  <div class="container">
 
-    <!-- Wrapper Flex -->
-    <div class="ts-split-row">
-        
-        <!-- COLONNA SINISTRA (66%) - Contiene il Form -->
-        <div class="ts-col-66">
-            <div class="note1"> <!-- Inizia la tua card originale -->
-                <h5 class="section-title" style="color: #ffe4b5 !important;">💱 Aggiungi Entry al Trade</h5>
-                <form id="trade-form" class="trade-form1">
-                    <div class="form-row">
-                        <label for="crypto-symbol" style="color: #BCC6CC !important;">SIMBOLO CRIPTO</label>
-                        <input type="text" id="crypto-symbol" placeholder="BTC" required>
-                    </div>
-                    <div class="form-row">
-    <label for="trade-quantity" style="color: #BCC6CC !important;">QUANTITA'</label>
-    <input type="number" id="trade-quantity" step="0.00000001" placeholder="0.00000000" required style="width: 180px;">
+  <form id="trade-form" class="container-f">
+    <h2>💱 Aggiungi Entry al Trade</h2>
+
+    <div class="input-group input-group-row">
+      <div class="input-field">
+        <label for="crypto-symbol">Simbolo cripto</label>
+        <input type="text" id="crypto-symbol" placeholder="BTC" required>
+      </div>
+
+      <div class="input-field">
+        <label for="trade-quantity">Quantità</label>
+        <input type="number"
+               id="trade-quantity"
+               step="0.00000001"
+               placeholder="0.00000000"
+               required>
+      </div>
+
+      <div class="input-field">
+        <label for="invested-amount">Importo entry (USDC)</label>
+        <input type="number"
+               id="invested-amount"
+               step="0.01"
+               placeholder="100.00"
+               required>
+      </div>
+    </div>
+
+    <div class="input-actions">
+      <button type="submit" class="btn btn-primary">
+        ➕ Aggiungi Entry
+      </button>
+    </div>
+  </form>
+
 </div>
-<div class="form-row">
-    <label for="trade-price" style="color: #BCC6CC !important;">IMPORTO ENTRY(USDC):</label>
-    <input type="number" id="invested-amount" placeholder="USDC" step="0.01" required style="width: 180px;">
-</div>
 
-                    <div class="form-row">
-                        <label></label>
-                        <button type="submit" class="btn-edit" style="font-size:1.1rem; padding:9px 22px;min-width:220px;margin-right:20px;">➕ Aggiungi Entry</button>
-                    </div>
-                    <input type="hidden" id="edit-trade-id">
-                </form>
-            </div> <!-- Fine card -->
-        </div>
 
-        <!-- COLONNA DESTRA (33%) - Vuota e scompare su mobile -->
-        <div class="ts-col-33">
-            <!-- Spazio vuoto o contenuto futuro -->
-        </div>
 
     </div>
 
