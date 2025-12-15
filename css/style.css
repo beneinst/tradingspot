@@ -69,7 +69,7 @@ p, {
 small {
   font-family: var(--font-body); /* Usa lo stesso font del body */
   color: #999999;                /* Colore grigio chiaro */
-  font-size: 0.8em;              /* Dimensione più piccola rispetto al testo normale */
+  font-size: 0.9em;              /* Dimensione più piccola rispetto al testo normale */
 }
 
 /* Heading Styles */

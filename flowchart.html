@@ -418,41 +418,7 @@
     </nav>
   </div>
   </div>      
-   <div style="padding: 4px;"></div>         
-    <div class="container">
-        
-
-        <!-- 1. Input Section -->
-   <div class="container-f">
-    <h2>➕ Inserisci Operazione</h2>
-    <div class="input-group input-group-row">
-        <div class="input-field">
-            <label>Data</label>
-            <input type="date" id="operationDate">
-        </div>
-        <div class="input-field">
-            <label>Importo</label>
-            <input type="number" id="operationAmount" step="0.01" placeholder="1000.00">
-        </div>
-        <div class="input-field">
-            <label>Tipo</label>
-            <select id="operationType">
-                <option value="EUR">💶 Deposito Euro (- Capitale iniziale)</option>
-                <option value="ATOM">🪙 ATOM acquistati (+ Investimento)</option>
-                <option value="Trading">📈 Profitto Trading (+ Guadagno)</option>
-            </select>
-        </div>
-        <div class="input-field">
-            <label>Note</label>
-            <input type="text" id="operationNote" placeholder="Descrizione operazione">
-        </div>
-    </div>
-
-    <div class="input-actions">
-        <button class="btn btn-primary" onclick="addOperation()">➕ Aggiungi Operazione</button>
-    </div>
-</div>
-</div>
+   
 <div style="padding: 4px;"></div>   
 <div class="container">
        <div class="ts-dash-card">
@@ -488,15 +454,50 @@
 
             
             <div class="export-buttons">
-                <button class="btn btn-success" onclick="exportDataHTML()">📊 Esporta Dati</button>
-                <button class="btn btn-primary" onclick="exportChartHTML()">📈 Esporta Grafico</button>
-                <button class="btn btn-success" onclick="loadAllData()">🔄 Aggiorna</button>
+                <button class="btn-edit" onclick="exportDataHTML()">📊 Esporta Dati</button>
+                <button class="btn-edit" onclick="exportChartHTML()">📈 Esporta Grafico</button>
+                <button class="btn-edit" onclick="loadAllData()">🔄 Aggiorna</button>
             </div>
         </div> </div>
- 
+         
+    <div class="ts-dash-card">
+        
+
+        <!-- 1. Input Section -->
+   <div class="container-f">
+    <h2>➕ Inserisci Operazione</h2>
+    <div class="input-group input-group-row">
+        <div class="input-field">
+            <label>Data</label>
+            <input type="date" id="operationDate">
+        </div>
+        <div class="input-field">
+            <label>Importo</label>
+            <input type="number" id="operationAmount" step="0.01" placeholder="1000.00">
+        </div>
+        <div class="input-field">
+            <label>Tipo</label>
+            <select id="operationType">
+                <option value="EUR">💶 Deposito Euro (- Capitale iniziale)</option>
+                <option value="ATOM">🪙 ATOM acquistati (+ Investimento)</option>
+                <option value="Trading">📈 Profitto Trading (+ Guadagno)</option>
+            </select>
+        </div>
+        <div class="input-field">
+            <label>Note</label>
+            <input type="text" id="operationNote" placeholder="Descrizione operazione">
+        </div>
+    </div>
+
+    <div class="input-actions">
+        <button class="btn btn-primary" onclick="addOperation()">➕ Aggiungi Operazione</button>
+    </div>
+</div>
+</div>
+<div style="padding: 6px;"></div> 
 
         <!-- 3. Data Lists by Type -->
-      <div class="data-section">
+      <div class="ts-dash-card">
   <h2>📋 Operazioni Registrate</h2>
   <div class="data-tables-grid">
     <div>

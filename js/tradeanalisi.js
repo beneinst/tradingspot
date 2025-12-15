@@ -191,57 +191,57 @@ function aggiornaStatistiche(dati) {
     const statsChiusi = getStatisticheTradesChiusi();
 
     const statsHtml = `
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">🎯 Trade Attivi</div>
             <div class="stat-value">${dati.length}</div>
         </div>
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">💰 Capitale Investito</div>
             <div class="stat-value">$${totaleInvestito.toFixed(0)}</div>
         </div>
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">💎 Valore Attuale</div>
             <div class="stat-value">$${totaleValore.toFixed(2)}</div>
         </div>
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">📊 P&L Attivi</div>
             <div class="stat-value ${totalePnl >= 0 ? 'positive' : 'negative'}">
                 $${totalePnl.toFixed(2)} (${pnlPercent.toFixed(2)}%)
             </div>
         </div>
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">✅ Trade Attivi Positivi</div>
             <div class="stat-value positive">${tradePositivi}</div>
         </div>
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">❌ Trade Attivi Negativi</div>
             <div class="stat-value negative">${tradeNegativi}</div>
         </div>
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">🏆 Trade Chiusi in Positivo</div>
             <div class="stat-value positive">${statsChiusi.chiusiPositivi}</div>
         </div>
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">💀 Trade Chiusi in Negativo</div>
             <div class="stat-value negative">${statsChiusi.chiusiNegativi}</div>
         </div>
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">⏱️ Giorni Medi in Posizione</div>
             <div class="stat-value">${giorniMedi.toFixed(1)}</div>
         </div>
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">🎯 Win Rate Attivi</div>
             <div class="stat-value ${tradePositivi > tradeNegativi ? 'positive' : 'negative'}">
                 ${((tradePositivi / dati.length) * 100).toFixed(1)}%
             </div>
         </div>
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">🎯 Win Rate Storico</div>
             <div class="stat-value ${statsChiusi.winRateChiusi >= 50 ? 'positive' : 'negative'}">
                 ${statsChiusi.totaleChiusi > 0 ? statsChiusi.winRateChiusi.toFixed(1) : '0.0'}%
             </div>
         </div>
-        <div class="stat-card">
+        <div class="ts-dash-card">
             <div class="stat-label">📊 P&L Storico</div>
             <div class="stat-value ${statsChiusi.totalePnLChiusi >= 0 ? 'positive' : 'negative'}">
                 $${statsChiusi.totalePnLChiusi.toFixed(2)}
