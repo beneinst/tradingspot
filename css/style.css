@@ -782,3 +782,53 @@ body::before {
         width: 100%;
     }
 }
+
+/* ----------- base ----------- */
+.header-crypto       { background:rgba(60, 60, 60, 0.25); color:#fff; font-family:system-ui, sans-serif; }
+.header-bar          { padding:8px 16px; }
+.header-bar img      { height:50px; width:auto; display:block; }
+
+/* desktop nav (orizzontale) */
+.nav-desktop ul      { list-style:none; margin:0; padding:4px 16px; display:flex; gap:28px; }
+.nav-desktop li      { position:relative; }
+.nav-desktop > ul > li > span { cursor:pointer; font-weight:600; }
+.nav-desktop li ul   { display:none; position:absolute; left:0; top:100%; background:#222; min-width:160px; padding:4px 0; }
+.nav-desktop li:hover ul { display:block; }
+.nav-desktop li ul li a { display:block; padding:6px 12px; color:#fff; text-decoration:none; font-size:.85rem; }
+.nav-desktop li ul li a:hover { background:#333; }
+
+/* mobile nav (verticale, nascosto su desktop) */
+.nav-mobile          { display:none; padding:0 16px 8px; }
+.nav-mobile ul       { list-style:none; margin:0; padding:0; }
+.nav-mobile li       { border-bottom:1px solid #222; }
+.nav-mobile li:last-child { border-bottom:none; }
+.nav-mobile a        { display:block; padding:10px 0; color:#fff; text-decoration:none; font-size:.95rem; }
+
+/* titolo */
+.header-title        { padding:4px 16px 8px; }
+.header-title h1     { margin:0; font-size:1.25rem; display:inline-block; }
+.header-title small  { margin-left:12px; font-size:.8rem; color:#aaa; }
+
+/* switch visibilità */
+@media (max-width:768px){
+  .nav-desktop { display:none; }   /* sparisce desktop */
+  .nav-mobile  { display:block; }  /* appare mobile */
+}
+/* ----- desktop / tablet ≥ 581px ----- */
+.logo-menu-row{
+  display:flex;               /* logo + menu sulla stessa riga */
+  align-items:center;         /* centrati verticalmente */
+  gap:16px;                   /* spazio fra logo e menu */
+  padding:8px 16px;
+}
+.logo-menu-row .logo img{    /* altezza logo (se già ce l'hai ignora) */
+  height:50px; width:auto; display:block;
+}
+
+/* ----- mobile ≤ 580px ----- */
+@media (max-width:580px){
+  .logo-menu-row{
+    flex-direction:column;   /* logo sopra, menu sotto */
+    align-items:flex-start;  /* allineati a sinistra */
+  }
+}
