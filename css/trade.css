@@ -16,7 +16,9 @@
     --color-link: #faebd7;
     --color-link-hover: #ffdb58;
     --color-card-bg: #333333;
-    --color-header-bg: #2a2a2a;
+    --color-header-bg: #2a2a2a;	
+  --color-surface-rgb: 248, 250, 252; /* esempio: sostituisci coi tuoi valori RGB */
+  --color-surface-elevated-rgb: 255, 255, 255;
 }
 
 /* Reset & base */
@@ -282,7 +284,8 @@ input::placeholder, textarea::placeholder {
 }
 
 .summary-item {
-    background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%);
+    background: linear-gradient(135deg, rgba(var(--color-surface-rgb), 0.5) 0%, rgba(var(--color-surface-elevated-rgb), 0.5) 100%);
+
     padding: 20px;
     border-radius: 8px;
     text-align: center;
@@ -507,7 +510,7 @@ table thead tr, .trade-summary table thead tr {
 
 /* Tabella trade – righe dispari/pari */
 table tbody tr, .trade-summary table tbody tr {
-    background: #383838 !important;
+    background: rgba(74, 74, 74, 0.3) !important;
 }
 
 /* Tabella trade – hover */
@@ -526,7 +529,7 @@ table th, .trade-summary table th {
 .trade-form,
 .trade-summary,
 .summary-item {
-    background: linear-gradient(135deg, #4a4a4a 0%, #383838 40%) !important;
+    background: rgba(74, 74, 74, 0.3) !important;
     border: 1px solid #4a4a4a !important;
     box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
