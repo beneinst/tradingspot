@@ -16,6 +16,23 @@
   let percentualeCapitaleChart = null;
   let periodoVisualizzato = 30; // default: 30 giorni
   
+   // Crea il grafico storico della distribuzione del capitale
+  // Configurazione colori per web e export
+const coloriConfig = {
+  web: {
+    testo: '#fff',
+    griglia: 'rgba(68, 68, 68, 0.8)',
+    sfondo: 'transparent'
+  },
+  export: {
+    testo: '#000',
+    griglia: 'rgba(200, 200, 200, 0.8)',
+    sfondo: '#ffffff'
+  }
+};
+
+let modalitaExport = false; // Flag per sapere se stiamo esportando
+  
   // Funzione di inizializzazione
   function inizializza() {
     // Carica dati salvati se disponibili
@@ -395,110 +412,31 @@ function creaGraficoCapitale() {
 
 // Funzione per scaricare il grafico percentuale
 // Funzione per scaricare il grafico percentuale con dimensioni HD e sfondo bianco
-function scaricaGraficoPercentuale1() {
-  console.log('Funzione scaricaGraficoPercentuale chiamata'); // Debug
-  
-  // Verifica che la variabile del grafico esista
-  if (typeof percentualeCapitaleChart === 'undefined' || !percentualeCapitaleChart) {
-    console.error('Grafico percentualeCapitaleChart non trovato - assicurati che sia stato creato');
-    alert('Grafico non disponibile per il download. Assicurati che il grafico sia visualizzato.');
-    return;
-  }
-  
-  try {
-    // Crea un canvas temporaneo con proporzioni più ampie (16:9)
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    
-    // Imposta dimensioni HD con rapporto 16:9
-    tempCanvas.width = 4260;
-    tempCanvas.height = 2160;
-    
-    // Riempie lo sfondo di BIANCO
-    tempCtx.fillStyle = '#FFFFFF';
-    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-    
-    // Ottieni l'immagine del grafico originale
-    const chartImageUrl = percentualeCapitaleChart.toBase64Image('image/png', 1.0);
-    
-    // Crea un'immagine temporanea per disegnare sul canvas
-    const img = new Image();
-    img.onload = function() {
-      // Disegna l'immagine del grafico sul canvas temporaneo
-      tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
-      
-      // Aggiungi il watermark se la funzione esiste
-      if (typeof aggiungiWatermark === 'function') {
-        aggiungiWatermark(tempCtx, tempCanvas.width, tempCanvas.height);
-      }
-      
-      // Crea il link per il download
-      const link = document.createElement('a');
-      const oggi = new Date();
-      const dataFormattata = oggi.toISOString().split('T')[0];
-      
-      link.download = `grafico-percentuale-capitale-HD-${dataFormattata}.png`;
-      link.href = tempCanvas.toDataURL('image/png', 1.0);
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      console.log('Download completato');
-    };
-    
-    img.onerror = function() {
-      console.error('Errore nel caricamento dell\'immagine del grafico');
-      alert('Errore nel caricamento dell\'immagine del grafico');
-    };
-    
-    // Carica l'immagine del grafico
-    img.src = chartImageUrl;
-    
-  } catch (error) {
-    console.error('Errore durante il download:', error);
-    alert('Errore durante il download del grafico: ' + error.message);
-  }
-}
-// NOTA: Nel tuo codice creaGraficoPercentualeCapitale() c'è un errore:
-// Cambia "borderColor: 2," in "borderColor: '#3498db'," o un altro colore valido
-
-// Pulsante HTML da aggiungere nella sezione del grafico percentuale
-/*
-<button onclick="scaricaGraficoPercentuale()" class="btn btn-secondary">
-  <i class="fas fa-download"></i> Scarica Grafico Percentuale
-</button>
-*/
-
-// Funzione per scaricare il grafico percentuale
 function scaricaGraficoPercentuale() {
-  const canvas = document.getElementById('percentualeCapitaleChart');
+  console.log('scaricaGraficoPercentuale chiamata');
   
-  // Attiva modalità export e ricrea il grafico
+  // 1. EXPORT + DESTROY
   modalitaExport = true;
+  if (percentualeCapitaleChart) {
+    percentualeCapitaleChart.destroy();
+  }
   creaGraficoPercentualeCapitale();
   
-  // Aspetta che il grafico sia completamente renderizzato
+  // 2. COPIA DIRETTA (come scaricaGrafico())
   setTimeout(() => {
-    // Crea un canvas temporaneo con proporzioni più ampie (16:9)
+    const canvas = document.getElementById('percentualeCapitaleChart');
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
     
-    // Imposta dimensioni HD con rapporto 16:9
     tempCanvas.width = 4260;
     tempCanvas.height = 2160;
     
-    // Riempie lo sfondo di BIANCO
     tempCtx.fillStyle = '#FFFFFF';
     tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     
-    // Copia il grafico originale sul canvas temporaneo
     tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
-    
-    // Aggiungi il watermark
     aggiungiWatermark(tempCtx, tempCanvas.width, tempCanvas.height);
     
-    // Crea il link per il download
     const link = document.createElement('a');
     const oggi = new Date();
     const dataFormattata = oggi.toISOString().split('T')[0];
@@ -510,28 +448,18 @@ function scaricaGraficoPercentuale() {
     link.click();
     document.body.removeChild(link);
     
-    // Disattiva modalità export e ricrea il grafico per la visualizzazione web
+    // 3. RIPRISTINA
     modalitaExport = false;
     creaGraficoPercentualeCapitale();
-  }, 100); // Piccolo delay per assicurarsi che il rendering sia completo
+  }, 200);
 }
-  
-  // Crea il grafico storico della distribuzione del capitale
-  // Configurazione colori per web e export
-const coloriConfig = {
-  web: {
-    testo: '#fff',
-    griglia: 'rgba(68, 68, 68, 0.8)',
-    sfondo: 'transparent'
-  },
-  export: {
-    testo: '#000',
-    griglia: 'rgba(200, 200, 200, 0.8)',
-    sfondo: '#ffffff'
-  }
-};
 
-let modalitaExport = false; // Flag per sapere se stiamo esportando
+
+
+
+
+
+ 
 
 // 3. Modifica la funzione creaGraficoStoricoCapitale() per mostrare solo due linee
 function creaGraficoStoricoCapitale() {
@@ -784,66 +712,88 @@ function aggiornaGraficoStorico() {
   }
   
   // Crea il grafico percentuale
-  function creaGraficoPercentualeCapitale() {
-    const ctx = document.getElementById('percentualeCapitaleChart').getContext('2d');
-    const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
-    
-    // Calcola le percentuali del capitale in dollari
-    const percentuali = datiPeriodo.map(item => {
-      const totaleInDollari = item.totaleIn * datiCapitale.quotaPerTrade;
-      const totaleComplessivo = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
-      return (totaleInDollari / totaleComplessivo) * 100;
-    });
-    
-    percentualeCapitaleChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: datiPeriodo.map(item => {
-          const data = new Date(item.data);
-          return `${data.getDate()}/${data.getMonth() + 1}`;
-        }),
-        datasets: [{
-          label: '% Capitale in Trading',
-          data: percentuali,
-          backgroundColor: 'rgba(213, 240, 255, 0.4)',
-          borderColor: 'rgba(0,65,194, 1)',
-          tension: 0.4,
-          fill: true,
-          pointRadius: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 100,
-            title: {
-              display: true,
-              text: 'Percentuale in Trading (%)'
-            }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Data'
-            }
-          }
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const value = context.raw || 0;
-                return `Capitale in Trading: ${value.toFixed(1)}%`;
-              }
-            }
+function creaGraficoPercentualeCapitale() {
+  const ctx = document.getElementById('percentualeCapitaleChart').getContext('2d');
+  // ← AGGIUNGI QUESTO BLOCCO
+  if (percentualeCapitaleChart) {
+    percentualeCapitaleChart.destroy();
+    percentualeCapitaleChart = null;
+  }
+  const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+  
+  const percentuali = datiPeriodo.map(item => {
+    const totaleInDollari = item.totaleIn * datiCapitale.quotaPerTrade;
+    const totaleComplessivo = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
+    return (totaleInDollari / totaleComplessivo) * 100;
+  });
+  
+  const colori = modalitaExport ? coloriConfig.export : coloriConfig.web;
+  
+  percentualeCapitaleChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: datiPeriodo.map(item => {
+        const data = new Date(item.data);
+        return `${data.getDate()}/${data.getMonth() + 1}`;
+      }),
+      datasets: [{
+        label: '% Capitale in Trading',
+        data: percentuali,
+        backgroundColor: modalitaExport ? 'rgba(213, 240, 255, 0.6)' : 'rgba(213, 240, 255, 0.4)',
+        borderColor: modalitaExport ? '#0041c2' : 'rgba(0,65,194, 1)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: modalitaExport ? 6 : 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: modalitaExport ? 0 : 800 },
+      plugins: {
+        legend: {  // ← AGGIUNGI QUESTO!
+          display: true,
+          labels: {
+            color: colori.testo,  // Bianco web / Nero export
+            font: { size: modalitaExport ? 14.5 : 12 }
           }
         }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          title: {
+            display: true,
+            text: 'Percentuale in Trading (%)',
+            color: colori.testo,
+            font: { size: modalitaExport ? 14.5 : 12 }
+          },
+          ticks: {
+            color: colori.testo,
+            font: { size: modalitaExport ? 14.5 : 12 }
+          },
+          grid: { color: colori.griglia }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Data',
+            color: colori.testo,
+            font: { size: modalitaExport ? 14.5 : 12 }
+          },
+          ticks: {
+            color: colori.testo,
+            font: { size: modalitaExport ? 14.5 : 12 }
+          },
+          grid: { color: colori.griglia }
+        }
       }
-    });
-  }
+    }
+  });
+}
+
+
   
   // Aggiorna il grafico percentuale
   function aggiornaGraficoPercentuale() {
