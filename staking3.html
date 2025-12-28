@@ -3,11 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Regole e Appunti</title>
-	<link rel="icon" type="image/png" href="favicon.png"> 
-	<link rel="stylesheet" href="css/regole.css">
-	<link rel="stylesheet" href="css/menusotto.css">
+    <title>Staking ATOM - Ledger</title>
+    <link rel="icon" type="image/png" href="favicon.png"> 
+    <link rel="stylesheet" href="css/trade.css">
+	<link rel="stylesheet" href="css/operativita.css">
+	<link rel="stylesheet" href="css/panoramica.css">
+    <link rel="stylesheet" href="css/menusotto.css">
 	<link rel="stylesheet" href="css/style.css">
+	
+	<style>
+	.atom-entry-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: #22242a;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,.18);
+}
+.atom-entry-table th,
+.atom-entry-table td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #2d313a;
+}
+.atom-entry-table th {
+  background: linear-gradient(135deg, #353850 0%, #23243b 100%);
+  color: #ececf1;
+  font-weight: 600;
+  font-size: .9em;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.atom-entry-table tr:hover {
+  background-color: #2d313a;
+}
+.btn-del {
+  background: #ff4d6d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.btn-icon-muted {
+    background: rgba(51, 51, 51, 0.6);  /* #333 semi-trasparente */
+    border-radius: 6px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #ffffff;
+    font-size: 0.9em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.btn-icon-muted:hover {
+    background: rgba(80, 80, 80, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 14px rgba(0,0,0,0.5);
+}
+</style>
 </head>
 <body>
 <div style="padding: 4px;"></div>
@@ -65,47 +124,67 @@
 
   <!-- TITOLO PAGINA (sempre sotto) -->
   <div class="header-title">
-    <h1>📒 Regole e Appunti Trading</h1>
-    <small>*Appunti, <strong>Regole</strong> e aggiornamenti tecnici seguendo i test.</small>
+    <h1>🎍 Staking ATOM | Meria</h1>
+    <small>*Gestione <strong>Entry ATOM</strong> con accumulo e prezzo medio.</small>
   </div>
 </header>
 <!-- ===================================== -->
 </div>
+  
+   <div style="padding: 7px;"></div>  
+  <!-- CARD FORM -->
+<div class="note1">
+  <h5 class="section-title" style="color: #ffe4b5 !important;">💱 Aggiungi Entry ATOM/USDC | Ledger </h5>
+  <form id="entryForm_2" class="trade-form1">
+    <div class="form-row">
+      <label for="qtyAtom_2" style="color: #BCC6CC !important;">QUANTITÀ ATOM</label>
+      <input type="number" id="qtyAtom_2" step="0.00000001" placeholder="0.00000000" required>
+    </div>
+    <div class="form-row">
+      <label for="spentUsdc_2" style="color: #BCC6CC !important;">IMPORTO USDC SPESI</label>
+      <input type="number" id="spentUsdc_2" placeholder="Importo USDC ($)" step="0.01" required>
+    </div>
+    <div class="form-row">
+      <label for="note_2" style="color: #BCC6CC !important;">NOTA (opzionale)</label>
+      <input type="text" id="note_2" maxlength="50" placeholder="Breve nota">
+    </div>
+    <div class="form-row">
+      <label></label>
+      <button type="submit" class="btn-edit" style="font-size:1.1rem; padding:9px 22px; min-width:220px; margin-right:20px;">
+        ➕ Aggiungi Entry
+      </button>
+    </div>
+  </form>
+</div>
+<!-- LISTA ENTRY -->
+<div class="container">
+  <div id="note_2">
+    <h4 class="section-title" style="color: #ffe4b5 !important;">
+  🎯 Portfolio ATOM | Val. 
+  <a href="https://www.mintscan.io/cosmos/validators/cosmosvaloper1wrx0x9m9ykdhw9sg04v7uljme53wuj03aa5d4f" target="_blank" rel="noopener noreferrer" style="color: #FFD801; text-decoration: underline;">
+    Meria
+  </a>
+</h4>
+    <div id="portfolio_2" class="trade-card" style="margin-top: 0;"></div>
+  </div>
+</div>
+<!-- PULSANTE DOWNLOAD -->
+<div class="form-container" style="margin-top: 30px;">
+  <button id="btnDownload_2" class="btn-edit" style="font-size:1.1rem; padding:9px 22px;">
+    📥 Scarica Report Completo Ledger
+  </button>
+</div>
+</div></div>
 
- <div style="padding: 6px;"></div> 
-   <div class="container">
-   
-        
-        <div class="form-container">
-            <h3 style="color: #9ac5d3 !important;" class="section-title">✏️ Aggiungi una Nuova Regola</h3>
-            <form id="rule-form">
-                <input type="text" id="rule-title" placeholder="Titolo della regola" required>
-                <textarea id="rule-content" placeholder="Descrizione della regola o appunto" required></textarea>
-                
-                <div class="image-upload-container">
-                    <label class="image-upload-label" for="rule-image">Immagine allegata (opzionale):</label>
-                    <input type="file" id="rule-image" accept="image/*">
-                    <img id="image-preview" class="image-preview" alt="Anteprima immagine">
-                </div>
-                
-                <button type="submit" class="btn-primary">Salva Regola</button>
-            </form>
-        </div>
-        
-        <div class="form-container">
-            <h3 style="color: #9ac5d3 !important;" class="section-title">🗂️ Le Tue Regole</h3>
-            <div id="rules-container" class="rules-container">
-                <!-- Le regole saranno inserite qui dinamicamente -->
-            </div>
-        </div></div></div>
-    
-        
-  	<div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
+
+<div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
       
       		   <p style="margin: 0; color: #c3c3c3; padding-top:25px; padding-bottom:35px; text-align: center; height: 15px; line-height: 12px;">
         ⛰️ 2026 © FlowChart by Gerardo D
       </p>
     </div></div>
+
+
 <!-- Bottone torna sopra principale (con freccia CSS) -->
     <button class="back-to-top" id="backToTop" title="Torna in cima"></button>  
     
@@ -142,8 +221,11 @@
         toggleBackToTopButton();
     </script>
 
-<script src="js/regole.js"></script>
-<script type="module" src="jsmodule/regole_Mod.js"></script>
+
+
+<script src="js/staking2.js"></script>
+
+
 
 </body>
 </html>
