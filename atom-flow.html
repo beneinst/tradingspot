@@ -437,28 +437,32 @@
     <canvas id="validatorChart" style="height: 400px; width: 100%; display: block;"></canvas>
         </div></div><div style="padding: 8x;">
 <div class="container">
-        <!-- Tabella Operazioni -->
-        
-            <h3>📋 Storico Operazioni</h3>
-            <table class="operations-table" id="operationsTable">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Tipo</th>
-                        <th>Figment</th>
-                        <th>Chorus One</th>
-                        <th>Meria</th>
-                        <th>StakeLab</th>
-                        <th>Totale ATOM</th>
-                        <th>Totale USD</th>
-                        <th>Note</th>
-                        <th>Azioni</th>
-                    </tr>
-                </thead>
-                <tbody id="operationsBody">
-                </tbody>
-            </table>
-        </div>
+    <!-- Tabella Operazioni -->
+    <h3>📋 Storico Operazioni</h3>
+    
+    <div class="input-actions" style="margin-bottom: 15px;">
+        <button class="btn-edit" onclick="downloadTableHTML()">📥 Scarica Tabella HTML</button>
+    </div>
+    
+    <table class="operations-table" id="operationsTable">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Figment</th>
+                <th>Chorus One</th>
+                <th>Meria</th>
+                <th>StakeLab</th>
+                <th>Totale ATOM</th>
+                <th>Totale USD</th>
+                <th>Note</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody id="operationsBody">
+        </tbody>
+    </table>
+</div>
     </div></div></div>
 	<div style="padding: 8x;"></div>
 		<div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
@@ -963,6 +967,184 @@ function updateValidatorChart() {
                 operations = JSON.parse(saved);
             }
         }
+		
+		// Scarica tabella in formato HTML
+function downloadTableHTML() {
+    if (operations.length === 0) {
+        alert('Nessuna operazione da scaricare!');
+        return;
+    }
+
+    const validatorNames = {
+        figment: '🏛️ Figment',
+        chorus: '🎵 Chorus One',
+        meria: '⚡ Meria',
+        stakelab: '🔬 StakeLab'
+    };
+
+    // Funzione helper per formattare i validatori
+    const formatValidator = (atom, usd) => {
+        if (atom === 0 && usd === 0) {
+            return '<span style="color: #ccc;">-</span>';
+        }
+        return `${atom.toFixed(6)} ($${usd.toFixed(2)})`;
+    };
+
+    // Genera le righe della tabella
+    let tableRows = '';
+    operations.forEach(op => {
+        const typeLabel = op.type === 'deposito' ? '💶 Deposito' : '📈 Staking';
+        
+        tableRows += `
+            <tr>
+                <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+                <td>${typeLabel}</td>
+                <td>${formatValidator(op.validators.figment.atom, op.validators.figment.usd)}</td>
+                <td>${formatValidator(op.validators.chorus.atom, op.validators.chorus.usd)}</td>
+                <td>${formatValidator(op.validators.meria.atom, op.validators.meria.usd)}</td>
+                <td>${formatValidator(op.validators.stakelab.atom, op.validators.stakelab.usd)}</td>
+                <td><strong>${op.totalAtom.toFixed(6)} ATOM</strong></td>
+                <td><strong>$${op.totalUsd.toFixed(2)}</strong></td>
+                <td>${op.note || '-'}</td>
+            </tr>
+        `;
+    });
+
+    // Template HTML completo
+    const htmlContent = `<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storico Operazioni ATOM - ${new Date().toLocaleDateString('it-IT')}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4e5754 0%, #4d5854 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .export-date {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        strong {
+            color: #333;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #999;
+            font-size: 0.85em;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Storico Operazioni ATOM Staking</h1>
+        <p class="export-date">Esportato il: ${new Date().toLocaleString('it-IT')}</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Figment</th>
+                    <th>Chorus One</th>
+                    <th>Meria</th>
+                    <th>StakeLab</th>
+                    <th>Totale ATOM</th>
+                    <th>Totale USD</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>
+        </table>
+        
+        <div class="footer">
+            <p>⛰️ FlowChart by Gerardo D - ${new Date().getFullYear()}</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+    // Crea e scarica il file
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `atom-staking-storico-${new Date().toISOString().split('T')[0]}.html`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
     </script>
 </body>
 </html>
