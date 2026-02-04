@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATOM Staking Portfolio Tracker</title>
+	<link rel="icon" type="image/png" href="favicon.png"> 
+	<link rel="stylesheet" href="css/menusotto.css">
+	<link rel="stylesheet" href="css/style.css">
+	
+	
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+      
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .input-group {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group-row {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+      
+
+        .validator-header {
+            font-weight: 700;
+            color: #addbe3;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .validator-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+       
+
+        canvas {
+            max-height: 700px;
+        }
+
+        .operations-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .operations-table th,
+        .operations-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .operations-table th {
+            background: #37393c;
+            font-weight: 600;
+            color: #addbe3;
+        }
+
+        .operations-table tr:hover {
+            background: #474a4c;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .price-display {
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .validator-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+		
+		.ts-grid-item {
+  background-color: var(--bg-container);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.ts-grid-item:hover {
+  border-color: var(--color-gold);
+  transform: translateY(-3px);
+  background-color: #383838;
+}
+.btn-icon-muted {
+    background: rgba(51, 51, 51, 0.6);  /* #333 semi-trasparente */
+    border-radius: 6px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #ffffff;
+    font-size: 0.9em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.btn-icon-muted:hover {
+    background: rgba(80, 80, 80, 0.1);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 14px rgba(0,0,0,0.5);
+}
+#validatorChart_1 {
+    height: 400px !important;
+}
+#validatorChart {
+    height: 400px !important;
+    max-height: 400px !important;
+    width: 100% !important;
+}
+
+    </style>
+</head>
+<body>
+<div style="padding: 4px;"></div>
+
+</header>
+
+<div class="container">
+<!-- ========== RIGA UNICA: LOGO + MENU (senza toccare il tuo stile) ========== -->
+<div class="logo-menu-row">
+  <!-- logo -->
+  <a href="index.html" class="logo">
+    <img src="images/logoinvest2a3.svg" alt="FlowChart">
+  </a>
+
+  <!-- tuo blocco ESISTENTE (incolonnato a destra del logo) -->
+  <div class="iflow-body">
+    <nav class="iflow-custom-menu">
+       <ul>
+        <li class="dropdown">
+          <span>Trade</span>
+          <ul>
+            <li><a href="https://beneinst.github.io/tradingspot/">Trade attivi</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
+			<li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
+			
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <span>Capitale</span>
+          <ul>
+            <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Panoramica</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
+			<li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
+			<li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <span>Strategia</span>
+          <ul>
+            <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <span>Backup</span>
+          <ul>
+            <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+
+  <!-- TITOLO PAGINA (sempre sotto) -->
+  <div class="header-title">
+    <h1>🎍 Staking ATOM | Tracker</h1>
+    <small>*Gestione <strong>Entry ATOM</strong> con accumulo e prezzo medio.</small>
+  </div>
+</header>
+  </div>
+
+   
+<div style="padding: 8px;"></div>   
+<!-- Prezzo ATOM in tempo reale -->
+        <div class="container-f">
+            <div class="price-display" id="atomPrice">
+                💰 Prezzo ATOM: Caricamento...
+            </div>
+        </div>
+<!-- Statistiche -->
+<div class="stats-grid">
+    <div class="ts-grid-item">
+        <div class="stat-label">Totale ATOM</div>
+        <div class="stat-value" id="totalAtom">0.00</div>
+    </div>
+    <div class="ts-grid-item">
+        <div class="stat-label">USD Investiti</div>
+        <div class="stat-value" id="totalInvested">$0.00</div>
+    </div>
+    <div class="ts-grid-item">
+        <div class="stat-label">Valore Attuale USD</div>
+        <div class="stat-value" id="totalValue">$0.00</div>
+    </div>
+    <div class="ts-grid-item" id="profitCard">
+        <div class="stat-label">Profitto/Perdita</div>
+        <div class="stat-value" id="profitLoss">$0.00</div>
+    </div>
+    <div class="ts-grid-item">
+        <div class="stat-label">ROI %</div>
+        <div class="stat-value" id="roiPercent">0.00%</div>
+    </div>
+    <div class="ts-grid-item">
+        <div class="stat-label">ATOM da Deposito</div>
+        <div class="stat-value" id="depositAtom">0.00</div>
+    </div>
+    <div class="ts-grid-item">
+        <div class="stat-label">ATOM da Staking</div>
+        <div class="stat-value" id="stakingAtom">0.00</div>
+    </div>
+</div>
+
+      
+ <div style="padding: 8px;"></div>
+         <!-- Form Inserimento -->
+        <div class="container-f">
+            <h1 style="text-align: left; font-size: 28px;">➕ Inserisci Operazione</h1>
+
+
+            
+            <div class="input-group input-group-row">
+                <div class="input-field">
+                    <label>Data</label>
+                    <input type="date" id="operationDate">
+                </div>
+                <div class="input-field">
+                    <label>Tipo Operazione</label>
+                    <select id="operationType">
+                        <option value="deposito">💶 Deposito (Acquisto ATOM)</option>
+                        <option value="staking">📈 Re-staking (Ricompense)</option>
+                    </select>
+                </div>
+                <div class="input-field">
+                    <label>Validatore</label>
+                    <select id="validatorSelect">
+                        <option value="figment">🏛️ Figment</option>
+                        <option value="chorus">🎵 Chorus One</option>
+                        <option value="meria">⚡ Meria</option>
+                        <option value="stakelab">🔬 StakeLab</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Modulo unico per inserimento -->
+            <div class="validator-section">
+                <div class="validator-inputs">
+                    <div class="input-field">
+                        <label>ATOM</label>
+                        <input type="number" id="atomAmount" step="0.000001" placeholder="0.000000">
+                    </div>
+                    <div class="input-field">
+                        <label>Spesa USD</label>
+                        <input type="number" id="usdAmount" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-field">
+                <label>Note</label>
+                <input type="text" id="operationNote" placeholder="Descrizione operazione">
+            </div>
+
+            <div class="input-actions"  >
+                <button class="btn-edit" onclick="addOperation()">➕ Aggiungi Operazione</button>
+                <button class="btn-danger" onclick="clearForm()">🔄 Pulisci Form</button>
+            </div>
+        </div>
+
+<div style="padding: 61x;"></div>
+<div class="container">
+        <!-- Grafico Andamento Capitale -->
+        <div class="chart-container">
+            <h3>📊 Andamento Capitale in ATOM</h3>
+            <canvas id="capitalChart"></canvas>
+        </div></div>
+<div style="padding: 61x;">
+<div class="container">
+ <!-- Grafico USD Investiti vs Valore Attuale -->
+        <div class="chart-container">
+            <h3>💰 USD Investiti vs Valore Attuale</h3>
+            <canvas id="usdComparisonChart"></canvas>
+        </div> </div>
+
+<div style="padding: 8x;"></div>
+
+<div class="container">
+        <!-- Grafico Distribuzione per Validatore -->
+        <div class="chart-container">
+            <h3>🥧 Distribuzione ATOM per Validatore</h3>
+    <canvas id="validatorChart" style="height: 400px; width: 100%; display: block;"></canvas>
+        </div></div><div style="padding: 8x;">
+<div class="container">
+        <!-- Tabella Operazioni -->
+        
+            <h3>📋 Storico Operazioni</h3>
+            <table class="operations-table" id="operationsTable">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Figment</th>
+                        <th>Chorus One</th>
+                        <th>Meria</th>
+                        <th>StakeLab</th>
+                        <th>Totale ATOM</th>
+                        <th>Totale USD</th>
+                        <th>Note</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="operationsBody">
+                </tbody>
+            </table>
+        </div>
+    </div></div></div>
+	<div style="padding: 8x;"></div>
+		<div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
+      
+      		   <p style="margin: 0; color: #c3c3c3; padding-top:25px; padding-bottom:35px; text-align: center; height: 15px; line-height: 12px;">
+        ⛰️ 2026 © FlowChart by Gerardo D
+      </p>
+    </div></div>
+
+<!-- Bottone torna sopra principale (con freccia CSS) -->
+    <button class="back-to-top" id="backToTop" title="Torna in cima"></button>  
+    
+
+    <script>
+        // Dati globali
+        let operations = [];
+        let atomPrice = 0;
+        let capitalChart = null;
+		let usdComparisonChart = null;
+        let validatorChart = null;
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            // Imposta data odierna
+            document.getElementById('operationDate').valueAsDate = new Date();
+            
+            // Carica dati salvati
+            loadData();
+            
+            // Ottieni prezzo ATOM
+            fetchAtomPrice();
+            
+            // Aggiorna prezzo ogni 30 secondi
+            setInterval(fetchAtomPrice, 30000);
+            
+            // Aggiorna visualizzazione
+            updateDisplay();
+        });
+
+        // Fetch prezzo ATOM da Binance
+        async function fetchAtomPrice() {
+            try {
+                const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=ATOMUSDT');
+                const data = await response.json();
+                atomPrice = parseFloat(data.price);
+                document.getElementById('atomPrice').textContent = `💰 Prezzo ATOM: $${atomPrice.toFixed(4)} USDT`;
+                updateDisplay();
+            } catch (error) {
+                console.error('Errore nel recupero del prezzo ATOM:', error);
+                document.getElementById('atomPrice').textContent = '💰 Prezzo ATOM: Errore caricamento';
+            }
+        }
+
+        // Aggiungi operazione
+       // Aggiungi operazione
+function addOperation() {
+    const date = document.getElementById('operationDate').value;
+    const type = document.getElementById('operationType').value;
+    const validator = document.getElementById('validatorSelect').value;
+    const note = document.getElementById('operationNote').value;
+    const atomAmount = parseFloat(document.getElementById('atomAmount').value) || 0;
+    const usdAmount = parseFloat(document.getElementById('usdAmount').value) || 0;
+
+    if (!date) {
+        alert('Per favore inserisci una data');
+        return;
+    }
+
+    if (atomAmount === 0) {
+        alert('Per favore inserisci una quantità di ATOM');
+        return;
+    }
+
+    // Crea oggetto validatori con tutti i campi a 0
+    const validators = {
+        figment: { atom: 0, usd: 0 },
+        chorus: { atom: 0, usd: 0 },
+        meria: { atom: 0, usd: 0 },
+        stakelab: { atom: 0, usd: 0 }
+    };
+
+    // Imposta solo il validatore selezionato
+    validators[validator] = { atom: atomAmount, usd: usdAmount };
+
+    const operation = {
+        id: Date.now(),
+        date: date,
+        type: type,
+        validator: validator,
+        note: note,
+        validators: validators,
+        totalAtom: atomAmount,
+        totalUsd: usdAmount
+    };
+
+    operations.push(operation);
+    operations.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    saveData();
+    updateDisplay();
+    clearForm();
+}
+
+        // Elimina operazione
+        function deleteOperation(id) {
+            if (confirm('Sei sicuro di voler eliminare questa operazione?')) {
+                operations = operations.filter(op => op.id !== id);
+                saveData();
+                updateDisplay();
+            }
+        }
+
+        // Pulisci form
+function clearForm() {
+    document.getElementById('atomAmount').value = '';
+    document.getElementById('usdAmount').value = '';
+    document.getElementById('operationNote').value = '';
+}
+
+       // Aggiorna visualizzazione
+        function updateDisplay() {
+            updateStats();
+            updateTable();
+            updateCharts();
+        }
+
+        // Aggiorna statistiche
+        function updateStats() {
+            const totalAtom = operations.reduce((sum, op) => sum + op.totalAtom, 0);
+            const totalInvested = operations.reduce((sum, op) => sum + op.totalUsd, 0);
+            const depositAtom = operations.filter(op => op.type === 'deposito').reduce((sum, op) => sum + op.totalAtom, 0);
+            const stakingAtom = operations.filter(op => op.type === 'staking').reduce((sum, op) => sum + op.totalAtom, 0);
+            const totalValue = totalAtom * atomPrice;
+            const profitLoss = totalValue - totalInvested;
+            const roiPercent = totalInvested > 0 ? ((profitLoss / totalInvested) * 100) : 0;
+
+            document.getElementById('totalAtom').textContent = totalAtom.toFixed(6);
+            document.getElementById('totalInvested').textContent = '$' + totalInvested.toFixed(2);
+            document.getElementById('totalValue').textContent = '$' + totalValue.toFixed(2);
+            document.getElementById('depositAtom').textContent = depositAtom.toFixed(6);
+            document.getElementById('stakingAtom').textContent = stakingAtom.toFixed(6);
+            
+            // Aggiorna profitto/perdita con colore
+            const profitCard = document.getElementById('profitCard');
+            const profitLossElement = document.getElementById('profitLoss');
+            profitLossElement.textContent = (profitLoss >= 0 ? '+' : '') + '$' + profitLoss.toFixed(2);
+            
+            // Cambia colore del card in base al profitto/perdita
+            if (profitLoss > 0) {
+                profitCard.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+            } else if (profitLoss < 0) {
+                profitCard.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+            } else {
+                profitCard.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }
+            
+            // Aggiorna ROI
+            const roiElement = document.getElementById('roiPercent');
+            roiElement.textContent = (roiPercent >= 0 ? '+' : '') + roiPercent.toFixed(2) + '%';
+        }
+
+// Aggiorna tabella
+function updateTable() {
+    const tbody = document.getElementById('operationsBody');
+    tbody.innerHTML = '';
+
+    const validatorNames = {
+        figment: '🏛️ Figment',
+        chorus: '🎵 Chorus One',
+        meria: '⚡ Meria',
+        stakelab: '🔬 StakeLab'
+    };
+
+    operations.forEach(op => {
+        const row = tbody.insertRow();
+        const typeLabel = op.type === 'deposito' ? '💶 Deposito' : '📈 Staking';
+        const validatorLabel = validatorNames[op.validator] || op.validator;
+        
+        row.innerHTML = `
+            <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+            <td>${typeLabel}</td>
+            <td>${op.validators.figment.atom.toFixed(6)} ($${op.validators.figment.usd.toFixed(2)})</td>
+            <td>${op.validators.chorus.atom.toFixed(6)} ($${op.validators.chorus.usd.toFixed(2)})</td>
+            <td>${op.validators.meria.atom.toFixed(6)} ($${op.validators.meria.usd.toFixed(2)})</td>
+            <td>${op.validators.stakelab.atom.toFixed(6)} ($${op.validators.stakelab.usd.toFixed(2)})</td>
+            <td><strong>${op.totalAtom.toFixed(6)} ATOM</strong></td>
+            <td><strong>$${op.totalUsd.toFixed(2)}</strong></td>
+            <td>${op.note || '-'}</td>
+            <td><button class="btn-delete" onclick="deleteOperation(${op.id})">🗑️</button></td>
+        `;
+    });
+}
+
+       // Aggiorna grafici
+        function updateCharts() {
+            updateCapitalChart();
+            updateUsdComparisonChart();
+            updateValidatorChart();
+        }
+
+
+        // Grafico andamento capitale
+        function updateCapitalChart() {
+            const ctx = document.getElementById('capitalChart').getContext('2d');
+            
+            // Calcola dati cumulativi
+            let cumulativeAtom = 0;
+            let cumulativeDeposit = 0;
+            let cumulativeStaking = 0;
+            
+            const labels = [];
+            const totalData = [];
+            const depositData = [];
+            const stakingData = [];
+            const valueData = [];
+
+            operations.forEach(op => {
+                cumulativeAtom += op.totalAtom;
+                if (op.type === 'deposito') {
+                    cumulativeDeposit += op.totalAtom;
+                } else {
+                    cumulativeStaking += op.totalAtom;
+                }
+
+                labels.push(new Date(op.date).toLocaleDateString('it-IT'));
+                totalData.push(cumulativeAtom);
+                depositData.push(cumulativeDeposit);
+                stakingData.push(cumulativeStaking);
+                valueData.push(cumulativeAtom * atomPrice);
+            });
+
+            if (capitalChart) {
+                capitalChart.destroy();
+            }
+
+            capitalChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Totale ATOM',
+                            data: totalData,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'ATOM da Deposito',
+                            data: depositData,
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'ATOM da Staking',
+                            data: stakingData,
+                            borderColor: '#ffc107',
+                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed.y.toFixed(6) + ' ATOM';
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'ATOM'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+// Grafico USD Investiti vs Valore Attuale
+        function updateUsdComparisonChart() {
+            const ctx = document.getElementById('usdComparisonChart').getContext('2d');
+            
+            // Calcola dati cumulativi
+            let cumulativeInvested = 0;
+            let cumulativeAtom = 0;
+            
+            const labels = [];
+            const investedData = [];
+            const currentValueData = [];
+            const profitLossData = [];
+
+            operations.forEach(op => {
+                cumulativeInvested += op.totalUsd;
+                cumulativeAtom += op.totalAtom;
+                const currentValue = cumulativeAtom * atomPrice;
+                const profitLoss = currentValue - cumulativeInvested;
+
+                labels.push(new Date(op.date).toLocaleDateString('it-IT'));
+                investedData.push(cumulativeInvested);
+                currentValueData.push(currentValue);
+                profitLossData.push(profitLoss);
+            });
+
+            if (usdComparisonChart) {
+                usdComparisonChart.destroy();
+            }
+
+            usdComparisonChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'USD Investiti',
+                            data: investedData,
+                            borderColor: '#dc3545',
+                            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                            tension: 0.4,
+                            fill: false,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Valore Attuale USD',
+                            data: currentValueData,
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            tension: 0.4,
+                            fill: false,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Profitto/Perdita',
+                            data: profitLossData,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.2)',  // <-- Colore fisso invece della funzione
+    tension: 0.4,
+                            fill: true,
+                            borderWidth: 2,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    const value = context.parsed.y;
+                                    if (label.includes('Profitto')) {
+                                        label += (value >= 0 ? '+' : '') + '$' + value.toFixed(2);
+                                    } else {
+                                        label += '$' + value.toFixed(2);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'USD'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(0);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+       // Grafico distribuzione validatori
+function updateValidatorChart() {
+    const ctx = document.getElementById('validatorChart').getContext('2d');
+    
+    // Calcola totali per validatore
+    const totals = {
+        figment: 0,
+        chorus: 0,
+        meria: 0,
+        stakelab: 0
+    };
+
+    operations.forEach(op => {
+        totals.figment += op.validators.figment.atom;
+        totals.chorus += op.validators.chorus.atom;
+        totals.meria += op.validators.meria.atom;
+        totals.stakelab += op.validators.stakelab.atom;
+    });
+
+    if (validatorChart) {
+        validatorChart.destroy();
+    }
+
+    validatorChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['🏛️ Figment', '🎵 Chorus One', '⚡ Meria', '🔬 StakeLab'],
+            datasets: [{
+                data: [totals.figment, totals.chorus, totals.meria, totals.stakelab],
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.8)',
+                    'rgba(118, 75, 162, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(40, 167, 69, 0.8)'
+                ],
+                borderColor: [
+                    '#667eea',
+                    '#764ba2',
+                    '#ffc107',
+                    '#28a745'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,  // Cambiato da true a false
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += context.parsed.toFixed(6) + ' ATOM';
+                            const percentage = ((context.parsed / context.dataset.data.reduce((a, b) => a + b, 0)) * 100).toFixed(2);
+                            label += ' (' + percentage + '%)';
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+
+        // Salva dati in localStorage
+        function saveData() {
+            localStorage.setItem('atomOperations', JSON.stringify(operations));
+        }
+
+        // Carica dati da localStorage
+        function loadData() {
+            const saved = localStorage.getItem('atomOperations');
+            if (saved) {
+                operations = JSON.parse(saved);
+            }
+        }
+    </script>
+</body>
+</html>
