@@ -171,7 +171,7 @@
         }
 
         .btn-delete {
-            background: #dc3545;
+            background: #523639;
             color: white;
             padding: 6px 12px;
             border: none;
@@ -637,13 +637,21 @@ function updateTable() {
         const typeLabel = op.type === 'deposito' ? '💶 Deposito' : '📈 Staking';
         const validatorLabel = validatorNames[op.validator] || op.validator;
         
+        // Funzione helper per formattare i validatori
+        const formatValidator = (atom, usd) => {
+            if (atom === 0 && usd === 0) {
+                return '<span style="color: #ccc;">-</span>';
+            }
+            return `${atom.toFixed(6)} ($${usd.toFixed(2)})`;
+        };
+        
         row.innerHTML = `
             <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
             <td>${typeLabel}</td>
-            <td>${op.validators.figment.atom.toFixed(6)} ($${op.validators.figment.usd.toFixed(2)})</td>
-            <td>${op.validators.chorus.atom.toFixed(6)} ($${op.validators.chorus.usd.toFixed(2)})</td>
-            <td>${op.validators.meria.atom.toFixed(6)} ($${op.validators.meria.usd.toFixed(2)})</td>
-            <td>${op.validators.stakelab.atom.toFixed(6)} ($${op.validators.stakelab.usd.toFixed(2)})</td>
+            <td>${formatValidator(op.validators.figment.atom, op.validators.figment.usd)}</td>
+            <td>${formatValidator(op.validators.chorus.atom, op.validators.chorus.usd)}</td>
+            <td>${formatValidator(op.validators.meria.atom, op.validators.meria.usd)}</td>
+            <td>${formatValidator(op.validators.stakelab.atom, op.validators.stakelab.usd)}</td>
             <td><strong>${op.totalAtom.toFixed(6)} ATOM</strong></td>
             <td><strong>$${op.totalUsd.toFixed(2)}</strong></td>
             <td>${op.note || '-'}</td>
