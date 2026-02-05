@@ -331,134 +331,6 @@
     transform: translateY(-1px);
     box-shadow: 0 3px 14px rgba(0,0,0,0.5);
 }
-/* Container principale della griglia */
-.ts-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-/* Stile per l'etichetta (più piccola) */
-.ts-grid-item h4 {
-  font-size: 0.85rem;      /* Dimensione ridotta */
-  text-transform: uppercase; /* Rende il testo più ordinato */
-  letter-spacing: 0.5px;   /* Migliora la leggibilità */
-  color: #666;             /* Colore leggermente più tenue */
-  margin-bottom: 4px;      /* Spazio tra etichetta e valore */
-  line-height: 1.2;        /* Altezza riga compatta */
-}
-
-/* Stile per il valore principale (più grande) */
-.ts-grid-item .value {
-  font-size: 1.5rem;       /* Valore in evidenza */
-  font-weight: 700;        /* Grassetto per risaltare */
-  line-height: 1.1;
-}
-
-/* Sottovalore (es. quantità ATOM/BTC) */
-.ts-grid-item .subvalue {
-  font-size: 0.75rem;
-  color: #888;
-  margin-top: 2px;
-}
-
-/* Classi di colore per i profitti */
-.profit-positive { color: #28a745; }
-.profit-negative { color: #dc3545; }
-
-/* Container del grafico */
-.ts-chart-box {
-    background: rgba(51, 51, 51, 0.8); /* Colore #333 con 80% opacità */
-    backdrop-filter: blur(10px);        /* Effetto sfocatura sfondo */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Bordino leggero */
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 25px;
-}
-
-/* Container della griglia stats */
-.ts-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
-}
-
-/* Singolo box delle statistiche */
-.ts-grid-item {
-    background: rgba(51, 51, 51, 0.7); /* Leggermente più trasparente */
-    border: 1px solid rgba(188, 204, 233, 0.2); /* Bordo colorato come il titolo */
-    border-radius: 10px;
-    padding: 15px;
-    transition: transform 0.2s ease;
-}
-
-.ts-grid-item:hover {
-    transform: translateY(-3px); /* Effetto al passaggio del mouse */
-    background: rgba(51, 51, 51, 0.9);
-}
-
-/* Stile Etichetta (Piccola e sobria) */
-.ts-grid-item h4 {
-    color: #bccce9;            /* Colore azzurrino del tuo titolo */
-    font-size: 0.75rem;         /* Molto più piccola del valore */
-    font-weight: 400;
-    margin: 0 0 8px 0;
-    text-transform: uppercase;
-    opacity: 0.8;               /* Leggera trasparenza per gerarchia */
-}
-
-/* Stile Valore (Grande e luminoso) */
-.ts-grid-item .value {
-    color: #ffffff;             /* Bianco puro per massima leggibilità */
-    font-size: 1.4rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-}
-
-/* Varianti Colore per i profitti */
-.profit-positive {
-    color: #4ade80 !important;  /* Verde fluo tipico dei temi dark */
-}
-
-.profit-negative {
-    color: #f87171 !important;  /* Rosso pastello */
-}
-
-/* Sottovalore (es. quantità token) */
-.subvalue {
-    font-size: 0.8rem;
-    color: #94a3b8;
-    margin-top: 4px;
-}
-
-/* Classe base per il contenitore del grafico */
-.ts-chart-box {
-    background: rgba(51, 51, 51, 0.6); /* Sfondo #333 trasparente */
-    backdrop-filter: blur(8px);         /* Effetto sfocato moderno */
-    -webkit-backdrop-filter: blur(8px);
-    
-    /* Bordo: rimpiazzato il viola con un grigio-azzurro molto tenue */
-    border: 1px solid rgba(188, 204, 233, 0.15); 
-    
-    border-radius: 16px;               /* Angoli arrotondati eleganti */
-    padding: 24px;
-    margin-bottom: 30px;
-    
-    /* Ombra leggera per dare profondità senza appesantire */
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-}
-
-/* Variante Large (se serve differenziare dimensioni o spaziatura) */
-.ts-chart-box-large {
-    width: 100%;
-    min-height: 400px; /* Assicura spazio per il canvas del grafico */
-}
-
-/* Ottimizzazione per il canvas all'interno */
-#equityChart {
-    width: 100% !important;
-    height: auto !important;
-}
 </style>
 </head>
 <body>
@@ -532,10 +404,10 @@
    
 <div style="padding: 8px;"></div>   
 <div class="container">
-       <div class="conteiner-f">
+       <div class="ts-dash-card">
 
- 
-     <h1 style="text-align: left; font-size: 24px; color: #bccce9; padding-bottom: 35px; padding-top: 16px;">Evoluzione Patrimonio</h1>
+  <div class="ts-dash-card-header">
+    <h2>Evoluzione Patrimonio</h2>
           <div class="ts-chart-box ts-chart-box-large">
     <canvas id="equityChart"></canvas>
             </div>
@@ -551,13 +423,7 @@
     <div class="value profit-positive" id="totalAtomValue">$0.00</div>
     <div class="subvalue" id="totalAtomQty">0 ATOM</div>
   </div>
-  
- <div class="ts-grid-item">
-    <h4>₿ Valore BTC</h4>
-    <div class="value profit-positive" id="totalBtcValue">$0.00</div>
-    <div class="subvalue" id="totalBtcQty">0 BTC</div>
-  </div>
-  
+
   <div class="ts-grid-item">
     <h4>📈 Profitto Trading</h4>
     <div class="value" id="totalTrading">$0.00</div>
@@ -582,7 +448,7 @@
 
         <!-- 1. Input Section -->
    <div class="container-f">
-    <h1 style="text-align: left; font-size: 24px; color: white; padding-bottom: 25px;">➕ Inserisci Operazione</h1>
+    <h2>➕ Inserisci Operazione</h2>
     <div class="input-group input-group-row">
         <div class="input-field">
             <label>Data</label>
@@ -597,7 +463,6 @@
             <select id="operationType">
                 <option value="EUR">💶 Deposito Euro (- Capitale iniziale)</option>
                 <option value="ATOM">🪙 ATOM acquistati (+ Investimento)</option>
-				<option value="BTC">₿ BTC acquistati (+ Investimento)</option>
                 <option value="Trading">📈 Profitto Trading (+ Guadagno)</option>
             </select>
         </div>
@@ -616,7 +481,7 @@
 
         <!-- 3. Data Lists by Type -->
       <div class="ts-dash-card">
-  <h3>📋 Operazioni Registrate</h3>
+  <h2>📋 Operazioni Registrate</h2>
   <div class="data-tables-grid">
     <div>
       <h3 class="data-title">💶 Depositi Euro (Capitale -)</h3>
@@ -647,17 +512,7 @@
         <tbody id="atomList"></tbody>
       </table>
     </div>
-	
- <div>
-    <h3 class="data-title">₿ BTC Acquistati (+)</h3>
-    <table class="data-table">
-      <thead>
-        <tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr>
-      </thead>
-      <tbody id="btcList"></tbody>
-    </table>
-  </div>
-  
+
     <div>
       <h3 class="data-title">📈 Profitti Trading (+)</h3>
       <table class="data-table">
@@ -728,7 +583,6 @@ if (backToTopAlt) {
    <script>
 let operations = JSON.parse(localStorage.getItem('cryptoOperations')) || [];
 let atomPrice = 0;
-let btcPrice = 0;  // ← NUOVO
 let chart = null;
 
 /* === UTIL === */
@@ -752,52 +606,37 @@ function init() {
     if (dateInput) {
         dateInput.value = new Date().toISOString().split('T')[0];
     }
-    loadCryptoPrices();  // ← MODIFICATO
-    setInterval(loadCryptoPrices, 5 * 60 * 1000);  // ← MODIFICATO
+    loadAtomPrice();
+    setInterval(loadAtomPrice, 5 * 60 * 1000);
     loadAllData();
 }
 
-/* === PREZZI CRYPTO === */
+/* === PREZZO ATOM === */
 
-async function loadCryptoPrices() {
+async function loadAtomPrice() {
     try {
-        // Carica ATOM
-        const atomResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=ATOMUSDT');
-        if (atomResponse.ok) {
-            const atomData = await atomResponse.json();
-            atomPrice = parseFloat(atomData.price);
+        const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=ATOMUSDT');
+        if (response.ok) {
+            const data = await response.json();
+            atomPrice = parseFloat(data.price);
+            const priceEl = document.getElementById('atomPrice');
+            const updEl   = document.getElementById('lastUpdate');
+            if (priceEl) priceEl.textContent = `$${atomPrice.toFixed(4)}`;
+            if (updEl)   updEl.textContent   = `Aggiornato: ${new Date().toLocaleString('it-IT')}`;
+            updateDisplays();
         }
-
-        // Carica BTC
-        const btcResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
-        if (btcResponse.ok) {
-            const btcData = await btcResponse.json();
-            btcPrice = parseFloat(btcData.price);
-        }
-
-        // Aggiorna display prezzi
-        const priceEl = document.getElementById('atomPrice');
-        const updEl = document.getElementById('lastUpdate');
-        if (priceEl) {
-            priceEl.textContent = `ATOM: $${atomPrice.toFixed(4)} | BTC: $${btcPrice.toFixed(2)}`;
-        }
-        if (updEl) {
-            updEl.textContent = `Aggiornato: ${new Date().toLocaleString('it-IT')}`;
-        }
-
-        updateDisplays();
     } catch (error) {
-        console.error('Errore caricamento prezzi crypto:', error);
+        console.error('Errore caricamento prezzo ATOM:', error);
     }
 }
 
 /* === CRUD OPERAZIONI === */
 
 function addOperation() {
-    const date = document.getElementById('operationDate').value;
+    const date  = document.getElementById('operationDate').value;
     const amount = parseFloat(document.getElementById('operationAmount').value);
-    const type = document.getElementById('operationType').value;
-    const note = document.getElementById('operationNote').value;
+    const type  = document.getElementById('operationType').value;
+    const note  = document.getElementById('operationNote').value;
 
     if (!date || !amount || isNaN(amount)) {
         alert('⚠️ Inserisci data e importo validi');
@@ -809,7 +648,7 @@ function addOperation() {
     localStorage.setItem('cryptoOperations', JSON.stringify(operations));
 
     document.getElementById('operationAmount').value = '';
-    document.getElementById('operationNote').value = '';
+    document.getElementById('operationNote').value   = '';
     loadAllData();
     alert('✅ Operazione aggiunta!');
 }
@@ -824,37 +663,30 @@ function removeOperation(id) {
 /* === DISPLAY CARD + GRAFICO === */
 
 function updateDisplays() {
-    const eurDeposits = operations.filter(op => op.type === 'EUR');
-    const atomBuys = operations.filter(op => op.type === 'ATOM');
-    const btcBuys = operations.filter(op => op.type === 'BTC');  // ← NUOVO
-    const tradingProfits = operations.filter(op => op.type === 'Trading');
+    const eurDeposits     = operations.filter(op => op.type === 'EUR');
+    const atomBuys        = operations.filter(op => op.type === 'ATOM');
+    const tradingProfits  = operations.filter(op => op.type === 'Trading');
 
-    const totalEurOut = eurDeposits.reduce((sum, op) => sum + op.amount, 0);
-    const totalAtomQty = atomBuys.reduce((sum, op) => sum + op.amount, 0);
-    const totalAtomValue = totalAtomQty * atomPrice;
-    const totalBtcQty = btcBuys.reduce((sum, op) => sum + op.amount, 0);  // ← NUOVO
-    const totalBtcValue = totalBtcQty * btcPrice;  // ← NUOVO
-    const totalTrading = tradingProfits.reduce((sum, op) => sum + op.amount, 0);
+    const totalEurOut   = eurDeposits.reduce( (sum, op) => sum + op.amount, 0);
+    const totalAtomQty  = atomBuys.reduce( (sum, op) => sum + op.amount, 0);
+    const totalAtomValue= totalAtomQty * atomPrice;
+    const totalTrading  = tradingProfits.reduce( (sum, op) => sum + op.amount, 0);
 
-    const netEquity = totalAtomValue + totalBtcValue + totalTrading - totalEurOut;  // ← MODIFICATO
+    const netEquity = totalAtomValue + totalTrading - totalEurOut;
 
-    const elEur = document.getElementById('totalEur');
-    const elAtomVal = document.getElementById('totalAtomValue');
-    const elAtomQty = document.getElementById('totalAtomQty');
-    const elBtcVal = document.getElementById('totalBtcValue');  // ← NUOVO
-    const elBtcQty = document.getElementById('totalBtcQty');  // ← NUOVO
-    const elTrading = document.getElementById('totalTrading');
-    const elEquity = document.getElementById('totalEquity');
+    const elEur      = document.getElementById('totalEur');
+    const elAtomVal  = document.getElementById('totalAtomValue');
+    const elAtomQty  = document.getElementById('totalAtomQty');
+    const elTrading  = document.getElementById('totalTrading');
+    const elEquity   = document.getElementById('totalEquity');
 
-    if (elEur) elEur.textContent = `-€${totalEurOut.toFixed(2)}`;
+    if (elEur)     elEur.textContent     = `-€${totalEurOut.toFixed(2)}`;
     if (elAtomVal) elAtomVal.textContent = `+$${totalAtomValue.toFixed(2)}`;
     if (elAtomQty) elAtomQty.textContent = `${totalAtomQty.toFixed(6)} ATOM`;
-    if (elBtcVal) elBtcVal.textContent = `+$${totalBtcValue.toFixed(2)}`;  // ← NUOVO
-    if (elBtcQty) elBtcQty.textContent = `${totalBtcQty.toFixed(8)} BTC`;  // ← NUOVO
     if (elTrading) elTrading.textContent = `+$${totalTrading.toFixed(2)}`;
     if (elEquity) {
         elEquity.textContent = `${netEquity >= 0 ? '+' : ''}$${Math.abs(netEquity).toFixed(2)}`;
-        elEquity.className = netEquity >= 0 ? 'value profit-positive' : 'value profit-negative';
+        elEquity.className   = netEquity >= 0 ? 'value profit-positive' : 'value profit-negative';
     }
 
     updateChart();
@@ -865,7 +697,6 @@ function updateDisplays() {
 function updateAllLists() {
     updateList('eurList', 'EUR');
     updateList('atomList', 'ATOM');
-    updateList('btcList', 'BTC');  // ← NUOVO
     updateList('tradingList', 'Trading');
 }
 
@@ -886,19 +717,9 @@ function updateList(containerId, type) {
     }
 
     tbody.innerHTML = typeOps.map(op => {
-        const dateStr = new Date(op.date).toLocaleDateString('it-IT');
-        let amountStr, symbol;
-        
-        if (type === 'ATOM') {
-            amountStr = op.amount.toFixed(6);
-            symbol = 'ATOM';
-        } else if (type === 'BTC') {  // ← NUOVO
-            amountStr = op.amount.toFixed(8);
-            symbol = 'BTC';
-        } else {
-            amountStr = op.amount.toFixed(2);
-            symbol = type === 'EUR' ? '€' : '€';
-        }
+        const dateStr   = new Date(op.date).toLocaleDateString('it-IT');
+        const amountStr = op.amount.toFixed(type === 'ATOM' ? 6 : 2);
+        const symbol    = type === 'EUR' ? '€' : type === 'ATOM' ? 'ATOM' : '€';
 
         return `
             <tr>
@@ -913,30 +734,28 @@ function updateList(containerId, type) {
     }).join('');
 }
 
+
 /* === GRAFICO PATRIMONIO === */
 
 function updateChart() {
     const chartData = [];
     let cumulativeEurOut = 0;
     let cumulativeAtomValue = 0;
-    let cumulativeBtcValue = 0;  // ← NUOVO
     let cumulativeTrading = 0;
 
     const sortedOperations = [...operations].sort((a, b) => new Date(a.date) - new Date(b.date));
 
     sortedOperations.forEach(op => {
-        if (op.type === 'EUR') cumulativeEurOut += op.amount;
-        else if (op.type === 'ATOM') cumulativeAtomValue += op.amount * atomPrice;
-        else if (op.type === 'BTC') cumulativeBtcValue += op.amount * btcPrice;  // ← NUOVO
-        else if (op.type === 'Trading') cumulativeTrading += op.amount;
+        if (op.type === 'EUR')       cumulativeEurOut   += op.amount;
+        else if (op.type === 'ATOM') cumulativeAtomValue+= op.amount * atomPrice;
+        else if (op.type === 'Trading') cumulativeTrading+= op.amount;
 
         chartData.push({
             date: new Date(op.date).toLocaleDateString('it-IT'),
             eurOut: -cumulativeEurOut,
             atomValue: cumulativeAtomValue,
-            btcValue: cumulativeBtcValue,  // ← NUOVO
             trading: cumulativeTrading,
-            netEquity: cumulativeAtomValue + cumulativeBtcValue + cumulativeTrading - cumulativeEurOut  // ← MODIFICATO
+            netEquity: cumulativeAtomValue + cumulativeTrading - cumulativeEurOut
         });
     });
 
@@ -966,19 +785,11 @@ function updateChart() {
                     tension: 0.4,
                     fill: false
                 },
-                {  // ← NUOVO DATASET
-                    label: 'Valore BTC (+)',
-                    data: chartData.map(d => d.btcValue),
-                    borderColor: '#f39c12',
-                    backgroundColor: 'rgba(243,156,18,0.1)',
-                    tension: 0.4,
-                    fill: false
-                },
                 {
                     label: 'Trading Profit (+)',
                     data: chartData.map(d => d.trading),
-                    borderColor: '#3498db',  // ← Cambiato colore
-                    backgroundColor: 'rgba(52,152,219,0.1)',
+                    borderColor: '#f39c12',
+                    backgroundColor: 'rgba(243,156,18,0.1)',
                     tension: 0.4,
                     fill: false
                 },
@@ -1001,7 +812,7 @@ function updateChart() {
                 y: {
                     ticks: {
                         callback: function (value) {
-                            return '$' + value.toLocaleString('it-IT');
+                            return '€' + value.toLocaleString('it-IT');
                         }
                     }
                 }
@@ -1016,6 +827,7 @@ function buildReportTables() {
     const now = new Date();
     const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
+    // Puoi usare solo Trading oppure EUR+Trading, qui uso Trading
     const reportOps = operations.filter(op => op.type === 'Trading');
     const groups = {};
 
@@ -1052,6 +864,7 @@ function buildReportTables() {
 
     Object.keys(groups).sort().forEach(key => {
         const list = groups[key];
+        let total = 0;
         const labelDate = new Date(key + '-01');
         const label = labelDate.toLocaleDateString('it-IT', { month: '2-digit', year: 'numeric' });
 
@@ -1059,7 +872,7 @@ function buildReportTables() {
         wrapper.className = 'report-block';
         wrapper.innerHTML = `
             <div style="margin:10px 0;">
-                <strong>dal ${label} - Totale: ${formatEuro(list.reduce((s, o) => s + o.amount, 0))}</strong>
+                <strong>dal ${label} - Totale: ${formatEuro(list.reduce((s,o)=>s+o.amount,0))}</strong>
             </div>
             <table class="report-table">
                 <thead>
@@ -1081,7 +894,6 @@ function buildReportTables() {
 
         const tbody = wrapper.querySelector('tbody');
         const tfootCell = wrapper.querySelector('.total-cell');
-        let total = 0;
 
         list.forEach(op => {
             const tr = document.createElement('tr');
@@ -1112,6 +924,7 @@ function loadAllData() {
 function exportDataHTML() {
     const now = new Date();
 
+    // Usa TUTTE le operazioni, non solo Trading
     const groups = {};
     operations.forEach(op => {
         const key = monthKey(op.date);
@@ -1149,11 +962,7 @@ tfoot td { background:#eef5ff; font-weight:bold; }
     currentList.forEach(op => {
         currentTot += op.amount;
         const sign = op.type === 'EUR' ? '-' : '+';
-        let symbol;
-        if (op.type === 'ATOM') symbol = ' ATOM';
-        else if (op.type === 'BTC') symbol = ' BTC';  // ← NUOVO
-        else symbol = '€';
-        
+        const symbol = op.type === 'ATOM' ? ' ATOM' : '€';
         html += `
 <tr>
   <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
@@ -1183,11 +992,7 @@ tfoot td { background:#eef5ff; font-weight:bold; }
         list.forEach(op => {
             tot += op.amount;
             const sign = op.type === 'EUR' ? '-' : '+';
-            let symbol;
-            if (op.type === 'ATOM') symbol = ' ATOM';
-            else if (op.type === 'BTC') symbol = ' BTC';  // ← NUOVO
-            else symbol = '€';
-            
+            const symbol = op.type === 'ATOM' ? ' ATOM' : '€';
             html += `
 <tr>
   <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
@@ -1217,18 +1022,20 @@ function exportChartHTML() {
         return;
     }
 
+    // Temporaneamente rimuovi overflow:hidden
     const originalOverflow = container.style.overflow;
     container.style.overflow = 'visible';
 
     html2canvas(canvas, {
-        backgroundColor: '#232335',
-        scale: 2
+        backgroundColor: '#232335', // colore di sfondo coerente
+        scale: 2 // qualità alta
     }).then(canvas => {
         const link = document.createElement('a');
         link.download = `grafico-portfolio-${new Date().toISOString().split('T')[0]}.png`;
         link.href = canvas.toDataURL();
         link.click();
 
+        // Ripristina overflow
         container.style.overflow = originalOverflow;
     });
 }
@@ -1237,8 +1044,8 @@ function exportChartHTML() {
 
 function downloadFile(content, filename) {
     const blob = new Blob([content], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
     a.href = url;
     a.download = filename;
     a.click();

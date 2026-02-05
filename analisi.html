@@ -144,6 +144,78 @@
                 height: 450px;
             }
         }
+		
+		/* Container della Card */
+.ts-dash-card {
+    background: rgba(51, 51, 51, 0.6); /* Sfondo #333 trasparente */
+    backdrop-filter: blur(12px);       /* Sfocatura profonda */
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 228, 181, 0.15); /* Bordo color crema leggerissimo */
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease;
+}
+
+.ts-dash-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 228, 181, 0.4); /* Il bordo si illumina al passaggio */
+}
+
+/* Titolo del Grafico */
+.chart-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Il colore è già gestito dallo stile inline, ma lo rinforziamo */
+    text-transform: uppercase;
+}
+
+/* Wrapper dei Grafici */
+.chart-wrapper {
+    background: rgba(0, 0, 0, 0.2); /* Sfondo scuro per far risaltare il grafico */
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.chart-wrapper.tall {
+    min-height: 350px; /* Altezza extra per la timeline */
+}
+
+/* Pulsanti "Scarica" (btn-outline) */
+.btn-outline {
+    background: transparent;
+    border: 1px solid #ffe4b5;
+    color: #ffe4b5;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+    background: #ffe4b5;
+    color: #333; /* Inversione colore */
+    box-shadow: 0 0 15px rgba(255, 228, 181, 0.3);
+}
+
+/* Allineamento del gruppo pulsanti */
+.btn-group {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
     </style>
 </head>
 <body>
@@ -168,7 +240,9 @@
           <ul>
             <li><a href="https://beneinst.github.io/tradingspot/">Trade attivi</a></li>
             <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
+			<li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
             <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
+			
           </ul>
         </li>
 

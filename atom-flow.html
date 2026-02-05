@@ -246,6 +246,186 @@
     max-height: 400px !important;
     width: 100% !important;
 }
+/* Container Form e Box Grafici */
+.container-f, .container, .chart-container {
+    background: rgba(51, 51, 51, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(188, 204, 233, 0.15);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Stile Campi Input (Date, Select, Number) */
+input, select {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(188, 204, 233, 0.2) !important;
+    color: #fff !important;
+    padding: 10px;
+    border-radius: 8px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: #bccce9 !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Label dei Form */
+label {
+    color: #bccce9;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Pulsante Danger (Pulisci Form) */
+.btn-danger {
+    background: rgba(220, 53, 69, 0.2);
+    border: 1px solid #dc3545;
+    color: #f8d7da;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.operations-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px; /* Crea spazio tra le righe */
+    margin-top: 15px;
+}
+
+.operations-table thead th {
+    background: transparent;
+    color: #bccce9;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 12px;
+    border-bottom: 2px solid rgba(188, 204, 233, 0.2);
+    text-align: center;
+}
+
+.operations-table tbody tr {
+    background: rgba(255, 255, 255, 0.03);
+    transition: background 0.3s;
+}
+
+.operations-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.operations-table td {
+    padding: 12px;
+    text-align: center;
+    color: #eee;
+    font-size: 0.9rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Arrotondamento angoli delle righe */
+.operations-table tr td:first-child { border-radius: 8px 0 0 8px; border-left: 1px solid rgba(255, 255, 255, 0.05); }
+.operations-table tr td:last-child { border-radius: 0 8px 8px 0; border-right: 1px solid rgba(255, 255, 255, 0.05); }
+
+.input-group-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.input-field {
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+.validator-inputs {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Box Prezzo ATOM: Ridotto e centrato */
+.container-f:has(#atomPrice) {
+    background: rgba(255, 228, 181, 0.05); /* Leggero riflesso oro */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 228, 181, 0.2);
+    border-radius: 50px; /* Forma a pillola */
+    padding: 10px 25px;
+    width: fit-content;  /* Non occupa più tutto lo spazio */
+    margin: 0 auto 30px auto; /* Centrato orizzontalmente */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.price-display {
+    color: #ffe4b5;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}
+
+/* Griglia Statistiche: Uniformata al tema Glass */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+/* Singolo Item della Griglia */
+.ts-grid-item {
+    background: rgba(51, 51, 51, 0.5) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(188, 204, 233, 0.15) !important; /* Bordino visibile */
+    border-radius: 14px !important;
+    padding: 20px 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+/* Effetto speciale per la card Profitto (verde se positivo) */
+#profitCard.positive {
+    background: rgba(46, 204, 113, 0.2) !important;
+    border-color: rgba(46, 204, 113, 0.4) !important;
+}
+
+.ts-grid-item:hover {
+    transform: translateY(-5px);
+    border-color: rgba(188, 204, 233, 0.4) !important;
+    background: rgba(60, 60, 60, 0.7) !important;
+}
+
+/* Label e Valori */
+.stat-label {
+    color: #bccce9;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+.stat-value {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-family: 'Monaco', 'Consolas', monospace; /* Stile tech */
+}
 
     </style>
 </head>
@@ -312,19 +492,18 @@
   <!-- TITOLO PAGINA (sempre sotto) -->
   <div class="header-title">
     <h1>🎍 Staking ATOM | Tracker</h1>
-    <small>*Gestione <strong>Entry ATOM</strong> con accumulo e prezzo medio.</small>
-  </div>
+    <small>
+        *Gestione <strong>Entry ATOM</strong> | 
+        <span class="price-inline"> <strong id="atomPrice">Caricamento...</strong></span>
+    </small>
+</div>
 </header>
   </div>
 
    
-<div style="padding: 8px;"></div>   
-<!-- Prezzo ATOM in tempo reale -->
-        <div class="container-f">
-            <div class="price-display" id="atomPrice">
-                💰 Prezzo ATOM: Caricamento...
-            </div>
-        </div>
+<div style="padding: 18px;"></div>   
+
+        
 <!-- Statistiche -->
 <div class="stats-grid">
     <div class="ts-grid-item">
