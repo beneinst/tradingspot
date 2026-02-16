@@ -559,6 +559,24 @@
   </div>
   
   <div class="ts-grid-item">
+    <h4>☀️ Valore SOL</h4>
+    <div class="value profit-positive" id="totalSolValue">$0.00</div>
+    <div class="subvalue" id="totalSolQty">0 SOL</div>
+  </div>
+
+  <div class="ts-grid-item">
+    <h4>Ł Valore LTC</h4>
+    <div class="value profit-positive" id="totalLtcValue">$0.00</div>
+    <div class="subvalue" id="totalLtcQty">0 LTC</div>
+  </div>
+
+  <div class="ts-grid-item">
+    <h4>🔷 Valore POL</h4>
+    <div class="value profit-positive" id="totalPolValue">$0.00</div>
+    <div class="subvalue" id="totalPolQty">0 POL</div>
+  </div>
+  
+  <div class="ts-grid-item">
     <h4>📈 Profitto Trading</h4>
     <div class="value" id="totalTrading">$0.00</div>
   </div>
@@ -598,6 +616,9 @@
                 <option value="EUR">💶 Deposito Euro (- Capitale iniziale)</option>
                 <option value="ATOM">🪙 ATOM acquistati (+ Investimento)</option>
 				<option value="BTC">₿ BTC acquistati (+ Investimento)</option>
+				<option value="SOL">☀️ SOL acquistati (+ Investimento)</option>
+				<option value="LTC">Ł LTC acquistati (+ Investimento)</option>
+				<option value="POL">🔷 POL acquistati (+ Investimento)</option>
                 <option value="Trading">📈 Profitto Trading (+ Guadagno)</option>
             </select>
         </div>
@@ -655,6 +676,36 @@
         <tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr>
       </thead>
       <tbody id="btcList"></tbody>
+    </table>
+  </div>
+
+  <div>
+    <h3 class="data-title">☀️ SOL Acquistati (+)</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr>
+      </thead>
+      <tbody id="solList"></tbody>
+    </table>
+  </div>
+
+  <div>
+    <h3 class="data-title">Ł LTC Acquistati (+)</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr>
+      </thead>
+      <tbody id="ltcList"></tbody>
+    </table>
+  </div>
+
+  <div>
+    <h3 class="data-title">🔷 POL Acquistati (+)</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr>
+      </thead>
+      <tbody id="polList"></tbody>
     </table>
   </div>
   
@@ -728,7 +779,10 @@ if (backToTopAlt) {
    <script>
 let operations = JSON.parse(localStorage.getItem('cryptoOperations')) || [];
 let atomPrice = 0;
-let btcPrice = 0;  // ← NUOVO
+let btcPrice = 0;
+let solPrice = 0;
+let ltcPrice = 0;
+let polPrice = 0;
 let chart = null;
 
 /* === UTIL === */
@@ -752,8 +806,8 @@ function init() {
     if (dateInput) {
         dateInput.value = new Date().toISOString().split('T')[0];
     }
-    loadCryptoPrices();  // ← MODIFICATO
-    setInterval(loadCryptoPrices, 5 * 60 * 1000);  // ← MODIFICATO
+    loadCryptoPrices();
+    setInterval(loadCryptoPrices, 5 * 60 * 1000);
     loadAllData();
 }
 
@@ -775,11 +829,32 @@ async function loadCryptoPrices() {
             btcPrice = parseFloat(btcData.price);
         }
 
+        // Carica SOL
+        const solResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT');
+        if (solResponse.ok) {
+            const solData = await solResponse.json();
+            solPrice = parseFloat(solData.price);
+        }
+
+        // Carica LTC
+        const ltcResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT');
+        if (ltcResponse.ok) {
+            const ltcData = await ltcResponse.json();
+            ltcPrice = parseFloat(ltcData.price);
+        }
+
+        // Carica POL (Polygon)
+        const polResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=POLUSDT');
+        if (polResponse.ok) {
+            const polData = await polResponse.json();
+            polPrice = parseFloat(polData.price);
+        }
+
         // Aggiorna display prezzi
         const priceEl = document.getElementById('atomPrice');
         const updEl = document.getElementById('lastUpdate');
         if (priceEl) {
-            priceEl.textContent = `ATOM: $${atomPrice.toFixed(4)} | BTC: $${btcPrice.toFixed(2)}`;
+            priceEl.textContent = `ATOM: $${atomPrice.toFixed(4)} | BTC: $${btcPrice.toFixed(2)} | SOL: $${solPrice.toFixed(2)} | LTC: $${ltcPrice.toFixed(2)} | POL: $${polPrice.toFixed(4)}`;
         }
         if (updEl) {
             updEl.textContent = `Aggiornato: ${new Date().toLocaleString('it-IT')}`;
@@ -826,31 +901,52 @@ function removeOperation(id) {
 function updateDisplays() {
     const eurDeposits = operations.filter(op => op.type === 'EUR');
     const atomBuys = operations.filter(op => op.type === 'ATOM');
-    const btcBuys = operations.filter(op => op.type === 'BTC');  // ← NUOVO
+    const btcBuys = operations.filter(op => op.type === 'BTC');
+    const solBuys = operations.filter(op => op.type === 'SOL');
+    const ltcBuys = operations.filter(op => op.type === 'LTC');
+    const polBuys = operations.filter(op => op.type === 'POL');
     const tradingProfits = operations.filter(op => op.type === 'Trading');
 
     const totalEurOut = eurDeposits.reduce((sum, op) => sum + op.amount, 0);
     const totalAtomQty = atomBuys.reduce((sum, op) => sum + op.amount, 0);
     const totalAtomValue = totalAtomQty * atomPrice;
-    const totalBtcQty = btcBuys.reduce((sum, op) => sum + op.amount, 0);  // ← NUOVO
-    const totalBtcValue = totalBtcQty * btcPrice;  // ← NUOVO
+    const totalBtcQty = btcBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalBtcValue = totalBtcQty * btcPrice;
+    const totalSolQty = solBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalSolValue = totalSolQty * solPrice;
+    const totalLtcQty = ltcBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalLtcValue = totalLtcQty * ltcPrice;
+    const totalPolQty = polBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalPolValue = totalPolQty * polPrice;
     const totalTrading = tradingProfits.reduce((sum, op) => sum + op.amount, 0);
 
-    const netEquity = totalAtomValue + totalBtcValue + totalTrading - totalEurOut;  // ← MODIFICATO
+    const netEquity = totalAtomValue + totalBtcValue + totalSolValue + totalLtcValue + totalPolValue + totalTrading - totalEurOut;
 
     const elEur = document.getElementById('totalEur');
     const elAtomVal = document.getElementById('totalAtomValue');
     const elAtomQty = document.getElementById('totalAtomQty');
-    const elBtcVal = document.getElementById('totalBtcValue');  // ← NUOVO
-    const elBtcQty = document.getElementById('totalBtcQty');  // ← NUOVO
+    const elBtcVal = document.getElementById('totalBtcValue');
+    const elBtcQty = document.getElementById('totalBtcQty');
+    const elSolVal = document.getElementById('totalSolValue');
+    const elSolQty = document.getElementById('totalSolQty');
+    const elLtcVal = document.getElementById('totalLtcValue');
+    const elLtcQty = document.getElementById('totalLtcQty');
+    const elPolVal = document.getElementById('totalPolValue');
+    const elPolQty = document.getElementById('totalPolQty');
     const elTrading = document.getElementById('totalTrading');
     const elEquity = document.getElementById('totalEquity');
 
     if (elEur) elEur.textContent = `-€${totalEurOut.toFixed(2)}`;
     if (elAtomVal) elAtomVal.textContent = `+$${totalAtomValue.toFixed(2)}`;
     if (elAtomQty) elAtomQty.textContent = `${totalAtomQty.toFixed(6)} ATOM`;
-    if (elBtcVal) elBtcVal.textContent = `+$${totalBtcValue.toFixed(2)}`;  // ← NUOVO
-    if (elBtcQty) elBtcQty.textContent = `${totalBtcQty.toFixed(8)} BTC`;  // ← NUOVO
+    if (elBtcVal) elBtcVal.textContent = `+$${totalBtcValue.toFixed(2)}`;
+    if (elBtcQty) elBtcQty.textContent = `${totalBtcQty.toFixed(8)} BTC`;
+    if (elSolVal) elSolVal.textContent = `+$${totalSolValue.toFixed(2)}`;
+    if (elSolQty) elSolQty.textContent = `${totalSolQty.toFixed(6)} SOL`;
+    if (elLtcVal) elLtcVal.textContent = `+$${totalLtcValue.toFixed(2)}`;
+    if (elLtcQty) elLtcQty.textContent = `${totalLtcQty.toFixed(8)} LTC`;
+    if (elPolVal) elPolVal.textContent = `+$${totalPolValue.toFixed(2)}`;
+    if (elPolQty) elPolQty.textContent = `${totalPolQty.toFixed(6)} POL`;
     if (elTrading) elTrading.textContent = `+$${totalTrading.toFixed(2)}`;
     if (elEquity) {
         elEquity.textContent = `${netEquity >= 0 ? '+' : ''}$${Math.abs(netEquity).toFixed(2)}`;
@@ -865,7 +961,10 @@ function updateDisplays() {
 function updateAllLists() {
     updateList('eurList', 'EUR');
     updateList('atomList', 'ATOM');
-    updateList('btcList', 'BTC');  // ← NUOVO
+    updateList('btcList', 'BTC');
+    updateList('solList', 'SOL');
+    updateList('ltcList', 'LTC');
+    updateList('polList', 'POL');
     updateList('tradingList', 'Trading');
 }
 
@@ -892,9 +991,18 @@ function updateList(containerId, type) {
         if (type === 'ATOM') {
             amountStr = op.amount.toFixed(6);
             symbol = 'ATOM';
-        } else if (type === 'BTC') {  // ← NUOVO
+        } else if (type === 'BTC') {
             amountStr = op.amount.toFixed(8);
             symbol = 'BTC';
+        } else if (type === 'SOL') {
+            amountStr = op.amount.toFixed(6);
+            symbol = 'SOL';
+        } else if (type === 'LTC') {
+            amountStr = op.amount.toFixed(8);
+            symbol = 'LTC';
+        } else if (type === 'POL') {
+            amountStr = op.amount.toFixed(6);
+            symbol = 'POL';
         } else {
             amountStr = op.amount.toFixed(2);
             symbol = type === 'EUR' ? '€' : '€';
@@ -919,7 +1027,10 @@ function updateChart() {
     const chartData = [];
     let cumulativeEurOut = 0;
     let cumulativeAtomValue = 0;
-    let cumulativeBtcValue = 0;  // ← NUOVO
+    let cumulativeBtcValue = 0;
+    let cumulativeSolValue = 0;
+    let cumulativeLtcValue = 0;
+    let cumulativePolValue = 0;
     let cumulativeTrading = 0;
 
     const sortedOperations = [...operations].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -927,16 +1038,22 @@ function updateChart() {
     sortedOperations.forEach(op => {
         if (op.type === 'EUR') cumulativeEurOut += op.amount;
         else if (op.type === 'ATOM') cumulativeAtomValue += op.amount * atomPrice;
-        else if (op.type === 'BTC') cumulativeBtcValue += op.amount * btcPrice;  // ← NUOVO
+        else if (op.type === 'BTC') cumulativeBtcValue += op.amount * btcPrice;
+        else if (op.type === 'SOL') cumulativeSolValue += op.amount * solPrice;
+        else if (op.type === 'LTC') cumulativeLtcValue += op.amount * ltcPrice;
+        else if (op.type === 'POL') cumulativePolValue += op.amount * polPrice;
         else if (op.type === 'Trading') cumulativeTrading += op.amount;
 
         chartData.push({
             date: new Date(op.date).toLocaleDateString('it-IT'),
             eurOut: -cumulativeEurOut,
             atomValue: cumulativeAtomValue,
-            btcValue: cumulativeBtcValue,  // ← NUOVO
+            btcValue: cumulativeBtcValue,
+            solValue: cumulativeSolValue,
+            ltcValue: cumulativeLtcValue,
+            polValue: cumulativePolValue,
             trading: cumulativeTrading,
-            netEquity: cumulativeAtomValue + cumulativeBtcValue + cumulativeTrading - cumulativeEurOut  // ← MODIFICATO
+            netEquity: cumulativeAtomValue + cumulativeBtcValue + cumulativeSolValue + cumulativeLtcValue + cumulativePolValue + cumulativeTrading - cumulativeEurOut
         });
     });
 
@@ -966,7 +1083,7 @@ function updateChart() {
                     tension: 0.4,
                     fill: false
                 },
-                {  // ← NUOVO DATASET
+                {
                     label: 'Valore BTC (+)',
                     data: chartData.map(d => d.btcValue),
                     borderColor: '#f39c12',
@@ -975,9 +1092,33 @@ function updateChart() {
                     fill: false
                 },
                 {
+                    label: 'Valore SOL (+)',
+                    data: chartData.map(d => d.solValue),
+                    borderColor: '#1abc9c',
+                    backgroundColor: 'rgba(26,188,156,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'Valore LTC (+)',
+                    data: chartData.map(d => d.ltcValue),
+                    borderColor: '#95a5a6',
+                    backgroundColor: 'rgba(149,165,166,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'Valore POL (+)',
+                    data: chartData.map(d => d.polValue),
+                    borderColor: '#8e44ad',
+                    backgroundColor: 'rgba(142,68,173,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
                     label: 'Trading Profit (+)',
                     data: chartData.map(d => d.trading),
-                    borderColor: '#3498db',  // ← Cambiato colore
+                    borderColor: '#3498db',
                     backgroundColor: 'rgba(52,152,219,0.1)',
                     tension: 0.4,
                     fill: false
@@ -1151,7 +1292,10 @@ tfoot td { background:#eef5ff; font-weight:bold; }
         const sign = op.type === 'EUR' ? '-' : '+';
         let symbol;
         if (op.type === 'ATOM') symbol = ' ATOM';
-        else if (op.type === 'BTC') symbol = ' BTC';  // ← NUOVO
+        else if (op.type === 'BTC') symbol = ' BTC';
+        else if (op.type === 'SOL') symbol = ' SOL';
+        else if (op.type === 'LTC') symbol = ' LTC';
+        else if (op.type === 'POL') symbol = ' POL';
         else symbol = '€';
         
         html += `
@@ -1185,7 +1329,10 @@ tfoot td { background:#eef5ff; font-weight:bold; }
             const sign = op.type === 'EUR' ? '-' : '+';
             let symbol;
             if (op.type === 'ATOM') symbol = ' ATOM';
-            else if (op.type === 'BTC') symbol = ' BTC';  // ← NUOVO
+            else if (op.type === 'BTC') symbol = ' BTC';
+            else if (op.type === 'SOL') symbol = ' SOL';
+            else if (op.type === 'LTC') symbol = ' LTC';
+            else if (op.type === 'POL') symbol = ' POL';
             else symbol = '€';
             
             html += `
@@ -1247,6 +1394,5 @@ function downloadFile(content, filename) {
 
 init();
 </script>
-
 </body>
 </html>
