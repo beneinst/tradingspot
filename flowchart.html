@@ -575,6 +575,12 @@
     <div class="value profit-positive" id="totalPolValue">$0.00</div>
     <div class="subvalue" id="totalPolQty">0 POL</div>
   </div>
+
+  <div class="ts-grid-item">
+    <h4>💵 Valore USDC</h4>
+    <div class="value profit-positive" id="totalUsdcValue">$0.00</div>
+    <div class="subvalue" id="totalUsdcQty">0 USDC</div>
+  </div>
   
   <div class="ts-grid-item">
     <h4>📈 Profitto Trading</h4>
@@ -619,6 +625,7 @@
 				<option value="SOL">☀️ SOL acquistati (+ Investimento)</option>
 				<option value="LTC">Ł LTC acquistati (+ Investimento)</option>
 				<option value="POL">🔷 POL acquistati (+ Investimento)</option>
+				<option value="USDC">💵 USDC acquistati (+ Stablecoin)</option>
                 <option value="Trading">📈 Profitto Trading (+ Guadagno)</option>
             </select>
         </div>
@@ -708,6 +715,16 @@
       <tbody id="polList"></tbody>
     </table>
   </div>
+
+  <div>
+    <h3 class="data-title">💵 USDC Acquistati (+)</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr>
+      </thead>
+      <tbody id="usdcList"></tbody>
+    </table>
+  </div>
   
     <div>
       <h3 class="data-title">📈 Profitti Trading (+)</h3>
@@ -783,6 +800,7 @@ let btcPrice = 0;
 let solPrice = 0;
 let ltcPrice = 0;
 let polPrice = 0;
+let usdcPrice = 1.00; // Stablecoin sempre ~$1
 let chart = null;
 
 /* === UTIL === */
@@ -850,11 +868,18 @@ async function loadCryptoPrices() {
             polPrice = parseFloat(polData.price);
         }
 
+        // Carica USDC (Stablecoin - sempre ~$1)
+        const usdcResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=USDCUSDT');
+        if (usdcResponse.ok) {
+            const usdcData = await usdcResponse.json();
+            usdcPrice = parseFloat(usdcData.price);
+        }
+
         // Aggiorna display prezzi
         const priceEl = document.getElementById('atomPrice');
         const updEl = document.getElementById('lastUpdate');
         if (priceEl) {
-            priceEl.textContent = `ATOM: $${atomPrice.toFixed(4)} | BTC: $${btcPrice.toFixed(2)} | SOL: $${solPrice.toFixed(2)} | LTC: $${ltcPrice.toFixed(2)} | POL: $${polPrice.toFixed(4)}`;
+            priceEl.textContent = `ATOM: $${atomPrice.toFixed(4)} | BTC: $${btcPrice.toFixed(2)} | SOL: $${solPrice.toFixed(2)} | LTC: $${ltcPrice.toFixed(2)} | POL: $${polPrice.toFixed(4)} | USDC: $${usdcPrice.toFixed(4)}`;
         }
         if (updEl) {
             updEl.textContent = `Aggiornato: ${new Date().toLocaleString('it-IT')}`;
@@ -905,6 +930,7 @@ function updateDisplays() {
     const solBuys = operations.filter(op => op.type === 'SOL');
     const ltcBuys = operations.filter(op => op.type === 'LTC');
     const polBuys = operations.filter(op => op.type === 'POL');
+    const usdcBuys = operations.filter(op => op.type === 'USDC');
     const tradingProfits = operations.filter(op => op.type === 'Trading');
 
     const totalEurOut = eurDeposits.reduce((sum, op) => sum + op.amount, 0);
@@ -918,9 +944,11 @@ function updateDisplays() {
     const totalLtcValue = totalLtcQty * ltcPrice;
     const totalPolQty = polBuys.reduce((sum, op) => sum + op.amount, 0);
     const totalPolValue = totalPolQty * polPrice;
+    const totalUsdcQty = usdcBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalUsdcValue = totalUsdcQty * usdcPrice;
     const totalTrading = tradingProfits.reduce((sum, op) => sum + op.amount, 0);
 
-    const netEquity = totalAtomValue + totalBtcValue + totalSolValue + totalLtcValue + totalPolValue + totalTrading - totalEurOut;
+    const netEquity = totalAtomValue + totalBtcValue + totalSolValue + totalLtcValue + totalPolValue + totalUsdcValue + totalTrading - totalEurOut;
 
     const elEur = document.getElementById('totalEur');
     const elAtomVal = document.getElementById('totalAtomValue');
@@ -933,6 +961,8 @@ function updateDisplays() {
     const elLtcQty = document.getElementById('totalLtcQty');
     const elPolVal = document.getElementById('totalPolValue');
     const elPolQty = document.getElementById('totalPolQty');
+    const elUsdcVal = document.getElementById('totalUsdcValue');
+    const elUsdcQty = document.getElementById('totalUsdcQty');
     const elTrading = document.getElementById('totalTrading');
     const elEquity = document.getElementById('totalEquity');
 
@@ -947,6 +977,8 @@ function updateDisplays() {
     if (elLtcQty) elLtcQty.textContent = `${totalLtcQty.toFixed(8)} LTC`;
     if (elPolVal) elPolVal.textContent = `+$${totalPolValue.toFixed(2)}`;
     if (elPolQty) elPolQty.textContent = `${totalPolQty.toFixed(6)} POL`;
+    if (elUsdcVal) elUsdcVal.textContent = `+$${totalUsdcValue.toFixed(2)}`;
+    if (elUsdcQty) elUsdcQty.textContent = `${totalUsdcQty.toFixed(2)} USDC`;
     if (elTrading) elTrading.textContent = `+$${totalTrading.toFixed(2)}`;
     if (elEquity) {
         elEquity.textContent = `${netEquity >= 0 ? '+' : ''}$${Math.abs(netEquity).toFixed(2)}`;
@@ -965,6 +997,7 @@ function updateAllLists() {
     updateList('solList', 'SOL');
     updateList('ltcList', 'LTC');
     updateList('polList', 'POL');
+    updateList('usdcList', 'USDC');
     updateList('tradingList', 'Trading');
 }
 
@@ -1003,6 +1036,9 @@ function updateList(containerId, type) {
         } else if (type === 'POL') {
             amountStr = op.amount.toFixed(6);
             symbol = 'POL';
+        } else if (type === 'USDC') {
+            amountStr = op.amount.toFixed(2);
+            symbol = 'USDC';
         } else {
             amountStr = op.amount.toFixed(2);
             symbol = type === 'EUR' ? '€' : '€';
@@ -1031,6 +1067,7 @@ function updateChart() {
     let cumulativeSolValue = 0;
     let cumulativeLtcValue = 0;
     let cumulativePolValue = 0;
+    let cumulativeUsdcValue = 0;
     let cumulativeTrading = 0;
 
     const sortedOperations = [...operations].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -1042,6 +1079,7 @@ function updateChart() {
         else if (op.type === 'SOL') cumulativeSolValue += op.amount * solPrice;
         else if (op.type === 'LTC') cumulativeLtcValue += op.amount * ltcPrice;
         else if (op.type === 'POL') cumulativePolValue += op.amount * polPrice;
+        else if (op.type === 'USDC') cumulativeUsdcValue += op.amount * usdcPrice;
         else if (op.type === 'Trading') cumulativeTrading += op.amount;
 
         chartData.push({
@@ -1052,8 +1090,9 @@ function updateChart() {
             solValue: cumulativeSolValue,
             ltcValue: cumulativeLtcValue,
             polValue: cumulativePolValue,
+            usdcValue: cumulativeUsdcValue,
             trading: cumulativeTrading,
-            netEquity: cumulativeAtomValue + cumulativeBtcValue + cumulativeSolValue + cumulativeLtcValue + cumulativePolValue + cumulativeTrading - cumulativeEurOut
+            netEquity: cumulativeAtomValue + cumulativeBtcValue + cumulativeSolValue + cumulativeLtcValue + cumulativePolValue + cumulativeUsdcValue + cumulativeTrading - cumulativeEurOut
         });
     });
 
@@ -1076,7 +1115,7 @@ function updateChart() {
                     fill: false
                 },
                 {
-                    label: 'Valore ATOM (+)',
+                    label: 'Val ATOM (+)',
                     data: chartData.map(d => d.atomValue),
                     borderColor: '#2ecc71',
                     backgroundColor: 'rgba(46,204,113,0.1)',
@@ -1084,7 +1123,7 @@ function updateChart() {
                     fill: false
                 },
                 {
-                    label: 'Valore BTC (+)',
+                    label: 'Val BTC (+)',
                     data: chartData.map(d => d.btcValue),
                     borderColor: '#f39c12',
                     backgroundColor: 'rgba(243,156,18,0.1)',
@@ -1092,7 +1131,7 @@ function updateChart() {
                     fill: false
                 },
                 {
-                    label: 'Valore SOL (+)',
+                    label: 'Val SOL (+)',
                     data: chartData.map(d => d.solValue),
                     borderColor: '#1abc9c',
                     backgroundColor: 'rgba(26,188,156,0.1)',
@@ -1100,7 +1139,7 @@ function updateChart() {
                     fill: false
                 },
                 {
-                    label: 'Valore LTC (+)',
+                    label: 'Val LTC (+)',
                     data: chartData.map(d => d.ltcValue),
                     borderColor: '#95a5a6',
                     backgroundColor: 'rgba(149,165,166,0.1)',
@@ -1108,10 +1147,18 @@ function updateChart() {
                     fill: false
                 },
                 {
-                    label: 'Valore POL (+)',
+                    label: 'Val POL (+)',
                     data: chartData.map(d => d.polValue),
                     borderColor: '#8e44ad',
                     backgroundColor: 'rgba(142,68,173,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'Val USDC (+)',
+                    data: chartData.map(d => d.usdcValue),
+                    borderColor: '#16a085',
+                    backgroundColor: 'rgba(22,160,133,0.1)',
                     tension: 0.4,
                     fill: false
                 },
@@ -1138,6 +1185,8 @@ function updateChart() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { position: 'top' } },
+		
+
             scales: {
                 y: {
                     ticks: {
@@ -1296,6 +1345,7 @@ tfoot td { background:#eef5ff; font-weight:bold; }
         else if (op.type === 'SOL') symbol = ' SOL';
         else if (op.type === 'LTC') symbol = ' LTC';
         else if (op.type === 'POL') symbol = ' POL';
+        else if (op.type === 'USDC') symbol = ' USDC';
         else symbol = '€';
         
         html += `
@@ -1333,6 +1383,7 @@ tfoot td { background:#eef5ff; font-weight:bold; }
             else if (op.type === 'SOL') symbol = ' SOL';
             else if (op.type === 'LTC') symbol = ' LTC';
             else if (op.type === 'POL') symbol = ' POL';
+            else if (op.type === 'USDC') symbol = ' USDC';
             else symbol = '€';
             
             html += `
