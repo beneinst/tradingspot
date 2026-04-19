@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panoramica</title>
+	<link rel="icon" type="image/png" href="favicon.png"> 
+    <link rel="stylesheet" href="css/trade.css">
+	<link rel="stylesheet" href="css/tracker.css">
+	<link rel="stylesheet" href="css/panoramica.css">
+    <link rel="stylesheet" href="css/menusotto.css">
+	<link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+	<style>
+:root {
+    --color-primary: #4a90e2;
+    --color-secondary: #667eea;
+    --color-border: rgba(255,255,255,0.1);
+    --color-text: #e0e0e0;
+    --color-muted: #a0a0a0;
+    --color-surface: rgba(35,35,59,0.6);
+    --color-card-bg: rgba(58,58,58,0.15);
+    --color-header-bg: rgba(96,96,96,0.3);
+}
+
+* { box-sizing: border-box; }
+
+
+
+/* Header */
+.header-section {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+
+
+.price-info { text-align: right; }
+.price-value { font-size: 1.8em; font-weight: 700; color: var(--color-primary); margin-bottom: 4px; }
+.price-update { font-size: 0.9em; color: var(--color-muted); }
+
+/* Input Section */
+.input-section {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+}
+
+.input-section h2 {
+    color: #F2BB66;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+    font-weight: 500;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+.input-group { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+.input-field { flex: 1; min-width: 200px; }
+.input-field label { display: block; color: #F2BB66; margin-bottom: 8px; font-weight: 500; font-size: 0.95em; }
+.input-field input, .input-field select {
+    width: 100%; padding: 12px 15px; border: 1px solid var(--color-border); border-radius: 6px;
+    background: rgba(35, 35, 59, 0.4); color: var(--color-text); font-size: 1em; transition: all 0.3s ease;
+}
+.input-field input:focus, .input-field select:focus {
+    outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    background: rgba(35, 35, 59, 0.6);
+}
+
+/* Chart & Totals */
+.chart-section {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+}
+
+.chart-container { position: relative; height: 760px; background: rgba(35, 35, 59, 0.9); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+
+.totals-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.total-box {
+    background: rgba(35, 35, 59, 0.5);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid var(--color-primary);
+    text-align: center;
+}
+
+.total-box h4 { color: #F2BB66; margin: 0 0 10px 0; font-size: 1em; }
+.total-box .value { font-size: 1.8em; font-weight: 700; margin-bottom: 5px; }
+.total-box .subvalue { font-size: 0.9em; color: var(--color-muted); }
+
+.export-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+
+/* Data Lists */
+.data-section {
+    background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+}
+
+.data-tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.data-title {
+    color: #F2BB66;
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(15, 15, 25, 0.6);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 20px rgba(0,0,0,0.4);
+    font-size: 0.9em;
+}
+
+.data-table thead th {
+    background: rgba(58, 58, 58, 0.8);  /* riga header più intensa */
+    color: #fff;
+    padding: 8px;
+    text-align: left;
+}
+
+.data-table tbody td {
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+/* righe alternate: una più intensa, una più chiara */
+.data-table tbody tr:nth-child(odd) {
+    background: rgba(35, 35, 59, 0.8);
+}
+
+.data-table tbody tr:nth-child(even) {
+    background: rgba(35, 35, 59, 0.2);
+}
+
+.data-table tbody tr:hover {
+    background: rgba(74, 144, 226, 0.2);
+}
+
+.data-table td.actions {
+    text-align: right;
+}
+
+/* Buttons */
+.btn {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    border: none; border-radius: 8px; padding: 12px 24px; color: white; font-weight: 600;
+    cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(74, 144, 226, 0.4);
+    display: inline-flex; align-items: center; gap: 8px;
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+    box-shadow: 0 6px 30px rgba(74, 144, 226, 0.6); transform: translateY(-2px);
+}
+
+.btn-success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+.btn-success:hover { background: linear-gradient(135deg, #27ae60, #229954); box-shadow: 0 6px 25px rgba(46, 204, 113, 0.6); }
+.btn-danger { background: linear-gradient(135deg, #ff4757, #ff3838); padding: 8px 16px; font-size: 0.9em; }
+.btn-danger:hover { background: linear-gradient(135deg, #ff3838, #ff1f1f); box-shadow: 0 4px 20px rgba(255,71,87,0.5); }
+
+.profit-positive { color: #2ecc71 !important; font-weight: bold; }
+.profit-negative { color: #e74c3c !important; font-weight: bold; }
+.empty-state { text-align: center; color: var(--color-muted); padding: 40px; font-style: italic; }
+
+@media (max-width: 768px) {
+    .input-group, .totals-section, .export-buttons { flex-direction: column; }
+    .input-field { min-width: 100%; }
+}
+.report-section {
+    background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+}
+
+.report-section h2 {
+    color: #F2BB66;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 8px;
+}
+
+.report-block {
+    margin-bottom: 25px;
+}
+
+.report-block h3 {
+    background: #3ca44a;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px 6px 0 0;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(15,15,25,0.9);
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+    box-shadow: 0 3px 20px rgba(0,0,0,0.4);
+}
+
+.report-table thead th {
+    background: #3ca44a;
+    color: #fff;
+    padding: 8px;
+    text-align: left;
+    font-size: 0.9em;
+}
+
+.report-table tbody td,
+.report-table tfoot td {
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.9em;
+}
+
+.report-table tbody tr:nth-child(even) {
+    background: rgba(255,255,255,0.02);
+}
+
+.report-table tfoot td {
+    background: rgba(240,240,255,0.06);
+    font-weight: 600;
+}
+
+.report-table .right {
+    text-align: right;
+}
+/* Allinea verticalmente tutti i campi della riga */
+.input-group-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 230px;
+    row-gap: 10px;
+    align-items: start;      /* tutti agganciati in alto */
+}
+
+/* Stessa altezza per input e select */
+.input-field input,
+.input-field select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: rgba(35, 35, 59, 0.4);
+    color: var(--color-text);
+    font-size: 1em;
+    line-height: 1.2;        /* coerente per tutti */
+    box-sizing: border-box;
+}
+
+/* Elimina differenze di offset del select nei browser */
+.input-field select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .input-group-row {
+        grid-template-columns: 1fr;
+        column-gap: 0;
+    }
+}
+
+.btn-icon-muted {
+    background: rgba(51, 51, 51, 0.6);  /* #333 semi-trasparente */
+    border-radius: 6px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #ffffff;
+    font-size: 0.9em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.btn-icon-muted:hover {
+    background: rgba(80, 80, 80, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 14px rgba(0,0,0,0.5);
+}
+/* Container principale della griglia */
+.ts-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+/* Stile per l'etichetta (più piccola) */
+.ts-grid-item h4 {
+  font-size: 0.85rem;      /* Dimensione ridotta */
+  text-transform: uppercase; /* Rende il testo più ordinato */
+  letter-spacing: 0.5px;   /* Migliora la leggibilità */
+  color: #666;             /* Colore leggermente più tenue */
+  margin-bottom: 4px;      /* Spazio tra etichetta e valore */
+  line-height: 1.2;        /* Altezza riga compatta */
+}
+
+/* Stile per il valore principale (più grande) */
+.ts-grid-item .value {
+  font-size: 1.5rem;       /* Valore in evidenza */
+  font-weight: 700;        /* Grassetto per risaltare */
+  line-height: 1.1;
+}
+
+/* Sottovalore (es. quantità ATOM/BTC) */
+.ts-grid-item .subvalue {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* Classi di colore per i profitti */
+.profit-positive { color: #28a745; }
+.profit-negative { color: #dc3545; }
+
+/* Container del grafico */
+.ts-chart-box {
+    background: rgba(51, 51, 51, 0.8); /* Colore #333 con 80% opacità */
+    backdrop-filter: blur(10px);        /* Effetto sfocatura sfondo */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Bordino leggero */
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+/* Container della griglia stats */
+.ts-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+/* Singolo box delle statistiche */
+.ts-grid-item {
+    background: rgba(51, 51, 51, 0.7); /* Leggermente più trasparente */
+    border: 1px solid rgba(188, 204, 233, 0.2); /* Bordo colorato come il titolo */
+    border-radius: 10px;
+    padding: 15px;
+    transition: transform 0.2s ease;
+}
+
+.ts-grid-item:hover {
+    transform: translateY(-3px); /* Effetto al passaggio del mouse */
+    background: rgba(51, 51, 51, 0.9);
+}
+
+/* Stile Etichetta (Piccola e sobria) */
+.ts-grid-item h4 {
+    color: #bccce9;            /* Colore azzurrino del tuo titolo */
+    font-size: 0.75rem;         /* Molto più piccola del valore */
+    font-weight: 400;
+    margin: 0 0 8px 0;
+    text-transform: uppercase;
+    opacity: 0.8;               /* Leggera trasparenza per gerarchia */
+}
+
+/* Stile Valore (Grande e luminoso) */
+.ts-grid-item .value {
+    color: #ffffff;             /* Bianco puro per massima leggibilità */
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Varianti Colore per i profitti */
+.profit-positive {
+    color: #4ade80 !important;  /* Verde fluo tipico dei temi dark */
+}
+
+.profit-negative {
+    color: #f87171 !important;  /* Rosso pastello */
+}
+
+/* Sottovalore (es. quantità token) */
+.subvalue {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+/* Classe base per il contenitore del grafico */
+.ts-chart-box {
+    background: rgba(51, 51, 51, 0.6); /* Sfondo #333 trasparente */
+    backdrop-filter: blur(8px);         /* Effetto sfocato moderno */
+    -webkit-backdrop-filter: blur(8px);
+    
+    /* Bordo: rimpiazzato il viola con un grigio-azzurro molto tenue */
+    border: 1px solid rgba(188, 204, 233, 0.15); 
+    
+    border-radius: 16px;               /* Angoli arrotondati eleganti */
+    padding: 24px;
+    margin-bottom: 30px;
+    
+    /* Ombra leggera per dare profondità senza appesantire */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Variante Large (se serve differenziare dimensioni o spaziatura) */
+.ts-chart-box-large {
+    width: 100%;
+    min-height: 800px; /* Assicura spazio per il canvas del grafico */
+}
+
+/* Ottimizzazione per il canvas all'interno */
+#equityChart {
+    width: 100% !important;
+    height: auto !important;
+}
+</style>
+</head>
+<body>
+<div style="padding: 4px;"></div>
+<div class="container">
+<!-- ========== RIGA UNICA: LOGO + MENU (senza toccare il tuo stile) ========== -->
+<div class="logo-menu-row">
+  <!-- logo -->
+  <a href="index.html" class="logo">
+    <img src="images/logoinvest2a3.svg" alt="FlowChart">
+  </a>
+
+  <!-- tuo blocco ESISTENTE (incolonnato a destra del logo) -->
+  <div class="iflow-body">
+    <nav class="iflow-custom-menu">
+       <ul>
+        <li class="dropdown">
+          <span>Trade</span>
+         <ul>
+            <li><a href="https://beneinst.github.io/tradingspot/">Trade attivi</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
+			<li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
+			
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <span>Capitale</span>
+          <ul>
+            <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Panoramica</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
+			<li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
+			<li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <span>Strategia</span>
+          <ul>
+            <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
+            <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <span>Backup</span>
+          <ul>
+            <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+
+  <!-- TITOLO PAGINA (sempre sotto) -->
+  <div class="header-title">
+    <h1>💼 Panoramica</h1>
+    <small><small class="price-line">
+  <span id="atomPrice">$0.0000</span> · <span id="lastUpdate">Caricamento...</span>
+</small></small>
+  </div>
+</header>
+<!-- ===================================== -->
+</div>
+
+   
+<div style="padding: 8px;"></div>   
+<div class="container">
+       <div class="conteiner-f">
+
+ 
+     <h1 style="text-align: left; font-size: 24px; color: #bccce9; padding-bottom: 35px; padding-top: 16px;">Evoluzione Patrimonio</h1>
+          <div class="ts-chart-box ts-chart-box-large">
+    <canvas id="equityChart"></canvas>
+            </div>
+            
+          <div class="ts-stats-grid">
+  <div class="ts-grid-item">
+    <h4>💶 Capitale Depositato</h4>
+    <div class="value profit-negative" id="totalEur">€0.00</div>
+  </div>
+
+  <div class="ts-grid-item">
+    <h4>🪙 Valore ATOM</h4>
+    <div class="value profit-positive" id="totalAtomValue">$0.00</div>
+    <div class="subvalue" id="totalAtomQty">0 ATOM</div>
+  </div>
+  
+ <div class="ts-grid-item">
+    <h4>₿ Valore BTC</h4>
+    <div class="value profit-positive" id="totalBtcValue">$0.00</div>
+    <div class="subvalue" id="totalBtcQty">0 BTC</div>
+  </div>
+  
+  <div class="ts-grid-item">
+    <h4>☀️ Valore SOL</h4>
+    <div class="value profit-positive" id="totalSolValue">$0.00</div>
+    <div class="subvalue" id="totalSolQty">0 SOL</div>
+  </div>
+
+  <div class="ts-grid-item">
+    <h4>Ł Valore LTC</h4>
+    <div class="value profit-positive" id="totalLtcValue">$0.00</div>
+    <div class="subvalue" id="totalLtcQty">0 LTC</div>
+  </div>
+
+  <div class="ts-grid-item">
+    <h4>🔷 Valore POL</h4>
+    <div class="value profit-positive" id="totalPolValue">$0.00</div>
+    <div class="subvalue" id="totalPolQty">0 POL</div>
+  </div>
+
+  <div class="ts-grid-item">
+    <h4>💵 Valore USDC</h4>
+    <div class="value profit-positive" id="totalUsdcValue">$0.00</div>
+    <div class="subvalue" id="totalUsdcQty">0 USDC</div>
+  </div>
+  
+  <div class="ts-grid-item">
+    <h4>📈 Profitto Trading</h4>
+    <div class="value" id="totalTrading">$0.00</div>
+  </div>
+
+  <div class="ts-grid-item">
+    <h4>💎 RENDIMENTO NETTO</h4>
+    <div class="value" id="totalEquity">$0.00</div>
+  </div>
+</div>
+
+            
+            <div class="export-buttons">
+                <button class="btn-edit" onclick="exportDataHTML()">📊 Esporta Dati</button>
+                <button class="btn-edit" onclick="exportChartHTML()">📈 Esporta Grafico</button>
+                <button class="btn-edit" onclick="loadAllData()">🔄 Aggiorna</button>
+            </div>
+        </div> </div>
+         
+    <div class="ts-dash-card">
+        
+
+        <!-- 1. Input Section -->
+   <div class="container-f">
+    <h1 style="text-align: left; font-size: 24px; color: white; padding-bottom: 25px;">➕ Inserisci Operazione</h1>
+    <div class="input-group input-group-row">
+        <div class="input-field">
+            <label>Data</label>
+            <input type="date" id="operationDate">
+        </div>
+        <div class="input-field">
+            <label>Importo</label>
+            <input type="number" id="operationAmount" step="0.01" placeholder="1000.00">
+        </div>
+        <div class="input-field">
+            <label>Tipo</label>
+            <select id="operationType">
+                <option value="EUR">💶 Deposito Euro (- Capitale iniziale)</option>
+                <option value="ATOM">🪙 ATOM acquistati (+ Investimento)</option>
+				<option value="BTC">₿ BTC acquistati (+ Investimento)</option>
+				<option value="SOL">☀️ SOL acquistati (+ Investimento)</option>
+				<option value="LTC">Ł LTC acquistati (+ Investimento)</option>
+				<option value="POL">🔷 POL acquistati (+ Investimento)</option>
+				<option value="USDC">💵 USDC acquistati (+ Stablecoin)</option>
+                <option value="Trading">📈 Profitto Trading (+ Guadagno)</option>
+            </select>
+        </div>
+        <div class="input-field">
+            <label>Note</label>
+            <input type="text" id="operationNote" placeholder="Descrizione operazione">
+        </div>
+    </div>
+
+    <div class="input-actions">
+        <button class="btn btn-primary" onclick="addOperation()">➕ Aggiungi Operazione</button>
+    </div>
+</div>
+</div>
+<div style="padding: 6px;"></div> 
+
+        <!-- 3. Data Lists by Type -->
+      <div class="ts-dash-card">
+  <h3>📋 Operazioni Registrate</h3>
+  <div class="data-tables-grid">
+    <div>
+      <h3 class="data-title">💶 Depositi Euro (Capitale -)</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Importo</th>
+            <th>Note</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="eurList"></tbody>
+      </table>
+    </div>
+
+    <div>
+      <h3 class="data-title">🪙 ATOM Acquistati (+)</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Quantità</th>
+            <th>Note</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="atomList"></tbody>
+      </table>
+    </div>
+	
+ <div>
+    <h3 class="data-title">₿ BTC Acquistati (+)</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr>
+      </thead>
+      <tbody id="btcList"></tbody>
+    </table>
+  </div>
+
+  <div>
+    <h3 class="data-title">☀️ SOL Acquistati (+)</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr>
+      </thead>
+      <tbody id="solList"></tbody>
+    </table>
+  </div>
+
+  <div>
+    <h3 class="data-title">Ł LTC Acquistati (+)</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr>
+      </thead>
+      <tbody id="ltcList"></tbody>
+    </table>
+  </div>
+
+  <div>
+    <h3 class="data-title">🔷 POL Acquistati (+)</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr>
+      </thead>
+      <tbody id="polList"></tbody>
+    </table>
+  </div>
+
+  <div>
+    <h3 class="data-title">💵 USDC Acquistati (+)</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr>
+      </thead>
+      <tbody id="usdcList"></tbody>
+    </table>
+  </div>
+  
+    <div>
+      <h3 class="data-title">📈 Profitti Trading (+)</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Importo</th>
+            <th>Note</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tradingList"></tbody>
+      </table>
+    </div>
+  </div>
+</div></div></div>
+
+
+	
+		<div class="container-f" style="padding-top: 1px; padding-bottom: 1px;">
+      
+      		   <p style="margin: 0; color: #c3c3c3; padding-top:25px; padding-bottom:35px; text-align: center; height: 15px; line-height: 12px;">
+        ⛰️ 2026 © FlowChart by Gerardo D
+      </p>
+    </div></div>
+
+<!-- Bottone torna sopra principale (con freccia CSS) -->
+    <button class="back-to-top" id="backToTop" title="Torna in cima"></button>  
+    
+    <script>
+        // Funzione per mostrare/nascondere il bottone
+        function toggleBackToTopButton() {
+            const backToTop = document.getElementById('backToTop');
+            const backToTopAlt = document.getElementById('backToTopAlt');
+if (backToTopAlt) {
+    backToTopAlt.addEventListener('click', scrollToTop);
+	 if (!backToTopAlt) return; 
+}
+ 
+            
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+                backToTopAlt.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+                backToTopAlt.classList.remove('show');
+            }
+        }
+        
+        // Funzione per tornare in cima con animazione smooth
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Event listeners
+        window.addEventListener('scroll', toggleBackToTopButton);
+        
+        document.getElementById('backToTop').addEventListener('click', scrollToTop);
+        document.getElementById('backToTopAlt').addEventListener('click', scrollToTop);
+        
+        // Controlla subito se mostrare il bottone
+        toggleBackToTopButton();
+    </script>
+
+   <script>
+let operations = JSON.parse(localStorage.getItem('cryptoOperations')) || [];
+let atomPrice = 0;
+let btcPrice = 0;
+let solPrice = 0;
+let ltcPrice = 0;
+let polPrice = 0;
+let usdcPrice = 1.00; // Stablecoin sempre ~$1
+let chart = null;
+
+/* === UTIL === */
+
+function formatEuro(value) {
+    return value.toLocaleString('it-IT', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function monthKey(dateStr) {
+    const d = new Date(dateStr);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/* === INIT === */
+
+function init() {
+    const dateInput = document.getElementById('operationDate');
+    if (dateInput) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+    }
+    loadCryptoPrices();
+    setInterval(loadCryptoPrices, 5 * 60 * 1000);
+    loadAllData();
+}
+
+/* === PREZZI CRYPTO === */
+
+async function loadCryptoPrices() {
+    try {
+        // Carica ATOM
+        const atomResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=ATOMUSDT');
+        if (atomResponse.ok) {
+            const atomData = await atomResponse.json();
+            atomPrice = parseFloat(atomData.price);
+        }
+
+        // Carica BTC
+        const btcResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+        if (btcResponse.ok) {
+            const btcData = await btcResponse.json();
+            btcPrice = parseFloat(btcData.price);
+        }
+
+        // Carica SOL
+        const solResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT');
+        if (solResponse.ok) {
+            const solData = await solResponse.json();
+            solPrice = parseFloat(solData.price);
+        }
+
+        // Carica LTC
+        const ltcResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT');
+        if (ltcResponse.ok) {
+            const ltcData = await ltcResponse.json();
+            ltcPrice = parseFloat(ltcData.price);
+        }
+
+        // Carica POL (Polygon)
+        const polResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=POLUSDT');
+        if (polResponse.ok) {
+            const polData = await polResponse.json();
+            polPrice = parseFloat(polData.price);
+        }
+
+        // Carica USDC (Stablecoin - sempre ~$1)
+        const usdcResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=USDCUSDT');
+        if (usdcResponse.ok) {
+            const usdcData = await usdcResponse.json();
+            usdcPrice = parseFloat(usdcData.price);
+        }
+
+        // Aggiorna display prezzi
+        const priceEl = document.getElementById('atomPrice');
+        const updEl = document.getElementById('lastUpdate');
+        if (priceEl) {
+            priceEl.textContent = `ATOM: $${atomPrice.toFixed(4)} | BTC: $${btcPrice.toFixed(2)} | SOL: $${solPrice.toFixed(2)} | LTC: $${ltcPrice.toFixed(2)} | POL: $${polPrice.toFixed(4)} | USDC: $${usdcPrice.toFixed(4)}`;
+        }
+        if (updEl) {
+            updEl.textContent = `Aggiornato: ${new Date().toLocaleString('it-IT')}`;
+        }
+
+        updateDisplays();
+    } catch (error) {
+        console.error('Errore caricamento prezzi crypto:', error);
+    }
+}
+
+/* === CRUD OPERAZIONI === */
+
+function addOperation() {
+    const date = document.getElementById('operationDate').value;
+    const amount = parseFloat(document.getElementById('operationAmount').value);
+    const type = document.getElementById('operationType').value;
+    const note = document.getElementById('operationNote').value;
+
+    if (!date || !amount || isNaN(amount)) {
+        alert('⚠️ Inserisci data e importo validi');
+        return;
+    }
+
+    const operation = { id: Date.now(), date, amount, type, note };
+    operations = [...operations, operation].sort((a, b) => new Date(a.date) - new Date(b.date));
+    localStorage.setItem('cryptoOperations', JSON.stringify(operations));
+
+    document.getElementById('operationAmount').value = '';
+    document.getElementById('operationNote').value = '';
+    loadAllData();
+    alert('✅ Operazione aggiunta!');
+}
+
+function removeOperation(id) {
+    if (!confirm('⚠️ Elimina operazione?')) return;
+    operations = operations.filter(op => op.id !== id);
+    localStorage.setItem('cryptoOperations', JSON.stringify(operations));
+    loadAllData();
+}
+
+/* === DISPLAY CARD + GRAFICO === */
+
+function updateDisplays() {
+    const eurDeposits = operations.filter(op => op.type === 'EUR');
+    const atomBuys = operations.filter(op => op.type === 'ATOM');
+    const btcBuys = operations.filter(op => op.type === 'BTC');
+    const solBuys = operations.filter(op => op.type === 'SOL');
+    const ltcBuys = operations.filter(op => op.type === 'LTC');
+    const polBuys = operations.filter(op => op.type === 'POL');
+    const usdcBuys = operations.filter(op => op.type === 'USDC');
+    const tradingProfits = operations.filter(op => op.type === 'Trading');
+
+    const totalEurOut = eurDeposits.reduce((sum, op) => sum + op.amount, 0);
+    const totalAtomQty = atomBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalAtomValue = totalAtomQty * atomPrice;
+    const totalBtcQty = btcBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalBtcValue = totalBtcQty * btcPrice;
+    const totalSolQty = solBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalSolValue = totalSolQty * solPrice;
+    const totalLtcQty = ltcBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalLtcValue = totalLtcQty * ltcPrice;
+    const totalPolQty = polBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalPolValue = totalPolQty * polPrice;
+    const totalUsdcQty = usdcBuys.reduce((sum, op) => sum + op.amount, 0);
+    const totalUsdcValue = totalUsdcQty * usdcPrice;
+    const totalTrading = tradingProfits.reduce((sum, op) => sum + op.amount, 0);
+
+    const netEquity = totalAtomValue + totalBtcValue + totalSolValue + totalLtcValue + totalPolValue + totalUsdcValue + totalTrading - totalEurOut;
+
+    const elEur = document.getElementById('totalEur');
+    const elAtomVal = document.getElementById('totalAtomValue');
+    const elAtomQty = document.getElementById('totalAtomQty');
+    const elBtcVal = document.getElementById('totalBtcValue');
+    const elBtcQty = document.getElementById('totalBtcQty');
+    const elSolVal = document.getElementById('totalSolValue');
+    const elSolQty = document.getElementById('totalSolQty');
+    const elLtcVal = document.getElementById('totalLtcValue');
+    const elLtcQty = document.getElementById('totalLtcQty');
+    const elPolVal = document.getElementById('totalPolValue');
+    const elPolQty = document.getElementById('totalPolQty');
+    const elUsdcVal = document.getElementById('totalUsdcValue');
+    const elUsdcQty = document.getElementById('totalUsdcQty');
+    const elTrading = document.getElementById('totalTrading');
+    const elEquity = document.getElementById('totalEquity');
+
+    if (elEur) elEur.textContent = `-€${totalEurOut.toFixed(2)}`;
+    if (elAtomVal) elAtomVal.textContent = `+$${totalAtomValue.toFixed(2)}`;
+    if (elAtomQty) elAtomQty.textContent = `${totalAtomQty.toFixed(6)} ATOM`;
+    if (elBtcVal) elBtcVal.textContent = `+$${totalBtcValue.toFixed(2)}`;
+    if (elBtcQty) elBtcQty.textContent = `${totalBtcQty.toFixed(8)} BTC`;
+    if (elSolVal) elSolVal.textContent = `+$${totalSolValue.toFixed(2)}`;
+    if (elSolQty) elSolQty.textContent = `${totalSolQty.toFixed(6)} SOL`;
+    if (elLtcVal) elLtcVal.textContent = `+$${totalLtcValue.toFixed(2)}`;
+    if (elLtcQty) elLtcQty.textContent = `${totalLtcQty.toFixed(8)} LTC`;
+    if (elPolVal) elPolVal.textContent = `+$${totalPolValue.toFixed(2)}`;
+    if (elPolQty) elPolQty.textContent = `${totalPolQty.toFixed(6)} POL`;
+    if (elUsdcVal) elUsdcVal.textContent = `+$${totalUsdcValue.toFixed(2)}`;
+    if (elUsdcQty) elUsdcQty.textContent = `${totalUsdcQty.toFixed(2)} USDC`;
+    if (elTrading) elTrading.textContent = `+$${totalTrading.toFixed(2)}`;
+    if (elEquity) {
+        elEquity.textContent = `${netEquity >= 0 ? '+' : ''}$${Math.abs(netEquity).toFixed(2)}`;
+        elEquity.className = netEquity >= 0 ? 'value profit-positive' : 'value profit-negative';
+    }
+
+    updateChart();
+}
+
+/* === LISTE OPERAZIONI (BOX) === */
+
+function updateAllLists() {
+    updateList('eurList', 'EUR');
+    updateList('atomList', 'ATOM');
+    updateList('btcList', 'BTC');
+    updateList('solList', 'SOL');
+    updateList('ltcList', 'LTC');
+    updateList('polList', 'POL');
+    updateList('usdcList', 'USDC');
+    updateList('tradingList', 'Trading');
+}
+
+function updateList(containerId, type) {
+    const tbody = document.getElementById(containerId);
+    if (!tbody) return;
+
+    const typeOps = operations.filter(op => op.type === type);
+
+    if (typeOps.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align:center; padding:10px; color:var(--color-muted);">
+                    Nessuna operazione ${type}
+                </td>
+            </tr>`;
+        return;
+    }
+
+    tbody.innerHTML = typeOps.map(op => {
+        const dateStr = new Date(op.date).toLocaleDateString('it-IT');
+        let amountStr, symbol;
+        
+        if (type === 'ATOM') {
+            amountStr = op.amount.toFixed(6);
+            symbol = 'ATOM';
+        } else if (type === 'BTC') {
+            amountStr = op.amount.toFixed(8);
+            symbol = 'BTC';
+        } else if (type === 'SOL') {
+            amountStr = op.amount.toFixed(6);
+            symbol = 'SOL';
+        } else if (type === 'LTC') {
+            amountStr = op.amount.toFixed(8);
+            symbol = 'LTC';
+        } else if (type === 'POL') {
+            amountStr = op.amount.toFixed(6);
+            symbol = 'POL';
+        } else if (type === 'USDC') {
+            amountStr = op.amount.toFixed(2);
+            symbol = 'USDC';
+        } else {
+            amountStr = op.amount.toFixed(2);
+            symbol = type === 'EUR' ? '€' : '€';
+        }
+
+        return `
+            <tr>
+                <td>${dateStr}</td>
+                <td>${type === 'EUR' ? '-' : '+'}${amountStr} ${symbol}</td>
+                <td>${op.note ? op.note : ''}</td>
+                <td class="actions">
+                    <button class="btn-icon-muted" onclick="removeOperation(${op.id})">🗑️</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+/* === GRAFICO PATRIMONIO === */
+
+function updateChart() {
+    const chartData = [];
+    let cumulativeEurOut = 0;
+    let cumulativeAtomValue = 0;
+    let cumulativeBtcValue = 0;
+    let cumulativeSolValue = 0;
+    let cumulativeLtcValue = 0;
+    let cumulativePolValue = 0;
+    let cumulativeUsdcValue = 0;
+    let cumulativeTrading = 0;
+
+    const sortedOperations = [...operations].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    sortedOperations.forEach(op => {
+        if (op.type === 'EUR') cumulativeEurOut += op.amount;
+        else if (op.type === 'ATOM') cumulativeAtomValue += op.amount * atomPrice;
+        else if (op.type === 'BTC') cumulativeBtcValue += op.amount * btcPrice;
+        else if (op.type === 'SOL') cumulativeSolValue += op.amount * solPrice;
+        else if (op.type === 'LTC') cumulativeLtcValue += op.amount * ltcPrice;
+        else if (op.type === 'POL') cumulativePolValue += op.amount * polPrice;
+        else if (op.type === 'USDC') cumulativeUsdcValue += op.amount * usdcPrice;
+        else if (op.type === 'Trading') cumulativeTrading += op.amount;
+
+        chartData.push({
+            date: new Date(op.date).toLocaleDateString('it-IT'),
+            eurOut: -cumulativeEurOut,
+            atomValue: cumulativeAtomValue,
+            btcValue: cumulativeBtcValue,
+            solValue: cumulativeSolValue,
+            ltcValue: cumulativeLtcValue,
+            polValue: cumulativePolValue,
+            usdcValue: cumulativeUsdcValue,
+            trading: cumulativeTrading,
+            netEquity: cumulativeAtomValue + cumulativeBtcValue + cumulativeSolValue + cumulativeLtcValue + cumulativePolValue + cumulativeUsdcValue + cumulativeTrading - cumulativeEurOut
+        });
+    });
+
+    const canvas = document.getElementById('equityChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.map(d => d.date),
+            datasets: [
+                {
+                    label: 'Capitale Depositato (-)',
+                    data: chartData.map(d => d.eurOut),
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231,76,60,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'Val ATOM (+)',
+                    data: chartData.map(d => d.atomValue),
+                    borderColor: '#2ecc71',
+                    backgroundColor: 'rgba(46,204,113,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'Val BTC (+)',
+                    data: chartData.map(d => d.btcValue),
+                    borderColor: '#f39c12',
+                    backgroundColor: 'rgba(243,156,18,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'Val SOL (+)',
+                    data: chartData.map(d => d.solValue),
+                    borderColor: '#1abc9c',
+                    backgroundColor: 'rgba(26,188,156,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'Val LTC (+)',
+                    data: chartData.map(d => d.ltcValue),
+                    borderColor: '#95a5a6',
+                    backgroundColor: 'rgba(149,165,166,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'Val POL (+)',
+                    data: chartData.map(d => d.polValue),
+                    borderColor: '#8e44ad',
+                    backgroundColor: 'rgba(142,68,173,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'Val USDC (+)',
+                    data: chartData.map(d => d.usdcValue),
+                    borderColor: '#16a085',
+                    backgroundColor: 'rgba(22,160,133,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'Trading Profit (+)',
+                    data: chartData.map(d => d.trading),
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52,152,219,0.1)',
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: 'RENDIMENTO NETTO',
+                    data: chartData.map(d => d.netEquity),
+                    borderColor: '#9b59b6',
+                    backgroundColor: 'rgba(155,89,182,0.2)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+		
+
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function (value) {
+                            return '$' + value.toLocaleString('it-IT');
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+/* === REPORT STILE TABELLA (WEB) === */
+
+function buildReportTables() {
+    const now = new Date();
+    const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+    const reportOps = operations.filter(op => op.type === 'Trading');
+    const groups = {};
+
+    reportOps.forEach(op => {
+        const key = monthKey(op.date);
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(op);
+    });
+
+    // Mese corrente
+    const currentBody = document.getElementById('currentMonthBody');
+    const currentTotalCell = document.getElementById('currentMonthTotal');
+    if (currentBody && currentTotalCell) {
+        currentBody.innerHTML = '';
+        let currentTotal = 0;
+
+        (groups[currentKey] || []).forEach(op => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+                <td>${op.type}</td>
+                <td class="right">${formatEuro(op.amount)}</td>
+            `;
+            currentBody.appendChild(tr);
+            currentTotal += op.amount;
+        });
+        currentTotalCell.textContent = formatEuro(currentTotal);
+    }
+
+    // Storico mensile
+    const historyContainer = document.getElementById('monthlyHistory');
+    if (!historyContainer) return;
+    historyContainer.innerHTML = '<h3>Storico Mensile (con dettagli)</h3>';
+
+    Object.keys(groups).sort().forEach(key => {
+        const list = groups[key];
+        const labelDate = new Date(key + '-01');
+        const label = labelDate.toLocaleDateString('it-IT', { month: '2-digit', year: 'numeric' });
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'report-block';
+        wrapper.innerHTML = `
+            <div style="margin:10px 0;">
+                <strong>dal ${label} - Totale: ${formatEuro(list.reduce((s, o) => s + o.amount, 0))}</strong>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Importo (€)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="right">TOTALE PERIODO</td>
+                        <td class="right total-cell"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        `;
+
+        const tbody = wrapper.querySelector('tbody');
+        const tfootCell = wrapper.querySelector('.total-cell');
+        let total = 0;
+
+        list.forEach(op => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+                <td>${op.type}</td>
+                <td class="right">${formatEuro(op.amount)}</td>
+            `;
+            tbody.appendChild(tr);
+            total += op.amount;
+        });
+
+        tfootCell.textContent = formatEuro(total);
+        historyContainer.appendChild(wrapper);
+    });
+}
+
+/* === LOAD ALL === */
+
+function loadAllData() {
+    updateAllLists();
+    updateDisplays();
+    buildReportTables();
+}
+
+/* === EXPORT HTML REPORT === */
+
+function exportDataHTML() {
+    const now = new Date();
+
+    const groups = {};
+    operations.forEach(op => {
+        const key = monthKey(op.date);
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(op);
+    });
+
+    const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const currentList = groups[currentKey] || [];
+
+    let html = `<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Report Completo - ${now.toLocaleDateString('it-IT')}</title>
+<style>
+body { font-family: Arial, sans-serif; font-size: 13px; padding:20px; }
+h1 { font-size: 20px; margin-bottom: 15px; }
+h2 { font-size: 16px; margin-top: 25px; margin-bottom: 10px; }
+table { width:100%; border-collapse:collapse; margin-bottom:15px; }
+thead th { background:#3ca44a; color:#fff; padding:6px; text-align:left; }
+td { padding:4px 6px; border-bottom:1px solid #ddd; }
+tfoot td { background:#eef5ff; font-weight:bold; }
+.right { text-align:right; }
+</style>
+</head>
+<body>
+<h1>Report Operazioni Completo</h1>
+<h2>Mese Corrente</h2>
+<table>
+<thead><tr><th>Data</th><th>Tipo</th><th>Importo</th><th>Note</th></tr></thead>
+<tbody>`;
+
+    let currentTot = 0;
+    currentList.forEach(op => {
+        currentTot += op.amount;
+        const sign = op.type === 'EUR' ? '-' : '+';
+        let symbol;
+        if (op.type === 'ATOM') symbol = ' ATOM';
+        else if (op.type === 'BTC') symbol = ' BTC';
+        else if (op.type === 'SOL') symbol = ' SOL';
+        else if (op.type === 'LTC') symbol = ' LTC';
+        else if (op.type === 'POL') symbol = ' POL';
+        else if (op.type === 'USDC') symbol = ' USDC';
+        else symbol = '€';
+        
+        html += `
+<tr>
+  <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+  <td>${op.type}</td>
+  <td class="right">${sign}${formatEuro(op.amount)}${symbol}</td>
+  <td>${op.note || ''}</td>
+</tr>`;
+    });
+
+    html += `</tbody>
+<tfoot><tr><td colspan="2" class="right">Totale</td><td class="right">${formatEuro(currentTot)}</td><td></td></tr></tfoot>
+</table>
+
+<h2>Storico Mensile</h2>
+`;
+
+    Object.keys(groups).sort().forEach(key => {
+        const list = groups[key];
+        const label = new Date(key + '-01').toLocaleDateString('it-IT', { month: '2-digit', year: 'numeric' });
+        let tot = 0;
+
+        html += `<p><strong>Mese ${label}</strong></p>
+<table>
+<thead><tr><th>Data</th><th>Tipo</th><th>Importo</th><th>Note</th></tr></thead>
+<tbody>`;
+
+        list.forEach(op => {
+            tot += op.amount;
+            const sign = op.type === 'EUR' ? '-' : '+';
+            let symbol;
+            if (op.type === 'ATOM') symbol = ' ATOM';
+            else if (op.type === 'BTC') symbol = ' BTC';
+            else if (op.type === 'SOL') symbol = ' SOL';
+            else if (op.type === 'LTC') symbol = ' LTC';
+            else if (op.type === 'POL') symbol = ' POL';
+            else if (op.type === 'USDC') symbol = ' USDC';
+            else symbol = '€';
+            
+            html += `
+<tr>
+  <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+  <td>${op.type}</td>
+  <td class="right">${sign}${formatEuro(op.amount)}${symbol}</td>
+  <td>${op.note || ''}</td>
+</tr>`;
+        });
+
+        html += `</tbody>
+<tfoot><tr><td colspan="2" class="right">TOTALE PERIODO</td><td class="right">${formatEuro(tot)}</td><td></td></tr></tfoot>
+</table>`;
+    });
+
+    html += `</body></html>`;
+
+    downloadFile(html, `report-completo-${now.toISOString().split('T')[0]}.html`);
+}
+
+/* === EXPORT CHART PLACEHOLDER === */
+
+function exportChartHTML() {
+    const canvas = document.getElementById('equityChart');
+    const container = canvas.closest('.chart-container');
+    if (!canvas || !container) {
+        alert('Grafico non trovato');
+        return;
+    }
+
+    const originalOverflow = container.style.overflow;
+    container.style.overflow = 'visible';
+
+    html2canvas(canvas, {
+        backgroundColor: '#232335',
+        scale: 2
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `grafico-portfolio-${new Date().toISOString().split('T')[0]}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+
+        container.style.overflow = originalOverflow;
+    });
+}
+
+/* === DOWNLOAD HELP === */
+
+function downloadFile(content, filename) {
+    const blob = new Blob([content], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+init();
+</script>
+</body>
+</html>
