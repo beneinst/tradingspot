@@ -211,6 +211,16 @@ h5 {
   box-shadow: var(--glass-shadow);
   z-index: 100000;
 }
+.iflow-custom-menu ul,
+.iflow-custom-menu li {
+  list-style: none !important;
+}
+
+.iflow-custom-menu ul li::before,
+.iflow-custom-menu li::before {
+  content: none !important;
+  display: none !important;
+}
 .iflow-custom-menu ul li ul {
   overflow: visible !important;      /* niente scroll */
   max-height: none !important;       /* niente altezza fissa */
