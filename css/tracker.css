@@ -81,7 +81,16 @@
     margin-bottom: 20px;
 }
 
-.chart-container { position: relative; height: 760px; background: rgba(35, 35, 59, 0.9); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+.chart-container { position: relative; background: rgba(35, 35, 59, 0.9); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+.chart-container {
+  height: auto;
+  min-height: 400px; /* decente su mobile */
+}
+@media (max-width: 768px) {
+  .chart-container {
+    min-height: 300px;
+  }
+}
 
 .totals-section {
     display: grid;
@@ -315,4 +324,24 @@
     background: rgba(80, 80, 80, 0.9);
     transform: translateY(-1px);
     box-shadow: 0 3px 14px rgba(0,0,0,0.5);
+}
+
+/* Mobile fixes aggiuntivi */
+@media (max-width: 768px) {
+  .chart-container {
+    min-height: 300px;
+    height: auto;
+  }
+  .btn-icon-muted {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+  .data-tables-grid {
+    grid-template-columns: 1fr; /* una colonna sola */
+  }
+  .report-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }

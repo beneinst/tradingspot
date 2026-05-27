@@ -756,3 +756,45 @@ label {
         font-weight: bold;
         margin: 0;
     }
+@media (max-width: 768px) {
+  /* Testo base */
+  body { font-size: 16px; background-attachment: scroll; }
+  
+  /* Container fluidi */
+  .container, .container-f, .chart-container, .storico-chart-container,
+  .input-section, .data-section, .report-section {
+    height: auto !important;
+    min-height: 300px;
+    padding: 12px;
+    margin: 8px;
+    width: calc(100% - 16px);
+  }
+  
+  /* Pulsanti e tocchi */
+  button, .btn, .btn-primary, .btn-secondary, .btn-danger, .btn-edit,
+  .btn-info, .btn-outline, .time-range-btn, .tab-button,
+  .full-box.backup-container button {
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+  
+  /* Tabelle scrollabili */
+  .data-table, .report-table, .tabella-sintesi, .note table,
+  .stats-grid, .distribution-stats {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  /* Griglie a una colonna */
+  .stats-grid, .header-stats, .totals-section, .summary-grid {
+    grid-template-columns: 1fr !important;
+    flex-direction: column;
+  }
+  
+  /* Input a larghezza piena */
+  input, select, textarea, .input-group, .form-group {
+    max-width: 100%;
+    width: 100%;
+  }
+}

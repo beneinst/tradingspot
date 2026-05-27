@@ -978,3 +978,86 @@ body::before {
     margin-bottom: 20px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
+
+/* Forza viewport già detto – questo va nell'HTML, non nel CSS */
+
+/* Miglioramenti touch e leggibilità per schermi <= 768px */
+@media (max-width: 768px) {
+  body {
+    font-size: 100% !important; /* 16px base */
+    background-attachment: scroll; /* Evita lag su mobile */
+  }
+
+  /* Container più compatti */
+  .container, .container-f, .chart-container, .ts-dash-card {
+    padding: 15px !important;
+    margin-left: 8px;
+    margin-right: 8px;
+    width: calc(100% - 16px);
+    max-width: none;
+  }
+
+  /* Pulsanti e link cliccabili: altezza minima 44px */
+  .btn-primary, .btn-secondary, .btn-danger, .btn-edit, .btn-info,
+  button, .btn-outline, .ts-input-group button,
+  .back-to-top, .back-to-top-alt {
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+
+  /* Rendi i campi input più grandi */
+  input, select, textarea {
+    font-size: 16px !important; /* Evita zoom automatico su iOS */
+    padding: 12px !important;
+  }
+
+  /* Riduci i gap e margini eccessivi */
+  .ts-stats-grid {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .ts-stat-item {
+    padding: 12px;
+  }
+
+  /* Testo nelle card statistiche più leggibile */
+  .ts-stat-value {
+    font-size: 1.2rem;
+  }
+
+  /* Le tabelle scrollabili orizzontalmente se necessario */
+  .ts-quick-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Nascondi eventuali colonne fisse che creano overflow */
+  .input-group-row {
+    gap: 12px;
+  }
+
+  /* Migliora la navigazione a tendina (se hai menu dropdown) */
+  .nav-desktop li ul {
+    position: static; /* su mobile meglio a schermo intero */
+    background: #111;
+  }
+}
+
+/* Per schermi molto piccoli (380px) */
+@media (max-width: 480px) {
+  h1, .header h1 {
+    font-size: 1.4rem !important;
+  }
+  h2 {
+    font-size: 1.2rem;
+  }
+  .ts-header-stats {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ts-stat-item {
+    min-width: auto;
+  }
+}

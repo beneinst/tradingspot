@@ -626,3 +626,44 @@ h3.storia-entry-title {
   -moz-appearance: textfield;
 }
 
+@media (max-width: 768px) {
+  /* Pulsanti e tocchi */
+  button, .btn, .btn-primary, .btn-secondary, .btn-danger, .btn-edit, .btn-info,
+  .btn-outline, .btn-icon-muted, .back-to-top, .back-to-top-alt {
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+
+  /* Tabelle scrollabili */
+  .data-table, .report-table, .tabella-sintesi, .note table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Chart container flessibile */
+  .chart-container {
+    height: auto !important;   /* override di eventuali height:760px */
+    min-height: 300px;
+  }
+
+  /* Container con padding laterale ridotto */
+  .container, .container-f, .form-container, .trade-form,
+  .input-section, .chart-section, .data-section, .report-section {
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+  }
+
+  /* Griglie a una colonna */
+  .data-tables-grid, .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Rimuovi larghezze fisse di input */
+  input[type="file"] {
+    max-width: 100%;
+  }
+}
