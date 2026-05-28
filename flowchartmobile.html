@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panoramica</title>
-	<script>
-    // Se schermo < 760px, vai alla versione mobile
-    if (window.innerWidth < 760) {
-      window.location.href = 'flowchartmobile.html';
+  <script>
+    // Se schermo > 760px, vai alla versione desktop
+    if (window.innerWidth > 760) {
+      window.location.href = 'flowchart.html';
     }
-    // Controllo anche al resize
     window.addEventListener('resize', function() {
-      if (window.innerWidth < 760) {
-        window.location.href = 'flowchartmobile.html';
+      if (window.innerWidth > 760) {
+        window.location.href = 'flowchart.html';
       }
     });
   </script>
+  
 	<link rel="icon" type="image/png" href="favicon.png"> 
     <link rel="stylesheet" href="css/trade.css">
 	<link rel="stylesheet" href="css/tracker.css">
@@ -24,320 +24,336 @@
 	<link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-	<style>
-:root {
-    --color-primary: #4a90e2;
-    --color-secondary: #667eea;
-    --color-border: rgba(255,255,255,0.1);
-    --color-text: #e0e0e0;
-    --color-muted: #a0a0a0;
-    --color-surface: rgba(35,35,59,0.6);
-    --color-card-bg: rgba(58,58,58,0.15);
-    --color-header-bg: rgba(96,96,96,0.3);
+	  <style>
+    /* ========== RESET BASE ========== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background: #0b0f19;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+    }
+
+    /* ========== CONTENITORI UNICI SEPARATI DA 3px ========== */
+    .box {
+      width: 100%;
+      margin-bottom: 3px;
+    }
+
+    .box:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ========== HEADER BOX ========== */
+    .box-header {
+      background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-top: 3px solid #000000;  /* NERO */
+      padding: 16px 20px;
+    }
+
+    .box-header .logo-menu-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .box-header .header-title h1 {
+      font-size: 1.4rem;
+      color: #e0e0e0;
+      margin: 0;
+    }
+
+    .box-header .price-line {
+      font-size: 0.85rem;
+      color: #a0a0a0;
+    }
+
+ /* ========== CHART MOBILE — ULTRA MINIMAL ========== */
+.chart-title {
+  color: #F2BB66;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 8px 14px 4px;
+  background: transparent;      /* nessuno sfondo */
+  border: none;
+  margin: 0;
+  opacity: 0.9;
 }
 
-* { box-sizing: border-box; }
-
-.header-section {
-    background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
-    border: 1px solid var(--color-border);
-    border-top: 3px solid var(--color-primary);
-    border-radius: 8px;
-    padding: 25px;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-    margin-bottom: 20px;
+.chart-wrapper {
+  position: relative;
+  height: 200px;
+  background: #0b0f19;          /* stesso colore del body, seamless */
+  border-top: 1px solid rgba(255,255,255,0.04);  /* linea ghost */
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  overflow: hidden;
+  margin-bottom: 3px;
 }
 
-.header-content { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
-.price-info { text-align:right; }
-.price-value { font-size:1.8em; font-weight:700; color:var(--color-primary); margin-bottom:4px; }
-.price-update { font-size:0.9em; color:var(--color-muted); }
-
-.input-section {
-    background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
-    border: 1px solid var(--color-border);
-    border-top: 3px solid var(--color-primary);
-    border-radius: 8px;
-    padding: 25px;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-    margin-bottom: 20px;
+.chart-wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
-.input-section h2 {
-    color: #F2BB66;
-    margin-bottom: 20px;
-    font-size: 1.4em;
-    font-weight: 500;
-    border-bottom: 2px solid var(--color-border);
-    padding-bottom: 10px;
-}
+    /* ========== STATS BOX ========== */
+    .box-stats {
+      background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-top: 3px solid #000000;  /* NERO */
+      padding: 20px;
+    }
 
-.input-group { display:flex; flex-wrap:wrap; gap:15px; margin-bottom:20px; }
-.input-field { flex:1; min-width:200px; }
-.input-field label { display:block; color:#F2BB66; margin-bottom:8px; font-weight:500; font-size:0.95em; }
-.input-field input, .input-field select {
-    width:100%; padding:12px 15px; border:1px solid var(--color-border); border-radius:6px;
-    background:rgba(35,35,59,0.4); color:var(--color-text); font-size:1em; transition:all 0.3s ease;
-}
-.input-field input:focus, .input-field select:focus {
-    outline:none; border-color:var(--color-primary); box-shadow:0 0 0 3px rgba(74,144,226,0.2);
-    background:rgba(35,35,59,0.6);
-}
+    .ts-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
 
-.chart-section {
-    background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
-    border: 1px solid var(--color-border);
-    border-top: 3px solid var(--color-primary);
-    border-radius: 8px;
-    padding: 25px;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-    margin-bottom: 20px;
-}
+    .ts-grid-item {
+      background: rgba(51,51,51,0.7);
+      border: 1px solid rgba(188,204,233,0.2);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
 
-.chart-container { position:relative; height:760px; background:rgba(35,35,59,0.9); border-radius:8px; overflow:hidden; margin-bottom:20px; }
+    .ts-grid-item h4 {
+      color: #bccce9;
+      font-size: 0.75rem;
+      font-weight: 400;
+      margin: 0 0 8px 0;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
 
-.totals-section { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:15px; }
+    .ts-grid-item .value {
+      color: #ffffff;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
 
-.total-box { background:rgba(35,35,59,0.5); padding:20px; border-radius:8px; border-left:4px solid var(--color-primary); text-align:center; }
-.total-box h4 { color:#F2BB66; margin:0 0 10px 0; font-size:1em; }
-.total-box .value { font-size:1.8em; font-weight:700; margin-bottom:5px; }
-.total-box .subvalue { font-size:0.9em; color:var(--color-muted); }
+    .ts-grid-item .subvalue {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
 
-.export-buttons { display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; }
+    .profit-positive { color: #4ade80 !important; }
+    .profit-negative { color: #f87171 !important; }
 
-/* ============================================
-   SEZIONE OPERAZIONI — box uniformi + scroll
-   ============================================ */
+    /* ========== INPUT BOX ========== */
+    .box-input {
+      background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-top: 3px solid #000000;  /* NERO */
+      padding: 20px;
+    }
 
-.data-section {
-    background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
-    border: 1px solid var(--color-border);
-    border-top: 3px solid var(--color-primary);
-    border-radius: 8px;
-    padding: 25px;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-    margin-bottom: 20px;
-}
+    .box-input h2 {
+      color: #F2BB66;
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
 
-.data-tables-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 18px;
-    margin-top: 20px;
-}
+    .input-group-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
 
-/* Box uniforme per ogni tipo di asset */
-.data-tables-grid > div {
-    display: flex;
-    flex-direction: column;
-    height: 268px;                          /* altezza fissa identica per tutti */
-    background: rgba(15,15,25,0.5);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 10px;
-    padding: 12px 14px 10px;
-    overflow: hidden;
-}
+    .input-field label {
+      display: block;
+      color: #F2BB66;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
 
-.data-title {
-    color: #F2BB66;
-    font-size: 0.95em;
-    margin: 0 0 8px 0;
-    flex-shrink: 0;                         /* il titolo non si restringe */
-}
+    .input-field input,
+    .input-field select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      background: rgba(35,35,59,0.4);
+      color: #e0e0e0;
+      font-size: 1rem;
+    }
 
-/* Tabella con thead fisso */
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.88em;
-    table-layout: fixed;
-    flex-shrink: 0;
-}
+    .btn-primary {
+      background: linear-gradient(135deg, #4a90e2, #667eea);
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
-.data-table thead th {
-    background: rgba(58,58,58,0.85);
-    color: #fff;
-    padding: 7px 8px;
-    text-align: left;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
+    /* ========== OPERATIONS BOX ========== */
+    .box-operations {
+      background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-top: 3px solid #000000;  /* NERO */
+      padding: 20px;
+    }
 
-/* tbody come blocco scrollabile */
-.data-table tbody {
-    display: block;
-    max-height: 172px;                      /* area scroll del corpo */
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(74,144,226,0.4) transparent;
-}
+    .box-operations h3 {
+      color: #F2BB66;
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+    }
 
-.data-table tbody::-webkit-scrollbar       { width: 4px; }
-.data-table tbody::-webkit-scrollbar-track { background: transparent; }
-.data-table tbody::-webkit-scrollbar-thumb { background: rgba(74,144,226,0.4); border-radius: 10px; }
+    .data-tables-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
 
-/* thead e righe tbody come table per allineamento colonne */
-.data-table thead,
-.data-table tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-}
+    .data-tables-grid > div {
+      background: rgba(15,15,25,0.5);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 12px;
+    }
 
-.data-table tbody td {
-    padding: 5px 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+    .data-title {
+      color: #F2BB66;
+      font-size: 0.9rem;
+      margin: 0 0 8px 0;
+    }
 
-.data-table tbody tr:nth-child(odd)  { background: rgba(35,35,59,0.8); }
-.data-table tbody tr:nth-child(even) { background: rgba(35,35,59,0.2); }
-.data-table tbody tr:hover           { background: rgba(74,144,226,0.18); }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85em;
+    }
 
-.data-table td.actions { text-align: right; width: 40px; }
+    .data-table thead th {
+      background: rgba(58,58,58,0.85);
+      color: #fff;
+      padding: 6px 8px;
+      text-align: left;
+    }
 
-/* Mobile: tolgo l'altezza fissa */
-@media (max-width: 768px) {
-    .data-tables-grid > div { height: auto; max-height: none; }
-    .data-table tbody       { max-height: 180px; }
-    .input-group, .totals-section, .export-buttons { flex-direction:column; }
-    .input-field { min-width:100%; }
-}
+    .data-table tbody td {
+      padding: 5px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
 
-/* Buttons */
-.btn {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-    border:none; border-radius:8px; padding:12px 24px; color:white; font-weight:600;
-    cursor:pointer; transition:all 0.3s ease; box-shadow:0 4px 20px rgba(74,144,226,0.4);
-    display:inline-flex; align-items:center; gap:8px;
-}
-.btn:hover { background:linear-gradient(135deg,var(--color-secondary),var(--color-primary)); box-shadow:0 6px 30px rgba(74,144,226,0.6); transform:translateY(-2px); }
-.btn-success { background:linear-gradient(135deg,#2ecc71,#27ae60); }
-.btn-success:hover { background:linear-gradient(135deg,#27ae60,#229954); box-shadow:0 6px 25px rgba(46,204,113,0.6); }
-.btn-danger { background:linear-gradient(135deg,#ff4757,#ff3838); padding:8px 16px; font-size:0.9em; }
-.btn-danger:hover { background:linear-gradient(135deg,#ff3838,#ff1f1f); box-shadow:0 4px 20px rgba(255,71,87,0.5); }
+    .data-table tbody tr:nth-child(odd) { background: rgba(35,35,59,0.8); }
+    .data-table tbody tr:nth-child(even) { background: rgba(35,35,59,0.2); }
 
-.profit-positive { color:#2ecc71 !important; font-weight:bold; }
-.profit-negative { color:#e74c3c !important; font-weight:bold; }
-.empty-state { text-align:center; color:var(--color-muted); padding:20px; font-style:italic; font-size:0.85em; }
+    /* ========== FOOTER BOX ========== */
+    .box-footer {
+      background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-top: 3px solid #000000;  /* NERO */
+      padding: 16px;
+      text-align: center;
+    }
 
-/* Report */
-.report-section {
-    background:linear-gradient(135deg,rgba(58,58,58,0.15) 0%,rgba(96,96,96,0.2) 100%);
-    border:1px solid var(--color-border); border-top:3px solid var(--color-primary);
-    border-radius:8px; padding:25px; margin-bottom:25px; box-shadow:0 5px 30px rgba(0,0,0,0.5);
-}
-.report-section h2 { color:#F2BB66; margin-bottom:20px; border-bottom:2px solid var(--color-border); padding-bottom:8px; }
-.report-block { margin-bottom:25px; }
-.report-block h3 { background:#3ca44a; color:#fff; padding:8px 12px; border-radius:6px 6px 0 0; font-size:1em; font-weight:600; }
-.report-table { width:100%; border-collapse:collapse; background:rgba(15,15,25,0.9); border-radius:0 0 6px 6px; overflow:hidden; box-shadow:0 3px 20px rgba(0,0,0,0.4); }
-.report-table thead th { background:#3ca44a; color:#fff; padding:8px; text-align:left; font-size:0.9em; }
-.report-table tbody td, .report-table tfoot td { padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:0.9em; }
-.report-table tbody tr:nth-child(even) { background:rgba(255,255,255,0.02); }
-.report-table tfoot td { background:rgba(240,240,255,0.06); font-weight:600; }
-.report-table .right { text-align:right; }
+    .box-footer p {
+      margin: 0;
+      color: #c3c3c3;
+      font-size: 0.85rem;
+    }
 
-/* Input row */
-.input-group-row { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); column-gap:230px; row-gap:10px; align-items:start; }
-.input-field input, .input-field select { width:100%; padding:12px 15px; border:1px solid var(--color-border); border-radius:6px; background:rgba(35,35,59,0.4); color:var(--color-text); font-size:1em; line-height:1.2; box-sizing:border-box; }
-.input-field select { -webkit-appearance:none; -moz-appearance:none; appearance:none; }
-@media (max-width:768px) { .input-group-row { grid-template-columns:1fr; column-gap:0; } }
-
-.btn-icon-muted {
-    background:rgba(51,51,51,0.6); border-radius:6px; padding:5px 8px;
-    border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85em; cursor:pointer;
-    display:inline-flex; align-items:center; justify-content:center;
-    transition:background 0.2s ease,transform 0.1s ease; box-shadow:0 2px 10px rgba(0,0,0,0.4);
-}
-.btn-icon-muted:hover { background:rgba(80,80,80,0.9); transform:translateY(-1px); }
-
-/* Stats grid */
-.ts-stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; }
-.ts-grid-item { background:rgba(51,51,51,0.7); border:1px solid rgba(188,204,233,0.2); border-radius:10px; padding:15px; transition:transform 0.2s ease; }
-.ts-grid-item:hover { transform:translateY(-3px); background:rgba(51,51,51,0.9); }
-.ts-grid-item h4 { color:#bccce9; font-size:0.75rem; font-weight:400; margin:0 0 8px 0; text-transform:uppercase; opacity:0.8; }
-.ts-grid-item .value { color:#ffffff; font-size:1.4rem; font-weight:700; letter-spacing:-0.5px; }
-.profit-positive { color:#4ade80 !important; }
-.profit-negative { color:#f87171 !important; }
-.subvalue { font-size:0.8rem; color:#94a3b8; margin-top:4px; }
-
-/* Chart box */
-.ts-chart-box {
-    background:rgba(51,51,51,0.6); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-    border:1px solid rgba(188,204,233,0.15); border-radius:16px; padding:24px; margin-bottom:30px;
-    box-shadow:0 8px 32px 0 rgba(0,0,0,0.3);
-}
-.ts-chart-box-large { width:100%; min-height:800px; }
-#equityChart { width:100% !important; height:auto !important; }
-</style>
+    /* ========== MOBILE ========== */
+    @media (max-width: 768px) {
+      .input-group-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .ts-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .chart-container {
+        height: 250px;
+      }
+      
+      .data-tables-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-<div style="padding: 4px;"></div>
-<div class="container">
-<div class="logo-menu-row">
-  <a href="index.html" class="logo">
-    <img src="images/logoinvest2a3.svg" alt="FlowChart">
-  </a>
-  <div class="iflow-body">
-    <nav class="iflow-custom-menu">
-      <ul>
-        <li class="dropdown">
-          <span>Trade</span>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/">Trade attivi</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <span>Capitale</span>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Panoramica</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <span>Strategia</span>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <span>Backup</span>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
-          </ul>
-        </li>
-      </ul>
-    </nav>
-  </div>
-  <div class="header-title">
-    <h1>💼 Panoramica</h1>
-    <small><small class="price-line">
-      <span id="atomPrice">$0.0000</span> · <span id="lastUpdate">Caricamento...</span>
-    </small></small>
-  </div>
-</header>
-</div>
 
-<div style="padding: 8px;"></div>
-<div class="container">
-  <div class="conteiner-f">
-    <h1 style="text-align:left;font-size:24px;color:#bccce9;padding-bottom:35px;padding-top:16px;">Evoluzione Patrimonio</h1>
-    <div class="ts-chart-box ts-chart-box-large">
-      <canvas id="equityChart"></canvas>
+  <!-- BOX 1: HEADER -->
+  <div class="box box-header">
+    <div class="logo-menu-row">
+      <a href="index.html" class="logo">
+        <img src="images/logoinvest2a3.svg" alt="FlowChart" style="height: 40px;">
+      </a>
+      <div class="iflow-body">
+        <nav class="iflow-custom-menu">
+          <ul>
+            <li class="dropdown">
+              <span>Trade</span>
+              <ul>
+                <li><a href="https://beneinst.github.io/tradingspot/">Trade attivi</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <span>Capitale</span>
+              <ul>
+                <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Panoramica</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <span>Strategia</span>
+              <ul>
+                <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
+                <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <span>Backup</span>
+              <ul>
+                <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="header-title">
+        <h1>💼 Panoramica</h1>
+        <small class="price-line">
+          <span id="atomPrice">$0.0000</span> · <span id="lastUpdate">Caricamento...</span>
+        </small>
+      </div>
     </div>
+  </div>
 
+  <!-- CHART — SENZA BOX ESTERNO, righe nere -->
+   <div class="">
+   <div style="padding: 4px;"></div>
+        <h3 style="text-align: center;">💼 Evoluzione Patrimonio</h3>
+ 
+  <div class="chart-container">
+    <canvas id="equityChart"></canvas>
+  </div>
+
+  <!-- BOX 3: STATS -->
+  <div class="box box-stats">
     <div class="ts-stats-grid">
       <div class="ts-grid-item">
         <h4>💶 Capitale Depositato</h4>
@@ -382,20 +398,18 @@
         <div class="value" id="totalEquity">$0.00</div>
       </div>
     </div>
-
-    <div class="export-buttons">
+    
+    <div class="export-buttons" style="display:flex; gap:12px; flex-wrap:wrap; margin-top:16px;">
       <button class="btn-edit" onclick="exportDataHTML()">📊 Esporta Dati</button>
       <button class="btn-edit" onclick="exportChartHTML()">📈 Esporta Grafico</button>
       <button class="btn-edit" onclick="loadAllData()">🔄 Aggiorna</button>
     </div>
   </div>
-</div>
 
-<div class="ts-dash-card">
-  <!-- Input Section -->
-  <div class="container-f">
-    <h1 style="text-align:left;font-size:24px;color:white;padding-bottom:25px;">➕ Inserisci Operazione</h1>
-    <div class="input-group input-group-row">
+  <!-- BOX 4: INPUT -->
+  <div class="box box-input">
+    <h2>➕ Inserisci Operazione</h2>
+    <div class="input-group-row">
       <div class="input-field">
         <label>Data</label>
         <input type="date" id="operationDate">
@@ -426,90 +440,85 @@
       <button class="btn btn-primary" onclick="addOperation()">➕ Aggiungi Operazione</button>
     </div>
   </div>
-</div>
 
-<div style="padding: 6px;"></div>
+  <!-- BOX 5: OPERATIONS -->
+  <div class="box box-operations">
+    <h3>📋 Operazioni Registrate</h3>
+    <div class="data-tables-grid">
 
-<!-- Operazioni Registrate -->
-<div class="ts-dash-card">
-  <h3>📋 Operazioni Registrate</h3>
-  <div class="data-tables-grid">
+      <div>
+        <h4 class="data-title">💶 Depositi Euro (Capitale -)</h4>
+        <table class="data-table">
+          <thead><tr><th>Data</th><th>Importo</th><th>Note</th><th></th></tr></thead>
+          <tbody id="eurList"></tbody>
+        </table>
+      </div>
 
-    <div>
-      <h3 class="data-title">💶 Depositi Euro (Capitale -)</h3>
-      <table class="data-table">
-        <thead><tr><th>Data</th><th>Importo</th><th>Note</th><th></th></tr></thead>
-        <tbody id="eurList"></tbody>
-      </table>
+      <div>
+        <h4 class="data-title">🪙 ATOM Acquistati (+)</h4>
+        <table class="data-table">
+          <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
+          <tbody id="atomList"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h4 class="data-title">₿ BTC Acquistati (+)</h4>
+        <table class="data-table">
+          <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
+          <tbody id="btcList"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h4 class="data-title">☀️ SOL Acquistati (+)</h4>
+        <table class="data-table">
+          <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
+          <tbody id="solList"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h4 class="data-title">Ł LTC Acquistati (+)</h4>
+        <table class="data-table">
+          <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
+          <tbody id="ltcList"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h4 class="data-title">🔷 POL Acquistati (+)</h4>
+        <table class="data-table">
+          <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
+          <tbody id="polList"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h4 class="data-title">💵 USDC Acquistati (+)</h4>
+        <table class="data-table">
+          <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
+          <tbody id="usdcList"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h4 class="data-title">📈 Profitti Trading (+)</h4>
+        <table class="data-table">
+          <thead><tr><th>Data</th><th>Importo</th><th>Note</th><th></th></tr></thead>
+          <tbody id="tradingList"></tbody>
+        </table>
+      </div>
+
     </div>
-
-    <div>
-      <h3 class="data-title">🪙 ATOM Acquistati (+)</h3>
-      <table class="data-table">
-        <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
-        <tbody id="atomList"></tbody>
-      </table>
-    </div>
-
-    <div>
-      <h3 class="data-title">₿ BTC Acquistati (+)</h3>
-      <table class="data-table">
-        <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
-        <tbody id="btcList"></tbody>
-      </table>
-    </div>
-
-    <div>
-      <h3 class="data-title">☀️ SOL Acquistati (+)</h3>
-      <table class="data-table">
-        <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
-        <tbody id="solList"></tbody>
-      </table>
-    </div>
-
-    <div>
-      <h3 class="data-title">Ł LTC Acquistati (+)</h3>
-      <table class="data-table">
-        <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
-        <tbody id="ltcList"></tbody>
-      </table>
-    </div>
-
-    <div>
-      <h3 class="data-title">🔷 POL Acquistati (+)</h3>
-      <table class="data-table">
-        <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
-        <tbody id="polList"></tbody>
-      </table>
-    </div>
-
-    <div>
-      <h3 class="data-title">💵 USDC Acquistati (+)</h3>
-      <table class="data-table">
-        <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
-        <tbody id="usdcList"></tbody>
-      </table>
-    </div>
-
-    <div>
-      <h3 class="data-title">📈 Profitti Trading (+)</h3>
-      <table class="data-table">
-        <thead><tr><th>Data</th><th>Importo</th><th>Note</th><th></th></tr></thead>
-        <tbody id="tradingList"></tbody>
-      </table>
-    </div>
-
   </div>
-</div>
 
-<div class="container-f" style="padding-top:1px;padding-bottom:1px;">
-  <p style="margin:0;color:#c3c3c3;padding-top:25px;padding-bottom:35px;text-align:center;height:15px;line-height:12px;">
-    ⛰️ 2026 © FlowChart by Gerardo D
-  </p>
-</div>
-</div>
+  <!-- BOX 6: FOOTER -->
+  <div class="box box-footer">
+    <p>⛰️ 2026 © FlowChart by Gerardo D</p>
+  </div>
 
-<button class="back-to-top" id="backToTop" title="Torna in cima"></button>
+  <button class="back-to-top" id="backToTop" title="Torna in cima"></button>
 
 <script>
 function toggleBackToTopButton() {

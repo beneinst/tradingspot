@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Panoramica - Mobile</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="css/trade.css">
+	<link rel="stylesheet" href="css/tracker.css">
+	<link rel="stylesheet" href="css/panoramica.css">
+    <link rel="stylesheet" href="css/menusotto.css">
+	<link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <head>
+  <style>
+    /* ========== RESET & BASE ========== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #0b0f19;
+      --bg-elevated: #151b2b;
+      --bg-card: #1a2236;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #4a90e2;
+      --accent-2: #667eea;
+      --profit: #4ade80;
+      --loss: #f87171;
+      --radius: 14px;
+      --space: 16px;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* ========== HEADER COMPATTO ========== */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11, 15, 25, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 12px var(--space);
+    }
+    
+    .app-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .app-header h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .price-tag {
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    
+    .price-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    
+    /* Menu hamburger semplificato */
+    .menu-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: var(--bg-card);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* ========== MAIN CONTENT ========== */
+    main {
+      padding: var(--space);
+      padding-bottom: 80px; /* spazio per nav bottom */
+    }
+    
+    /* ========== SEZIONI — UN SOLO BOX, NO BORDI ========== */
+    section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: var(--space);
+      margin-bottom: var(--space);
+    }
+    
+    section h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    
+    section h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    
+    /* ========== STATS GRID ========== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    
+    .stat-item {
+      background: var(--bg-elevated);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    
+    .stat-item h4 {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    
+    .stat-item .value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    
+    .stat-item .sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    
+    .stat-item.profit .value { color: var(--profit); }
+    .stat-item.loss .value { color: var(--loss); }
+    
+    /* ========== CHART ========== */
+    .chart-wrap {
+      position: relative;
+      height: 280px;
+      margin: 0 -4px; /* compensa padding canvas */
+    }
+    
+    /* ========== FORM INPUT ========== */
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+    
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .field label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: var(--bg-elevated);
+      color: var(--text);
+      font-size: 16px; /* previene zoom iOS */
+      -webkit-appearance: none;
+    }
+    
+    .field input:focus,
+    .field select:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+    
+    /* ========== BUTTONS ========== */
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    
+    .btn-row .btn {
+      flex: 1;
+      font-size: 0.85rem;
+      padding: 12px;
+    }
+    
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text);
+    }
+    
+    /* ========== TABLES — CARDS AL POSTO DI TABELLE ========== */
+    .asset-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .asset-card {
+      background: var(--bg-elevated);
+      border-radius: 12px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .asset-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(74, 144, 226, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    
+    .asset-info h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .asset-info p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    .asset-value {
+      text-align: right;
+    }
+    
+    .asset-value .amount {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    
+    .asset-value .date {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    
+    /* ========== BOTTOM NAV ========== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(11, 15, 25, 0.95);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+    
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.65rem;
+      border: none;
+      background: none;
+    }
+    
+    .nav-item.active {
+      color: var(--accent);
+    }
+    
+    .nav-item span:first-child {
+      font-size: 1.3rem;
+    }
+    
+    /* ========== UTILITIES ========== */
+    .text-profit { color: var(--profit); }
+    .text-loss { color: var(--loss); }
+    .text-center { text-align: center; }
+    .mb-0 { margin-bottom: 0; }
+    
+    /* Scrollbar nascosta ma funzionale */
+    ::-webkit-scrollbar { width: 0; height: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER STICKY -->
+  <header class="app-header">
+    <div class="app-header-top">
+      <h1>💼 Panoramica</h1>
+      <button class="menu-btn">☰</button>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span class="price-tag" id="atomPrice">$0.0000</span>
+      <span class="price-time" id="lastUpdate">Aggiornamento...</span>
+    </div>
+  </header>
+
+  <!-- CONTENUTO PRINCIPALE -->
+  <main>
+
+    <!-- SEZIONE 1: GRAFICO + STATS -->
+    <section>
+      <h2>📊 Evoluzione Patrimonio</h2>
+      <div class="chart-wrap">
+        <canvas id="equityChart"></canvas>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-item loss">
+          <h4>💶 Capitale</h4>
+          <div class="value" id="totalEur">€0.00</div>
+        </div>
+        <div class="stat-item">
+          <h4>🪙 ATOM</h4>
+          <div class="value" id="totalAtomValue">$0.00</div>
+          <div class="sub" id="totalAtomQty">0 ATOM</div>
+        </div>
+        <div class="stat-item">
+          <h4>₿ BTC</h4>
+          <div class="value" id="totalBtcValue">$0.00</div>
+          <div class="sub" id="totalBtcQty">0 BTC</div>
+        </div>
+        <div class="stat-item">
+          <h4>☀️ SOL</h4>
+          <div class="value" id="totalSolValue">$0.00</div>
+          <div class="sub" id="totalSolQty">0 SOL</div>
+        </div>
+        <div class="stat-item">
+          <h4>Ł LTC</h4>
+          <div class="value" id="totalLtcValue">$0.00</div>
+          <div class="sub" id="totalLtcQty">0 LTC</div>
+        </div>
+        <div class="stat-item">
+          <h4>🔷 POL</h4>
+          <div class="value" id="totalPolValue">$0.00</div>
+          <div class="sub" id="totalPolQty">0 POL</div>
+        </div>
+        <div class="stat-item">
+          <h4>💵 USDC</h4>
+          <div class="value" id="totalUsdcValue">$0.00</div>
+          <div class="sub" id="totalUsdcQty">0 USDC</div>
+        </div>
+        <div class="stat-item profit">
+          <h4>📈 Profitto</h4>
+          <div class="value" id="totalTrading">$0.00</div>
+        </div>
+        <div class="stat-item" style="grid-column: 1 / -1;">
+          <h4>💎 RENDIMENTO NETTO</h4>
+          <div class="value text-center" id="totalEquity">$0.00</div>
+        </div>
+      </div>
+      
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="exportDataHTML()">📊 Dati</button>
+        <button class="btn btn-secondary" onclick="exportChartHTML()">📈 Grafico</button>
+        <button class="btn btn-secondary" onclick="loadAllData()">🔄</button>
+      </div>
+    </section>
+
+    <!-- SEZIONE 2: INSERIMENTO OPERAZIONE -->
+    <section>
+      <h2>➕ Nuova Operazione</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label>Data</label>
+          <input type="date" id="operationDate">
+        </div>
+        <div class="field">
+          <label>Importo / Quantità</label>
+          <input type="number" id="operationAmount" step="0.01" placeholder="1000.00">
+        </div>
+        <div class="field">
+          <label>Tipo</label>
+          <select id="operationType">
+            <option value="EUR">💶 Deposito Euro</option>
+            <option value="ATOM">🪙 ATOM</option>
+            <option value="BTC">₿ BTC</option>
+            <option value="SOL">☀️ SOL</option>
+            <option value="LTC">Ł LTC</option>
+            <option value="POL">🔷 POL</option>
+            <option value="USDC">💵 USDC</option>
+            <option value="Trading">📈 Profitto Trading</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Note</label>
+          <input type="text" id="operationNote" placeholder="Descrizione">
+        </div>
+      </div>
+      <button class="btn" onclick="addOperation()">➕ Aggiungi Operazione</button>
+    </section>
+
+    <!-- SEZIONE 3: LISTA OPERAZIONI (cards al posto di tabelle) -->
+    <section>
+      <h2>📋 Operazioni Registrate</h2>
+      
+      <h3>💶 Depositi Euro</h3>
+      <div class="asset-list" id="eurList">
+        <!-- JS popolerà: <div class="asset-card">...</div> -->
+      </div>
+      
+      <h3 style="margin-top:16px;">🪙 ATOM</h3>
+      <div class="asset-list" id="atomList"></div>
+      
+      <h3 style="margin-top:16px;">₿ BTC</h3>
+      <div class="asset-list" id="btcList"></div>
+      
+      <h3 style="margin-top:16px;">☀️ SOL</h3>
+      <div class="asset-list" id="solList"></div>
+      
+      <h3 style="margin-top:16px;">Ł LTC</h3>
+      <div class="asset-list" id="ltcList"></div>
+      
+      <h3 style="margin-top:16px;">🔷 POL</h3>
+      <div class="asset-list" id="polList"></div>
+      
+      <h3 style="margin-top:16px;">💵 USDC</h3>
+      <div class="asset-list" id="usdcList"></div>
+      
+      <h3 style="margin-top:16px;">📈 Trading</h3>
+      <div class="asset-list" id="tradingList"></div>
+    </section>
+
+  </main>
+
+  <!-- NAVIGAZIONE BOTTOM -->
+  <nav class="bottom-nav">
+    <a href="#" class="nav-item active">
+      <span>📊</span>
+      <span>Panoramica</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span>💰</span>
+      <span>Capitale</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span>📈</span>
+      <span>Trade</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span>⚙️</span>
+      <span>Impostazioni</span>
+    </a>
+  </nav>
+
+  <!-- JS functions (le tue esistenti: loadAllData, addOperation, etc.) -->
+ <script>
+function toggleBackToTopButton() {
+    const backToTop    = document.getElementById('backToTop');
+    const backToTopAlt = document.getElementById('backToTopAlt');
+    if (backToTopAlt) backToTopAlt.addEventListener('click', scrollToTop);
+    if (window.pageYOffset > 300) {
+        backToTop.classList.add('show');
+        if (backToTopAlt) backToTopAlt.classList.add('show');
+    } else {
+        backToTop.classList.remove('show');
+        if (backToTopAlt) backToTopAlt.classList.remove('show');
+    }
+}
+function scrollToTop() { window.scrollTo({ top:0, behavior:'smooth' }); }
+window.addEventListener('scroll', toggleBackToTopButton);
+document.getElementById('backToTop').addEventListener('click', scrollToTop);
+toggleBackToTopButton();
+</script>
+
+<script>
+let operations = JSON.parse(localStorage.getItem('cryptoOperations')) || [];
+let atomPrice=0, btcPrice=0, solPrice=0, ltcPrice=0, polPrice=0, usdcPrice=1.00;
+let chart = null;
+
+function formatEuro(v) { return v.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function monthKey(d) { const x=new Date(d); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`; }
+
+function init() {
+    const di = document.getElementById('operationDate');
+    if (di) di.value = new Date().toISOString().split('T')[0];
+    loadCryptoPrices();
+    setInterval(loadCryptoPrices, 5*60*1000);
+    loadAllData();
+}
+
+async function loadCryptoPrices() {
+    try {
+        const [aR,bR,sR,lR,pR,uR] = await Promise.all([
+            fetch('https://api.binance.com/api/v3/ticker/price?symbol=ATOMUSDT'),
+            fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT'),
+            fetch('https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT'),
+            fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT'),
+            fetch('https://api.binance.com/api/v3/ticker/price?symbol=POLUSDT'),
+            fetch('https://api.binance.com/api/v3/ticker/price?symbol=USDCUSDT'),
+        ]);
+        if(aR.ok) atomPrice  = parseFloat((await aR.json()).price);
+        if(bR.ok) btcPrice   = parseFloat((await bR.json()).price);
+        if(sR.ok) solPrice   = parseFloat((await sR.json()).price);
+        if(lR.ok) ltcPrice   = parseFloat((await lR.json()).price);
+        if(pR.ok) polPrice   = parseFloat((await pR.json()).price);
+        if(uR.ok) usdcPrice  = parseFloat((await uR.json()).price);
+        const pe = document.getElementById('atomPrice');
+        const ue = document.getElementById('lastUpdate');
+        if(pe) pe.textContent = `ATOM: $${atomPrice.toFixed(4)} | BTC: $${btcPrice.toFixed(2)} | SOL: $${solPrice.toFixed(2)} | LTC: $${ltcPrice.toFixed(2)} | POL: $${polPrice.toFixed(4)} | USDC: $${usdcPrice.toFixed(4)}`;
+        if(ue) ue.textContent = `Aggiornato: ${new Date().toLocaleString('it-IT')}`;
+        updateDisplays();
+    } catch(e) { console.error('Errore prezzi:', e); }
+}
+
+function addOperation() {
+    const date   = document.getElementById('operationDate').value;
+    const amount = parseFloat(document.getElementById('operationAmount').value);
+    const type   = document.getElementById('operationType').value;
+    const note   = document.getElementById('operationNote').value;
+    if (!date || !amount || isNaN(amount)) { alert('⚠️ Inserisci data e importo validi'); return; }
+    operations = [...operations, {id:Date.now(),date,amount,type,note}].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    localStorage.setItem('cryptoOperations', JSON.stringify(operations));
+    document.getElementById('operationAmount').value = '';
+    document.getElementById('operationNote').value   = '';
+    loadAllData();
+    alert('✅ Operazione aggiunta!');
+}
+
+function removeOperation(id) {
+    if (!confirm('⚠️ Elimina operazione?')) return;
+    operations = operations.filter(op => op.id !== id);
+    localStorage.setItem('cryptoOperations', JSON.stringify(operations));
+    loadAllData();
+}
+
+function updateDisplays() {
+    const eur=operations.filter(o=>o.type==='EUR'), atom=operations.filter(o=>o.type==='ATOM'),
+          btc=operations.filter(o=>o.type==='BTC'), sol=operations.filter(o=>o.type==='SOL'),
+          ltc=operations.filter(o=>o.type==='LTC'), pol=operations.filter(o=>o.type==='POL'),
+          usdc=operations.filter(o=>o.type==='USDC'), trade=operations.filter(o=>o.type==='Trading');
+    const tEur=eur.reduce((s,o)=>s+o.amount,0),
+          tAtomQ=atom.reduce((s,o)=>s+o.amount,0), tAtomV=tAtomQ*atomPrice,
+          tBtcQ=btc.reduce((s,o)=>s+o.amount,0),   tBtcV=tBtcQ*btcPrice,
+          tSolQ=sol.reduce((s,o)=>s+o.amount,0),   tSolV=tSolQ*solPrice,
+          tLtcQ=ltc.reduce((s,o)=>s+o.amount,0),   tLtcV=tLtcQ*ltcPrice,
+          tPolQ=pol.reduce((s,o)=>s+o.amount,0),   tPolV=tPolQ*polPrice,
+          tUsdcQ=usdc.reduce((s,o)=>s+o.amount,0), tUsdcV=tUsdcQ*usdcPrice,
+          tTrade=trade.reduce((s,o)=>s+o.amount,0),
+          net=tAtomV+tBtcV+tSolV+tLtcV+tPolV+tUsdcV+tTrade-tEur;
+    const s=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t;};
+    s('totalEur',`-€${tEur.toFixed(2)}`);
+    s('totalAtomValue',`+$${tAtomV.toFixed(2)}`); s('totalAtomQty',`${tAtomQ.toFixed(6)} ATOM`);
+    s('totalBtcValue', `+$${tBtcV.toFixed(2)}`);  s('totalBtcQty', `${tBtcQ.toFixed(8)} BTC`);
+    s('totalSolValue', `+$${tSolV.toFixed(2)}`);  s('totalSolQty', `${tSolQ.toFixed(6)} SOL`);
+    s('totalLtcValue', `+$${tLtcV.toFixed(2)}`);  s('totalLtcQty', `${tLtcQ.toFixed(8)} LTC`);
+    s('totalPolValue', `+$${tPolV.toFixed(2)}`);  s('totalPolQty', `${tPolQ.toFixed(6)} POL`);
+    s('totalUsdcValue',`+$${tUsdcV.toFixed(2)}`); s('totalUsdcQty',`${tUsdcQ.toFixed(2)} USDC`);
+    s('totalTrading',  `+$${tTrade.toFixed(2)}`);
+    const elEq=document.getElementById('totalEquity');
+    if(elEq){ elEq.textContent=`${net>=0?'+':''}$${Math.abs(net).toFixed(2)}`; elEq.className=net>=0?'value profit-positive':'value profit-negative'; }
+    updateChart();
+}
+
+function updateAllLists() {
+    ['EUR','ATOM','BTC','SOL','LTC','POL','USDC','Trading'].forEach(t =>
+        updateList(t.toLowerCase()+'List'+(t==='Trading'?'':''), t==='Trading'?'tradingList':t.toLowerCase()+'List', t));
+}
+// simplified direct call
+function updateAllLists() {
+    updateList('eurList','EUR'); updateList('atomList','ATOM'); updateList('btcList','BTC');
+    updateList('solList','SOL'); updateList('ltcList','LTC');  updateList('polList','POL');
+    updateList('usdcList','USDC'); updateList('tradingList','Trading');
+}
+
+function updateList(cid, type) {
+    const tbody = document.getElementById(cid);
+    if (!tbody) return;
+    const ops = operations.filter(o => o.type===type);
+    if (!ops.length) {
+        tbody.innerHTML=`<tr><td colspan="4" class="empty-state">Nessuna operazione ${type}</td></tr>`;
+        return;
+    }
+    const fmt = (op) => {
+        if(type==='ATOM') return `${op.amount.toFixed(6)} ATOM`;
+        if(type==='BTC')  return `${op.amount.toFixed(8)} BTC`;
+        if(type==='SOL')  return `${op.amount.toFixed(6)} SOL`;
+        if(type==='LTC')  return `${op.amount.toFixed(8)} LTC`;
+        if(type==='POL')  return `${op.amount.toFixed(6)} POL`;
+        if(type==='USDC') return `${op.amount.toFixed(2)} USDC`;
+        return `${op.amount.toFixed(2)} €`;
+    };
+    tbody.innerHTML = ops.map(op=>`
+        <tr>
+            <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+            <td>${type==='EUR'?'-':'+'}${fmt(op)}</td>
+            <td>${op.note||''}</td>
+            <td class="actions"><button class="btn-icon-muted" onclick="removeOperation(${op.id})">🗑️</button></td>
+        </tr>`).join('');
+}
+
+function updateChart() {
+    const d=[];
+    let cE=0,cA=0,cB=0,cS=0,cL=0,cP=0,cU=0,cT=0;
+    [...operations].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(op=>{
+        if(op.type==='EUR')    cE+=op.amount;
+        else if(op.type==='ATOM')   cA+=op.amount*atomPrice;
+        else if(op.type==='BTC')    cB+=op.amount*btcPrice;
+        else if(op.type==='SOL')    cS+=op.amount*solPrice;
+        else if(op.type==='LTC')    cL+=op.amount*ltcPrice;
+        else if(op.type==='POL')    cP+=op.amount*polPrice;
+        else if(op.type==='USDC')   cU+=op.amount*usdcPrice;
+        else if(op.type==='Trading')cT+=op.amount;
+        d.push({date:new Date(op.date).toLocaleDateString('it-IT'),eurOut:-cE,atomValue:cA,btcValue:cB,solValue:cS,ltcValue:cL,polValue:cP,usdcValue:cU,trading:cT,netEquity:cA+cB+cS+cL+cP+cU+cT-cE});
+    });
+    const cv=document.getElementById('equityChart'); if(!cv)return;
+    if(chart)chart.destroy();
+    chart=new Chart(cv.getContext('2d'),{type:'line',data:{labels:d.map(x=>x.date),datasets:[
+        {label:'Capitale Depositato (-)',data:d.map(x=>x.eurOut),   borderColor:'#e74c3c',backgroundColor:'rgba(231,76,60,0.1)',  tension:0.4,fill:false},
+        {label:'Val ATOM (+)',           data:d.map(x=>x.atomValue),borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,0.1)', tension:0.4,fill:false},
+        {label:'Val BTC (+)',            data:d.map(x=>x.btcValue), borderColor:'#f39c12',backgroundColor:'rgba(243,156,18,0.1)', tension:0.4,fill:false},
+        {label:'Val SOL (+)',            data:d.map(x=>x.solValue), borderColor:'#1abc9c',backgroundColor:'rgba(26,188,156,0.1)', tension:0.4,fill:false},
+        {label:'Val LTC (+)',            data:d.map(x=>x.ltcValue), borderColor:'#95a5a6',backgroundColor:'rgba(149,165,166,0.1)',tension:0.4,fill:false},
+        {label:'Val POL (+)',            data:d.map(x=>x.polValue), borderColor:'#8e44ad',backgroundColor:'rgba(142,68,173,0.1)', tension:0.4,fill:false},
+        {label:'Val USDC (+)',           data:d.map(x=>x.usdcValue),borderColor:'#16a085',backgroundColor:'rgba(22,160,133,0.1)', tension:0.4,fill:false},
+        {label:'Trading Profit (+)',     data:d.map(x=>x.trading),  borderColor:'#3498db',backgroundColor:'rgba(52,152,219,0.1)', tension:0.4,fill:false},
+        {label:'RENDIMENTO NETTO',       data:d.map(x=>x.netEquity),borderColor:'#9b59b6',backgroundColor:'rgba(155,89,182,0.2)', tension:0.4,fill:true,borderWidth:3}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:v=>'$'+v.toLocaleString('it-IT')}}}}});
+}
+
+function buildReportTables() {
+    const now=new Date(), ck=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const groups={};
+    operations.filter(o=>o.type==='Trading').forEach(o=>{const k=monthKey(o.date);if(!groups[k])groups[k]=[];groups[k].push(o);});
+    const cb=document.getElementById('currentMonthBody'), ct=document.getElementById('currentMonthTotal');
+    if(cb&&ct){cb.innerHTML='';let tot=0;(groups[ck]||[]).forEach(op=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${new Date(op.date).toLocaleDateString('it-IT')}</td><td>${op.type}</td><td class="right">${formatEuro(op.amount)}</td>`;cb.appendChild(tr);tot+=op.amount;});ct.textContent=formatEuro(tot);}
+    const hc=document.getElementById('monthlyHistory'); if(!hc)return;
+    hc.innerHTML='<h3>Storico Mensile (con dettagli)</h3>';
+    Object.keys(groups).sort().forEach(k=>{
+        const list=groups[k],label=new Date(k+'-01').toLocaleDateString('it-IT',{month:'2-digit',year:'numeric'});
+        const w=document.createElement('div');w.className='report-block';
+        w.innerHTML=`<div style="margin:10px 0;"><strong>dal ${label} - Totale: ${formatEuro(list.reduce((s,o)=>s+o.amount,0))}</strong></div><table class="report-table"><thead><tr><th>Data</th><th>Tipo</th><th>Importo (€)</th></tr></thead><tbody></tbody><tfoot><tr><td colspan="2" class="right">TOTALE PERIODO</td><td class="right total-cell"></td></tr></tfoot></table>`;
+        const tb=w.querySelector('tbody'),tf=w.querySelector('.total-cell');let tot=0;
+        list.forEach(op=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${new Date(op.date).toLocaleDateString('it-IT')}</td><td>${op.type}</td><td class="right">${formatEuro(op.amount)}</td>`;tb.appendChild(tr);tot+=op.amount;});
+        tf.textContent=formatEuro(tot);hc.appendChild(w);
+    });
+}
+
+function loadAllData() { updateAllLists(); updateDisplays(); buildReportTables(); }
+
+function exportDataHTML() {
+    const now=new Date(),groups={};
+    operations.forEach(op=>{const k=monthKey(op.date);if(!groups[k])groups[k]=[];groups[k].push(op);});
+    const ck=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`,cl=groups[ck]||[];
+    const sym=t=>t==='ATOM'?' ATOM':t==='BTC'?' BTC':t==='SOL'?' SOL':t==='LTC'?' LTC':t==='POL'?' POL':t==='USDC'?' USDC':'€';
+    let html=`<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Report - ${now.toLocaleDateString('it-IT')}</title><style>body{font-family:Arial,sans-serif;font-size:13px;padding:20px;}h1{font-size:20px;}h2{font-size:16px;margin-top:25px;}table{width:100%;border-collapse:collapse;margin-bottom:15px;}thead th{background:#3ca44a;color:#fff;padding:6px;text-align:left;}td{padding:4px 6px;border-bottom:1px solid #ddd;}tfoot td{background:#eef5ff;font-weight:bold;}.right{text-align:right;}</style></head><body><h1>Report Operazioni</h1><h2>Mese Corrente</h2><table><thead><tr><th>Data</th><th>Tipo</th><th>Importo</th><th>Note</th></tr></thead><tbody>`;
+    let ct=0;cl.forEach(op=>{ct+=op.amount;html+=`<tr><td>${new Date(op.date).toLocaleDateString('it-IT')}</td><td>${op.type}</td><td class="right">${op.type==='EUR'?'-':'+'}${formatEuro(op.amount)}${sym(op.type)}</td><td>${op.note||''}</td></tr>`;});
+    html+=`</tbody><tfoot><tr><td colspan="2" class="right">Totale</td><td class="right">${formatEuro(ct)}</td><td></td></tr></tfoot></table><h2>Storico Mensile</h2>`;
+    Object.keys(groups).sort().forEach(k=>{
+        const list=groups[k],label=new Date(k+'-01').toLocaleDateString('it-IT',{month:'2-digit',year:'numeric'});let tot=0;
+        html+=`<p><strong>Mese ${label}</strong></p><table><thead><tr><th>Data</th><th>Tipo</th><th>Importo</th><th>Note</th></tr></thead><tbody>`;
+        list.forEach(op=>{tot+=op.amount;html+=`<tr><td>${new Date(op.date).toLocaleDateString('it-IT')}</td><td>${op.type}</td><td class="right">${op.type==='EUR'?'-':'+'}${formatEuro(op.amount)}${sym(op.type)}</td><td>${op.note||''}</td></tr>`;});
+        html+=`</tbody><tfoot><tr><td colspan="2" class="right">TOTALE PERIODO</td><td class="right">${formatEuro(tot)}</td><td></td></tr></tfoot></table>`;
+    });
+    html+=`</body></html>`;
+    downloadFile(html,`report-completo-${now.toISOString().split('T')[0]}.html`);
+}
+
+function exportChartHTML() {
+    const canvas=document.getElementById('equityChart');
+    if(!canvas){alert('Grafico non trovato');return;}
+    html2canvas(canvas,{backgroundColor:'#232335',scale:2}).then(c=>{
+        const a=document.createElement('a');a.download=`grafico-portfolio-${new Date().toISOString().split('T')[0]}.png`;a.href=c.toDataURL();a.click();
+    });
+}
+
+function downloadFile(content,filename) {
+    const blob=new Blob([content],{type:'text/html'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+}
+
+init();
+</script>
+</body>
+</html>
