@@ -1,0 +1,2433 @@
+/* ============================================
+   MAIN.CSS UNIFICATO — FlowChart Trading
+   ============================================ */
+
+/* ========== FONT ========== */
+@font-face {
+  font-family: 'Bitcount';
+  src: url('https://beneinst.github.io/tradingspot/componenti/BitcountPropSingle-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Bitcount-Light';
+  src: url('https://beneinst.github.io/tradingspot/componenti/BitcountPropSingle-Light.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'AncizarSans';
+  src: url('https://beneinst.github.io/tradingspot/componenti/TitilliumWeb-Regular.ttf') format('truetype');
+}
+
+/* ========== VARIABILI ROOT ========== */
+:root {
+  /* Font */
+  --font-heading: 'Bitcount', monospace;
+  --font-heading-light: 'Bitcount-Light', monospace;
+  --font-body: 'AncizarSans', sans-serif;
+  
+  /* Colori heading */
+  --color-heading-main: #FFD012;
+  --color-heading-2: #BF9900;
+  --color-heading-3: #E8BA00;
+  --color-heading-4: #FFCD04;
+  --color-heading-5: #dd7109;
+  
+  /* Colori funzionali */
+  --color-primary: #4a90e2;
+  --color-secondary: #2ecc71;
+  --color-danger: #e74c3c;
+  --color-warning: #f39c12;
+  
+  /* Sfondi */
+  --bg-body: #0a0e1a;
+  --bg-glass: rgba(20, 25, 40, 0.85);
+  --bg-glass-hover: rgba(30, 35, 55, 0.9);
+  --bg-card: rgba(17, 24, 39, 0.9);
+  --bg-elevated: rgba(26, 34, 54, 0.9);
+  
+  /* Bordi */
+  --border-glass: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.1);
+  
+  /* Testo */
+  --text-primary: #e8ecf1;
+  --text-secondary: #8b9bb4;
+  --text-muted: #94a3b8;
+  
+  /* Accent */
+  --accent-gold: #c9a96e;
+  --accent-blue: #4a90e2;
+  --profit: #4ade80;
+  --loss: #f87171;
+  
+  /* Ombre e radius */
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --radius: 14px;
+  --space: 16px;
+}
+
+/* ========== RESET ========== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 95%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: var(--bg-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ========== TYPOGRAPHY ========== */
+h1, header {
+  font-family: var(--font-heading);
+  color: var(--color-heading-main);
+  font-size: 1.9em;
+}
+
+h2 {
+  font-family: var(--font-heading-light);
+  color: var(--color-heading-2);
+  font-size: 1.4em;
+  font-weight: 500;
+}
+
+h3 {
+  font-family: var(--font-heading-light);
+  color: var(--color-heading-3);
+  font-size: 1.1em;
+}
+
+h4 {
+  font-family: var(--font-heading-light);
+  color: var(--color-heading-4);
+  font-size: 1em;
+}
+
+h5 {
+  font-family: var(--font-heading-light);
+  color: var(--color-heading-5);
+  font-size: 0.9em;
+}
+
+p {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  font-size: 1em;
+}
+
+small {
+  font-family: var(--font-body);
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+
+/* ========== LINK ========== */
+a {
+  color: var(--accent-gold);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--color-heading-main);
+  text-decoration: underline;
+}
+
+.link-no-underline {
+  text-decoration: none;
+  color: white;
+}
+
+.link-no-underline:hover {
+  text-decoration: underline;
+}
+
+/* ========== BOX UNIVERSALE — FULL WIDTH, LINEE NERE ========== */
+.box {
+  width: 100%;
+  margin-bottom: 3px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: none;
+  border-top: 2px solid #000000;
+  padding: var(--space);
+}
+
+.box:first-child {
+  border-top: none;
+}
+
+.box:last-child {
+  margin-bottom: 0;
+}
+
+/* ========== MENU HAMBURGER ========== */
+.menu-hamburger {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-glass);
+  padding: 12px 16px;
+}
+
+.menu-hamburger .menu-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu-hamburger .hamburger-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-hamburger .logo-text {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+}
+
+/* Pannello menu (nascosto di default) */
+.menu-hamburger .menu-panel {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-glass);
+  padding: 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.menu-hamburger.open .menu-panel {
+  display: block;
+}
+
+.menu-hamburger .menu-panel a {
+  display: block;
+  padding: 12px 16px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  font-family: var(--font-body);
+}
+
+.menu-hamburger .menu-panel a:hover {
+  background: var(--bg-glass-hover);
+  color: var(--accent-gold);
+}
+
+/* ========== HEADER CLASSICO (alternativa al hamburger) ========== */
+.box-header {
+  padding: 12px 16px;
+}
+
+.logo-menu-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.logo img {
+  height: 32px;
+  display: block;
+}
+
+/* Menu desktop originale */
+.iflow-custom-menu ul {
+  list-style: none;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.iflow-custom-menu .dropdown {
+  position: relative;
+}
+
+.iflow-custom-menu .dropdown > span {
+  color: var(--accent-gold);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  display: block;
+  font-family: var(--font-body);
+}
+
+.iflow-custom-menu .dropdown ul {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 8px 0;
+  min-width: 160px;
+  z-index: 1000;
+  box-shadow: var(--shadow);
+}
+
+.iflow-custom-menu .dropdown:hover ul,
+.iflow-custom-menu .dropdown.active ul {
+  display: block;
+}
+
+.iflow-custom-menu .dropdown ul li a {
+  display: block;
+  padding: 8px 14px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  font-family: var(--font-body);
+}
+
+.iflow-custom-menu .dropdown ul li a:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--accent-gold);
+}
+
+/* Titolo header */
+.header-title {
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.header-title h1 {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.price-inline,
+.price-tag {
+  font-size: 0.85rem;
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+/* ========== STATS GRID ========== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.ts-grid-item,
+.stat-item {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  padding: 16px 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.ts-grid-item:hover,
+.stat-item:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-gold);
+  box-shadow: 0 8px 25px rgba(255, 208, 18, 0.1);
+}
+
+.ts-grid-item h4,
+.stat-item h4,
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+
+.ts-grid-item .value,
+.stat-item .value,
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.ts-grid-item .subvalue,
+.sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.ts-grid-item.full,
+.stat-item.full {
+  grid-column: 1 / -1;
+}
+
+.profit-positive,
+.positive { color: var(--profit) !important; }
+.profit-negative,
+.negative { color: var(--loss) !important; }
+
+/* ========== FORM ========== */
+.box h2 {
+  color: var(--accent-gold);
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.input-group,
+.input-group-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-field label {
+  color: var(--accent-gold);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.input-field input,
+.input-field select,
+.input-field textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-primary);
+  font-size: 16px;
+  font-family: var(--font-body);
+  -webkit-appearance: none;
+  transition: all 0.3s;
+}
+
+.input-field input:focus,
+.input-field select:focus,
+.input-field textarea:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.2);
+}
+
+.validator-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* ========== BUTTONS ========== */
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-edit,
+.btn-info {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 8px;
+  font-family: var(--font-body);
+}
+
+.btn-primary,
+.btn {
+  background: linear-gradient(135deg, var(--accent-blue), #667eea);
+  color: white;
+}
+
+.btn-primary:hover,
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+}
+
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-glass-hover);
+  color: var(--text-primary);
+}
+
+.btn-danger {
+  background: rgba(220, 53, 69, 0.2);
+  border: 1px solid var(--color-danger);
+  color: #f8d7da;
+}
+
+.btn-danger:hover {
+  background: var(--color-danger);
+  color: white;
+}
+
+.btn-edit {
+  background: #434190;
+  color: #f5f5f5;
+  font-size: 0.9rem;
+  padding: 10px 16px;
+}
+
+.btn-edit:hover {
+  background: #667eea;
+}
+
+.btn-info {
+  background: #17a2b8;
+  color: white;
+}
+
+.btn-info:hover {
+  background: #138496;
+}
+
+/* ========== CHART ========== */
+.chart-title {
+  color: var(--accent-gold);
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 12px 16px 6px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  border-top: 2px solid #000000;
+  border-left: 1px solid var(--border-light);
+  border-right: 1px solid var(--border-light);
+  margin: 0;
+}
+
+.chart-container,
+.chart-wrap {
+  position: relative;
+  height: 250px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-light);
+  border-bottom: 2px solid #000000;
+  overflow: hidden;
+  margin-bottom: 3px;
+}
+
+.chart-container canvas,
+.chart-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ========== TABELLE / CARD OPERAZIONI ========== */
+.data-title {
+  color: var(--accent-gold);
+  font-size: 0.95rem;
+  margin: 0 0 12px 0;
+}
+
+.ops-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.op-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.op-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.op-card-type {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.op-card-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.op-card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.op-card-stat {
+  text-align: center;
+}
+
+.op-card-stat .label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.op-card-stat .val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.op-card-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  border-top: 1px solid var(--border-glass);
+  padding-top: 8px;
+}
+
+.op-card-actions {
+  text-align: right;
+  margin-top: 8px;
+}
+
+.btn-delete {
+  background: #523639;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* ========== FOOTER ========== */
+.box-footer {
+  text-align: center;
+  padding: 20px 16px;
+}
+
+.box-footer p,
+.footer {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ========== BACK TO TOP ========== */
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(51, 51, 51, 0.8);
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: none;
+  z-index: 99;
+  transition: all 0.3s;
+}
+
+.back-to-top.visible,
+.back-to-top.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-to-top:hover {
+  background: rgba(80, 80, 80, 0.9);
+  transform: translateY(-2px);
+}
+
+/* ========== CONTAINER LEGACY (compatibilità) ========== */
+.container,
+.container-f {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ========== DESKTOP (>760px) ========== */
+@media (min-width: 761px) {
+  /* Menu: nascondi hamburger, mostra menu orizzontale */
+  .menu-hamburger .hamburger-btn {
+    display: none;
+  }
+  
+  .menu-hamburger .menu-panel {
+    display: flex !important;
+    position: static;
+    flex-direction: row;
+    gap: 8px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    backdrop-filter: none;
+    max-height: none;
+    overflow: visible;
+  }
+  
+  .menu-hamburger .menu-panel a {
+    margin-bottom: 0;
+    white-space: nowrap;
+    padding: 8px 14px;
+  }
+  
+  /* Stats: più colonne */
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  /* Form: colonne multiple */
+  .input-group-row {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  /* Box: padding maggiore */
+  .box {
+    padding: 24px 32px;
+  }
+  
+  /* Chart: più alto */
+  .chart-container,
+  .chart-wrap {
+    height: 400px;
+  }
+}
+
+/* ========== MOBILE (<=760px) ========== */
+@media (max-width: 760px) {
+  body {
+    font-size: 100%;
+  }
+  
+  /* Menu: mostra hamburger, nascondi menu desktop */
+  .iflow-custom-menu {
+    display: none;
+  }
+  
+  /* Stats: 2 colonne */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .ts-grid-item,
+  .stat-item {
+    padding: 12px 8px;
+  }
+  
+  .ts-grid-item .value,
+  .stat-item .value,
+  .stat-value {
+    font-size: 1.1rem;
+  }
+  
+  /* Form: una colonna */
+  .validator-inputs {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Chart: più basso */
+  .chart-container,
+  .chart-wrap {
+    height: 220px;
+  }
+  
+  /* Tabelle: scroll orizzontale */
+  .data-table,
+  .operations-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* ========== MOBILE PICCOLO (<=480px) ========== */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.4rem !important;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  
+  .ts-grid-item h4,
+  .stat-item h4,
+  .stat-label {
+    font-size: 0.65rem;
+  }
+  
+  .ts-grid-item .value,
+  .stat-item .value,
+  .stat-value {
+    font-size: 1rem;
+  }
+  
+  .box {
+    padding: 12px;
+  }
+}
+
+/* ========== UTILITIES ========== */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+.mb-0 { margin-bottom: 0; }
+.mt-0 { margin-top: 0; }
+.hidden { display: none; }
+.visible { display: block; }
+
+/* Scrollbar nascosta ma funzionale */
+::-webkit-scrollbar { width: 0; height: 0; }
+
+/* ============================================
+   SEZIONE 2: PANORAMICA — CSS Specifico
+   ============================================ */
+
+/* ---------- Header Panoramica ---------- */
+.panorama-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.panorama-header .price-info {
+  text-align: right;
+}
+
+.panorama-header .price-value {
+  font-size: 1.6em;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+.panorama-header .price-update {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Sezioni Input / Chart / Data (stile legacy) ---------- */
+.input-section,
+.chart-section,
+.data-section,
+.report-section {
+  background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
+  border: 1px solid var(--border-light);
+  border-top: 3px solid #000000;
+  border-radius: 0;
+  padding: 20px;
+  margin-bottom: 3px;
+  width: 100%;
+}
+
+.input-section h2,
+.chart-section h2,
+.data-section h3,
+.report-section h2 {
+  color: var(--accent-gold);
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 8px;
+}
+
+/* ---------- Griglia dati (tabelle operazioni) ---------- */
+.data-tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.data-tables-grid > div {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  padding: 12px;
+  overflow: hidden;
+}
+
+/* Altezza fissa desktop, auto mobile */
+@media (min-width: 761px) {
+  .data-tables-grid > div {
+    height: 268px;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 760px) {
+  .data-tables-grid {
+    grid-template-columns: 1fr;
+  }
+  .data-tables-grid > div {
+    height: auto;
+  }
+}
+
+/* ---------- Tabella dati interna ---------- */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85em;
+  table-layout: fixed;
+}
+
+.data-table thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.data-table thead th {
+  background: rgba(58,58,58,0.85);
+  color: #fff;
+  padding: 7px 8px;
+  text-align: left;
+  font-size: 0.8rem;
+}
+
+/* tbody scrollabile */
+.data-table tbody {
+  display: block;
+  max-height: 172px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74,144,226,0.4) transparent;
+}
+
+.data-table tbody::-webkit-scrollbar {
+  width: 4px;
+}
+
+.data-table tbody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.data-table tbody::-webkit-scrollbar-thumb {
+  background: rgba(74,144,226,0.4);
+  border-radius: 10px;
+}
+
+.data-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.data-table tbody td {
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+.data-table tbody tr:nth-child(odd) {
+  background: rgba(35,35,59,0.8);
+}
+
+.data-table tbody tr:nth-child(even) {
+  background: rgba(35,35,59,0.2);
+}
+
+.data-table tbody tr:hover {
+  background: rgba(74,144,226,0.18);
+}
+
+.data-table td.actions {
+  text-align: right;
+  width: 40px;
+}
+
+/* ---------- Totals Section ---------- */
+.totals-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.total-box {
+  background: var(--bg-elevated);
+  padding: 16px;
+  border-radius: 10px;
+  border-left: 3px solid var(--accent-blue);
+  text-align: center;
+}
+
+.total-box h4 {
+  color: var(--accent-gold);
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.total-box .value {
+  font-size: 1.4em;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.total-box .subvalue {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Export Buttons ---------- */
+.export-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.export-buttons .btn-edit {
+  width: auto;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+}
+
+/* ---------- Report Table (fisco/report) ---------- */
+.report-block {
+  margin-bottom: 20px;
+}
+
+.report-block h3 {
+  background: #3ca44a;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px 6px 0 0;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(15,15,25,0.9);
+  border-radius: 0 0 6px 6px;
+  overflow: hidden;
+  box-shadow: 0 3px 20px rgba(0,0,0,0.4);
+}
+
+.report-table thead th {
+  background: #3ca44a;
+  color: #fff;
+  padding: 8px;
+  text-align: left;
+  font-size: 0.9em;
+}
+
+.report-table tbody td,
+.report-table tfoot td {
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.9em;
+}
+
+.report-table tbody tr:nth-child(even) {
+  background: rgba(255,255,255,0.02);
+}
+
+.report-table tfoot td {
+  background: rgba(240,240,255,0.06);
+  font-weight: 600;
+}
+
+.report-table .right {
+  text-align: right;
+}
+
+/* ---------- Chart grande panoramica ---------- */
+.ts-chart-box-large {
+  width: 100%;
+  min-height: 400px;
+}
+
+#equityChart {
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* ============================================
+   SEZIONE 3: REGOLE / APPUNTI — CSS Specifico
+   ============================================ */
+
+/* ---------- Container regole ---------- */
+.rules-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------- Singola regola / nota ---------- */
+.rule,
+.note {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  transition: transform 0.2s;
+}
+
+.rule:hover,
+.note:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-gold);
+}
+
+.rule h3,
+.note h3 {
+  color: var(--accent-gold);
+  margin-bottom: 12px;
+  font-size: 1.2em;
+  font-family: var(--font-heading-light);
+}
+
+.rule-content,
+.note-content {
+  color: var(--text-primary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  margin-bottom: 12px;
+}
+
+.rule-date,
+.note-date {
+  color: var(--text-muted);
+  font-size: 0.85em;
+  margin-bottom: 12px;
+}
+
+/* ---------- Immagini nelle regole ---------- */
+.rule-image,
+.note-image {
+  margin: 12px 0;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border-glass);
+  display: block;
+}
+
+/* ---------- Azioni regola (edit/delete) ---------- */
+.rule-actions,
+.note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-glass);
+}
+
+/* ---------- Form nuova regola ---------- */
+.rule-form .form-group {
+  margin-bottom: 16px;
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.rule-form .form-group:focus-within {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.rule-form label {
+  color: var(--accent-gold);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.rule-form input[type="text"],
+.rule-form textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-primary);
+  font-size: 16px;
+  font-family: var(--font-body);
+}
+
+.rule-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Upload immagine */
+.image-upload-container {
+  margin-bottom: 16px;
+}
+
+.image-upload-label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.image-preview {
+  display: none;
+  margin-top: 10px;
+  border-radius: 8px;
+  max-width: 100%;
+  max-height: 200px;
+  border: 1px solid var(--border-glass);
+}
+
+/* ---------- Card (usata in regole/appunti) ---------- */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-glass);
+}
+
+.card-header {
+  background: var(--bg-elevated);
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-glass);
+}
+
+.card-header h2 {
+  color: var(--accent-gold);
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* ---------- Empty state ---------- */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ---------- Backup container (regole) ---------- */
+.backup-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-glass);
+}
+
+.backup-container input[type="file"] {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px dashed var(--border-light);
+  border-radius: 8px;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   RESPONSIVE SPECIFICO PANORAMICA & REGOLE
+   ============================================ */
+
+@media (max-width: 760px) {
+  /* Panoramica: tabella semplice, no scroll interno */
+  .data-table tbody {
+    max-height: none;
+    overflow-y: visible;
+  }
+  
+  .data-table thead,
+  .data-table tbody tr {
+    display: table;
+    width: 100%;
+  }
+  
+  /* Regole: full width */
+  .rule,
+  .note {
+    padding: 16px;
+  }
+  
+  .rule-actions,
+  .note-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .rule-actions .btn,
+  .note-actions .btn {
+    width: 100%;
+    margin-top: 0;
+  }
+  
+  /* Backup container: stack */
+  .backup-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .backup-container input[type="file"] {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   SEZIONE 4: TRACKER — CSS Specifico
+   ============================================ */
+
+/* ---------- Tracker Header ---------- */
+.tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tracker-header .price-info {
+  text-align: right;
+}
+
+.tracker-header .price-value {
+  font-size: 1.6em;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+.tracker-header .price-update {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Tracker Stats Grid ---------- */
+.tracker-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.tracker-stat-item {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.tracker-stat-item:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-gold);
+}
+
+.tracker-stat-item h4 {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.tracker-stat-item .value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tracker-stat-item .subvalue {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ---------- Tracker Chart Box ---------- */
+.tracker-chart-box {
+  height: 400px;
+  margin-bottom: 20px;
+}
+
+/* ---------- Tracker Operations Table ---------- */
+.tracker-ops-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.tracker-ops-table thead th {
+  background: rgba(58, 58, 58, 0.85);
+  color: #fff;
+  padding: 10px;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.tracker-ops-table tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.tracker-ops-table tbody tr:nth-child(odd) {
+  background: rgba(35, 35, 59, 0.6);
+}
+
+.tracker-ops-table tbody tr:nth-child(even) {
+  background: rgba(35, 35, 59, 0.2);
+}
+
+.tracker-ops-table tbody tr:hover {
+  background: rgba(74, 144, 226, 0.15);
+}
+
+/* ---------- Tracker Form ---------- */
+.tracker-form .input-group-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+@media (max-width: 760px) {
+  .tracker-form .input-group-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .tracker-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .tracker-chart-box {
+    height: 250px;
+  }
+}
+
+/* ============================================
+   SEZIONE 5: TRADE — CSS Specifico
+   ============================================ */
+
+/* ---------- Trade Form ---------- */
+.trade-form {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 3px;
+}
+
+.trade-form .form-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.trade-form .form-row:last-child {
+  border-bottom: none;
+}
+
+.trade-form .form-row label {
+  color: var(--accent-gold);
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* ---------- Trade Summary ---------- */
+.trade-summary {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 3px;
+}
+
+.trade-summary h3 {
+  color: var(--accent-gold);
+  margin-bottom: 16px;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 15px;
+}
+
+.summary-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.summary-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+}
+
+.summary-item .label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-item .value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.summary-item .value.positive {
+  color: var(--profit);
+}
+
+.summary-item .value.negative {
+  color: var(--loss);
+}
+
+.summary-item .value.neutral {
+  color: var(--accent-gold);
+}
+
+/* ---------- Trade Notes ---------- */
+.trade-note {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.trade-note:hover {
+  border-left-color: var(--accent-gold);
+  transform: translateX(2px);
+}
+
+.trade-note h3 {
+  color: var(--accent-gold);
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+
+.trade-note p {
+  color: var(--text-primary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.trade-note .note-date {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+/* ---------- Trade Table ---------- */
+.trade-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.trade-table thead th {
+  background: rgba(58, 58, 58, 0.85);
+  color: #fff;
+  padding: 10px;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.trade-table tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.trade-table tbody tr:nth-child(odd) {
+  background: rgba(35, 35, 59, 0.6);
+}
+
+.trade-table tbody tr:nth-child(even) {
+  background: rgba(35, 35, 59, 0.2);
+}
+
+.trade-table tbody tr:hover {
+  background: rgba(74, 144, 226, 0.15);
+}
+
+/* ---------- Tabella Sintesi (Trade) ---------- */
+.tabella-sintesi {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto 20px;
+  border-collapse: collapse;
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.tabella-sintesi th,
+.tabella-sintesi td {
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.tabella-sintesi th {
+  background: rgba(0, 0, 0, 0.45);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--accent-gold);
+}
+
+.tabella-sintesi td {
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.tabella-sintesi tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Input dentro tabella sintesi */
+.ts-input {
+  width: 64px;
+  font-size: 0.9rem;
+  text-align: center;
+  border: none;
+  border-radius: 4px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  padding: 4px;
+}
+
+.ts-input::-webkit-outer-spin-button,
+.ts-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ts-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* ---------- Edit Form (Trade) ---------- */
+.edit-form {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 15px;
+}
+
+.edit-form input,
+.edit-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.edit-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.edit-form .btn-group {
+  display: flex;
+  gap: 12px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-glass);
+}
+
+/* ---------- Alerts & Status ---------- */
+.alert {
+  padding: 16px 20px;
+  background: var(--bg-elevated);
+  color: var(--accent-gold);
+  border-radius: var(--radius);
+  border: 1px solid var(--accent-gold);
+  border-left: 4px solid var(--accent-gold);
+  margin-bottom: 20px;
+}
+
+.alert-success {
+  color: var(--profit);
+  border-color: var(--profit);
+  border-left-color: var(--profit);
+}
+
+.alert-warning {
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+  border-left-color: var(--accent-gold);
+}
+
+.alert-error {
+  color: var(--loss);
+  border-color: var(--loss);
+  border-left-color: var(--loss);
+}
+
+.loading {
+  color: var(--accent-blue);
+  font-style: italic;
+}
+
+.error {
+  color: var(--loss);
+  font-size: 0.9em;
+}
+
+.last-update {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 15px;
+}
+
+.current-price {
+  font-size: 0.9em;
+  color: var(--accent-blue);
+  font-weight: bold;
+}
+
+/* ---------- Time Range Selector ---------- */
+.time-range-selector {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.time-range-btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.time-range-btn:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--accent-gold);
+}
+
+.time-range-btn.active {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+/* ---------- Storico Chart Container ---------- */
+.storico-chart-container {
+  height: 500px;
+  width: 100%;
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 3px;
+}
+
+/* ---------- Distribution Stats ---------- */
+.distribution-stats {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin: 15px 0;
+}
+
+.distribution-item {
+  background: var(--bg-elevated);
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 120px;
+  border: 1px solid var(--border-glass);
+  margin: 5px;
+}
+
+.distribution-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.distribution-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ---------- Custom Button (Trade) ---------- */
+.btn-custom {
+  height: 50px;
+  background: linear-gradient(135deg, var(--accent-blue), #667eea);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0 24px;
+  transition: all 0.3s;
+}
+
+.btn-custom:hover {
+  background: linear-gradient(135deg, #667eea, var(--accent-blue));
+  transform: translateY(-2px);
+}
+
+/* ---------- Tab Container ---------- */
+.tab-container {
+  margin-bottom: 15px;
+}
+
+.tab-buttons {
+  display: flex;
+  border-bottom: 1px solid var(--border-glass);
+  gap: 4px;
+}
+
+.tab-button {
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  color: var(--text-primary);
+}
+
+.tab-button.active {
+  color: var(--accent-gold);
+  border-bottom-color: var(--accent-gold);
+}
+
+.tab-content {
+  padding-top: 15px;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* ============================================
+   RESPONSIVE SPECIFICO TRACKER & TRADE
+   ============================================ */
+
+@media (max-width: 760px) {
+  /* Trade form: una colonna */
+  .trade-form .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  /* Summary grid: 2 colonne */
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Storico chart più basso */
+  .storico-chart-container {
+    height: 300px;
+    padding: 12px;
+  }
+  
+  /* Tabella sintesi: scroll orizzontale */
+  .tabella-sintesi {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  /* Time range: wrap */
+  .time-range-selector {
+    gap: 6px;
+  }
+  
+  .time-range-btn {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+  
+  /* Distribution: 2 colonne */
+  .distribution-stats {
+    gap: 8px;
+  }
+  
+  .distribution-item {
+    min-width: calc(50% - 8px);
+  }
+  
+  /* Tab buttons: scroll orizzontale */
+  .tab-buttons {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .tab-button {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Summary: una colonna */
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Tracker stats: una colonna */
+  .tracker-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Trade note: padding ridotto */
+  .trade-note {
+    padding: 14px;
+  }
+}
+/* ============================================
+   SEZIONE 6: CSS INLINE DALLE PAGINE
+   ============================================ */
+
+/* ---------- Staking ATOM — atom-entry-table ---------- */
+.atom-entry-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+
+.atom-entry-table th,
+.atom-entry-table td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.atom-entry-table th {
+  background: linear-gradient(135deg, #353850 0%, #23243b 100%);
+  color: #ececf1;
+  font-weight: 600;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.atom-entry-table tr:hover {
+  background-color: var(--bg-glass-hover);
+}
+
+.atom-entry-table tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ---------- Staking ATOM — btn-del ---------- */
+.btn-del {
+  background: var(--loss);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.btn-del:hover {
+  background: #ff1f3a;
+  transform: scale(1.05);
+}
+
+/* ---------- Operatività — Input Section (override box) ---------- */
+.operativita-box {
+  background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+  border: 1px solid var(--border-light);
+  border-top: 3px solid #000000;
+  border-radius: 0;
+  padding: 20px;
+  margin-bottom: 3px;
+  width: 100%;
+}
+
+.operativita-box h2 {
+  color: var(--accent-gold);
+  margin-bottom: 16px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 8px;
+}
+
+/* Input group operatività */
+.operativita-input-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.operativita-input-group .input-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+.operativita-input-group .input-field label {
+  display: block;
+  color: var(--accent-gold);
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 0.95em;
+}
+
+.operativita-input-group .input-field input,
+.operativita-input-group .input-field select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  background: rgba(35, 35, 59, 0.4);
+  color: var(--text-primary);
+  font-size: 1em;
+  transition: all 0.3s ease;
+}
+
+.operativita-input-group .input-field input:focus,
+.operativita-input-group .input-field select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+  background: rgba(35, 35, 59, 0.6);
+}
+
+/* ---------- Panoramica — Header Section (override) ---------- */
+.panorama-header-section {
+  background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+  border: 1px solid var(--border-light);
+  border-top: 3px solid #000000;
+  padding: 20px;
+  margin-bottom: 3px;
+  width: 100%;
+}
+
+.panorama-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.panorama-price-info {
+  text-align: right;
+}
+
+.panorama-price-value {
+  font-size: 1.6em;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+.panorama-price-update {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Panoramica — Data Tables Grid (override con altezza fissa) ---------- */
+.panorama-data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.panorama-data-grid > div {
+  display: flex;
+  flex-direction: column;
+  height: 268px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  padding: 12px 14px 10px;
+  overflow: hidden;
+}
+
+.panorama-data-title {
+  color: var(--accent-gold);
+  font-size: 0.95em;
+  margin: 0 0 8px 0;
+  flex-shrink: 0;
+}
+
+/* Tabella con scroll interno */
+.panorama-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88em;
+  table-layout: fixed;
+  flex-shrink: 0;
+}
+
+.panorama-data-table thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.panorama-data-table thead th {
+  background: rgba(58, 58, 58, 0.85);
+  color: #fff;
+  padding: 7px 8px;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.panorama-data-table tbody {
+  display: block;
+  max-height: 172px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74, 144, 226, 0.4) transparent;
+}
+
+.panorama-data-table tbody::-webkit-scrollbar {
+  width: 4px;
+}
+
+.panorama-data-table tbody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panorama-data-table tbody::-webkit-scrollbar-thumb {
+  background: rgba(74, 144, 226, 0.4);
+  border-radius: 10px;
+}
+
+.panorama-data-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.panorama-data-table tbody td {
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panorama-data-table tbody tr:nth-child(odd) {
+  background: rgba(35, 35, 59, 0.8);
+}
+
+.panorama-data-table tbody tr:nth-child(even) {
+  background: rgba(35, 35, 59, 0.2);
+}
+
+.panorama-data-table tbody tr:hover {
+  background: rgba(74, 144, 226, 0.18);
+}
+
+/* ---------- Panoramica — Totals Section ---------- */
+.panorama-totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.panorama-total-box {
+  background: var(--bg-elevated);
+  padding: 16px;
+  border-radius: 10px;
+  border-left: 3px solid var(--accent-blue);
+  text-align: center;
+}
+
+.panorama-total-box h4 {
+  color: var(--accent-gold);
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.panorama-total-box .value {
+  font-size: 1.4em;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.panorama-total-box .subvalue {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Panoramica — Report Section ---------- */
+.panorama-report {
+  background: linear-gradient(135deg, rgba(58, 58, 58, 0.15) 0%, rgba(96, 96, 96, 0.2) 100%);
+  border: 1px solid var(--border-light);
+  border-top: 3px solid #000000;
+  padding: 20px;
+  margin-bottom: 3px;
+  width: 100%;
+}
+
+.panorama-report h2 {
+  color: var(--accent-gold);
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 8px;
+}
+
+.panorama-report-block {
+  margin-bottom: 20px;
+}
+
+.panorama-report-block h3 {
+  background: #3ca44a;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px 6px 0 0;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.panorama-report-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(15, 15, 25, 0.9);
+  border-radius: 0 0 6px 6px;
+  overflow: hidden;
+}
+
+.panorama-report-table thead th {
+  background: #3ca44a;
+  color: #fff;
+  padding: 8px;
+  text-align: left;
+  font-size: 0.9em;
+}
+
+.panorama-report-table tbody td,
+.panorama-report-table tfoot td {
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.9em;
+}
+
+.panorama-report-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.panorama-report-table tfoot td {
+  background: rgba(240, 240, 255, 0.06);
+  font-weight: 600;
+}
+
+.panorama-report-table .right {
+  text-align: right;
+}
+
+/* ---------- Panoramica — Input Group Row (4 colonne) ---------- */
+.panorama-input-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 20px;
+  row-gap: 10px;
+  align-items: start;
+}
+
+.panorama-input-row .input-field input,
+.panorama-input-row .input-field select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  background: rgba(35, 35, 59, 0.4);
+  color: var(--text-primary);
+  font-size: 1em;
+  line-height: 1.2;
+}
+
+.panorama-input-row .input-field select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* ---------- Panoramica — Chart Box Large ---------- */
+.panorama-chart-large {
+  width: 100%;
+  min-height: 600px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 3px;
+}
+
+/* ============================================
+   RESPONSIVE SPECIFICO CSS INLINE
+   ============================================ */
+
+@media (max-width: 760px) {
+  /* Staking ATOM: tabella scrollabile */
+  .atom-entry-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  /* Operatività: una colonna */
+  .operativita-input-group {
+    flex-direction: column;
+  }
+  
+  .operativita-input-group .input-field {
+    min-width: 100%;
+  }
+  
+  /* Panoramica: griglia una colonna, altezza auto */
+  .panorama-data-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .panorama-data-grid > div {
+    height: auto;
+    max-height: none;
+  }
+  
+  .panorama-data-table tbody {
+    max-height: 180px;
+  }
+  
+  .panorama-totals {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .panorama-input-row {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+  
+  .panorama-chart-large {
+    min-height: 300px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .panorama-totals {
+    grid-template-columns: 1fr;
+  }
+  
+  .atom-entry-table th,
+  .atom-entry-table td {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+}
