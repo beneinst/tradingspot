@@ -221,6 +221,7 @@
             .iflow-custom-menu ul { gap: 4px; }
             .iflow-custom-menu .dropdown > span { font-size: 0.75rem; padding: 5px 8px; }
         }
+		
     </style>
 </head>
 <body>
@@ -272,6 +273,45 @@
                 </nav>
             </div>
         </div>
+		<!-- MENU MOBILE (nuovo — visibile solo < 760px) -->
+<nav class="iflow-mobile-menu" style="display:none;">
+  <ul>
+    <li>
+      <span class="iflow-menu-label">Trade</span>
+      <ul>
+        <li><a href="/tradingspot/">Trade attivi</a></li>
+        <li><a href="/tradingspot/operativita.html">Operatività</a></li>
+        <li><a href="/tradingspot/atom-flow.html">Wallet Atom</a></li>
+        <li><a href="/tradingspot/analisi.html">Analisi</a></li>
+      </ul>
+    </li>
+    <li>
+      <span class="iflow-menu-label">Capitale</span>
+      <ul>
+        <li><a href="/tradingspot/flowchart.html">Panoramica</a></li>
+        <li><a href="/tradingspot/fiscoit.html">Fisco</a></li>
+        <li><a href="/tradingspot/staking3.html">Meria</a></li>
+        <li><a href="/tradingspot/staking.html">Figment</a></li>
+        <li><a href="/tradingspot/staking2.html">Ledger</a></li>
+        <li><a href="/tradingspot/staking4.html">StakeLab</a></li>
+      </ul>
+    </li>
+    <li>
+      <span class="iflow-menu-label">Strategia</span>
+      <ul>
+        <li><a href="/tradingspot/blocco-note.html">Blocco Note</a></li>
+        <li><a href="/tradingspot/regole-trading.html">Regole</a></li>
+        <li><a href="/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+      </ul>
+    </li>
+    <li>
+      <span class="iflow-menu-label">Backup</span>
+      <ul>
+        <li><a href="/tradingspot/backup.html">Backup</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
         <div class="header-title">
             <h1>🎍 Staking ATOM | Tracker</h1>
             <small>
@@ -359,27 +399,59 @@
             <button class="btn btn-danger" onclick="clearForm()">🔄 Pulisci Form</button>
         </div>
     </div>
+<div style="padding: 61x;"></div>
+<div class="container">
+        <!-- Grafico Andamento Capitale -->
+        <div class="chart-container">
+            <h3>📊 Andamento Capitale in ATOM</h3>
+            <canvas id="capitalChart"></canvas>
+        </div></div>
+<div style="padding: 61x;">
+<div class="container">
+ <!-- Grafico USD Investiti vs Valore Attuale -->
+        <div class="chart-container">
+            <h3>💰 USD Investiti vs Valore Attuale</h3>
+            <canvas id="usdComparisonChart"></canvas>
+        </div> </div>
 
-    <!-- CHART 1: TITOLO + CONTAINER -->
-    <h2 class="chart-title">📊 Andamento Capitale ATOM</h2>
-    <div class="chart-container">
-        <canvas id="capitalChart"></canvas>
+<div style="padding: 8x;"></div>
+
+<!--<div class="container">
+        <!-- Grafico Distribuzione per Validatore 
+        <div class="chart-container">
+            <h3>🥧 Distribuzione ATOM per Validatore</h3>
+    <canvas id="validatorChart" style="height: 400px; width: 100%; display: block;"></canvas>
+        </div></div><div style="padding: 8x;">-->
+<div class="container">
+    <!-- Tabella Operazioni -->
+    <h3>📋 Storico Operazioni</h3>
+    
+    <div class="input-actions mb-15">
+        <button class="btn btn-edit" onclick="downloadTableHTML()">📥 Scarica Tabella HTML</button>
     </div>
+    
+    <table class="operations-table table-responsive-md">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Figment</th>
+                <th>Chorus One</th>
+                <th>Meria</th>
+                <th>StakeLab</th>
+                <th>Totale ATOM</th>
+                <th>Totale USD</th>
+                <th>Note</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody id="operationsBody">
+        </tbody>
+    </table>
+</div>
 
-    <!-- CHART 2: TITOLO + CONTAINER -->
-    <h2 class="chart-title">💰 USD Investiti vs Valore Attuale</h2>
-    <div class="chart-container">
-        <canvas id="usdComparisonChart"></canvas>
-    </div>
-
-    <!-- BOX 4: OPERAZIONI -->
-    <div class="box">
-        <h3 class="data-title">📋 Storico Operazioni</h3>
-        <div class="ops-list" id="operationsList">
-            <!-- JS popola con op-card -->
-        </div>
-    </div>
-
+    </div></div></div>
+<div style="padding: 8x;"></div>
     <!-- BOX 5: FOOTER -->
     <div class="box box-footer">
         <p>⛰️ 2026 © FlowChart by Gerardo D</p>

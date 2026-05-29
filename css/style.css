@@ -29,166 +29,194 @@
   --color-heading: var(--color-heading-main);
 }
 
+/* =========================================
+   RESET & GLASS CORE - EFFETTO WEALTFOLIO/CRYPTO WALLET
+   ========================================= */
 
-
-p, body {
-  font-family: var(--font-body);
-  color: #e0e0e0;
-  font-size: 18px;
-}
-
-/* Heading Styles */
-h1, header {
-  font-family: var(--font-heading);
-  color: var(--color-heading-main);
-}
-h2 {
-  font-family: var(--font-heading-light);
-  color: var(--color-heading-2);
-}
-h3, note h3 {
-  font-family: var(--font-heading-light);
-  color: var(--color-heading-3);
-  font-size: 18px;
-}
-h4 {
-  font-family: var(--font-heading-light);
-  color: var(--color-heading-4);
-}
-h5 {
-  font-family: var(--font-heading-light);
-  color: var(--color-heading-5);
-}
-
-p, {
-  font-family: var(--font-body);
-  color: #e0e0e0;
-  font-size: 18px;
-}
-
-small {
-  font-family: var(--font-body); /* Usa lo stesso font del body */
-  color: #999999;                /* Colore grigio chiaro */
-  font-size: 0.9em;              /* Dimensione più piccola rispetto al testo normale */
-}
-
-/* Heading Styles */
-h1, header {
-  font-family: var(--font-heading);
-  color: var(--color-heading-main);
-}
-
-h2 {
-  font-family: var(--font-heading-light);
-  color: var(--color-heading-2);
-}
-h3 {
-  font-family: var(--font-heading-light);
-  color: var(--color-heading-3);
-}
-h4, header-stat-label {
-  font-family: var(--font-heading-light);
-  color: #BCC6CC;
-}
-h5 {
-  font-family: var(--font-heading-light);
-  color: var(--color-heading-5);
-}
-
-/* Reset margini di default */
 * {
-  box-sizing: border-box;
+    box-sizing: border-box; /* Fondamentale per calcoli precisi */
 }
 
-/* Body */
+/* BODY: Sfondo fluido, niente box pesanti qui sopra */
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    position: relative;
+    
+    /* Sfondo Blockchain */
+    background-image: url('../images/blockchain_edited.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Fissa lo sfondo anche scrollando */
+    
+    color: #e0e0e0;
+    font-family: var(--font-body);
+    overflow-x: hidden;
+}
+
+/* Overlay scuro semitrasparente per leggibilità (Lightness 90% Glass) */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(25, 25, 30, 0.6); /* Sfondo scuro opaco */
+    backdrop-filter: blur(0px); 
+    z-index: -1;
+    pointer-events: none;
+}
 
 /* =========================================
-   RIDUZIONE FONT GLOBALE (-10%)
+   CONTAINER PRINCIPALI (NO BORDI PESANTI)
    ========================================= */
-body {
-    font-size: 95% !important;
-}
 
-body {
-  background-image: url('../images/blockchain_edited.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-attachment: fixed;
-  color: var(--color-text);
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  position: relative;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  
-  /* MODIFICATO: Grigio #3c3c3c con 90% opacità */
-  background: rgba(60, 60, 60, 0.4) !important; 
-  
-  z-index: -1;
-  pointer-events: none;
-}
-
-/* Container */
+/* Rimuove il box pesante classico */
 .container {
     max-width: 1400px;
-    margin: 0 auto;
-    background-color: rgba(44, 44, 44, 0.6);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+    margin: 0 auto; /* Centraggio fluido */
+    padding: 20px;  /* Padding leggero, non bordi */
+    
+    /* Stile Vetro Smerigliato Fluido */
+    background: rgba(44, 44, 44, 0.3); /* Trasparente per far vedere lo sfondo */
+    border-radius: 12px;   /* Arrotondamenti morbidi */
+    
+    /* Sottili ombre invece dei bordi neri */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); 
+    
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Bordo molto sottile opaco */
 }
 
-
-
+/* Variante container più leggero (es per le tab o sezioni laterali) */
 .container-f {
     max-width: 1300px;
     margin: 0 auto;
-    background-color: rgba(44, 44, 44, 0.05);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.0);
+    padding: 24px; /* Padding generoso interno */
+    
+    background: rgba(25, 25, 28, 0.85); /* Più scuro e opaco per contrasto */
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
+/* =========================================
+   FORM CONTAINER & CARDS (STILE CUBITO/WALLET)
+   ========================================= */
 
-
-/* Form Container */
 .form-container {
-    
+    /* Nessuna linea laterale spessa */
+    border: none; 
+    background: rgba(30, 30, 40, 0.9);
     padding: 25px;
-    border-radius: 8px;
-    border: 1px solid var(--color-border);
-    margin-bottom: 25px;
-    border-left: 4px solid var(--color-primary);
-    box-shadow: 0 4px 25px rgba(0,0,0,0.6);
+    border-radius: var(--radius-md);
+    margin-bottom: 20px; /* Spazio tra i box */
+    
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4); /* Ombra morbida */
+    backdrop-filter: blur(8px); /* Effetto Glass attivo solo su mobile/form */
 }
 
-/* Header */
+/* Rimuove il bordo colorato laterale pesante */
+.form-container { border-left: none; } 
+
+/* =========================================
+   HEADER SEMPLIFICATO
+   ========================================= */
+
 .header {
-  background: linear-gradient(135deg, var(--color-header-bg) 0%, #0f0f0f 100%);
-  padding: 25px 30px;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  border-bottom: 2px solid var(--color-border-light);
-  margin-bottom: 30px;
-  width: 100%;
-  box-sizing: border-box;
-  color: var(--color-heading);
-  box-shadow: 0 2px 20px rgba(0,0,0,0.8);
-}
-.header h1 {
-    font-size: 1.9em;
-    text-align: left;
-    margin-left: 20px;
-	 font-family: var(--font-heading);
-  color: var(--color-heading-main);
+    background: transparent; /* Trasparente sul body scuro */
+    padding: 20px 30px;
+    margin-bottom: 0;
     
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Solo la linea inferiore sottile */
+    width: 100%;
+    display: flex; /* Flessibile per layout moderni */
+    justify-content: space-between; /* Logo a sinistra, Menu a destra */
+    align-items: center;
 }
+
+.header h1 {
+    font-family: var(--font-heading);
+    color: var(--color-heading-main);
+    margin-left: 0; /* Resetta il margine sinistro */
+    font-size: 24px; /* Dimensione leggibile */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* =========================================
+   TYPOGRAPHY CLEAN (TESTO)
+   ========================================= */
+
+p, .description {
+    font-family: var(--font-body);
+    color: #e0e0e0;
+    font-size: 17px; /* Leggermente più grande per mobile */
+    line-height: 1.6;
+}
+
+small, .text-muted {
+    font-family: var(--font-body);
+    color: #999999;
+    font-size: 0.9em;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: var(--font-heading);
+    margin-bottom: 10px;
+}
+
+h1 { color: #ffffff; }
+h2 { color: var(--color-heading-2); }
+h3 { color: var(--color-heading-3); }
+h4, .header-stat-label { color: #BCC6CC; } /* Colore grigio-blu chiaro */
+h5 { color: var(--color-heading-5); }
+
+/* =========================================
+   MEDIA QUERY MOBILE (< 760px) OPTIMIZATION
+   ========================================= */
+
+@media (max-width: 768px) {
+    /* Riduce la larghezza del container per far stare tutto in uno schermato stretto */
+    .container { padding: 15px; border-radius: 0; background: transparent; } 
+    .container-f { padding: 15px; border-radius: 8px; }
+
+    /* Form Container Mobile (Flat Layout) */
+    .form-container {
+        background: rgba(40, 40, 50, 0.8); /* Leggera sfumatura opaca */
+        margin-bottom: 15px;
+        border-radius: var(--radius-md); /* Solo arrotondamento morbido */
+        border: none; /* Senza bordi neri su mobile per pulizia */
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    /* Header Mobile */
+    .header { 
+        background: transparent !important;
+        border-bottom: none !important; /* Rimuovi la linea su mobile per immersione */
+        padding: 20px;
+    }
+
+    /* Titoli più grandi per leggibilità mobile */
+    h1, header h1 { font-size: 28px !important; margin-left: 0 !important; text-align: center;}
+    
+    /* Rimuovi box spessi dai container interni */
+    .card, .input-group { 
+        background: transparent !important; /* Rimuove sfondo bianco se presente */
+        border: none !important; 
+        padding: 10px !important; 
+        margin-bottom: 0 !important;
+        box-shadow: none !important;
+    }
+
+    /* Input full width */
+    .input-field input, .input-group input { width: 100%; max-width: 100% !important; }
+}
+
+/* =========================================
+   UTILITY: GRADIENT & GLASS EFFECT
+   ========================================= */
+
+/* Classi per gradienti interni al codice */
+.gradient-text { background: linear-gradient(45deg, var(--accent-blue), var(--success-green)); -webkit-background-clip: text; color: transparent;}
 
 .link-no-underline {
     text-decoration: none;
