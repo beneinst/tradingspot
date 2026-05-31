@@ -758,7 +758,12 @@ h5 { color: var(--color-heading-5); }
     height: auto;
   }
 }
-
+@media (max-width: 759px) {
+  .centrato-mobile {
+    text-align: center;
+	font-size: 10px;
+  }
+}
 /* =========================================
    UTILITIES
    ========================================= */

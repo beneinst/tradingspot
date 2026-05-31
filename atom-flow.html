@@ -604,17 +604,17 @@ label {
         </div>
 
 <div style="padding: 61x;"></div>
-<div class="container">
+
         <!-- Grafico Andamento Capitale -->
         <div class="chart-container">
-            <h3>📊 Andamento Capitale in ATOM</h3>
+           <h3 class="centrato-mobile">📊 Andamento Capitale in ATOM</h3>
             <canvas id="capitalChart"></canvas>
-        </div></div>
+        </div>
 <div style="padding: 61x;">
-<div class="container">
+
  <!-- Grafico USD Investiti vs Valore Attuale -->
         <div class="chart-container">
-            <h3>💰 USD Investiti vs Valore Attuale</h3>
+            <h3 class="centrato-mobile">💰 USD Investiti vs Valore Attuale</h3>
             <canvas id="usdComparisonChart"></canvas>
         </div> </div>
 
@@ -628,7 +628,7 @@ label {
         </div></div><div style="padding: 8x;">-->
 <div class="container">
     <!-- Tabella Operazioni -->
-    <h3>📋 Storico Operazioni</h3>
+    <h3 class="centrato-mobile">📋 Storico Operazioni</h3>
     
     <div class="input-actions" style="margin-bottom: 15px;">
         <button class="btn-edit" onclick="downloadTableHTML()">📥 Scarica Tabella HTML</button>
@@ -862,107 +862,126 @@ function updateTable() {
         }
 
 
-        // Grafico andamento capitale
-        function updateCapitalChart() {
-            const ctx = document.getElementById('capitalChart').getContext('2d');
-            
-            // Calcola dati cumulativi
-            let cumulativeAtom = 0;
-            let cumulativeDeposit = 0;
-            let cumulativeStaking = 0;
-            
-            const labels = [];
-            const totalData = [];
-            const depositData = [];
-            const stakingData = [];
-            const valueData = [];
+     // Grafico andamento capitale
+function updateCapitalChart() {
+    const ctx = document.getElementById('capitalChart').getContext('2d');
+    
+    // Calcola dati cumulativi
+    let cumulativeAtom = 0;
+    let cumulativeDeposit = 0;
+    let cumulativeStaking = 0;
+    
+    const labels = [];
+    const totalData = [];
+    const depositData = [];
+    const stakingData = [];
+    const valueData = [];
 
-            operations.forEach(op => {
-                cumulativeAtom += op.totalAtom;
-                if (op.type === 'deposito') {
-                    cumulativeDeposit += op.totalAtom;
-                } else {
-                    cumulativeStaking += op.totalAtom;
-                }
+    operations.forEach(op => {
+        cumulativeAtom += op.totalAtom;
+        if (op.type === 'deposito') {
+            cumulativeDeposit += op.totalAtom;
+        } else {
+            cumulativeStaking += op.totalAtom;
+        }
 
-                labels.push(new Date(op.date).toLocaleDateString('it-IT'));
-                totalData.push(cumulativeAtom);
-                depositData.push(cumulativeDeposit);
-                stakingData.push(cumulativeStaking);
-                valueData.push(cumulativeAtom * atomPrice);
-            });
+        labels.push(new Date(op.date).toLocaleDateString('it-IT'));
+        totalData.push(cumulativeAtom);
+        depositData.push(cumulativeDeposit);
+        stakingData.push(cumulativeStaking);
+        valueData.push(cumulativeAtom * atomPrice);
+    });
 
-            if (capitalChart) {
-                capitalChart.destroy();
-            }
+    if (capitalChart) {
+        capitalChart.destroy();
+    }
 
-            capitalChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Totale ATOM',
-                            data: totalData,
-                            borderColor: '#667eea',
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: 'ATOM da Deposito',
-                            data: depositData,
-                            borderColor: '#28a745',
-                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: 'ATOM da Staking',
-                            data: stakingData,
-                            borderColor: '#ffc107',
-                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }
-                    ]
+    capitalChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Totale ATOM',
+                    data: totalData,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    label += context.parsed.y.toFixed(6) + ' ATOM';
-                                    return label;
-                                }
-                            }
+                {
+                    label: 'ATOM da Deposito',
+                    data: depositData,
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'ATOM da Staking',
+                    data: stakingData,
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 11
                         }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'ATOM'
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
                             }
+                            label += context.parsed.y.toFixed(6) + ' ATOM';
+                            return label;
                         }
                     }
                 }
-            });
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'ATOM',
+                        font: {
+                            size: 11
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: 10
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 10
+                        }
+                    }
+                }
+            }
         }
-
+    });
+}
 // Grafico USD Investiti vs Valore Attuale
         function updateUsdComparisonChart() {
             const ctx = document.getElementById('usdComparisonChart').getContext('2d');
