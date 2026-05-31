@@ -662,7 +662,6 @@ h5 { color: var(--color-heading-5); }
   margin-bottom: 20px;
 }
 .trade-form1 { padding: 15px 0; }
-
 /* =========================================
    HEADER CRYPTO / NAV
    ========================================= */
@@ -693,9 +692,66 @@ h5 { color: var(--color-heading-5); }
   align-items: center;
   gap: 16px;
   padding: 8px 16px;
+  justify-content: flex-start;
 }
-.logo-menu-row .logo img { height: 50px; width: auto; display: block; }
 
+.logo-menu-row .logo img { 
+  height: 50px; 
+  width: auto; 
+  display: block; 
+  max-width: 100%;
+}
+
+@media (max-width: 760px) {
+  .logo-menu-row {
+    justify-content: center !important;
+    width: 100%;
+    margin: 0;
+    padding: 8px 0;
+  }
+  
+  .logo-menu-row .logo {
+    display: block !important;
+    width: 100%;
+    text-align: center !important;
+    margin: 0;
+  }
+  
+  .logo-menu-row .logo img { 
+    display: block !important;
+    margin: 0 auto !important;
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .header-bar {
+    text-align: center;
+    padding: 8px 0;
+  }
+  
+  .header-title {
+    text-align: center;
+  }
+  
+  .header-title h1 {
+    display: block;
+  }
+  
+  .header-title small {
+    margin-left: 0;
+    display: block;
+    margin-top: 4px;
+  }
+  
+  .iflow-body {
+    text-align: center;
+  }
+}
+@media (max-width: 760px) {
+  .logo-menu-row .logo {
+    padding-left: 50px;  /* prova con 50px */
+  }
+}
 /* =========================================
    UTILITIES
    ========================================= */

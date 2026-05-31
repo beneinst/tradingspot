@@ -223,29 +223,25 @@
 </div>
 
  <div style="padding: 9px;"></div> 
-   <div class="container">
-
-            <div class="card">
-                
-           
+<div class="container">
+    <div class="card">
+        <p>Salva e carica tutti i dati per trasferirli tra dispositivi.</p>
+        <div style="padding: 15px;"></div>  
+        <div class="back-container" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <button id="btn-download-backup" class="btn-danger"
+                style="font-size:1rem; padding:8px 18px; min-width:150px;">
+                📥 Backup
+            </button>
             
-            <p> Salva e carica tutti i dati presenti, per trasferirli tra dispositivi diversi.</p>
-              <div style="padding: 15px;"></div>  
-            <div class="back-container" >
-			<button id="btn-download-backup" class="btn-danger"
-        style="font-size:1.1rem; padding:9px 22px;min-width:220px;margin-right:20px;">
-  📥 Backup completo (JSON)
-</button>
-
-<input type="file" id="file-upload-backup" accept=".json" style="display:none">
-
-<button id="btn-upload-backup" class="btn-edit"
-        style="font-size:1.1rem; padding:9px 22px; min-width:220px;">
-  📤 Ripristina backup
-</button>
-               
-            </div>
-        </div></div></div>
+            <input type="file" id="file-upload-backup" accept=".json" style="display:none">
+            
+            <button id="btn-upload-backup" class="btn-edit"
+                style="font-size:1rem; padding:8px 18px; min-width:150px;">
+                📤 Ripristina
+            </button>
+        </div>
+    </div>
+</div>
         
     
     <div style="padding: 4px;"></div>  
