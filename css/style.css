@@ -750,7 +750,7 @@ h5 { color: var(--color-heading-5); }
 @media (max-width: 760px) {
   .logo-menu-row .logo {
     padding-left: 55px;
-	padding-top: 10px;
+	padding-top: 12px;
   }
   
   .logo-menu-row .logo img {
