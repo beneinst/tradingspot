@@ -749,7 +749,12 @@ h5 { color: var(--color-heading-5); }
 }
 @media (max-width: 760px) {
   .logo-menu-row .logo {
-    padding-left: 50px;  /* prova con 50px */
+    padding-left: 75px;
+  }
+  
+  .logo-menu-row .logo img {
+    width: 50%;
+    height: auto;
   }
 }
 /* =========================================
