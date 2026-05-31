@@ -334,7 +334,7 @@
 <div style="padding: 8px;"></div>
 <div class="container">
   <div class="conteiner-f">
-    <h1 style="text-align:left;font-size:24px;color:#bccce9;padding-bottom:35px;padding-top:16px;">Evoluzione Patrimonio</h1>
+    <h1 style="text-align:center;font-size:24px;color:#bccce9;padding-bottom:35px;padding-top:16px;">Evoluzione Patrimonio</h1>
     <div class="ts-chart-box ts-chart-box-large">
       <canvas id="equityChart"></canvas>
     </div>
@@ -501,7 +501,7 @@
     </div>
 
   </div>
-</div>
+</div></div>
 
 	<div style="padding: 2px;"></div>
   <p style="margin:0;color:#c3c3c3;padding-top:25px;padding-bottom:35px;text-align:center;height:15px;line-height:12px;">
@@ -660,6 +660,21 @@ function updateList(cid, type) {
 function updateChart() {
     const d=[];
     let cE=0,cA=0,cB=0,cS=0,cL=0,cP=0,cU=0,cT=0;
+    
+    // Etichette accorciate per mobile
+    const isMobile = window.innerWidth <= 760;
+    const labels = {
+        'Capitale Depositato (-)': isMobile ? 'Deposito (-)' : 'Capitale Depositato (-)',
+        'Val ATOM (+)': isMobile ? 'ATOM (+)' : 'Val ATOM (+)',
+        'Val BTC (+)': isMobile ? 'BTC (+)' : 'Val BTC (+)',
+        'Val SOL (+)': isMobile ? 'SOL (+)' : 'Val SOL (+)',
+        'Val LTC (+)': isMobile ? 'LTC (+)' : 'Val LTC (+)',
+        'Val POL (+)': isMobile ? 'POL (+)' : 'Val POL (+)',
+        'Val USDC (+)': isMobile ? 'USDC (+)' : 'Val USDC (+)',
+        'Trading Profit (+)': isMobile ? 'Trading (+)' : 'Trading Profit (+)',
+        'RENDIMENTO NETTO': isMobile ? 'Netto' : 'RENDIMENTO NETTO'
+    };
+    
     [...operations].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(op=>{
         if(op.type==='EUR')    cE+=op.amount;
         else if(op.type==='ATOM')   cA+=op.amount*atomPrice;
@@ -671,19 +686,50 @@ function updateChart() {
         else if(op.type==='Trading')cT+=op.amount;
         d.push({date:new Date(op.date).toLocaleDateString('it-IT'),eurOut:-cE,atomValue:cA,btcValue:cB,solValue:cS,ltcValue:cL,polValue:cP,usdcValue:cU,trading:cT,netEquity:cA+cB+cS+cL+cP+cU+cT-cE});
     });
-    const cv=document.getElementById('equityChart'); if(!cv)return;
+    
+    const cv=document.getElementById('equityChart'); 
+    if(!cv)return;
+    
     if(chart)chart.destroy();
-    chart=new Chart(cv.getContext('2d'),{type:'line',data:{labels:d.map(x=>x.date),datasets:[
-        {label:'Capitale Depositato (-)',data:d.map(x=>x.eurOut),   borderColor:'#e74c3c',backgroundColor:'rgba(231,76,60,0.1)',  tension:0.4,fill:false},
-        {label:'Val ATOM (+)',           data:d.map(x=>x.atomValue),borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,0.1)', tension:0.4,fill:false},
-        {label:'Val BTC (+)',            data:d.map(x=>x.btcValue), borderColor:'#f39c12',backgroundColor:'rgba(243,156,18,0.1)', tension:0.4,fill:false},
-        {label:'Val SOL (+)',            data:d.map(x=>x.solValue), borderColor:'#1abc9c',backgroundColor:'rgba(26,188,156,0.1)', tension:0.4,fill:false},
-        {label:'Val LTC (+)',            data:d.map(x=>x.ltcValue), borderColor:'#95a5a6',backgroundColor:'rgba(149,165,166,0.1)',tension:0.4,fill:false},
-        {label:'Val POL (+)',            data:d.map(x=>x.polValue), borderColor:'#8e44ad',backgroundColor:'rgba(142,68,173,0.1)', tension:0.4,fill:false},
-        {label:'Val USDC (+)',           data:d.map(x=>x.usdcValue),borderColor:'#16a085',backgroundColor:'rgba(22,160,133,0.1)', tension:0.4,fill:false},
-        {label:'Trading Profit (+)',     data:d.map(x=>x.trading),  borderColor:'#3498db',backgroundColor:'rgba(52,152,219,0.1)', tension:0.4,fill:false},
-        {label:'RENDIMENTO NETTO',       data:d.map(x=>x.netEquity),borderColor:'#9b59b6',backgroundColor:'rgba(155,89,182,0.2)', tension:0.4,fill:true,borderWidth:3}
-    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:v=>'$'+v.toLocaleString('it-IT')}}}}});
+    
+    chart=new Chart(cv.getContext('2d'),{
+        type:'line',
+        data:{
+            labels:d.map(x=>x.date),
+            datasets:[
+                {label:labels['Capitale Depositato (-)'],data:d.map(x=>x.eurOut),   borderColor:'#e74c3c',backgroundColor:'rgba(231,76,60,0.1)',  tension:0.4,fill:false},
+                {label:labels['Val ATOM (+)'],           data:d.map(x=>x.atomValue),borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,0.1)', tension:0.4,fill:false},
+                {label:labels['Val BTC (+)'],            data:d.map(x=>x.btcValue), borderColor:'#f39c12',backgroundColor:'rgba(243,156,18,0.1)', tension:0.4,fill:false},
+                {label:labels['Val SOL (+)'],            data:d.map(x=>x.solValue), borderColor:'#1abc9c',backgroundColor:'rgba(26,188,156,0.1)', tension:0.4,fill:false},
+                {label:labels['Val LTC (+)'],            data:d.map(x=>x.ltcValue), borderColor:'#95a5a6',backgroundColor:'rgba(149,165,166,0.1)',tension:0.4,fill:false},
+                {label:labels['Val POL (+)'],            data:d.map(x=>x.polValue), borderColor:'#8e44ad',backgroundColor:'rgba(142,68,173,0.1)', tension:0.4,fill:false},
+                {label:labels['Val USDC (+)'],           data:d.map(x=>x.usdcValue),borderColor:'#16a085',backgroundColor:'rgba(22,160,133,0.1)', tension:0.4,fill:false},
+                {label:labels['Trading Profit (+)'],     data:d.map(x=>x.trading),  borderColor:'#3498db',backgroundColor:'rgba(52,152,219,0.1)', tension:0.4,fill:false},
+                {label:labels['RENDIMENTO NETTO'],       data:d.map(x=>x.netEquity),borderColor:'#9b59b6',backgroundColor:'rgba(155,89,182,0.2)', tension:0.4,fill:true,borderWidth:3}
+            ]
+        },
+        options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            plugins:{
+                legend:{
+                    position:'top',
+                    labels:{
+                        boxWidth:isMobile ? 12 : 15,
+                        padding:isMobile ? 8 : 12,
+                        font:{size:isMobile ? 10 : 12}
+                    }
+                }
+            },
+            scales:{
+                y:{
+                    ticks:{
+                        callback:v=>'$'+v.toLocaleString('it-IT')
+                    }
+                }
+            }
+        }
+    });
 }
 
 function buildReportTables() {
