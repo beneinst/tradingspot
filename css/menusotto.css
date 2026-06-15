@@ -30,37 +30,11 @@
     flex-wrap: nowrap;              /* tutto su una riga */
 }
 
-/* HAMBURGER – versione unica, stabile su desktop e mobile */
-.hamburger {
-    background: rgba(30, 30, 40, 0.7);
-    backdrop-filter: blur(8px);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;      /* non si riduce mai */
-    box-shadow: var(--glass-shadow);
-}
 
-.hamburger:hover {
-    background: rgba(188, 204, 233, 0.2);
-    border-color: var(--color-primary);
-}
 
-.hamburger .bar {
-    width: 24px;
-    height: 2px;
-    background-color: var(--color-text);
-    border-radius: 4px;
-    transition: 0.2s;
-}
+
+
+
 
 /* Logo */
 .logo {
@@ -243,15 +217,8 @@ body.menu-open {
         gap: 12px;
         flex-wrap: nowrap;
     }
-    .hamburger {
-        width: 44px;       /* leggermente più piccolo ma sempre quadrato e robusto */
-        height: 44px;
-        gap: 5px;
-    }
-    .hamburger .bar {
-        width: 22px;
-        height: 2px;
-    }
+  
+   
     .logo img {
         height: 42px;
     }
@@ -266,13 +233,8 @@ body.menu-open {
     .top-navbar {
         gap: 8px;
     }
-    .hamburger {
-        width: 40px;
-        height: 40px;
-    }
-    .hamburger .bar {
-        width: 20px;
-    }
+
+  
     .logo img {
         height: 36px;
     }
@@ -280,3 +242,47 @@ body.menu-open {
         font-size: 1rem;
     }
 }
+
+/* ========== HAMBURGER – dimensioni stabili e responsive ========== */
+.hamburger {
+    background: rgba(30, 30, 40, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    width: 48px;           /* larghezza su desktop */
+    height: 48px;          /* altezza su desktop */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    box-shadow: var(--glass-shadow);
+}
+
+.hamburger .bar {
+    width: 24px;
+    height: 2px;
+    background-color: var(--color-text);
+    border-radius: 4px;
+    transition: 0.2s;
+}
+
+/* FORZA le dimensioni dell'hamburger su mobile - override definitivo */
+@media (max-width: 768px) {
+    .top-navbar .hamburger,
+    .hamburger {
+        width: 26px !important;
+        height: 6px !important;
+        gap: 8px !important;
+		 padding-left: 9px !important;
+    }
+    .top-navbar .hamburger .bar,
+    .hamburger .bar {
+        width: 38px !important;
+        height: 4px !important;
+    }
+}
+
