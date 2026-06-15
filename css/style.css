@@ -1095,3 +1095,26 @@ h5 { color: var(--color-heading-5); }
     color: #ccc;
     white-space: nowrap;      /* evita che la riga prezzi si spezzi */
 }
+.header {
+    padding-top: env(safe-area-inset-top, 20px); /* supporto iPhone X+ e Android moderno */
+}
+
+/* Oppure, se vuoi un valore fisso per Android */
+@media (max-width: 760px) {
+    .header {
+        padding-top: 24px; /* spazio sufficiente per la barra notifiche */
+    }
+}
+.offcanvas {
+    padding-top: env(safe-area-inset-top, 20px);
+}
+
+/* Versione fissa per mobile */
+@media (max-width: 760px) {
+    .offcanvas {
+        padding-top: 24px;
+    }
+}
+.offcanvas-header span {
+    font-size: 1.2rem; /* regola a piacere */
+}

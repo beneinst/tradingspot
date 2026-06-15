@@ -152,7 +152,7 @@
     padding: 0;
 }
 .offcanvas-main-menu li {
-    margin-bottom: 3px;
+    margin-bottom: 2px;
 }
 .offcanvas-dropdown {
     border-radius: 14px;
@@ -199,7 +199,7 @@
     padding: 10px 12px;
 }
 .offcanvas-submenu li {
-    padding: 2px 0;
+    padding: 1px 0;
 }
 .offcanvas-submenu a {
     display: block;
