@@ -544,7 +544,7 @@ h5 { color: var(--color-heading-5); }
    FIX: unificata definizione duplicata di ts-chart-box
    ========================================= */
 .ts-chart-box {
-  height: 400px;
+  height: 410px;
   margin-bottom: 30px;
   position: relative;
   padding: 20px;
@@ -553,7 +553,21 @@ h5 { color: var(--color-heading-5); }
   border-radius: 12px;
   border: 1px solid rgba(188, 204, 233, 0.15);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+   width: 100%;                        /* FIX: era assente */
+  max-width: 1400px;
+  margin: 0 auto;
+ }
+ 
+ /* Solo su smartphone in verticale (portrait) */
+@media (max-width: 768px) and (orientation: portrait) {
+  .ts-chart-box {
+    height: auto;          /* toglie altezza fissa */
+    min-height: 280px;     /* altezza minima comfort */
+    margin-bottom: 20px;
+    padding: 12px;
+  }
 }
+
 .ts-chart-box-large {
   height: 600px;
   width: 100%;
