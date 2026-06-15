@@ -516,74 +516,141 @@ label {
 <body>
 <div style="padding: 4px;"></div>
 
-</header>
-<div class="container">
-<!-- ========== RIGA UNICA: LOGO + MENU (senza toccare il tuo stile) ========== -->
-<div class="logo-menu-row">
-  <!-- logo -->
-  <a href="index.html" class="logo">
-    <img src="images/logoinvest2a3.svg" alt="FlowChart">
-  </a>
-
-  <!-- tuo blocco ESISTENTE (incolonnato a destra del logo) -->
-  <div class="iflow-body">
-    <nav class="iflow-custom-menu">
-       <ul>
-        <li class="dropdown">
-          <span>Trade</span>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/">Trade attivi</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
-			<li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
-			
-          </ul>
-        </li>
-
-        <li class="dropdown">
-          <span>Capitale</span>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Panoramica</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
-			<li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
-			<li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown">
-          <span>Strategia</span>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
-            <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown">
-          <span>Backup</span>
-          <ul>
-            <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
-          </ul>
-        </li>
-      </ul>
+ <!-- ========== MENU LATERALE E OVERLAY (FUORI DAL CONTAINER) ========== -->
+<div class="offcanvas" id="offcanvasMenu">
+    <div class="offcanvas-header">
+        <span>📋 Navigazione</span>
+        <button class="close-menu-btn" id="closeMenuBtn">✕</button>
+    </div>
+    <nav class="offcanvas-nav">
+        <ul class="offcanvas-main-menu">
+            <!-- Trade -->
+            <li class="offcanvas-dropdown">
+                <div class="offcanvas-dropdown-toggle">Trade</div>
+                <ul class="offcanvas-submenu">
+                    <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Trade attivi</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
+                </ul>
+            </li>
+            <!-- Capitale -->
+            <li class="offcanvas-dropdown">
+                <div class="offcanvas-dropdown-toggle">Capitale</div>
+                <ul class="offcanvas-submenu">
+                    <li><a href="https://beneinst.github.io/tradingspot/">Panoramica</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
+                </ul>
+            </li>
+            <!-- Strategia -->
+            <li class="offcanvas-dropdown">
+                <div class="offcanvas-dropdown-toggle">Strategia</div>
+                <ul class="offcanvas-submenu">
+                    <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+                </ul>
+            </li>
+            <!-- Backup -->
+            <li class="offcanvas-dropdown">
+                <div class="offcanvas-dropdown-toggle">Backup</div>
+                <ul class="offcanvas-submenu">
+                    <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
+                </ul>
+            </li>
+        </ul>
     </nav>
-  </div>
+</div>
+<div class="offcanvas-overlay" id="overlay"></div>
 
+<!-- ========== CONTENUTO PRINCIPALE ========== -->
+<div class="header">
+  <header class="app-header">
+    <div class="top-navbar custom-mobile-left">
+      <!-- Hamburger a sinistra -->
+      <button class="hamburger" id="hamburgerBtn">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
 
-  <!-- TITOLO PAGINA (sempre sotto) -->
-  <div class="header-title">
+      <!-- Logo accanto all'hamburger -->
+      <a href="index.html" class="logo">
+        <img src="images/logoinvest2a3.svg" alt="FlowChart">
+      </a>
+
+      <!-- Eventuale titolo o box a destra (libero per altri contenuti) -->
+      <div class="header-title-right">
+        <!-- qui puoi mettere testo o lasciare vuoto -->
+      </div>
+    </div>
+  </header>
+</div>
+
+<script>
+    (function() {
+        const hamburger = document.getElementById('hamburgerBtn');
+        const offcanvas = document.getElementById('offcanvasMenu');
+        const overlay = document.getElementById('overlay');
+        const closeBtn = document.getElementById('closeMenuBtn');
+        const body = document.body;
+
+        function openMenu() {
+            offcanvas.classList.add('open');
+            overlay.classList.add('active');
+            body.classList.add('menu-open');
+        }
+
+        function closeMenu() {
+            offcanvas.classList.remove('open');
+            overlay.classList.remove('active');
+            body.classList.remove('menu-open');
+        }
+
+        if (hamburger) hamburger.addEventListener('click', openMenu);
+        if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+        if (overlay) overlay.addEventListener('click', closeMenu);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && offcanvas.classList.contains('open')) closeMenu();
+        });
+
+        // Dropdown toggle
+        const toggles = document.querySelectorAll('.offcanvas-dropdown-toggle');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const parent = toggle.closest('.offcanvas-dropdown');
+                if (parent) parent.classList.toggle('active');
+            });
+        });
+
+        // Chiudi menu dopo click su un link
+        document.querySelectorAll('.offcanvas-submenu a').forEach(link => {
+            link.addEventListener('click', () => setTimeout(closeMenu, 100));
+        });
+    })();
+	</script>
+<div style="padding: 2px;"></div>   
+ <div class="header header-line">
+			
     <h1>🎍 Staking ATOM | Tracker</h1>
     <small>
         *Gestione <strong>Entry ATOM</strong> | 
         <span class="price-inline"> <strong id="atomPrice">Caricamento...</strong></span>
     </small>
-</div>
-</header>
   </div>
-  <div style="padding: 8x;"></div>
-       <div class="chart-container">
+                
+        </div>
+
+<div style="padding: 2px;"></div>             
+      <div class="container">
+
+ 
 	   <h2 class="title-fixed">📈 Capitale vs Valore</h2>
 	    
          
@@ -592,7 +659,7 @@ label {
 
 
    
-  
+   <div class="container">
 
     <div class="ts-stats-grid">
   <div class="ts-grid-item">
