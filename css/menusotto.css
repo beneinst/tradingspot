@@ -270,19 +270,33 @@ body.menu-open {
     transition: 0.2s;
 }
 
-/* FORZA le dimensioni dell'hamburger su mobile - override definitivo */
 @media (max-width: 768px) {
-    .top-navbar .hamburger,
-    .hamburger {
-        width: 26px !important;
-        height: 6px !important;
-        gap: 8px !important;
-		 padding-left: 9px !important;
+    /* Riduzione padding top */
+    .top-navbar {
+        padding-top: 4px !important;
+        gap: 24px !important;          /* più spazio tra hamburger e logo */
     }
-    .top-navbar .hamburger .bar,
+    
+    /* Logo più grande */
+    .logo img {
+        height: 56px !important;
+    }
+    
+    /* Hamburger più piccolo di 2px per lato (44px invece di 48) */
+    .hamburger {
+        width: 44px !important;
+        height: 44px !important;
+        gap: 5px !important;
+        padding-left: 0 !important;
+    }
     .hamburger .bar {
-        width: 38px !important;
-        height: 4px !important;
+        width: 22px !important;
+        height: 2px !important;
+    }
+    
+    /* Nascondi il blocco header-line */
+    .header.header-line {
+        display: none !important;
     }
 }
 
