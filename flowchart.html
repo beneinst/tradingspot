@@ -20,7 +20,7 @@
  <!-- ========== MENU LATERALE E OVERLAY (FUORI DAL CONTAINER) ========== -->
 <div class="offcanvas" id="offcanvasMenu">
     <div class="offcanvas-header">
-        <span>🎢FlowChart</span>
+        <span>💱 FlowChart</span>
         <button class="close-menu-btn" id="closeMenuBtn">✕</button>
     </div>
     <nav class="offcanvas-nav">
@@ -189,17 +189,25 @@
   </form>
 </div>
 
-</div> <div style="padding: 4px;"></div>
-        <div class="container">
-            <h4 class="section-title" style="color: #ffe4b5 !important;">🎯 I tuoi Trade Attivi</h4>
-            <div id="trades-container"></div>
+</div> 
+
+    <!-- Accordion per i Trade Attivi -->
+    <div class="accordion-item" id="accordionTrades">
+        <div class="accordion-header">
+            <h4 class="section-title" style="color: #ffe4b5 !important; margin: 0;">🎯 I tuoi Trade Attivi</h4>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div id="trade-counter" style="display: flex; gap: 5px; font-size: 0.9rem;">
+                    📊 Trade attivi: <span id="trade-count" style="font-weight: bold; color: #ffe4b5;">0</span>
+                </div>
+                <span class="accordion-icon">▼</span>
+            </div>
         </div>
-		
-		
-		<div id="trade-counter" style="display: none;">
-  📊 Trade attivi: <span id="trade-count" style="display: inline;">0</span>
+        <div class="accordion-content" style="padding-top: 16px;">
+    <div id="trades-container"></div>
 </div>
-<div style="padding: 5px;"></div>		
+    </div>
+</div>
+<div style="padding: 6px;"></div>		
 <div class="container">
   <h5 class="section-title" style="color: #ffe4b5 !important;">🪔 Storico Distribuzione Capitale</h5>
   
@@ -421,6 +429,18 @@ window.addEventListener('storage', (e) => {
 
 // 🧠 Aggiorna anche al caricamento pagina
 document.addEventListener('DOMContentLoaded', updateTradeCount);
+
+// Accordion per lo storico operazioni
+document.addEventListener('DOMContentLoaded', function() {
+    const accordionItem = document.querySelector('.accordion-item');
+    const accordionHeader = document.querySelector('.accordion-header');
+    
+    if (accordionHeader && accordionItem) {
+        accordionHeader.addEventListener('click', function() {
+            accordionItem.classList.toggle('open');
+        });
+    }
+});
 </script>
 
 <script>

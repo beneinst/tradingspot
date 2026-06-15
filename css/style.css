@@ -1120,13 +1120,21 @@ h5 { color: var(--color-heading-5); }
 }
 /* ========== ACCORDION STYLES ========== */
 .accordion-item {
-    background: rgba(30, 30, 40, 0.6);
+   
     backdrop-filter: blur(8px);
-    border-radius: 16px;
+    border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 20px;
     overflow: hidden;
     transition: all 0.2s ease;
+	width: 100%;                        /* FIX: era assente */
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  background: rgba(44, 44, 44, 0.3);
+ 
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .accordion-header {
