@@ -770,34 +770,38 @@ label {
     <canvas id="validatorChart" style="height: 400px; width: 100%; display: block;"></canvas>
         </div></div><div style="padding: 8x;">-->
 <div class="container">
-    <!-- Tabella Operazioni -->
-	<h2 class="title-fixed">📋 Storico Operazioni</h2>
-    
-    
-    <div class="input-actions" style="margin-bottom: 15px;">
-        <button class="btn-edit" onclick="downloadTableHTML()">📥 Scarica Tabella HTML</button>
+    <!-- Accordion Operazioni -->
+    <div class="accordion-item">
+        <div class="accordion-header" id="accordionHeader">
+            <h2 class="title-fixed">📋 Storico Operazioni</h2>
+            <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content" id="accordionContent">
+            <div class="input-actions" style="margin-bottom: 15px;">
+                <button class="btn-edit" onclick="downloadTableHTML()">📥 Scarica Tabella HTML</button>
+            </div>
+            <table class="operations-table" id="operationsTable">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Figment</th>
+                        <th>Chorus One</th>
+                        <th>Meria</th>
+                        <th>StakeLab</th>
+                        <th>Totale ATOM</th>
+                        <th>Totale USD</th>
+                        <th>Note</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="operationsBody">
+                    <!-- I dati verranno popolati dinamicamente -->
+                </tbody>
+            </table>
+        </div>
     </div>
-    
-    <table class="operations-table" id="operationsTable">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Tipo</th>
-                <th>Figment</th>
-                <th>Chorus One</th>
-                <th>Meria</th>
-                <th>StakeLab</th>
-                <th>Totale ATOM</th>
-                <th>Totale USD</th>
-                <th>Note</th>
-                <th>Azioni</th>
-            </tr>
-        </thead>
-        <tbody id="operationsBody">
-        </tbody>
-    </table>
 </div>
-    </div></div></div>
 	<div style="padding: 1x;"></div>
 		<div  style="padding-top: 1px; padding-bottom: 3px;">
       
@@ -1498,6 +1502,19 @@ function downloadTableHTML() {
     link.click();
     document.body.removeChild(link);
 }
+
+// Accordion per lo storico operazioni
+document.addEventListener('DOMContentLoaded', function() {
+    const accordionItem = document.querySelector('.accordion-item');
+    const accordionHeader = document.querySelector('.accordion-header');
+    
+    if (accordionHeader && accordionItem) {
+        accordionHeader.addEventListener('click', function() {
+            accordionItem.classList.toggle('open');
+        });
+    }
+});
+
     </script>
 </body>
 </html>

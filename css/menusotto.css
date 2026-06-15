@@ -279,7 +279,7 @@ body.menu-open {
     
     /* Logo più grande */
     .logo img {
-        height: 56px !important;
+        height: 50px !important;
     }
     
     /* Hamburger più piccolo di 2px per lato (44px invece di 48) */
@@ -297,6 +297,12 @@ body.menu-open {
     /* Nascondi il blocco header-line */
     .header.header-line {
         display: none !important;
+    }
+}
+@media (max-width: 768px) {
+    .top-navbar {
+        gap: 2px !important;                     /* riduce lo spazio tra hamburger e logo */
+        padding-left: 4px !important;            /* eventuale piccolo margine dal bordo sinistro */
     }
 }
 

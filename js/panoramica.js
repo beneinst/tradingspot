@@ -1178,3 +1178,4 @@ async function getPriceFromBinance(symbol) {
         return null;
     }
 }
+
