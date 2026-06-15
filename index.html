@@ -285,26 +285,26 @@
     </div>
     <nav class="offcanvas-nav">
         <ul class="offcanvas-main-menu">
-            <!-- Trade -->
-            <li class="offcanvas-dropdown">
-                <div class="offcanvas-dropdown-toggle">Trade</div>
-                <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Trade attivi</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
-                </ul>
-            </li>
+           
             <!-- Capitale -->
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Capitale</div>
                 <ul class="offcanvas-submenu">
                     <li><a href="https://beneinst.github.io/tradingspot/">Panoramica</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
+		    <li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
+		    <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
                     <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
                     <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
+                </ul>
+            </li>
+ <!-- Trade -->
+            <li class="offcanvas-dropdown">
+                <div class="offcanvas-dropdown-toggle">Trade</div>
+                <ul class="offcanvas-submenu">
+                    <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Trade attivi</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
                 </ul>
             </li>
             <!-- Strategia -->
@@ -313,6 +313,7 @@
                 <ul class="offcanvas-submenu">
                     <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
                     <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
+<li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
                     <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
                 </ul>
             </li>
@@ -468,11 +469,13 @@
     </div>
   </div>
 </div>
+
+ <div style="padding: 3px;"></div>
 <div class="container">
 
   <!-- Input Section -->
  
-    <h1 style="text-align:left;font-size:24px;color:white;padding-bottom:25px;">➕ Aggiungi al Wallet</h1>
+    <h1 style="text-align:left;font-size:16px;color:white;padding-bottom:25px;">➕ Aggiungi al Wallet</h1>
     <div class="input-group input-group-row">
       <div class="input-field">
         <label>Data</label>
@@ -501,12 +504,12 @@
       </div>
     </div>
     <div class="input-actions">
-      <button class="btn btn-primary" onclick="addOperation()">➕ Aggiungi Operazione</button>
+      <button class="btn btn-primary" onclick="addOperation()">➕ Aggiungi</button>
     </div>
   </div>
 </div>
 
-<div style="padding: 2px;"></div>
+<div style="padding: 3px;"></div>
 
     <!-- Accordion per Operazioni Registrate -->
     <div class="accordion-item" id="accordionOperazioni">
