@@ -470,51 +470,48 @@
   </div>
 </div>
 
- <div style="padding: 3px;"></div>
-<div class="container">
 
-  <!-- Input Section -->
- 
-    <h1 style="text-align:left;font-size:16px;color:white;padding-bottom:25px;">➕ Aggiungi al Wallet</h1>
-    <div class="input-group input-group-row">
-      <div class="input-field">
-        <label>Data</label>
-        <input type="date" id="operationDate">
-      </div>
-      <div class="input-field">
-        <label>Importo</label>
-        <input type="number" id="operationAmount" step="0.01" placeholder="1000.00">
-      </div>
-      <div class="input-field">
-        <label>Tipo</label>
-        <select id="operationType">
-          <option value="EUR">💶 Deposito Euro (- Capitale iniziale)</option>
-          <option value="ATOM">🪙 ATOM acquistati (+ Investimento)</option>
-          <option value="BTC">₿ BTC acquistati (+ Investimento)</option>
-          <option value="SOL">☀️ SOL acquistati (+ Investimento)</option>
-          <option value="LTC">Ł LTC acquistati (+ Investimento)</option>
-          <option value="POL">🔷 POL acquistati (+ Investimento)</option>
-          <option value="USDC">💵 USDC acquistati (+ Stablecoin)</option>
-          <option value="Trading">📈 Profitto Trading (+ Guadagno)</option>
-        </select>
-      </div>
-      <div class="input-field">
-        <label>Note</label>
-        <input type="text" id="operationNote" placeholder="Descrizione operazione">
-      </div>
+<div class="container">
+  <h1 style="text-align:left;font-size:16px;color:white;padding-bottom:25px;">➕ Aggiungi al Wallet</h1>
+  <div class="input-group input-group-row">
+    <div class="input-field">
+      <label>DATA</label>
+      <input type="date" id="operationDate">
     </div>
-    <div class="input-actions">
-      <button class="btn btn-primary" onclick="addOperation()">➕ Aggiungi</button>
+    <div class="input-field">
+      <label>IMPORTO</label>
+      <input type="number" id="operationAmount" step="0.01" placeholder="1000.00">
     </div>
+    <div class="input-field">
+      <label>TIPO</label>
+      <select id="operationType">
+        <option value="EUR">💶 Deposito Euro (- Capitale iniziale)</option>
+        <option value="ATOM">🪙 ATOM acquistati (+ Investimento)</option>
+        <option value="BTC">₿ BTC acquistati (+ Investimento)</option>
+        <option value="SOL">☀️ SOL acquistati (+ Investimento)</option>
+        <option value="LTC">Ł LTC acquistati (+ Investimento)</option>
+        <option value="POL">🔷 POL acquistati (+ Investimento)</option>
+        <option value="USDC">💵 USDC acquistati (+ Stablecoin)</option>
+        <option value="Trading">📈 Profitto Trading (+ Guadagno)</option>
+      </select>
+    </div>
+    <div class="input-field">
+      <label>NOTE</label>
+      <input type="text" id="operationNote" placeholder="Descrizione operazione">
+    </div>
+  </div>
+  <div class="input-actions">
+    <button class="btn-edit" onclick="addOperation()">➕ Aggiungi Operazione</button>
+    <button class="btn-danger" onclick="clearForm()">🔄 Pulisci Form</button>
   </div>
 </div>
 
-<div style="padding: 3px;"></div>
+
 
     <!-- Accordion per Operazioni Registrate -->
     <div class="accordion-item" id="accordionOperazioni">
         <div class="accordion-header">
-            <h3>📋 Operazioni Registrate</h3>
+            <h3 >🗃️ Storico</h3>
             <span class="accordion-icon">▼</span>
         </div>
         <div class="accordion-content">
