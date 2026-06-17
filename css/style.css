@@ -544,10 +544,10 @@ h5 { color: var(--color-heading-5); }
    FIX: unificata definizione duplicata di ts-chart-box
    ========================================= */
 .ts-chart-box {
-  height: 410px;
+  height: 800px;
   margin-bottom: 30px;
   position: relative;
-  padding: 20px;
+  padding: 10px;
   background: rgba(51, 51, 51, 0.6);
   backdrop-filter: blur(8px);
   border-radius: 12px;
@@ -555,8 +555,14 @@ h5 { color: var(--color-heading-5); }
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
    width: 100%;                        /* FIX: era assente */
   max-width: 1400px;
+   
   margin: 0 auto;
  }
+ #usdComparisonChart {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
  
  /* Solo su smartphone in verticale (portrait) */
 @media (max-width: 768px) and (orientation: portrait) {
@@ -841,7 +847,18 @@ h5 { color: var(--color-heading-5); }
     margin-right: 0;
     border-radius: 8px;
   }
-
+@media (max-width: 768px) {
+  .chart-container {
+    width: 900px;          /* larghezza fissa */
+    max-width: 900px;      /* impedisce che si riduca */
+    padding: 14px !important;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 8px;
+    /* opzionale: per permettere scroll orizzontale se il contenitore è più largo dello schermo */
+    overflow-x: auto;
+  }
+}
   
   /* ── NAV ── */
   .nav-desktop { display: none; }
