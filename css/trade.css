@@ -667,3 +667,24 @@ h3.storia-entry-title {
     max-width: 100%;
   }
 }
+
+/* ===== FIX SCROLL VERTICALE - Trade Attivi ===== */
+#trades-container {
+    max-height: 480px;          /* regola in base a quanti trade vuoi vedere */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;  /* scroll fluido iOS */
+    padding-right: 4px;
+}
+
+#trades-container::-webkit-scrollbar { width: 6px; }
+#trades-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 228, 181, 0.35);
+    border-radius: 10px;
+}
+#trades-container::-webkit-scrollbar-track { background: transparent; }
+
+/* Il contenitore dell'accordion NON deve bloccare l'overflow del figlio */
+.accordion-content {
+    overflow: visible;
+}

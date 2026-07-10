@@ -1,0 +1,310 @@
+/* =========================================================
+   MOBILE-CUSTOM.CSS
+   Stile personalizzato mobile-first per i box interni al
+   .container di "Trade Attivi Portfolio".
+   NON tocca: .offcanvas / hamburger menu / top-navbar / logo
+   (quelli restano gestiti da menusotto.css)
+   ========================================================= */
+
+:root {
+    --mc-bg-card: rgba(255, 255, 255, 0.035);
+    --mc-bg-card-hover: rgba(255, 255, 255, 0.06);
+    --mc-accent: #ffe4b5;
+    --mc-accent-soft: rgba(255, 228, 181, 0.35);
+    --mc-text: #eaeaea;
+    --mc-text-muted: #a8a8a8;
+    --mc-radius: 10px;
+    --mc-radius-sm: 6px;
+    --mc-gap: 10px;
+}
+
+/* ---------- RESET LEGGERO CONTAINER ---------- */
+.container {
+    border: 0 !important;
+    border-radius: var(--mc-radius);
+    background: var(--mc-bg-card);
+    box-shadow: none !important;
+    padding: 14px 12px;
+    margin: 0 0 12px 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ---------- TITOLI SEZIONE ---------- */
+.header.header-line {
+    border: 0;
+    padding: 6px 4px 4px 4px;
+    margin: 0;
+}
+.header.header-line h1 {
+    font-size: 1.25rem;
+    margin: 0 0 2px 0;
+    color: var(--mc-accent);
+}
+.header.header-line small {
+    color: var(--mc-text-muted);
+    font-size: 0.78rem;
+}
+.section-title {
+    font-size: 1rem;
+    margin: 0 0 10px 0;
+    border: 0;
+}
+
+/* ---------- FORM AGGIUNGI ENTRY ---------- */
+.input-section {
+    border: 0 !important;
+    background: transparent;
+    padding: 0;
+}
+.input-section h2 {
+    font-size: 1rem;
+    color: var(--mc-accent);
+    margin: 0 0 12px 0;
+}
+.input-group-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mc-gap);
+}
+.input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.input-field label {
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--mc-text-muted);
+}
+.input-field input {
+    border: 1px solid var(--mc-accent-soft);
+    border-radius: var(--mc-radius-sm);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--mc-text);
+    padding: 10px 12px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+}
+.input-field input:focus {
+    outline: none;
+    border-color: var(--mc-accent);
+}
+.input-actions {
+    margin-top: 14px;
+}
+.btn-edit {
+    border: 0 !important;
+    border-radius: var(--mc-radius-sm);
+    background: var(--mc-accent-soft);
+    color: var(--mc-accent);
+    font-weight: 600;
+    padding: 10px 18px !important;
+    width: 100%;
+    min-width: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+    transition: background 0.2s ease;
+}
+.btn-edit.active,
+.btn-edit:hover {
+    background: var(--mc-accent);
+    color: #1a1a1a;
+}
+
+/* ---------- COLONNE ---------- */
+.ts-col-66 {
+    width: 100%;
+    flex: none;
+}
+
+/* ---------- ACCORDION TRADE ATTIVI ---------- */
+.accordion-item {
+    border: 0 !important;
+    border-radius: var(--mc-radius);
+    background: var(--mc-bg-card);
+    overflow: hidden;
+    margin-top: 12px;
+}
+.accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    cursor: pointer;
+    border: 0;
+}
+.accordion-header h4 {
+    font-size: 0.95rem;
+}
+#trade-counter {
+    font-size: 0.78rem;
+    color: var(--mc-text-muted);
+}
+.accordion-icon {
+    color: var(--mc-accent);
+    transition: transform 0.25s ease;
+}
+.accordion-item.open .accordion-icon,
+.accordion-header.open .accordion-icon {
+    transform: rotate(180deg);
+}
+
+/* FIX: il contenuto dell'accordion NON deve tagliare (overflow hidden)
+   il figlio scrollabile #trades-container */
+.accordion-content {
+    border: 0;
+    padding: 0 12px 12px 12px !important;
+    overflow: visible;
+}
+
+/* FIX SCROLL VERTICALE: la vera area che scorre è questa */
+#trades-container {
+    max-height: 55vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 4px;
+    border: 0;
+}
+#trades-container::-webkit-scrollbar {
+    width: 5px;
+}
+#trades-container::-webkit-scrollbar-thumb {
+    background: var(--mc-accent-soft);
+    border-radius: 10px;
+}
+#trades-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* singola card trade (se generata via JS con classi generiche) */
+#trades-container > * {
+    border: 0 !important;
+    border-radius: var(--mc-radius-sm);
+    background: var(--mc-bg-card-hover);
+    margin-bottom: 8px;
+    padding: 10px 12px;
+}
+
+/* ---------- STATISTICHE CAPITALE ---------- */
+.ts-stat-item {
+    border: 0 !important;
+    border-radius: var(--mc-radius-sm);
+    background: var(--mc-bg-card-hover);
+    padding: 10px 8px;
+    text-align: center;
+}
+.ts-stat-label {
+    font-size: 0.68rem;
+    color: var(--mc-text-muted);
+    margin-bottom: 4px;
+}
+.ts-stat-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+.ts-text-total { color: #7fd6ff; }
+.ts-text-capital { color: var(--mc-accent); }
+
+/* ---------- GRAFICI ---------- */
+.ts-chart-box,
+.ts-chart-box-large {
+    border: 0 !important;
+    border-radius: var(--mc-radius-sm);
+    background: rgba(0, 0, 0, 0.15);
+    width: 100%;
+    box-sizing: border-box;
+}
+.ts-chart-box-large {
+    height: 260px;
+}
+
+/* ---------- CARD TABS (Distribuzione / Percentuale) ---------- */
+.ts-dash-card {
+    border: 0 !important;
+    background: transparent;
+    padding: 0;
+}
+.ts-tab-header {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+.ts-tab-header .btn-edit {
+    width: auto;
+    flex: 1;
+    font-size: 0.82rem;
+    padding: 9px 10px !important;
+}
+.ts-tab-content {
+    border: 0;
+}
+
+/* ---------- SELETTORE TEMPO ---------- */
+.ts-time-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.ts-time-selector .btn-edit {
+    width: auto;
+    flex: 1 1 auto;
+    font-size: 0.75rem;
+    padding: 8px 10px !important;
+}
+
+/* ---------- INFO BOX ---------- */
+.ts-info-box {
+    border: 0;
+    border-left: 3px solid var(--mc-accent-soft);
+    background: rgba(255, 228, 181, 0.06);
+    border-radius: var(--mc-radius-sm);
+    padding: 10px 12px;
+    font-size: 0.82rem;
+    color: var(--mc-text-muted);
+    margin-bottom: 14px;
+}
+
+/* ---------- GRIGLIA STATISTICHE PERCENTUALI ---------- */
+.ts-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.ts-grid-item {
+    border: 0 !important;
+    border-radius: var(--mc-radius-sm);
+    background: var(--mc-bg-card-hover);
+    padding: 10px 8px;
+    text-align: center;
+}
+
+/* ---------- BOTTONE TORNA SU ---------- */
+.back-to-top {
+    border: 0 !important;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    background: var(--mc-accent-soft);
+}
+
+/* ---------- MEDIA QUERY MOBILE STRETTO ---------- */
+@media (max-width: 480px) {
+    .container {
+        padding: 12px 10px;
+        border-radius: 8px;
+    }
+    .ts-stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .ts-chart-box-large {
+        height: 220px;
+    }
+    #trades-container {
+        max-height: 50vh;
+    }
+}
