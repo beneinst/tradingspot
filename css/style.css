@@ -102,10 +102,10 @@ body::after {
   max-width: 1400px;
   margin: 0 auto 20px;
   padding: 25px;
-  background: rgba(51, 51, 51, 0.6);
+  background-color: transparent;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(188, 204, 233, 0.15);
+  
   border-radius: 16px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
@@ -509,7 +509,7 @@ h5 { color: var(--color-heading-5); }
   margin-bottom: 30px;
   position: relative;
   padding: 10px;
-  background: rgba(51, 51, 51, 0.6);
+  background-color: transparent;
   backdrop-filter: blur(8px);
   border-radius: 12px;
   border: 1px solid rgba(188, 204, 233, 0.15);
@@ -836,10 +836,10 @@ h5 { color: var(--color-heading-5); }
   align-items: center;
   padding: 18px 24px;
   cursor: pointer;
-  background: rgba(20, 20, 28, 0.8);
+  background: rgba(20, 20, 28, 0.2);
   transition: background 0.2s;
 }
-.accordion-header:hover { background: rgba(40, 40, 50, 0.9); }
+.accordion-header:hover { background: rgba(40, 40, 50, 0.2); }
 .accordion-header h2 {
   margin: 0;
   font-size: 1.3rem;
