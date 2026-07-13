@@ -273,11 +273,17 @@
   margin: 0 auto;
   
 }
-/* Altezza 600px per schermi < 480px */
 @media (max-width: 480px) {
-    .container-f, .container, .chart-container {
-        height: 350px;
-		 
+    .chart-box {
+        height: 380px;      /* box grafico, titolo incluso */
+        position: relative; /* necessario perché Chart.js si ridimensioni correttamente */
+        display: flex;
+        flex-direction: column;
+    }
+    .chart-box canvas {
+        flex: 1 1 auto;
+        max-height: 100% !important;
+        width: 100% !important;
     }
 }
 /* Stile Campi Input (Date, Select, Number) */
@@ -690,7 +696,7 @@ label {
  
 	   
 	    
-         <div class="chart-container">
+         <div class="chart-container chart-box">
 		 <h2 class="title-fixed">📈 Capitale vs Valore</h2>
       <canvas id="usdComparisonChart"></canvas>
     </div>
@@ -783,7 +789,7 @@ label {
  <div style="padding: 5px;"></div>
 
         <!-- Grafico Andamento Capitale -->
-        <div class="chart-container">
+        <div class="chart-container chart-box">
 		<h2 class="title-fixed">👜️ Andamento Capitale</h2>
 		 
           
