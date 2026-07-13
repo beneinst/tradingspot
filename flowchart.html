@@ -151,7 +151,7 @@
        
  <div class="ts-col-66">
   <form id="trade-form" class="input-section">
-    <h4>💱 Aggiungi Entry al Trade</h4>
+    <h2>💱 Aggiungi Entry al Trade</h2>
 
     <div class="input-group input-group-row">
       <div class="input-field">
@@ -195,7 +195,7 @@
     <!-- Accordion per i Trade Attivi -->
     <div class="accordion-item" id="accordionTrades">
         <div class="accordion-header">
-            <h4 class="section-title" style="color: #fff !important; margin: 0;">🎯 I tuoi Trade Attivi</h4>
+            <h4 class="section-title" style="color: #ffe4b5 !important; margin: 0;">🎯 I tuoi Trade Attivi</h4>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div id="trade-counter" style="display: flex; gap: 5px; font-size: 0.9rem;">
                     📊 On <span id="trade-count" style="font-weight: bold; color: #ffe4b5;">0</span>
@@ -209,8 +209,8 @@
     </div>
 </div>
 <div style="padding: 6px;"></div>		
-
-  <h5 class="section-title" style="color: #ffe4b5 !important;">🪔 Storico Distribuzione Capitale</h5>
+<div class="container">
+  <h5 class="section-title" style="color: #ffe4b5 !important;">🪔 STORICO Distribuzione Capitale</h5>
   
  
 
@@ -250,8 +250,8 @@
 <div style="padding: 4px;"></div>
   
   
-  <!-- Nuova card per il grafico storico -->
- 
+  <!-- Nuova card per il grafico STORICO -->
+ <div class="container">
    <div class="ts-dash-card">
   
   <!-- Intestazione Tabs -->
@@ -265,7 +265,7 @@
     
     <!-- Box Grafico Grande (600px) -->
     <div class="ts-chart-box-large" style="position: relative; width: 100%;">
-      <canvas id="storicoCapitaleChart" style="width: 100%; height: 100%;"></canvas>
+      <canvas id="STORICOCapitaleChart" style="width: 100%; height: 100%;"></canvas>
     </div>
 
     <!-- Selettore Tempo -->
@@ -369,7 +369,7 @@
   <span id="mediaTradeTotaleIn"></span>
   <span id="mediaDollariTrading"></span>
   <canvas id="capitaleChart"></canvas>
-  <canvas id="storicoCapitaleChart"></canvas>
+  <canvas id="STORICOCapitaleChart"></canvas>
   <canvas id="percentualeCapitaleChart"></canvas>
 </div>
 
@@ -432,7 +432,7 @@ window.addEventListener('storage', (e) => {
 // 🧠 Aggiorna anche al caricamento pagina
 document.addEventListener('DOMContentLoaded', updateTradeCount);
 
-// Accordion per lo storico operazioni
+// Accordion per lo STORICO operazioni
 document.addEventListener('DOMContentLoaded', function() {
     const accordionItem = document.querySelector('.accordion-item');
     const accordionHeader = document.querySelector('.accordion-header');

@@ -275,7 +275,7 @@
 }
 @media (max-width: 480px) {
     .chart-box {
-        height: 360px;      /* box grafico, titolo incluso */
+        height: 350px;      /* box grafico, titolo incluso */
         position: relative; /* necessario perché Chart.js si ridimensioni correttamente */
         display: flex;
         flex-direction: column;
@@ -810,7 +810,7 @@ label {
     <!-- Accordion Operazioni -->
     <div class="accordion-item">
         <div class="accordion-header" id="accordionHeader">
-            <h3 >🗃️ Storico</h3>
+            <h3 >🗃️ STORICO</h3>
             <span class="accordion-icon">▼</span>
         </div>
                
@@ -858,7 +858,7 @@ label {
 		let usdComparisonChart = null;
 
         // Nomi validatori: servono SOLO per etichettare le vecchie operazioni
-        // già presenti nello storico (create prima della semplificazione del form).
+        // già presenti nello STORICO (create prima della semplificazione del form).
         const validatorNames = {
             figment: '🏛️ Figment',
             chorus: '🎵 Chorus One',
@@ -936,7 +936,7 @@ label {
         }
 
         // Recupera (se presente) il nome del validatore di una vecchia operazione,
-        // solo per mostrarlo come etichetta informativa nello storico.
+        // solo per mostrarlo come etichetta informativa nello STORICO.
         function getOperationValidatorTag(op) {
             if (!op.validators) return '';
             const entry = Object.entries(op.validators).find(([key, v]) => v.atom > 0 || v.usd > 0);
@@ -1358,7 +1358,7 @@ function downloadTableHTML() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Storico Operazioni ATOM - ${new Date().toLocaleDateString('it-IT')}</title>
+    <title>STORICO Operazioni ATOM - ${new Date().toLocaleDateString('it-IT')}</title>
     <style>
         * {
             margin: 0;
@@ -1445,7 +1445,7 @@ function downloadTableHTML() {
 </head>
 <body>
     <div class="container">
-        <h1>📋 Storico Operazioni ATOM Staking</h1>
+        <h1>📋 STORICO Operazioni ATOM Staking</h1>
         <p class="export-date">Esportato il: ${new Date().toLocaleString('it-IT')} — Importi in EUR</p>
         
         <table>
@@ -1476,7 +1476,7 @@ function downloadTableHTML() {
     const url = URL.createObjectURL(blob);
     
     link.setAttribute('href', url);
-    link.setAttribute('download', `atom-staking-storico-${new Date().toISOString().split('T')[0]}.html`);
+    link.setAttribute('download', `atom-staking-STORICO-${new Date().toISOString().split('T')[0]}.html`);
     link.style.visibility = 'hidden';
     
     document.body.appendChild(link);
@@ -1484,7 +1484,7 @@ function downloadTableHTML() {
     document.body.removeChild(link);
 }
 
-// Accordion per lo storico operazioni
+// Accordion per lo STORICO operazioni
 document.addEventListener('DOMContentLoaded', function() {
     const accordionItem = document.querySelector('.accordion-item');
     const accordionHeader = document.querySelector('.accordion-header');

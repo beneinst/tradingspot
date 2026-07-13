@@ -515,7 +515,7 @@
     <!-- Accordion per Operazioni Registrate -->
     <div class="accordion-item" id="accordionOperazioni">
         <div class="accordion-header">
-            <h3 >🗃️ Storico</h3>
+            <h3 >🗃️ STORICO</h3>
             <span class="accordion-icon">▼</span>
         </div>
         <div class="accordion-content">
@@ -826,7 +826,7 @@ function buildReportTables() {
     const cb=document.getElementById('currentMonthBody'), ct=document.getElementById('currentMonthTotal');
     if(cb&&ct){cb.innerHTML='';let tot=0;(groups[ck]||[]).forEach(op=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${new Date(op.date).toLocaleDateString('it-IT')}</td><td>${op.type}</td><td class="right">${formatEuro(op.amount)}</td>`;cb.appendChild(tr);tot+=op.amount;});ct.textContent=formatEuro(tot);}
     const hc=document.getElementById('monthlyHistory'); if(!hc)return;
-    hc.innerHTML='<h3>Storico Mensile (con dettagli)</h3>';
+    hc.innerHTML='<h3>STORICO Mensile (con dettagli)</h3>';
     Object.keys(groups).sort().forEach(k=>{
         const list=groups[k],label=new Date(k+'-01').toLocaleDateString('it-IT',{month:'2-digit',year:'numeric'});
         const w=document.createElement('div');w.className='report-block';
@@ -846,7 +846,7 @@ function exportDataHTML() {
     const sym=t=>t==='ATOM'?' ATOM':t==='BTC'?' BTC':t==='SOL'?' SOL':t==='LTC'?' LTC':t==='POL'?' POL':t==='USDC'?' USDC':'€';
     let html=`<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Report - ${now.toLocaleDateString('it-IT')}</title><style>body{font-family:Arial,sans-serif;font-size:13px;padding:20px;}h1{font-size:20px;}h2{font-size:16px;margin-top:25px;}table{width:100%;border-collapse:collapse;margin-bottom:15px;}thead th{background:#3ca44a;color:#fff;padding:6px;text-align:left;}td{padding:4px 6px;border-bottom:1px solid #ddd;}tfoot td{background:#eef5ff;font-weight:bold;}.right{text-align:right;}</style></head><body><h1>Report Operazioni</h1><h2>Mese Corrente</h2><table><thead><tr><th>Data</th><th>Tipo</th><th>Importo</th><th>Note</th></tr></thead><tbody>`;
     let ct=0;cl.forEach(op=>{ct+=op.amount;html+=`<tr><td>${new Date(op.date).toLocaleDateString('it-IT')}</td><td>${op.type}</td><td class="right">${op.type==='EUR'?'-':'+'}${formatEuro(op.amount)}${sym(op.type)}</td><td>${op.note||''}</td></tr>`;});
-    html+=`</tbody><tfoot><tr><td colspan="2" class="right">Totale</td><td class="right">${formatEuro(ct)}</td><td></td></tr></tfoot></table><h2>Storico Mensile</h2>`;
+    html+=`</tbody><tfoot><tr><td colspan="2" class="right">Totale</td><td class="right">${formatEuro(ct)}</td><td></td></tr></tfoot></table><h2>STORICO Mensile</h2>`;
     Object.keys(groups).sort().forEach(k=>{
         const list=groups[k],label=new Date(k+'-01').toLocaleDateString('it-IT',{month:'2-digit',year:'numeric'});let tot=0;
         html+=`<p><strong>Mese ${label}</strong></p><table><thead><tr><th>Data</th><th>Tipo</th><th>Importo</th><th>Note</th></tr></thead><tbody>`;
@@ -872,7 +872,7 @@ function downloadFile(content,filename) {
 
 init();
 
-// Accordion per lo storico operazioni
+// Accordion per lo STORICO operazioni
 document.addEventListener('DOMContentLoaded', function() {
     const accordionItem = document.querySelector('.accordion-item');
     const accordionHeader = document.querySelector('.accordion-header');
