@@ -476,37 +476,37 @@
 
 
 <div class="container">
-  <h1 style="text-align:left;font-size:16px;color:white;padding-bottom:25px;">➕ Aggiungi al Wallet</h1>
+  <h1 style="text-align:left;font-size:16px;color:white;padding-bottom:13px;">➕ Aggiungi al Wallet</h1>
   <div class="input-group input-group-row">
     <div class="input-field">
-      <label>DATA</label>
+      <label style="font-size: 0.70em;">DATA</label>
       <input type="date" id="operationDate">
     </div>
     <div class="input-field">
-      <label>IMPORTO</label>
+      <label style="font-size: 0.70em;">IMPORTO</label>
       <input type="number" id="operationAmount" step="0.01" placeholder="1000.00">
     </div>
     <div class="input-field">
-      <label>TIPO</label>
+      <label style="font-size: 0.70em;">TIPO</label>
       <select id="operationType">
-        <option value="EUR">💶 Deposito Euro (- Capitale iniziale)</option>
-        <option value="ATOM">🪙 ATOM acquistati (+ Investimento)</option>
-        <option value="BTC">₿ BTC acquistati (+ Investimento)</option>
-        <option value="SOL">☀️ SOL acquistati (+ Investimento)</option>
-        <option value="LTC">Ł LTC acquistati (+ Investimento)</option>
-        <option value="POL">🔷 POL acquistati (+ Investimento)</option>
-        <option value="USDC">💵 USDC acquistati (+ Stablecoin)</option>
-        <option value="Trading">📈 Profitto Trading (+ Guadagno)</option>
+       <option value="EUR" style="background-color: #1a1a2e; color: #e0e0e0;">💶 Deposito Euro (- Capitale iniziale)</option>
+<option value="ATOM" style="background-color: #1a1a2e; color: #e0e0e0;">🪙 ATOM acquistati (+ Investimento)</option>
+<option value="BTC" style="background-color: #1a1a2e; color: #e0e0e0;">₿ BTC acquistati (+ Investimento)</option>
+<option value="SOL" style="background-color: #1a1a2e; color: #e0e0e0;">☀️ SOL acquistati (+ Investimento)</option>
+<option value="LTC" style="background-color: #1a1a2e; color: #e0e0e0;">Ł LTC acquistati (+ Investimento)</option>
+<option value="POL" style="background-color: #1a1a2e; color: #e0e0e0;">🔷 POL acquistati (+ Investimento)</option>
+<option value="USDC" style="background-color: #1a1a2e; color: #e0e0e0;">💵 USDC acquistati (+ Stablecoin)</option>
+<option value="Trading" style="background-color: #1a1a2e; color: #e0e0e0;">📈 Profitto Trading (+ Guadagno)</option>
       </select>
     </div>
     <div class="input-field">
-      <label>NOTE</label>
+      <label style="font-size: 0.70em;">NOTE</label>
       <input type="text" id="operationNote" placeholder="Descrizione operazione">
     </div>
   </div>
   <div class="input-actions">
     <button class="btn-edit" onclick="addOperation()">➕ Aggiungi Operazione</button>
-    <button class="btn-danger" onclick="clearForm()">🔄 Pulisci Form</button>
+    <button class="btn-edit" onclick="clearForm()">🔄 Pulisci Form</button>
   </div>
 </div>
 
