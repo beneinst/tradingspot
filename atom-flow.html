@@ -273,7 +273,12 @@
   margin: 0 auto;
   
 }
-
+/* Altezza 600px per schermi < 480px */
+@media (max-width: 480px) {
+    .container-f, .container, .chart-container {
+        height: 800px;
+    }
+}
 /* Stile Campi Input (Date, Select, Number) */
 input, select {
     background: rgba(255, 255, 255, 0.05) !important;
