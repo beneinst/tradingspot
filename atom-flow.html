@@ -524,26 +524,23 @@ label {
   }
 }
 
-/* ===== FIX SCROLL VERTICALE - Trade Attivi ===== */
-#trades-container {
-    max-height: 480px;          /* regola in base a quanti trade vuoi vedere */
+.accordion-content { overflow: visible; }
+
+.table-scroll-wrap {
+    max-height: 480px;
     overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;  /* scroll fluido iOS */
+    overflow-x: auto;              /* le tabelle su mobile spesso sono più larghe dello schermo */
+    -webkit-overflow-scrolling: touch;
     padding-right: 4px;
 }
-
-#trades-container::-webkit-scrollbar { width: 6px; }
-#trades-container::-webkit-scrollbar-thumb {
+.table-scroll-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
+.table-scroll-wrap::-webkit-scrollbar-thumb {
     background: rgba(255, 228, 181, 0.35);
     border-radius: 10px;
 }
-#trades-container::-webkit-scrollbar-track { background: transparent; }
+.table-scroll-wrap::-webkit-scrollbar-track { background: transparent; }
 
-/* Il contenitore dell'accordion NON deve bloccare l'overflow del figlio */
-.accordion-content {
-    overflow: visible;
-}
+.operations-table { width: 100%; min-width: 480px; } /* evita che le colonne si schiaccino */
     </style>
 </head>
 <body>
@@ -804,30 +801,30 @@ label {
             <h3 >🗃️ Storico</h3>
             <span class="accordion-icon">▼</span>
         </div>
-		<div class="trade-counter" >
-        <div class="accordion-content" id="accordionContent">
-            <div class="input-actions" style="margin-bottom: 15px;">
-                <button class="btn-edit" onclick="downloadTableHTML()">📥 Scarica Tabella HTML</button>
-            </div>
-			
-            <table class="operations-table" id="operationsTable">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Tipo</th>
-                        <th>ATOM</th>
-                        <th>Importo (€)</th>
-                        <th>Note</th>
-                        <th>Azioni</th>
-                    </tr>
-                </thead>
-                <tbody id="operationsBody">
-                    <!-- I dati verranno popolati dinamicamente -->
-                </tbody>
-            </table>
-        </div>
+               
+		
+      <div class="accordion-content" id="accordionContent">
+    <div class="input-actions" style="margin-bottom: 15px;">
+        <button class="btn-edit" onclick="downloadTableHTML()">📥 Scarica Tabella HTML</button>
+    </div>
+
+    <div class="table-scroll-wrap">
+        <table class="operations-table" id="operationsTable">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>ATOM</th>
+                    <th>Importo (€)</th>
+                    <th>Note</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody id="operationsBody"></tbody>
+        </table>
     </div>
 </div></div>
+</div>
 	<div style="padding: 1x;"></div>
 		<div  style="padding-top: 1px; padding-bottom: 3px;">
       
