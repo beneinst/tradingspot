@@ -523,6 +523,27 @@ label {
     text-align: center;   /* centrato su smartphone */
   }
 }
+
+/* ===== FIX SCROLL VERTICALE - Trade Attivi ===== */
+#trades-container {
+    max-height: 480px;          /* regola in base a quanti trade vuoi vedere */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;  /* scroll fluido iOS */
+    padding-right: 4px;
+}
+
+#trades-container::-webkit-scrollbar { width: 6px; }
+#trades-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 228, 181, 0.35);
+    border-radius: 10px;
+}
+#trades-container::-webkit-scrollbar-track { background: transparent; }
+
+/* Il contenitore dell'accordion NON deve bloccare l'overflow del figlio */
+.accordion-content {
+    overflow: visible;
+}
     </style>
 </head>
 <body>
@@ -787,6 +808,7 @@ label {
             <div class="input-actions" style="margin-bottom: 15px;">
                 <button class="btn-edit" onclick="downloadTableHTML()">📥 Scarica Tabella HTML</button>
             </div>
+			<div id="trade-counter" style="display: flex; gap: 5px; font-size: 0.9rem;">
             <table class="operations-table" id="operationsTable">
                 <thead>
                     <tr>
