@@ -9,6 +9,35 @@
 
 };
 
+  // ---- CONVERTITORE VALUTA ----
+  // usdToEurRate viene aggiornato via API (frankfurter.app, gratuita senza chiave).
+  // 0.93 è solo un valore di fallback usato finché la chiamata non risponde.
+  let usdToEurRate = 0.93;
+
+  async function fetchExchangeRate() {
+    try {
+      const response = await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR');
+      const data = await response.json();
+      if (data && data.rates && data.rates.EUR) {
+        usdToEurRate = data.rates.EUR;
+      }
+    } catch (error) {
+      console.error('Errore nel recupero del cambio USD/EUR, uso il valore di fallback:', error);
+    }
+  }
+
+  // Restituisce la quotaPerTrade in EUR:
+  // - se i dati sono già marchiati 'EUR' (inseriti dopo la conversione), la usa così com'è
+  // - se sono ancora marchiati 'USD' (dati storici pre-conversione), la converte al volo
+  //   usando il tasso corrente, SENZA MAI sovrascrivere il valore originale salvato.
+  function getQuotaPerTradeEUR() {
+    const quota = datiCapitale.quotaPerTrade || 0;
+    if (datiCapitale.currency === 'EUR') {
+      return quota;
+    }
+    return quota * usdToEurRate;
+  }
+
   
   // Variabili per i grafici
   let capitaleChart = null;
@@ -89,6 +118,8 @@ datiCapitale.storicoCapitale.push({
   // Aggiorna i totali
   function aggiornaTotali() {
     datiCapitale.quotaPerTrade = parseFloat(document.getElementById("quotaPerTrade").value) || datiCapitale.quotaPerTrade;
+    // Da qui in avanti la quota inserita manualmente è considerata in EUR
+    datiCapitale.currency = 'EUR';
     
     // Aggiorna l'interfaccia
     aggiornaInterfaccia();
@@ -234,25 +265,26 @@ function aggiornaInterfaccia() {
     // Aggiorna il valore dell'input (ora solo uno)
     document.getElementById("inputTotaleIn").value = datiCapitale.totaleIn;
     
-    // Calcola e aggiorna i nuovi valori in dollari
-    const capitaleTotale = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
-    const capitaleInDollari = datiCapitale.capitale * datiCapitale.quotaPerTrade;
-    const totaleInDollari = datiCapitale.totaleIn * datiCapitale.quotaPerTrade;
+    // Calcola e aggiorna i nuovi valori in EURO (quotaPerTrade convertita se storica in USD)
+    const quotaEUR = getQuotaPerTradeEUR();
+    const capitaleTotale = datiCapitale.totaleTrade * quotaEUR;
+    const capitaleInDollari = datiCapitale.capitale * quotaEUR;
+    const totaleInDollari = datiCapitale.totaleIn * quotaEUR;
     
     // Aggiorna i nuovi elementi dell'interfaccia
-    document.getElementById('capitaleTotale').innerText = capitaleTotale;
-    document.getElementById('capitaleInDollari').innerText = `$${capitaleInDollari}`;
-    document.getElementById('totaleInDollari').innerText = `$${totaleInDollari}`;
+    document.getElementById('capitaleTotale').innerText = `€${capitaleTotale.toFixed(2)}`;
+    document.getElementById('capitaleInDollari').innerText = `€${capitaleInDollari.toFixed(2)}`;
+    document.getElementById('totaleInDollari').innerText = `€${totaleInDollari.toFixed(2)}`;
     
     // Calcola e aggiorna le medie (modificato per il totale unico)
     const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
     
     if (datiPeriodo.length > 0) {
       const mediaTotaleIn = calcolaMedia(datiPeriodo.map(item => item.totaleIn));
-      const mediaDollari = mediaTotaleIn * datiCapitale.quotaPerTrade;
+      const mediaDollari = mediaTotaleIn * quotaEUR;
       
       document.getElementById("mediaTradeTotaleIn").textContent = mediaTotaleIn.toFixed(1);
-      document.getElementById("mediaDollariTrading").textContent = `$${mediaDollari.toFixed(2)}`;
+      document.getElementById("mediaDollariTrading").textContent = `€${mediaDollari.toFixed(2)}`;
     }
 }
 
@@ -330,8 +362,8 @@ function creaGraficoCapitale() {
           borderRadius: { topLeft: 10, bottomLeft: 10 } // Arrotonda sinistra
         },
         {
-          label: 'A Capitale (USD)',
-          data: [datiCapitale.capitale], // Valore USD
+          label: 'A Capitale (EUR)',
+          data: [datiCapitale.capitale], // Valore EUR
           backgroundColor: '#20bf6b',    // Blu
           borderColor: '#222',
           borderWidth: 0,
@@ -369,8 +401,8 @@ function creaGraficoCapitale() {
             // Personalizziamo il tooltip come nel tuo vecchio grafico
             label: function(context) {
               const value = context.raw;
-              const dollari = (value * datiCapitale.quotaPerTrade).toFixed(2);
-              return ` ${context.dataset.label}: ${value} slot ($${dollari})`;
+              const euro = (value * getQuotaPerTradeEUR()).toFixed(2);
+              return ` ${context.dataset.label}: ${value} slot (€${euro})`;
             }
           }
         }
@@ -494,7 +526,7 @@ function creaGraficoStoricoCapitale() {
           pointHoverRadius: 6
         },
         {
-          label: 'Capitale (USD)',
+          label: 'Capitale (EUR)',
           data: datiPeriodo.map(item => item.capitale),
           backgroundColor: 'rgba(0, 128, 128, 0.2)',
           borderColor: '#20bf6b',
@@ -720,11 +752,12 @@ function creaGraficoPercentualeCapitale() {
     percentualeCapitaleChart = null;
   }
   const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+  const quotaEUR = getQuotaPerTradeEUR();
   
   const percentuali = datiPeriodo.map(item => {
-    const totaleInDollari = item.totaleIn * datiCapitale.quotaPerTrade;
-    const totaleComplessivo = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
-    return (totaleInDollari / totaleComplessivo) * 100;
+    const totaleInEuro = item.totaleIn * quotaEUR;
+    const totaleComplessivo = datiCapitale.totaleTrade * quotaEUR;
+    return (totaleInEuro / totaleComplessivo) * 100;
   });
   
   const colori = modalitaExport ? coloriConfig.export : coloriConfig.web;
@@ -799,6 +832,7 @@ function creaGraficoPercentualeCapitale() {
   function aggiornaGraficoPercentuale() {
     if (percentualeCapitaleChart) {
       const datiPeriodo = filtraDatiPerPeriodo(datiCapitale.storicoCapitale, periodoVisualizzato);
+      const quotaEUR = getQuotaPerTradeEUR();
       
       // Aggiorna le etichette
       percentualeCapitaleChart.data.labels = datiPeriodo.map(item => {
@@ -808,9 +842,9 @@ function creaGraficoPercentualeCapitale() {
       
       // Calcola le nuove percentuali
       const percentuali = datiPeriodo.map(item => {
-        const totaleInDollari = item.totaleIn * datiCapitale.quotaPerTrade;
-        const totaleComplessivo = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
-        return (totaleInDollari / totaleComplessivo) * 100;
+        const totaleInEuro = item.totaleIn * quotaEUR;
+        const totaleComplessivo = datiCapitale.totaleTrade * quotaEUR;
+        return (totaleInEuro / totaleComplessivo) * 100;
       });
       
       percentualeCapitaleChart.data.datasets[0].data = percentuali;
@@ -826,6 +860,8 @@ function creaGraficoPercentualeCapitale() {
       return;
     }
     
+    const quotaEUR = getQuotaPerTradeEUR();
+    
     // Contatori per ciascuna fascia percentuale
     let count0_25 = 0;
     let count25_50 = 0;
@@ -834,9 +870,9 @@ function creaGraficoPercentualeCapitale() {
     
     // Calcola le percentuali per ogni giorno e incrementa i contatori
     datiPeriodo.forEach(item => {
-      const totaleInDollari = item.totaleIn * datiCapitale.quotaPerTrade;
-      const totaleComplessivo = datiCapitale.totaleTrade * datiCapitale.quotaPerTrade;
-      const percentuale = (totaleInDollari / totaleComplessivo) * 100;
+      const totaleInEuro = item.totaleIn * quotaEUR;
+      const totaleComplessivo = datiCapitale.totaleTrade * quotaEUR;
+      const percentuale = (totaleInEuro / totaleComplessivo) * 100;
       
       if (percentuale <= 25) {
         count0_25++;
@@ -861,25 +897,26 @@ function creaGraficoPercentualeCapitale() {
     // Recupera il valore dei "Trade Totali"
     const tradeTotali = parseInt(document.getElementById('totaleTrade').innerText);
 
-    // Recupera il valore della "Quota per Trade"
+    // Recupera il valore della "Quota per Trade" (inserita manualmente qui: consideriamo EUR)
     const quotaPerTrade = parseInt(document.getElementById('quotaPerTrade').value);
 
     // Salva il valore quotaPerTrade nei dati principali
     datiCapitale.quotaPerTrade = quotaPerTrade;
+    datiCapitale.currency = 'EUR';
 
     // Calcola il "Capitale Totale"
     const capitaleTotale = tradeTotali * quotaPerTrade;
 
-    // Calcola "A Capitale" in dollari
+    // Calcola "A Capitale" in euro
     const capitaleInDollari = datiCapitale.capitale * quotaPerTrade;
 
-    // Calcola "Totale In" in dollari
+    // Calcola "Totale In" in euro
     const totaleInDollari = datiCapitale.totaleIn * quotaPerTrade;
 
     // Aggiorna tutti i valori nell'interfaccia
-    document.getElementById('capitaleTotale').innerText = capitaleTotale;
-    document.getElementById('capitaleInDollari').innerText = `$${capitaleInDollari}`;
-    document.getElementById('totaleInDollari').innerText = `$${totaleInDollari}`;
+    document.getElementById('capitaleTotale').innerText = `€${capitaleTotale.toFixed(2)}`;
+    document.getElementById('capitaleInDollari').innerText = `€${capitaleInDollari.toFixed(2)}`;
+    document.getElementById('totaleInDollari').innerText = `€${totaleInDollari.toFixed(2)}`;
 
     // Salva i dati aggiornati
     salvaDatiLocali();
@@ -888,8 +925,11 @@ function creaGraficoPercentualeCapitale() {
 
 
 // Modifica la funzione aggiornaTotali() per salvare quotaPerTrade
+// (Nota: questa seconda dichiarazione sovrascrive quella precedente nel file originale;
+// la manteniamo identica per compatibilità, entrambe ora taggano currency 'EUR')
 function aggiornaTotali() {
     datiCapitale.quotaPerTrade = parseFloat(document.getElementById("quotaPerTrade").value) || datiCapitale.quotaPerTrade;
+    datiCapitale.currency = 'EUR';
     
     // Aggiorna l'interfaccia
     aggiornaInterfaccia();
@@ -916,6 +956,11 @@ function aggiornaTotali() {
   }
   
   // Carica i dati da localStorage
+  // MIGRAZIONE: se il file salvato non ha ancora il campo "currency", significa che
+  // è stato creato prima del passaggio a EUR, quindi la quotaPerTrade è ancora in USD.
+  // NON la convertiamo qui: la marchiamo solo come 'USD' e la conversione in EUR
+  // avviene "al volo" nei calcoli tramite getQuotaPerTradeEUR(). Il valore originale
+  // resta quindi sempre intatto nel JSON di localStorage.
   function caricaDatiLocali() {
   const datiSalvati = localStorage.getItem('datiCapitale');
   if (datiSalvati) {
@@ -923,6 +968,9 @@ function aggiornaTotali() {
     if (!datiCaricati.hasOwnProperty('totaleIn') || !datiCaricati.hasOwnProperty('capitale')) {
       alert('Il file non contiene dati validi.');
       return;
+    }
+    if (!datiCaricati.currency) {
+      datiCaricati.currency = 'USD';
     }
     Object.assign(datiCapitale, datiCaricati);
   }
@@ -1014,32 +1062,37 @@ function sincronizzaTradeAttivi() {
 
   
   // Inizializza l'applicazione quando il documento è pronto
-  document.addEventListener('DOMContentLoaded', function() {
+  // (i due listener DOMContentLoaded originali sono stati unificati in uno solo,
+  // preceduto dal recupero del tasso di cambio, per evitare doppie inizializzazioni
+  // e per garantire che getQuotaPerTradeEUR() usi un tasso aggiornato fin da subito)
+  document.addEventListener('DOMContentLoaded', async function () {
+    await fetchExchangeRate();
+
     inizializza();
-// 	window.addEventListener('resize', gestisciRidimensionamento);
-    
-    // Aggiungi l'indicatore del tempo dopo l'inizializzazione
     aggiungiIndicatoreTempo();
-    
-    // Aggiorna l'indicatore quando cambia il range di tempo
+    sincronizzaTradeAttivi(); // prima sincronizzazione
+
     document.querySelectorAll('.time-range-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         aggiungiIndicatoreTempo();
       });
     });
-  });
-  
-  document.addEventListener('DOMContentLoaded', function () {
-  inizializza();
-  sincronizzaTradeAttivi(); // 👈 prima sincronizzazione
 
-  // 🔄 Ascolta eventi di apertura/chiusura trade
-  window.addEventListener('storage', e => {
-    if (e.key === '__tradeEvent__' && e.newValue) {
-      sincronizzaTradeAttivi();
-    }
+    // 🔄 Ascolta eventi di apertura/chiusura trade
+    window.addEventListener('storage', e => {
+      if (e.key === '__tradeEvent__' && e.newValue) {
+        sincronizzaTradeAttivi();
+      }
+    });
+
+    // Aggiorna il tasso di cambio periodicamente (ogni 5 minuti) e ricalcola
+    setInterval(async () => {
+      await fetchExchangeRate();
+      aggiornaInterfaccia();
+      aggiornaGraficoPercentuale();
+      calcolaStatistichePercentuali();
+    }, 300000);
   });
-});
 
  // 🟢  Ascolta gli eventi di apertura / chiusura trade
 window.addEventListener('storage', e => {
@@ -1066,6 +1119,11 @@ setInterval(() => {
 // ========================================
 
 // 1. Funzione per salvare un trade chiuso
+// Nota: totalInvestment, totalQuantity, avgPrice, closePrice, closeValue e finalPnL
+// restano salvati nella valuta nativa di Binance (USDC, equivalente a USD), perché
+// è la valuta reale in cui avviene lo scambio. La conversione in EUR viene fatta
+// solo al momento della visualizzazione (vedi deleteTrade), così il dato salvato
+// resta sempre accurato rispetto all'operazione reale sull'exchange.
 function salvaTradeChiuso(trade, stats, currentPrice) {
     const tradesChiusi = JSON.parse(localStorage.getItem('closedTrades') || '[]');
     
@@ -1135,19 +1193,20 @@ async function deleteTrade(id) {
     stats.avgPrice = stats.totalQuantity > 0 ? stats.totalInvestment / stats.totalQuantity : 0;
     
     try {
-        // Ottieni prezzo corrente
+        // Ottieni prezzo corrente (in USDC, ~ USD)
         const currentPrice = await getPriceFromBinance(trade.symbol);
         
         if (currentPrice) {
-            // Salva il trade chiuso con i dati finali
+            // Salva il trade chiuso con i dati finali (in USD/USDC, valuta nativa Binance)
             const tradeChiuso = salvaTradeChiuso(trade, stats, currentPrice);
             
             console.log('Trade chiuso salvato:', tradeChiuso);
             
-            // Mostra notifica con il risultato
-            const pnlText = tradeChiuso.finalPnL >= 0 
-                ? `+$${tradeChiuso.finalPnL.toFixed(2)} (+${tradeChiuso.finalPnLPercent.toFixed(2)}%)` 
-                : `-$${Math.abs(tradeChiuso.finalPnL).toFixed(2)} (${tradeChiuso.finalPnLPercent.toFixed(2)}%)`;
+            // Converte il P&L in EUR solo per la visualizzazione nell'alert
+            const pnlEUR = tradeChiuso.finalPnL * usdToEurRate;
+            const pnlText = pnlEUR >= 0 
+                ? `+€${pnlEUR.toFixed(2)} (+${tradeChiuso.finalPnLPercent.toFixed(2)}%)` 
+                : `-€${Math.abs(pnlEUR).toFixed(2)} (${tradeChiuso.finalPnLPercent.toFixed(2)}%)`;
             
             alert(`Trade ${trade.symbol} chiuso!\nP&L finale: ${pnlText}`);
         }
@@ -1178,4 +1237,3 @@ async function getPriceFromBinance(symbol) {
         return null;
     }
 }
-
