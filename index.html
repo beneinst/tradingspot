@@ -94,11 +94,7 @@
     margin-bottom: 20px;
 }
 
-<<<<<<< HEAD
-.chart-container { position:relative; height:760px; background:rgba(35,35,59,0.1); border-radius:8px; overflow:hidden; margin-bottom:20px; }
-=======
 .chart-container { position:relative; height:760px; background:rgba(35,35,59,0.2); border-radius:8px; overflow:hidden; margin-bottom:20px; }
->>>>>>> 1bf06233944369af529a34fb7e7dc0eb155d6ac6
 
 .totals-section { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:15px; }
 
@@ -142,12 +138,34 @@
     overflow: hidden;
 }
 
+.data-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 8px 0;
+    flex-shrink: 0;
+}
+
 .data-title {
     color: #F2BB66;
     font-size: 0.95em;
-    margin: 0 0 8px 0;
-    flex-shrink: 0;                         /* il titolo non si restringe */
+    margin: 0;
+    flex-shrink: 0;
 }
+
+.btn-download-csv {
+    background: rgba(74,144,226,0.15);
+    border: 1px solid rgba(74,144,226,0.4);
+    color: #cfe0f7;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.78em;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+.btn-download-csv:hover { background: rgba(74,144,226,0.35); transform: translateY(-1px); }
 
 /* Tabella con thead fisso */
 .data-table {
@@ -490,12 +508,12 @@
       <label style="font-size: 0.70em;">TIPO</label>
       <select id="operationType">
        <option value="EUR" style="background-color: #1a1a2e; color: #e0e0e0;">💶 Deposito Euro (- Capitale iniziale)</option>
-<option value="ATOM" style="background-color: #1a1a2e; color: #e0e0e0;">🪙 ATOM acquistati (+ Investimento)</option>
-<option value="BTC" style="background-color: #1a1a2e; color: #e0e0e0;">₿ BTC acquistati (+ Investimento)</option>
-<option value="SOL" style="background-color: #1a1a2e; color: #e0e0e0;">☀️ SOL acquistati (+ Investimento)</option>
-<option value="LTC" style="background-color: #1a1a2e; color: #e0e0e0;">Ł LTC acquistati (+ Investimento)</option>
-<option value="POL" style="background-color: #1a1a2e; color: #e0e0e0;">🔷 POL acquistati (+ Investimento)</option>
-<option value="USDC" style="background-color: #1a1a2e; color: #e0e0e0;">💵 USDC acquistati (+ Stablecoin)</option>
+<option value="ATOM" style="background-color: #1a1a2e; color: #e0e0e0;">🪙 ATOM (+ Investimento)</option>
+<option value="BTC" style="background-color: #1a1a2e; color: #e0e0e0;">₿ BTC (+ Investimento)</option>
+<option value="SOL" style="background-color: #1a1a2e; color: #e0e0e0;">☀️ SOL (+ Investimento)</option>
+<option value="LTC" style="background-color: #1a1a2e; color: #e0e0e0;">Ł LTC (+ Investimento)</option>
+<option value="POL" style="background-color: #1a1a2e; color: #e0e0e0;">🔷 POL (+ Investimento)</option>
+<option value="USDC" style="background-color: #1a1a2e; color: #e0e0e0;">💵 USDC (+ Stablecoin)</option>
 <option value="Trading" style="background-color: #1a1a2e; color: #e0e0e0;">📈 Profitto Trading (+ Guadagno)</option>
       </select>
     </div>
@@ -522,7 +540,10 @@
             <div class="data-tables-grid">
 
                 <div>
-                    <h3 class="data-title">💶 Depositi Euro (Capitale -)</h3>
+                    <div class="data-title-row">
+                        <h3 class="data-title">💶 Depositi Euro (Capitale -)</h3>
+                        <button class="btn-download-csv" onclick="downloadCSV('EUR')">⬇️ CSV</button>
+                    </div>
                     <table class="data-table">
                         <thead><tr><th>Data</th><th>Importo</th><th>Note</th><th></th></tr></thead>
                         <tbody id="eurList"></tbody>
@@ -530,7 +551,10 @@
                 </div>
 
                 <div>
-                    <h3 class="data-title">🪙 ATOM Acquistati (+)</h3>
+                    <div class="data-title-row">
+                        <h3 class="data-title">🪙 Movimenti ATOM (+)</h3>
+                        <button class="btn-download-csv" onclick="downloadCSV('ATOM')">⬇️ CSV</button>
+                    </div>
                     <table class="data-table">
                         <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
                         <tbody id="atomList"></tbody>
@@ -538,7 +562,10 @@
                 </div>
 
                 <div>
-                    <h3 class="data-title">₿ BTC Acquistati (+)</h3>
+                    <div class="data-title-row">
+                        <h3 class="data-title">₿ Movimenti BTC (+)</h3>
+                        <button class="btn-download-csv" onclick="downloadCSV('BTC')">⬇️ CSV</button>
+                    </div>
                     <table class="data-table">
                         <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
                         <tbody id="btcList"></tbody>
@@ -546,7 +573,10 @@
                 </div>
 
                 <div>
-                    <h3 class="data-title">☀️ SOL Acquistati (+)</h3>
+                    <div class="data-title-row">
+                        <h3 class="data-title">☀️ Movimenti SOL (+)</h3>
+                        <button class="btn-download-csv" onclick="downloadCSV('SOL')">⬇️ CSV</button>
+                    </div>
                     <table class="data-table">
                         <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
                         <tbody id="solList"></tbody>
@@ -554,7 +584,10 @@
                 </div>
 
                 <div>
-                    <h3 class="data-title">Ł LTC Acquistati (+)</h3>
+                    <div class="data-title-row">
+                        <h3 class="data-title">Ł Movimenti LTC (+)</h3>
+                        <button class="btn-download-csv" onclick="downloadCSV('LTC')">⬇️ CSV</button>
+                    </div>
                     <table class="data-table">
                         <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
                         <tbody id="ltcList"></tbody>
@@ -562,7 +595,10 @@
                 </div>
 
                 <div>
-                    <h3 class="data-title">🔷 POL Acquistati (+)</h3>
+                    <div class="data-title-row">
+                        <h3 class="data-title">🔷 Movimenti POL (+)</h3>
+                        <button class="btn-download-csv" onclick="downloadCSV('POL')">⬇️ CSV</button>
+                    </div>
                     <table class="data-table">
                         <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
                         <tbody id="polList"></tbody>
@@ -570,7 +606,10 @@
                 </div>
 
                 <div>
-                    <h3 class="data-title">💵 USDC Acquistati (+)</h3>
+                    <div class="data-title-row">
+                        <h3 class="data-title">💵 Movimenti USDC (+)</h3>
+                        <button class="btn-download-csv" onclick="downloadCSV('USDC')">⬇️ CSV</button>
+                    </div>
                     <table class="data-table">
                         <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
                         <tbody id="usdcList"></tbody>
@@ -578,13 +617,20 @@
                 </div>
 
                 <div>
-                    <h3 class="data-title">📈 Profitti Trading (+)</h3>
+                    <div class="data-title-row">
+                        <h3 class="data-title">📈 Profitti Trading (+)</h3>
+                        <button class="btn-download-csv" onclick="downloadCSV('Trading')">⬇️ CSV</button>
+                    </div>
                     <table class="data-table">
                         <thead><tr><th>Data</th><th>Importo</th><th>Note</th><th></th></tr></thead>
                         <tbody id="tradingList"></tbody>
                     </table>
                 </div>
 
+            </div>
+
+            <div class="export-buttons" style="margin-top:18px;">
+                <button class="btn-edit" onclick="downloadCSV('ALL')">⬇️ Scarica Tutto lo Storico (CSV)</button>
             </div>
         </div>
     </div>
@@ -708,11 +754,6 @@ function updateDisplays() {
 }
 
 function updateAllLists() {
-    ['EUR','ATOM','BTC','SOL','LTC','POL','USDC','Trading'].forEach(t =>
-        updateList(t.toLowerCase()+'List'+(t==='Trading'?'':''), t==='Trading'?'tradingList':t.toLowerCase()+'List', t));
-}
-// simplified direct call
-function updateAllLists() {
     updateList('eurList','EUR'); updateList('atomList','ATOM'); updateList('btcList','BTC');
     updateList('solList','SOL'); updateList('ltcList','LTC');  updateList('polList','POL');
     updateList('usdcList','USDC'); updateList('tradingList','Trading');
@@ -723,7 +764,7 @@ function updateList(cid, type) {
     if (!tbody) return;
     const ops = operations.filter(o => o.type===type);
     if (!ops.length) {
-        tbody.innerHTML=`<tr><td colspan="4" class="empty-state">Nessuna operazione ${type}</td></tr>`;
+        tbody.innerHTML=`<tr><td colspan="4" class="empty-state">Nessun movimento ${type}</td></tr>`;
         return;
     }
     const fmt = (op) => {
@@ -838,6 +879,59 @@ function buildReportTables() {
 }
 
 function loadAllData() { updateAllLists(); updateDisplays(); buildReportTables(); }
+
+/* ============================================
+   EXPORT CSV PER MONETA / STORICO COMPLETO
+   ============================================ */
+
+function csvEscape(v) {
+    const s = String(v ?? '');
+    if (s.includes('"') || s.includes(',') || s.includes('\n')) {
+        return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+}
+
+function unitSuffix(type) {
+    if (type==='ATOM') return 'ATOM';
+    if (type==='BTC')  return 'BTC';
+    if (type==='SOL')  return 'SOL';
+    if (type==='LTC')  return 'LTC';
+    if (type==='POL')  return 'POL';
+    if (type==='USDC') return 'USDC';
+    return 'EUR';
+}
+
+function buildCSV(ops) {
+    const rows = [['Data','Tipo','Segno','Importo','Unità','Note']];
+    [...ops].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(op=>{
+        const segno = op.type==='EUR' ? '-' : '+';
+        rows.push([
+            new Date(op.date).toLocaleDateString('it-IT'),
+            op.type,
+            segno,
+            op.amount,
+            unitSuffix(op.type),
+            op.note || ''
+        ]);
+    });
+    return rows.map(r => r.map(csvEscape).join(',')).join('\n');
+}
+
+function downloadCSV(type) {
+    const ops = type === 'ALL' ? operations : operations.filter(o => o.type === type);
+    if (!ops.length) { alert('⚠️ Nessun movimento da esportare per questa categoria'); return; }
+    const csv = '\uFEFF' + buildCSV(ops); // BOM per Excel/caratteri italiani
+    const now = new Date().toISOString().split('T')[0];
+    const filename = type === 'ALL'
+        ? `storico-completo-${now}.csv`
+        : `storico-${type.toLowerCase()}-${now}.csv`;
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+}
 
 function exportDataHTML() {
     const now=new Date(),groups={};

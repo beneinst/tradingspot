@@ -9,41 +9,6 @@ let trades = [];
 let editingTradeId = null;
 
 // ------------------------------------------------------------------
-//  CONVERTITORE VALUTA (USD -> EUR)
-// ------------------------------------------------------------------
-// Nota tecnica: usiamo "window.usdToEurRate" (proprietà) invece di "let"
-// perché questo script viene caricato nella stessa pagina di panoramica.js,
-// che dichiara già una propria variabile locale "usdToEurRate". Se anche
-// qui usassimo "let usdToEurRate" il browser darebbe un errore di sintassi
-// ("Identifier already declared") e bloccherebbe l'esecuzione degli script
-// successivi. Con window.usdToEurRate non c'è conflitto.
-//
-// I prezzi arrivano da Binance in USDT/USDC (cioè in dollari): il motore di
-// calcolo (priceAtPurchase, avgPrice, currentValue, P&L...) resta quindi in
-// USD, che è la valuta reale in cui avvengono gli scambi. La conversione in
-// EUR avviene SOLO al momento di mostrare i totali a schermo, tramite la
-// funzione toEUR(). Il file JSON in localStorage (singleTrades) non viene
-// mai toccato/riscritto in valuta diversa: resta accurato rispetto alle
-// operazioni reali su Binance.
-window.usdToEurRate = window.usdToEurRate || 0.93; // fallback iniziale
-
-async function fetchExchangeRateTrade() {
-    try {
-        const response = await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR');
-        const data = await response.json();
-        if (data && data.rates && data.rates.EUR) {
-            window.usdToEurRate = data.rates.EUR;
-        }
-    } catch (error) {
-        console.error('Errore nel recupero del cambio USD/EUR, uso il valore di fallback:', error);
-    }
-}
-
-function toEUR(usdAmount) {
-    return (usdAmount || 0) * (window.usdToEurRate || 0.93);
-}
-
-// ------------------------------------------------------------------
 //  Prezzi da Binance (Sostituisce CoinGecko)
 // ------------------------------------------------------------------
 async function getPriceFromBinance(symbol) {
@@ -103,9 +68,6 @@ async function stampaTuttiTrade() {
         alert('Nessun trade da stampare');
         return;
     }
-
-    // Assicura un tasso di cambio aggiornato prima di generare il report
-    await fetchExchangeRateTrade();
     
     let htmlContent = `
     <!DOCTYPE html>
@@ -319,7 +281,7 @@ tr:hover {
         </div>
     `;
 
-    // Calcola riepilogo portfolio (accumulato in USD, valuta nativa Binance)
+    // Calcola riepilogo portfolio
     let totalInvestmentPortfolio = 0;
     let totalCurrentValuePortfolio = 0;
     let totalPnlPortfolio = 0;
@@ -367,7 +329,7 @@ tr:hover {
         const pnl = currentValue - totalInvestment;
         const pnlPercent = totalInvestment > 0 ? (pnl / totalInvestment) * 100 : 0;
         
-        // Aggiorna statistiche portfolio (sempre in USD)
+        // Aggiorna statistiche portfolio
         totalInvestmentPortfolio += totalInvestment;
         totalCurrentValuePortfolio += currentValue;
         totalPnlPortfolio += pnl;
@@ -378,34 +340,26 @@ tr:hover {
         const pnlClass = pnl > 0 ? 'positive' : pnl < 0 ? 'negative' : 'neutral';
         const pnlIcon = pnl > 0 ? '📈' : pnl < 0 ? '📉' : '➖';
 
-        // Valori convertiti in EUR SOLO per la visualizzazione nel report
-        const avgPriceEUR = toEUR(avgPrice);
-        const totalInvestmentEUR = toEUR(totalInvestment);
-        const currentPriceEUR = currentPrice ? toEUR(currentPrice) : null;
-        const currentValueEUR = toEUR(currentValue);
-        const pnlEUR = toEUR(pnl);
-
         // Genera tabella entries con stile migliorato
         let entriesHtml = '';
         trade.entries.forEach((entry, entryIndex) => {
             const profit = currentPrice ? (currentPrice - entry.priceAtPurchase) * entry.quantity : 0;
             const profitPercent = entry.priceAtPurchase > 0 ? ((currentPrice - entry.priceAtPurchase) / entry.priceAtPurchase) * 100 : 0;
             const profitClass = profit > 0 ? 'positive' : profit < 0 ? 'negative' : 'neutral';
-            const profitEUR = toEUR(profit);
             
             entriesHtml += `
                 <tr>
                     <td><strong>#${entryIndex + 1}</strong></td>
                     <td>${entry.quantity.toFixed(8)}</td>
-                    <td>€${toEUR(entry.priceAtPurchase).toFixed(4)}</td>
-                    <td><strong>€${toEUR(entry.investedAmount).toFixed(2)}</strong></td>
+                    <td>$${entry.priceAtPurchase.toFixed(4)}</td>
+                    <td><strong>$${entry.investedAmount.toFixed(2)}</strong></td>
                     <td>${new Date(entry.timestamp).toLocaleDateString('it-IT')}</td>
-                    <td class="${profitClass}">€${profitEUR.toFixed(2)} (${profitPercent.toFixed(1)}%)</td>
+                    <td class="${profitClass}">$${profit.toFixed(2)} (${profitPercent.toFixed(1)}%)</td>
                 </tr>
             `;
         });
 
-        // Calcola performance rispetto al mercato (percentuale, indipendente dalla valuta)
+        // Calcola performance rispetto al mercato
         const marketPerformance = currentPrice && avgPrice > 0 ? ((currentPrice - avgPrice) / avgPrice) * 100 : 0;
         const marketIcon = marketPerformance > 0 ? '🚀' : marketPerformance < 0 ? '📉' : '➖';
 
@@ -426,23 +380,23 @@ tr:hover {
                     </div>
                     <div class="summary-item">
                         <div class="label">📊 Prezzo Medio Acquisto</div>
-                        <div class="value">€${avgPriceEUR.toFixed(8)}</div>
+                        <div class="value">$${avgPrice.toFixed(8)}</div>
                     </div>
                     <div class="summary-item">
                         <div class="label">💵 Investimento Totale</div>
-                        <div class="value">€${totalInvestmentEUR.toFixed(0)}</div>
+                        <div class="value">$${totalInvestment.toFixed(0)}</div>
                     </div>
                     <div class="summary-item">
                         <div class="label">📈 Prezzo Attuale</div>
-                        <div class="value">${currentPriceEUR !== null ? '€' + currentPriceEUR.toFixed(8) : '⚠️ Non disponibile'}</div>
+                        <div class="value">${currentPrice ? '$' + currentPrice.toFixed(8) : '⚠️ Non disponibile'}</div>
                     </div>
                     <div class="summary-item">
                         <div class="label">💎 Valore Attuale</div>
-                        <div class="value">€${currentValueEUR.toFixed(2)}</div>
+                        <div class="value">$${currentValue.toFixed(2)}</div>
                     </div>
                     <div class="summary-item">
                         <div class="label">${pnlIcon} Profitto/Perdita</div>
-                        <div class="value ${pnlClass}">€${pnlEUR.toFixed(2)} (${pnlPercent.toFixed(2)}%)</div>
+                        <div class="value ${pnlClass}">$${pnl.toFixed(2)} (${pnlPercent.toFixed(2)}%)</div>
                     </div>
                 </div>
 
@@ -487,17 +441,11 @@ tr:hover {
     // Rimuovi loading
     document.body.removeChild(loadingDiv);
 
-    // Calcola statistiche portfolio avanzate (in USD)
+    // Calcola statistiche portfolio avanzate
     const portfolioPnlPercent = totalInvestmentPortfolio > 0 ? (totalPnlPortfolio / totalInvestmentPortfolio) * 100 : 0;
     const portfolioPnlClass = totalPnlPortfolio > 0 ? 'positive' : totalPnlPortfolio < 0 ? 'negative' : 'neutral';
     const successRate = trades.length > 0 ? (tradesPositivi / trades.length) * 100 : 0;
     const avgTradeSize = trades.length > 0 ? totalInvestmentPortfolio / trades.length : 0;
-
-    // Conversione in EUR SOLO per la visualizzazione del riepilogo finale
-    const totalInvestmentPortfolioEUR = toEUR(totalInvestmentPortfolio);
-    const totalCurrentValuePortfolioEUR = toEUR(totalCurrentValuePortfolio);
-    const totalPnlPortfolioEUR = toEUR(totalPnlPortfolio);
-    const avgTradeSizeEUR = toEUR(avgTradeSize);
 
     // Riepilogo portfolio finale migliorato
     htmlContent += `
@@ -510,15 +458,15 @@ tr:hover {
                 </div>
                 <div class="summary-item">
                     <div class="label">💰 Capitale Investito</div>
-                    <div class="value">€${totalInvestmentPortfolioEUR.toFixed(0)}</div>
+                    <div class="value">$${totalInvestmentPortfolio.toFixed(0)}</div>
                 </div>
                 <div class="summary-item">
                     <div class="label">💎 Valore Attuale</div>
-                    <div class="value">€${totalCurrentValuePortfolioEUR.toFixed(2)}</div>
+                    <div class="value">$${totalCurrentValuePortfolio.toFixed(2)}</div>
                 </div>
                 <div class="summary-item">
                     <div class="label">📊 P&L Totale</div>
-                    <div class="value ${portfolioPnlClass}">€${totalPnlPortfolioEUR.toFixed(2)} (${portfolioPnlPercent.toFixed(2)}%)</div>
+                    <div class="value ${portfolioPnlClass}">$${totalPnlPortfolio.toFixed(2)} (${portfolioPnlPercent.toFixed(2)}%)</div>
                 </div>
                 <div class="summary-item">
                     <div class="label">✅ Trade Positivi</div>
@@ -534,7 +482,7 @@ tr:hover {
                 </div>
                 <div class="summary-item">
                     <div class="label">📊 Trade Medio</div>
-                    <div class="value">€${avgTradeSizeEUR.toFixed(6)}</div>
+                    <div class="value">$${avgTradeSize.toFixed(6)}</div>
                 </div>
             </div>
             
@@ -555,7 +503,7 @@ tr:hover {
             <p>🕒 Timestamp: ${new Date().toLocaleString('it-IT')}</p>
             <p>💻 Sviluppato per il monitoraggio avanzato del portfolio crypto</p>
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #dee2e6;">
-                <small>⚠️ I dati di prezzo sono forniti da Binance API (in USD/USDC) e convertiti in EUR al cambio corrente. Le performance passate non garantiscono risultati futuri.</small>
+                <small>⚠️ I dati di prezzo sono forniti da Binance API. Le performance passate non garantiscono risultati futuri.</small>
             </div>
         </div>
     </body>
@@ -644,7 +592,7 @@ function mostrarMessaggio(messaggio) {
 // Esponi la funzione globalmente per il pulsante
 window.stampaTuttiTrade = stampaTuttiTrade;
 
-// Calcola importo medio ponderato e quantità totale (resta in USD, valuta nativa Binance)
+// Calcola importo medio ponderato e quantità totale
 function calcolaStatisticheTrade(entries) {
     let totalInvestment = 0;
     let totalQuantity = 0;
@@ -679,7 +627,7 @@ function loadTrades() {
 }
 
 
-// Render trade (SISTEMATO PER USARE BINANCE, totali mostrati in EUR)
+// Render trade (SISTEMATO PER USARE BINANCE)
 async function renderTrades() {
     const container = document.getElementById('trades-container');
     container.innerHTML = '<div class="loading">Caricamento trade...</div>';
@@ -696,7 +644,7 @@ async function renderTrades() {
         const stats = calcolaStatisticheTrade(trade.entries);
         const { totalInvestment, totalQuantity, avgPrice } = stats;
         
-        // USA BINANCE INVECE DI COINGECKO (prezzo in USD/USDC)
+        // USA BINANCE INVECE DI COINGECKO
         const currentPrice = await getPriceFromBinance(trade.symbol);
         
         const currentValue = currentPrice ? totalQuantity * currentPrice : 0;
@@ -705,13 +653,6 @@ async function renderTrades() {
         
         const pnlClass = pnl > 0 ? 'positive' : pnl < 0 ? 'negative' : 'neutral';
 
-        // Valori convertiti in EUR SOLO per la visualizzazione
-        const avgPriceEUR = toEUR(avgPrice);
-        const totalInvestmentEUR = toEUR(totalInvestment);
-        const currentPriceEUR = currentPrice ? toEUR(currentPrice) : null;
-        const currentValueEUR = toEUR(currentValue);
-        const pnlEUR = toEUR(pnl);
-
         // Genera tabella entries
         let entriesHtml = '';
         trade.entries.forEach((entry, index) => {
@@ -719,8 +660,8 @@ async function renderTrades() {
                 <tr>
                     <td>${index + 1}</td>
                     <td>${entry.quantity.toFixed(8)}</td>
-                    <td>€${toEUR(entry.priceAtPurchase).toFixed(2)}</td>
-                    <td>€${toEUR(entry.investedAmount).toFixed(2)}</td>
+                    <td>$${entry.priceAtPurchase.toFixed(2)}</td>
+                    <td>$${entry.investedAmount.toFixed(2)}</td>
                     <td>${new Date(entry.timestamp).toLocaleDateString('it-IT')}</td>
                 </tr>
             `;
@@ -739,23 +680,23 @@ async function renderTrades() {
                         </div>
                         <div class="summary-item">
                             <div class="label">Prezzo Medio di Acquisto</div>
-                            <div class="value">€${avgPriceEUR.toFixed(4)}</div>
+                            <div class="value">$${avgPrice.toFixed(4)}</div>
                         </div>
                         <div class="summary-item">
                             <div class="label">Investimento Totale</div>
-                            <div class="value">€${totalInvestmentEUR.toFixed(0)}</div>
+                            <div class="value">$${totalInvestment.toFixed(0)}</div>
                         </div>
                         <div class="summary-item">
                             <div class="label">Prezzo Attuale</div>
-                            <div class="value current-price">€${currentPriceEUR !== null ? currentPriceEUR.toFixed(4) : 'N/A'}</div>
+                            <div class="value current-price">$${currentPrice ? currentPrice.toFixed(4) : 'N/A'}</div>
                         </div>
                         <div class="summary-item">
                             <div class="label">Valore Attuale</div>
-                            <div class="value">€${currentValueEUR.toFixed(2)}</div>
+                            <div class="value">$${currentValue.toFixed(2)}</div>
                         </div>
                         <div class="summary-item">
                             <div class="label">Profitto/Perdita (P&L)</div>
-                            <div class="value ${pnlClass}">€${pnlEUR.toFixed(2)} (${pnlPercent.toFixed(2)}%)</div>
+                            <div class="value ${pnlClass}">$${pnl.toFixed(2)} (${pnlPercent.toFixed(2)}%)</div>
                         </div>
                     </div>
                 </div>
@@ -812,10 +753,6 @@ window.deleteTrade = function(id) {
 };
 
 // Gestione form - MODIFICATA PER PERMETTERE TRADE MULTIPLI
-// Nota: l'importo entry resta in USDC (è la valuta reale con cui si compra
-// su Binance). Se in futuro vuoi inserire l'importo direttamente in EUR,
-// dimmelo: va convertito in USD PRIMA di calcolare priceAtPurchase, altrimenti
-// il confronto con il prezzo live di Binance (in USD) non torna più corretto.
 document.getElementById('trade-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -892,19 +829,10 @@ function validateTrades(tradesArray) {
 
 
 // Inizializzazione
-// Recuperiamo il tasso di cambio PRIMA del primo render, così i totali
-// mostrati sono già in EUR fin dal caricamento della pagina.
-document.addEventListener('DOMContentLoaded', async function() {
-    await fetchExchangeRateTrade();
+document.addEventListener('DOMContentLoaded', function() {
     loadTrades();
-    await renderTrades();
+    renderTrades();
     updateTradeCount();
-
-    // Aggiorna periodicamente il cambio e ridisegna i totali in EUR aggiornato
-    setInterval(async () => {
-        await fetchExchangeRateTrade();
-        renderTrades();
-    }, 300000); // ogni 5 minuti
 });
 
 // 🟢  EVENTI per apertura / chiusura trade
