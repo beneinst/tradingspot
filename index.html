@@ -669,14 +669,44 @@ let operations = JSON.parse(localStorage.getItem('cryptoOperations')) || [];
 let atomPrice=0, btcPrice=0, solPrice=0, ltcPrice=0, polPrice=0, usdcPrice=1.00;
 let chart = null;
 
+// ------------------------------------------------------------------
+//  CONVERTITORE VALUTA (USD -> EUR)
+// ------------------------------------------------------------------
+// Usiamo window.usdToEurRate (proprietà, non "let") per evitare conflitti
+// se questo script viene caricato sulla stessa pagina di altri script che
+// gestiscono già il cambio (es. panoramica.js, trade.js).
+// I prezzi di ATOM/BTC/SOL/LTC/POL/USDC arrivano da Binance in USDT (dollari):
+// le quantità restano quelle salvate (non sono dollari, quindi non c'è nulla
+// da migrare), la conversione in EUR avviene solo quando calcoliamo il VALORE
+// (quantità × prezzo) da mostrare a schermo.
+window.usdToEurRate = window.usdToEurRate || 0.93; // fallback iniziale
+
+async function fetchExchangeRatePanoramica() {
+    try {
+        const response = await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR');
+        const data = await response.json();
+        if (data && data.rates && data.rates.EUR) {
+            window.usdToEurRate = data.rates.EUR;
+        }
+    } catch (error) {
+        console.error('Errore nel recupero del cambio USD/EUR, uso il valore di fallback:', error);
+    }
+}
+
+function toEUR(usdAmount) {
+    return (usdAmount || 0) * (window.usdToEurRate || 0.93);
+}
+
 function formatEuro(v) { return v.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function monthKey(d) { const x=new Date(d); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`; }
 
-function init() {
+async function init() {
     const di = document.getElementById('operationDate');
     if (di) di.value = new Date().toISOString().split('T')[0];
+    await fetchExchangeRatePanoramica();
     loadCryptoPrices();
     setInterval(loadCryptoPrices, 5*60*1000);
+    setInterval(fetchExchangeRatePanoramica, 5*60*1000);
     loadAllData();
 }
 
@@ -698,7 +728,7 @@ async function loadCryptoPrices() {
         if(uR.ok) usdcPrice  = parseFloat((await uR.json()).price);
         const pe = document.getElementById('atomPrice');
         const ue = document.getElementById('lastUpdate');
-        if(pe) pe.textContent = `ATOM: $${atomPrice.toFixed(4)} | BTC: $${btcPrice.toFixed(2)} | SOL: $${solPrice.toFixed(2)} | LTC: $${ltcPrice.toFixed(2)} | POL: $${polPrice.toFixed(4)} | USDC: $${usdcPrice.toFixed(4)}`;
+        if(pe) pe.textContent = `ATOM: €${toEUR(atomPrice).toFixed(4)} | BTC: €${toEUR(btcPrice).toFixed(2)} | SOL: €${toEUR(solPrice).toFixed(2)} | LTC: €${toEUR(ltcPrice).toFixed(2)} | POL: €${toEUR(polPrice).toFixed(4)} | USDC: €${toEUR(usdcPrice).toFixed(4)}`;
         if(ue) ue.textContent = `Aggiornato: ${new Date().toLocaleString('it-IT')}`;
         updateDisplays();
     } catch(e) { console.error('Errore prezzi:', e); }
@@ -731,25 +761,25 @@ function updateDisplays() {
           ltc=operations.filter(o=>o.type==='LTC'), pol=operations.filter(o=>o.type==='POL'),
           usdc=operations.filter(o=>o.type==='USDC'), trade=operations.filter(o=>o.type==='Trading');
     const tEur=eur.reduce((s,o)=>s+o.amount,0),
-          tAtomQ=atom.reduce((s,o)=>s+o.amount,0), tAtomV=tAtomQ*atomPrice,
-          tBtcQ=btc.reduce((s,o)=>s+o.amount,0),   tBtcV=tBtcQ*btcPrice,
-          tSolQ=sol.reduce((s,o)=>s+o.amount,0),   tSolV=tSolQ*solPrice,
-          tLtcQ=ltc.reduce((s,o)=>s+o.amount,0),   tLtcV=tLtcQ*ltcPrice,
-          tPolQ=pol.reduce((s,o)=>s+o.amount,0),   tPolV=tPolQ*polPrice,
-          tUsdcQ=usdc.reduce((s,o)=>s+o.amount,0), tUsdcV=tUsdcQ*usdcPrice,
-          tTrade=trade.reduce((s,o)=>s+o.amount,0),
+          tAtomQ=atom.reduce((s,o)=>s+o.amount,0), tAtomV=toEUR(tAtomQ*atomPrice),
+          tBtcQ=btc.reduce((s,o)=>s+o.amount,0),   tBtcV=toEUR(tBtcQ*btcPrice),
+          tSolQ=sol.reduce((s,o)=>s+o.amount,0),   tSolV=toEUR(tSolQ*solPrice),
+          tLtcQ=ltc.reduce((s,o)=>s+o.amount,0),   tLtcV=toEUR(tLtcQ*ltcPrice),
+          tPolQ=pol.reduce((s,o)=>s+o.amount,0),   tPolV=toEUR(tPolQ*polPrice),
+          tUsdcQ=usdc.reduce((s,o)=>s+o.amount,0), tUsdcV=toEUR(tUsdcQ*usdcPrice),
+          tTrade=trade.reduce((s,o)=>s+o.amount,0), // già in EUR (coerente con report/CSV)
           net=tAtomV+tBtcV+tSolV+tLtcV+tPolV+tUsdcV+tTrade-tEur;
     const s=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t;};
     s('totalEur',`-€${tEur.toFixed(2)}`);
-    s('totalAtomValue',`+$${tAtomV.toFixed(2)}`); s('totalAtomQty',`${tAtomQ.toFixed(6)} ATOM`);
-    s('totalBtcValue', `+$${tBtcV.toFixed(2)}`);  s('totalBtcQty', `${tBtcQ.toFixed(8)} BTC`);
-    s('totalSolValue', `+$${tSolV.toFixed(2)}`);  s('totalSolQty', `${tSolQ.toFixed(6)} SOL`);
-    s('totalLtcValue', `+$${tLtcV.toFixed(2)}`);  s('totalLtcQty', `${tLtcQ.toFixed(8)} LTC`);
-    s('totalPolValue', `+$${tPolV.toFixed(2)}`);  s('totalPolQty', `${tPolQ.toFixed(6)} POL`);
-    s('totalUsdcValue',`+$${tUsdcV.toFixed(2)}`); s('totalUsdcQty',`${tUsdcQ.toFixed(2)} USDC`);
-    s('totalTrading',  `+$${tTrade.toFixed(2)}`);
+    s('totalAtomValue',`+€${tAtomV.toFixed(2)}`); s('totalAtomQty',`${tAtomQ.toFixed(6)} ATOM`);
+    s('totalBtcValue', `+€${tBtcV.toFixed(2)}`);  s('totalBtcQty', `${tBtcQ.toFixed(8)} BTC`);
+    s('totalSolValue', `+€${tSolV.toFixed(2)}`);  s('totalSolQty', `${tSolQ.toFixed(6)} SOL`);
+    s('totalLtcValue', `+€${tLtcV.toFixed(2)}`);  s('totalLtcQty', `${tLtcQ.toFixed(8)} LTC`);
+    s('totalPolValue', `+€${tPolV.toFixed(2)}`);  s('totalPolQty', `${tPolQ.toFixed(6)} POL`);
+    s('totalUsdcValue',`+€${tUsdcV.toFixed(2)}`); s('totalUsdcQty',`${tUsdcQ.toFixed(2)} USDC`);
+    s('totalTrading',  `+€${tTrade.toFixed(2)}`);
     const elEq=document.getElementById('totalEquity');
-    if(elEq){ elEq.textContent=`${net>=0?'+':''}$${Math.abs(net).toFixed(2)}`; elEq.className=net>=0?'value profit-positive':'value profit-negative'; }
+    if(elEq){ elEq.textContent=`${net>=0?'+':''}€${Math.abs(net).toFixed(2)}`; elEq.className=net>=0?'value profit-positive':'value profit-negative'; }
     updateChart();
 }
 
@@ -805,13 +835,13 @@ function updateChart() {
     
     [...operations].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(op=>{
         if(op.type==='EUR')    cE+=op.amount;
-        else if(op.type==='ATOM')   cA+=op.amount*atomPrice;
-        else if(op.type==='BTC')    cB+=op.amount*btcPrice;
-        else if(op.type==='SOL')    cS+=op.amount*solPrice;
-        else if(op.type==='LTC')    cL+=op.amount*ltcPrice;
-        else if(op.type==='POL')    cP+=op.amount*polPrice;
-        else if(op.type==='USDC')   cU+=op.amount*usdcPrice;
-        else if(op.type==='Trading')cT+=op.amount;
+        else if(op.type==='ATOM')   cA+=toEUR(op.amount*atomPrice);
+        else if(op.type==='BTC')    cB+=toEUR(op.amount*btcPrice);
+        else if(op.type==='SOL')    cS+=toEUR(op.amount*solPrice);
+        else if(op.type==='LTC')    cL+=toEUR(op.amount*ltcPrice);
+        else if(op.type==='POL')    cP+=toEUR(op.amount*polPrice);
+        else if(op.type==='USDC')   cU+=toEUR(op.amount*usdcPrice);
+        else if(op.type==='Trading')cT+=op.amount; // già in EUR
         d.push({date:new Date(op.date).toLocaleDateString('it-IT'),eurOut:-cE,atomValue:cA,btcValue:cB,solValue:cS,ltcValue:cL,polValue:cP,usdcValue:cU,trading:cT,netEquity:cA+cB+cS+cL+cP+cU+cT-cE});
     });
     
@@ -852,7 +882,7 @@ function updateChart() {
             scales:{
                 y:{
                     ticks:{
-                        callback:v=>'$'+v.toLocaleString('it-IT')
+                        callback:v=>'€'+v.toLocaleString('it-IT')
                     }
                 }
             }
@@ -977,7 +1007,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
 </script>
 </body>
 </html>
