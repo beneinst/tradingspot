@@ -151,16 +151,16 @@
        
  <div class="ts-col-66">
   <form id="trade-form" class="input-section">
-    <h2>💱 Aggiungi Entry al Trade</h2>
+    <h3 style="color: #8fbc8f !important; padding: 0 0 30px 0;">💱 Aggiungi Entry al Trade</h3>
 
     <div class="input-group input-group-row">
       <div class="input-field">
-        <label for="crypto-symbol">SIMBOLO CRIPTO</label>
+        <label style="font-size: 0.70em;" for="crypto-symbol">SIMBOLO CRIPTO</label>
         <input type="text" id="crypto-symbol" placeholder="BTC" required>
       </div>
 
       <div class="input-field">
-        <label for="trade-quantity">QUANTITA'</label>
+        <label style="font-size: 0.70em;" for="trade-quantity">QUANTITA'</label>
         <input type="number"
                id="trade-quantity"
                step="0.00000001"
@@ -169,7 +169,7 @@
       </div>
 
       <div class="input-field">
-        <label for="invested-amount">IMPORTO ENTRY (USDC)</label>
+        <label style="font-size: 0.70em;" for="invested-amount">IMPORTO ENTRY (USDC)</label>
         <input type="number"
                id="invested-amount"
                placeholder="USDC"
@@ -195,7 +195,7 @@
     <!-- Accordion per i Trade Attivi -->
     <div class="accordion-item" id="accordionTrades">
         <div class="accordion-header">
-            <h4 class="section-title" style="color: #ffe4b5 !important; margin: 0;">🎯 I tuoi Trade Attivi</h4>
+            <h4 class="section-title" style="color: #8fbc8f !important; margin: 0;">🎯 I tuoi Trade Attivi</h4>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div id="trade-counter" style="display: flex; gap: 5px; font-size: 0.9rem;">
                     📊 On <span id="trade-count" style="font-weight: bold; color: #ffe4b5;">0</span>
@@ -210,7 +210,7 @@
 </div>
 <div style="padding: 6px;"></div>		
 <div class="container">
-  <h5 class="section-title" style="color: #ffe4b5 !important;">🪔 STORICO Distribuzione Capitale</h5>
+  <h5 class="section-title" style="color: #8fbc8f !important;">🪔 STORICO Distribuzione Capitale</h5>
   
  
 
@@ -250,7 +250,7 @@
 <div style="padding: 4px;"></div>
   
   
-  <!-- Nuova card per il grafico STORICO -->
+ <!-- Nuova card per il grafico storico -->
  <div class="container">
    <div class="ts-dash-card">
   
@@ -265,7 +265,7 @@
     
     <!-- Box Grafico Grande (600px) -->
     <div class="ts-chart-box-large" style="position: relative; width: 100%;">
-      <canvas id="STORICOCapitaleChart" style="width: 100%; height: 100%;"></canvas>
+      <canvas id="storicoCapitaleChart" style="width: 100%; height: 100%;"></canvas>
     </div>
 
     <!-- Selettore Tempo -->
