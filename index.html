@@ -479,7 +479,7 @@
         <div class="value" id="totalTrading">$0.00</div>
       </div>
 	  <div class="ts-grid-item">
-    <h4>💼 Capitale Investito (Crypto)</h4>
+    <h4>💼 Capitale Crypto</h4>
     <div class="value profit-negative" id="totalCryptoCost">€0.00</div>
 </div>
       <div class="ts-grid-item">
@@ -688,11 +688,12 @@ const CRYPTO_CON_CARICO = ['ATOM','BTC','SOL','LTC','POL'];
 // ------------------------------------------------------------------
 //  VALORI BASE (saldo di partenza per asset)
 // ------------------------------------------------------------------
-// Rappresentano quantità + costo che avevi già PRIMA di iniziare a tracciare
-// operazione per operazione. Si sommano a tutte le operazioni registrate,
-// così i totali si allineano alla realtà senza dover reinserire a mano
-// ogni acquisto storico. Salvati separatamente da "cryptoOperations",
-// quindi non toccano/perdono i dati già presenti.
+// Rappresentano SOLO il prezzo di carico (in €) che avevi già speso PRIMA di
+// iniziare a registrare il costo per ogni singola operazione. La quantità
+// NON si tocca qui: è già tutta tracciata dalle operazioni esistenti in
+// "cryptoOperations" (nel JSON), quindi il valore base si aggancia a quella
+// quantità già presente senza duplicarla. Salvato separatamente
+// (chiave "cryptoValoriBase"), non tocca/perde i dati già presenti.
 function getValoriBase() {
     return JSON.parse(localStorage.getItem('cryptoValoriBase') || '{}');
 }
@@ -703,35 +704,33 @@ function salvaValoriBase(basi) {
 
 function getBase(tipo) {
     const basi = getValoriBase();
-    return basi[tipo] || { qty: 0, costo: 0 };
+    return basi[tipo] || { costo: 0 };
 }
 
-// Imposta il valore base per UN singolo asset (quantità + prezzo di carico)
+// Imposta il PREZZO DI CARICO base per UN singolo asset.
+// Nessuna quantità qui: la quantità è già tutta tracciata dalle operazioni
+// esistenti in "cryptoOperations" (nel JSON). Il valore base serve solo ad
+// agganciare un costo di partenza a quella quantità già presente, per le
+// crypto che avevi acquistato prima di iniziare a registrare il prezzo di
+// carico per ogni singola operazione.
 function impostaValoreBase(tipo) {
     const basi = getValoriBase();
-    const attuale = basi[tipo] || { qty: 0, costo: 0 };
-
-    const qtyInput = prompt(
-        `Quantità ${tipo} già in possesso PRIMA di questo tracciamento (valore di partenza):`,
-        attuale.qty > 0 ? attuale.qty : ''
-    );
-    if (qtyInput === null) return; // annullato
-    const qty = parseFloat(qtyInput) || 0;
+    const attuale = basi[tipo] || { costo: 0 };
 
     const costoInput = prompt(
-        `Prezzo di carico totale per questa quantità di ${tipo} (€, opzionale - lascia vuoto se non lo sai):`,
+        `Prezzo di carico totale già speso per la quantità di ${tipo} che hai già in portafoglio (quantità già presente nelle operazioni, qui inserisci solo il costo in €):`,
         attuale.costo > 0 ? attuale.costo : ''
     );
     if (costoInput === null) return; // annullato
     const costo = parseFloat(costoInput) || 0;
 
-    basi[tipo] = { qty, costo };
+    basi[tipo] = { costo };
     salvaValoriBase(basi);
     loadAllData();
-    alert(`✅ Valore base ${tipo} impostato: ${qty} ${tipo}${costo > 0 ? ` (carico €${costo.toFixed(2)})` : ''}`);
+    alert(`✅ Prezzo di carico base ${tipo} impostato: €${costo.toFixed(2)}`);
 }
 
-// Imposta i valori base per TUTTI gli asset in sequenza (comodo per il primo allineamento)
+// Imposta il prezzo di carico base per TUTTI gli asset in sequenza (comodo per il primo allineamento)
 function impostaValoriBaseTutti() {
     CRYPTO_CON_CARICO.forEach(tipo => impostaValoreBase(tipo));
 }
@@ -883,11 +882,11 @@ function updateDisplays() {
           baseLtc=getBase('LTC'), basePol=getBase('POL');
 
     const tEur=eur.reduce((s,o)=>s+o.amount,0),
-          tAtomQ=baseAtom.qty + atom.reduce((s,o)=>s+o.amount,0), tAtomV=toEUR(tAtomQ*atomPrice), tAtomCost=baseAtom.costo + sommaCosto(atom),
-          tBtcQ=baseBtc.qty + btc.reduce((s,o)=>s+o.amount,0),   tBtcV=toEUR(tBtcQ*btcPrice),   tBtcCost=baseBtc.costo + sommaCosto(btc),
-          tSolQ=baseSol.qty + sol.reduce((s,o)=>s+o.amount,0),   tSolV=toEUR(tSolQ*solPrice),   tSolCost=baseSol.costo + sommaCosto(sol),
-          tLtcQ=baseLtc.qty + ltc.reduce((s,o)=>s+o.amount,0),   tLtcV=toEUR(tLtcQ*ltcPrice),   tLtcCost=baseLtc.costo + sommaCosto(ltc),
-          tPolQ=basePol.qty + pol.reduce((s,o)=>s+o.amount,0),   tPolV=toEUR(tPolQ*polPrice),   tPolCost=basePol.costo + sommaCosto(pol),
+          tAtomQ=atom.reduce((s,o)=>s+o.amount,0), tAtomV=toEUR(tAtomQ*atomPrice), tAtomCost=baseAtom.costo + sommaCosto(atom),
+          tBtcQ=btc.reduce((s,o)=>s+o.amount,0),   tBtcV=toEUR(tBtcQ*btcPrice),   tBtcCost=baseBtc.costo + sommaCosto(btc),
+          tSolQ=sol.reduce((s,o)=>s+o.amount,0),   tSolV=toEUR(tSolQ*solPrice),   tSolCost=baseSol.costo + sommaCosto(sol),
+          tLtcQ=ltc.reduce((s,o)=>s+o.amount,0),   tLtcV=toEUR(tLtcQ*ltcPrice),   tLtcCost=baseLtc.costo + sommaCosto(ltc),
+          tPolQ=pol.reduce((s,o)=>s+o.amount,0),   tPolV=toEUR(tPolQ*polPrice),   tPolCost=basePol.costo + sommaCosto(pol),
           tUsdcQ=usdc.reduce((s,o)=>s+o.amount,0), tUsdcV=toEUR(tUsdcQ*usdcPrice),
           tTrade=trade.reduce((s,o)=>s+o.amount,0); // già in EUR (coerente con report/CSV)
 
@@ -948,7 +947,7 @@ function updateList(cid, type) {
     const ops = operations.filter(o => o.type===type);
     const base = CRYPTO_CON_CARICO.includes(type) ? getBase(type) : null;
 
-    if (!ops.length && !(base && base.qty > 0)) {
+    if (!ops.length && !(base && base.costo > 0)) {
         tbody.innerHTML=`<tr><td colspan="4" class="empty-state">Nessun movimento ${type}</td></tr>`;
         return;
     }
@@ -964,16 +963,16 @@ function updateList(cid, type) {
     };
     const isCryptoConCarico = CRYPTO_CON_CARICO.includes(type);
 
-    // Riga speciale (non eliminabile) per il valore base, se impostato
+    // Riga speciale (non eliminabile) per il costo base, se impostato.
+    // Nessuna quantità qui: la quantità è già tutta nelle operazioni sopra/sotto.
     let baseRow = '';
-    if (base && base.qty > 0) {
-        const caricoBase = base.costo > 0 ? ` <small style="opacity:0.7;">(carico €${base.costo.toFixed(2)})</small>` : '';
+    if (base && base.costo > 0) {
         baseRow = `
         <tr style="opacity:0.85;">
             <td>—</td>
-            <td>📌 Base: +${base.qty} ${type}${caricoBase}</td>
-            <td>Saldo di partenza</td>
-            <td class="actions"><button class="btn-icon-muted" onclick="impostaValoreBase('${type}')" title="Modifica valore base">✏️</button></td>
+            <td>📌 Costo Base: €${base.costo.toFixed(2)}</td>
+            <td>Prezzo di carico di partenza (quantità già inclusa nelle operazioni)</td>
+            <td class="actions"><button class="btn-icon-muted" onclick="impostaValoreBase('${type}')" title="Modifica costo base">✏️</button></td>
         </tr>`;
     }
 
@@ -995,8 +994,9 @@ function updateChart() {
           baseLtc=getBase('LTC'), basePol=getBase('POL');
 
     let cE=0,
-        cA=toEUR(baseAtom.qty*atomPrice), cB=toEUR(baseBtc.qty*btcPrice), cS=toEUR(baseSol.qty*solPrice),
-        cL=toEUR(baseLtc.qty*ltcPrice),   cP=toEUR(basePol.qty*polPrice), cU=0, cT=0,
+        cA=0, cB=0, cS=0, cL=0, cP=0, cU=0, cT=0,
+        // Il costo base parte già valorizzato: rappresenta il prezzo di carico
+        // di quantità che sono già dentro le operazioni (quindi già in cA/cB/...).
         cCosto = baseAtom.costo+baseBtc.costo+baseSol.costo+baseLtc.costo+basePol.costo;
     
     // Etichette accorciate per mobile
@@ -1015,7 +1015,9 @@ function updateChart() {
     };
     
     // "Capitale Depositato" (cE) resta SOLO i depositi EUR.
-    // cA/cB/cS/cL/cP partono già dal valore base (sopra), poi si sommano le operazioni.
+    // cA/cB/cS/cL/cP si costruiscono unicamente dalle operazioni (la quantità
+    // era già tutta lì); il costo base si aggiunge solo a cCosto, come
+    // riferimento visivo separato, non al valore delle crypto.
     [...operations].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(op=>{
         if(op.type==='EUR') {
             cE+=op.amount;
