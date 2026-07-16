@@ -533,11 +533,7 @@
   <div class="input-actions">
     <button class="btn-edit" onclick="addOperation()">➕ Aggiungi Operazione</button>
     <button class="btn-edit" onclick="clearForm()">🔄 Pulisci Form</button>
-	
-    <button class="btn-edit" onclick="impostaValoriBaseTutti()">📌 Imposta Valori Base Crypto</button>
-
   </div>
-  
 </div>
 
 
@@ -682,59 +678,7 @@ let atomPrice=0, btcPrice=0, solPrice=0, ltcPrice=0, polPrice=0, usdcPrice=1.00;
 let chart = null;
 
 // Tipi di crypto per cui si può registrare un prezzo di carico (informativo)
-// e un valore base di partenza
 const CRYPTO_CON_CARICO = ['ATOM','BTC','SOL','LTC','POL'];
-
-// ------------------------------------------------------------------
-//  VALORI BASE (saldo di partenza per asset)
-// ------------------------------------------------------------------
-// Rappresentano quantità + costo che avevi già PRIMA di iniziare a tracciare
-// operazione per operazione. Si sommano a tutte le operazioni registrate,
-// così i totali si allineano alla realtà senza dover reinserire a mano
-// ogni acquisto storico. Salvati separatamente da "cryptoOperations",
-// quindi non toccano/perdono i dati già presenti.
-function getValoriBase() {
-    return JSON.parse(localStorage.getItem('cryptoValoriBase') || '{}');
-}
-
-function salvaValoriBase(basi) {
-    localStorage.setItem('cryptoValoriBase', JSON.stringify(basi));
-}
-
-function getBase(tipo) {
-    const basi = getValoriBase();
-    return basi[tipo] || { qty: 0, costo: 0 };
-}
-
-// Imposta il valore base per UN singolo asset (quantità + prezzo di carico)
-function impostaValoreBase(tipo) {
-    const basi = getValoriBase();
-    const attuale = basi[tipo] || { qty: 0, costo: 0 };
-
-    const qtyInput = prompt(
-        `Quantità ${tipo} già in possesso PRIMA di questo tracciamento (valore di partenza):`,
-        attuale.qty > 0 ? attuale.qty : ''
-    );
-    if (qtyInput === null) return; // annullato
-    const qty = parseFloat(qtyInput) || 0;
-
-    const costoInput = prompt(
-        `Prezzo di carico totale per questa quantità di ${tipo} (€, opzionale - lascia vuoto se non lo sai):`,
-        attuale.costo > 0 ? attuale.costo : ''
-    );
-    if (costoInput === null) return; // annullato
-    const costo = parseFloat(costoInput) || 0;
-
-    basi[tipo] = { qty, costo };
-    salvaValoriBase(basi);
-    loadAllData();
-    alert(`✅ Valore base ${tipo} impostato: ${qty} ${tipo}${costo > 0 ? ` (carico €${costo.toFixed(2)})` : ''}`);
-}
-
-// Imposta i valori base per TUTTI gli asset in sequenza (comodo per il primo allineamento)
-function impostaValoriBaseTutti() {
-    CRYPTO_CON_CARICO.forEach(tipo => impostaValoreBase(tipo));
-}
 
 // ------------------------------------------------------------------
 //  CONVERTITORE VALUTA (USD -> EUR) - per i prezzi live da Binance
@@ -843,9 +787,8 @@ function removeOperation(id) {
     loadAllData();
 }
 
-// Assegna o corregge il prezzo di carico su una SINGOLA operazione crypto
-// già esistente (per rettifiche puntuali; per allineare tutto insieme usa
-// invece "Imposta Valori Base").
+// Assegna o corregge il prezzo di carico su un'operazione crypto,
+// anche già esistente (creata prima di questa funzionalità).
 function editCosto(id) {
     const op = operations.find(o => o.id === id);
     if (!op) return;
@@ -868,6 +811,7 @@ function editCosto(id) {
 }
 
 // Somma il prezzo di carico (costEur) di un elenco di operazioni.
+// Le operazioni senza costo assegnato contano come 0.
 function sommaCosto(ops) {
     return ops.reduce((s,o) => s + (o.costEur || 0), 0);
 }
@@ -878,24 +822,22 @@ function updateDisplays() {
           ltc=operations.filter(o=>o.type==='LTC'), pol=operations.filter(o=>o.type==='POL'),
           usdc=operations.filter(o=>o.type==='USDC'), trade=operations.filter(o=>o.type==='Trading');
 
-    // Valori base: il "saldo di partenza" per ogni crypto si somma alle operazioni
-    const baseAtom=getBase('ATOM'), baseBtc=getBase('BTC'), baseSol=getBase('SOL'),
-          baseLtc=getBase('LTC'), basePol=getBase('POL');
-
     const tEur=eur.reduce((s,o)=>s+o.amount,0),
-          tAtomQ=baseAtom.qty + atom.reduce((s,o)=>s+o.amount,0), tAtomV=toEUR(tAtomQ*atomPrice), tAtomCost=baseAtom.costo + sommaCosto(atom),
-          tBtcQ=baseBtc.qty + btc.reduce((s,o)=>s+o.amount,0),   tBtcV=toEUR(tBtcQ*btcPrice),   tBtcCost=baseBtc.costo + sommaCosto(btc),
-          tSolQ=baseSol.qty + sol.reduce((s,o)=>s+o.amount,0),   tSolV=toEUR(tSolQ*solPrice),   tSolCost=baseSol.costo + sommaCosto(sol),
-          tLtcQ=baseLtc.qty + ltc.reduce((s,o)=>s+o.amount,0),   tLtcV=toEUR(tLtcQ*ltcPrice),   tLtcCost=baseLtc.costo + sommaCosto(ltc),
-          tPolQ=basePol.qty + pol.reduce((s,o)=>s+o.amount,0),   tPolV=toEUR(tPolQ*polPrice),   tPolCost=basePol.costo + sommaCosto(pol),
+          tAtomQ=atom.reduce((s,o)=>s+o.amount,0), tAtomV=toEUR(tAtomQ*atomPrice), tAtomCost=sommaCosto(atom),
+          tBtcQ=btc.reduce((s,o)=>s+o.amount,0),   tBtcV=toEUR(tBtcQ*btcPrice),   tBtcCost=sommaCosto(btc),
+          tSolQ=sol.reduce((s,o)=>s+o.amount,0),   tSolV=toEUR(tSolQ*solPrice),   tSolCost=sommaCosto(sol),
+          tLtcQ=ltc.reduce((s,o)=>s+o.amount,0),   tLtcV=toEUR(tLtcQ*ltcPrice),   tLtcCost=sommaCosto(ltc),
+          tPolQ=pol.reduce((s,o)=>s+o.amount,0),   tPolV=toEUR(tPolQ*polPrice),   tPolCost=sommaCosto(pol),
           tUsdcQ=usdc.reduce((s,o)=>s+o.amount,0), tUsdcV=toEUR(tUsdcQ*usdcPrice),
           tTrade=trade.reduce((s,o)=>s+o.amount,0); // già in EUR (coerente con report/CSV)
 
-    // Solo informativo: totale del prezzo di carico di tutte le crypto (base + operazioni).
+    // Solo informativo: totale del prezzo di carico di tutte le crypto.
+    // NON entra nel calcolo del Rendimento Netto (vedi commento su "net" sotto).
     const totalCryptoCost = tAtomCost + tBtcCost + tSolCost + tLtcCost + tPolCost;
 
-    // Il capitale investito resta rappresentato da "Capitale Depositato" (tEur).
-    // Il prezzo di carico/valori base servono solo per il P&L per asset e per il grafico.
+    // Formula originale: il capitale investito è già rappresentato per intero
+    // da "Capitale Depositato" (tEur). Il prezzo di carico serve solo a livello
+    // di singolo asset (P&L per crypto) e nel grafico, non qui.
     const net = tAtomV+tBtcV+tSolV+tLtcV+tPolV+tUsdcV+tTrade - tEur;
 
     const s=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t;};
@@ -946,9 +888,7 @@ function updateList(cid, type) {
     const tbody = document.getElementById(cid);
     if (!tbody) return;
     const ops = operations.filter(o => o.type===type);
-    const base = CRYPTO_CON_CARICO.includes(type) ? getBase(type) : null;
-
-    if (!ops.length && !(base && base.qty > 0)) {
+    if (!ops.length) {
         tbody.innerHTML=`<tr><td colspan="4" class="empty-state">Nessun movimento ${type}</td></tr>`;
         return;
     }
@@ -963,21 +903,7 @@ function updateList(cid, type) {
         return `${op.amount.toFixed(2)} €`;
     };
     const isCryptoConCarico = CRYPTO_CON_CARICO.includes(type);
-
-    // Riga speciale (non eliminabile) per il valore base, se impostato
-    let baseRow = '';
-    if (base && base.qty > 0) {
-        const caricoBase = base.costo > 0 ? ` <small style="opacity:0.7;">(carico €${base.costo.toFixed(2)})</small>` : '';
-        baseRow = `
-        <tr style="opacity:0.85;">
-            <td>—</td>
-            <td>📌 Base: +${base.qty} ${type}${caricoBase}</td>
-            <td>Saldo di partenza</td>
-            <td class="actions"><button class="btn-icon-muted" onclick="impostaValoreBase('${type}')" title="Modifica valore base">✏️</button></td>
-        </tr>`;
-    }
-
-    tbody.innerHTML = baseRow + ops.map(op=>`
+    tbody.innerHTML = ops.map(op=>`
         <tr>
             <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
             <td>${type==='EUR'?'-':'+'}${fmt(op)}</td>
@@ -991,13 +917,7 @@ function updateList(cid, type) {
 
 function updateChart() {
     const d=[];
-    const baseAtom=getBase('ATOM'), baseBtc=getBase('BTC'), baseSol=getBase('SOL'),
-          baseLtc=getBase('LTC'), basePol=getBase('POL');
-
-    let cE=0,
-        cA=toEUR(baseAtom.qty*atomPrice), cB=toEUR(baseBtc.qty*btcPrice), cS=toEUR(baseSol.qty*solPrice),
-        cL=toEUR(baseLtc.qty*ltcPrice),   cP=toEUR(basePol.qty*polPrice), cU=0, cT=0,
-        cCosto = baseAtom.costo+baseBtc.costo+baseSol.costo+baseLtc.costo+basePol.costo;
+    let cE=0,cA=0,cB=0,cS=0,cL=0,cP=0,cU=0,cT=0,cCosto=0;
     
     // Etichette accorciate per mobile
     const isMobile = window.innerWidth <= 760;
@@ -1014,8 +934,9 @@ function updateChart() {
         'RENDIMENTO NETTO': isMobile ? 'Netto' : 'RENDIMENTO NETTO'
     };
     
-    // "Capitale Depositato" (cE) resta SOLO i depositi EUR.
-    // cA/cB/cS/cL/cP partono già dal valore base (sopra), poi si sommano le operazioni.
+    // "Capitale Depositato" (cE) resta SOLO i depositi EUR, come in origine.
+    // "Costo Carico Cripto" (cCosto) è tracciato a parte, come riferimento
+    // puramente visivo nel grafico: non entra nel calcolo del Rendimento Netto.
     [...operations].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(op=>{
         if(op.type==='EUR') {
             cE+=op.amount;
