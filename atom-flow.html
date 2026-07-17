@@ -273,21 +273,7 @@
   margin: 0 auto;
   
 }
-@media (max-width: 480px) {
-    .chart-box {
-              /* box grafico,height: 350px; titolo incluso */
-        position: relative; /* necessario perché Chart.js si ridimensioni correttamente */
-        display: flex;
-        flex-direction: column;
-		width:100% !important; height:auto !important; 
-		width:100%; min-height:800px;
-    }
-    .chart-box canvas {
-        flex: 1 1 auto;
-        max-height: 100% !important;
-        width: 100% !important;
-    }
-}
+
 /* Stile Campi Input (Date, Select, Number) */
 input, select {
     background: rgba(255, 255, 255, 0.05) !important;
@@ -560,12 +546,14 @@ label {
 @media (max-width: 480px) {
     /* --- Regole già esistenti per il primo grafico (funzionante) --- */
     .chart-box {
-        position: relative;
         display: flex;
         flex-direction: column;
         width: 100% !important;
         height: auto !important;
-        min-height: 800px;
+        min-height: 400px;          /* ridotto da 800 a 400 */
+        max-height: 75vh;           /* non supera il 75% dell'altezza dello schermo */
+        position: relative;
+        /* manteniamo lo sfondo, bordo, ecc. già presenti */
     }
     .chart-box canvas {
         flex: 1 1 auto;
