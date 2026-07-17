@@ -275,10 +275,12 @@
 }
 @media (max-width: 480px) {
     .chart-box {
-        height: 350px;      /* box grafico, titolo incluso */
+              /* box grafico,height: 350px; titolo incluso */
         position: relative; /* necessario perché Chart.js si ridimensioni correttamente */
         display: flex;
         flex-direction: column;
+		width:100% !important; height:auto !important; 
+		width:100%; min-height:800px;
     }
     .chart-box canvas {
         flex: 1 1 auto;
@@ -553,6 +555,44 @@ label {
 .table-scroll-wrap::-webkit-scrollbar-track { background: transparent; }
 
 .operations-table { width: 100%; min-width: 480px; } /* evita che le colonne si schiaccino */
+
+
+@media (max-width: 480px) {
+    /* --- Regole già esistenti per il primo grafico (funzionante) --- */
+    .chart-box {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 800px;
+    }
+    .chart-box canvas {
+        flex: 1 1 auto;
+        max-height: 100% !important;
+        width: 100% !important;
+    }
+
+    /* --- COPIA le stesse identiche regole per il SECONDO grafico --- */
+    .ts-chart-box {                     /* questa è la classe da sistemare */
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100% !important;
+        height: auto !important;        /* fondamentale: sovrascrive l'altezza fissa di 800px/600px */
+        min-height: 800px;              /* stessa lunghezza del primo */
+        /* mantieni gli altri stili come sfondo, bordo, ombra che già possiede */
+    }
+
+    /* Selettore per il canvas dentro .ts-chart-box (o per l'id specifico) */
+    .ts-chart-box canvas,
+    #usdComparisonChart {               /* metti entrambi per sicurezza */
+        flex: 1 1 auto;
+        max-height: 100% !important;
+        width: 100% !important;
+        display: block;
+    }
+}
     </style>
 </head>
 <body>
@@ -690,15 +730,14 @@ label {
                 
         </div>
 
-<div style="padding: 2px;"></div> 
- <div class="chart-container">            
-      <h2 class="title-fixed">📈 Capitale vs Valore</h2></div>
+<div style="padding: 2px;"></div>             
+      
 
  
 	   
 	    
-         <div class="chart-container chart-box">
-		 
+         <div class="chart-container chart-box" style="min-height: 800px;">
+		 <h2 class="title-fixed">📈 Capitale vs Valore</h2>
       <canvas id="usdComparisonChart"></canvas>
     </div>
             
@@ -790,7 +829,7 @@ label {
  <div style="padding: 5px;"></div>
 
         <!-- Grafico Andamento Capitale -->
-        <div class="chart-container chart-box">
+        <div class="chart-container chart-box" style="min-height: 800px;">
 		<h2 class="title-fixed">👜️ Andamento Capitale</h2>
 		 
           
@@ -1138,7 +1177,7 @@ function updateCapitalChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,
@@ -1258,7 +1297,7 @@ function updateCapitalChart() {
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             display: true,
