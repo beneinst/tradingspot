@@ -505,7 +505,7 @@ h5 { color: var(--color-heading-5); }
    CHART CONTAINERS
    ========================================= */
 .ts-chart-box {
-  height: 800px;
+  height: 700px;
   margin-bottom: 30px;
   position: relative;
   padding: 10px;
