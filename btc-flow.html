@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet BTC - FlowChart</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="css/trade.css">
+    <link rel="stylesheet" href="css/operativita.css">
+    <link rel="stylesheet" href="css/panoramica.css">
+    <link rel="stylesheet" href="css/menusotto.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+    <script>
+      // Fallback: se cdnjs è bloccato (firewall/antivirus/adblocker), riprova con jsDelivr
+      if (typeof Chart === "undefined") {
+        document.write(
+          '<scr' + 'ipt src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></scr' + 'ipt>'
+        );
+      }
+    </script>
+
+    <style>
+    .btc-entry-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #22242a;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,.18);
+    }
+    .btc-entry-table th,
+    .btc-entry-table td {
+      padding: 12px 15px;
+      text-align: center;
+      border-bottom: 1px solid #2d313a;
+    }
+    .btc-entry-table th {
+      background: linear-gradient(135deg, #353850 0%, #23243b 100%);
+      color: #ececf1;
+      font-weight: 600;
+      font-size: .9em;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .btc-entry-table tr:hover {
+      background-color: #2d313a;
+    }
+    .btn-del {
+      background: #ff4d6d;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 3px 8px;
+      cursor: pointer;
+    }
+    .btn-icon-muted {
+        background: rgba(51, 51, 51, 0.6);
+        border-radius: 6px;
+        padding: 6px 10px;
+        border: 1px solid rgba(255,255,255,0.12);
+        color: #ffffff;
+        font-size: 0.9em;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+    .btn-icon-muted:hover {
+        background: rgba(80, 80, 80, 0.9);
+        transform: translateY(-1px);
+        box-shadow: 0 3px 14px rgba(0,0,0,0.5);
+    }
+
+    /* --- Specifico pagina BTC --- */
+    .price-live-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: #22242a;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.18);
+      flex-wrap: wrap;
+    }
+    .price-live-box .price-val {
+      font-size: 1.4em;
+      font-weight: 700;
+      color: #f7931a; /* arancio BTC */
+    }
+    .price-live-box .price-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #3ddc84;
+      box-shadow: 0 0 6px #3ddc84;
+      animation: pulseDot 1.6s infinite;
+      display: inline-block;
+    }
+    @keyframes pulseDot {
+      0% { opacity: .4; }
+      50% { opacity: 1; }
+      100% { opacity: .4; }
+    }
+    .price-live-box .price-updated {
+      font-size: .75em;
+      color: #9a9ca3;
+    }
+
+    .type-badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: .75em;
+      font-weight: 600;
+      letter-spacing: .3px;
+    }
+    .type-deposito {
+      background: rgba(63, 140, 255, .18);
+      color: #6fb1ff;
+      border: 1px solid rgba(111,177,255,.4);
+    }
+    .type-restaking {
+      background: rgba(155, 89, 255, .18);
+      color: #c69bff;
+      border: 1px solid rgba(198,155,255,.4);
+    }
+
+    .val-green { color: #3ddc84 !important; font-weight: 600; }
+    .val-red   { color: #ff4d6d !important; font-weight: 600; }
+
+    .totals-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+    .totals-row .total-card {
+      background: #22242a;
+      border-radius: 8px;
+      padding: 12px 20px;
+      min-width: 150px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,.18);
+    }
+    .totals-row .total-card .label {
+      font-size: .70em;
+      color: #8fbc8f;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .totals-row .total-card .value {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #ececf1;
+    }
+
+    .chart-wrapper {
+      background: #22242a;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.18);
+      position: relative;
+      height: 340px;
+    }
+
+    .legend-row {
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      font-size: .78em;
+      color: #c3c3c3;
+    }
+    .legend-row span.dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      display: inline-block;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    </style>
+</head>
+<body>
+<div style="padding: 4px;"></div>
+
+ <!-- ========== MENU LATERALE E OVERLAY (FUORI DAL CONTAINER) ========== -->
+<div class="offcanvas" id="offcanvasMenu">
+    <div class="offcanvas-header">
+        <span>💱 FlowChart</span>
+        <button class="close-menu-btn" id="closeMenuBtn">✕</button>
+    </div>
+    <nav class="offcanvas-nav">
+        <ul class="offcanvas-main-menu">
+
+            <!-- Capitale -->
+            <li class="offcanvas-dropdown">
+                <div class="offcanvas-dropdown-toggle">Capitale</div>
+                <ul class="offcanvas-submenu">
+                    <li><a href="https://beneinst.github.io/tradingspot/">Panoramica</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/btc-flow.html">Wallet BTC</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
+					<li><a href="https://beneinst.github.io/tradingspot/btc-flow.html">Wallet BTC</a></li>
+                </ul>
+            </li>
+ <!-- Trade -->
+            <li class="offcanvas-dropdown">
+                <div class="offcanvas-dropdown-toggle">Trade</div>
+                <ul class="offcanvas-submenu">
+                    <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Trade attivi</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
+                </ul>
+            </li>
+            <!-- Strategia -->
+            <li class="offcanvas-dropdown">
+                <div class="offcanvas-dropdown-toggle">Strategia</div>
+                <ul class="offcanvas-submenu">
+                    <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+                </ul>
+            </li>
+            <!-- Backup -->
+            <li class="offcanvas-dropdown">
+                <div class="offcanvas-dropdown-toggle">Backup</div>
+                <ul class="offcanvas-submenu">
+                    <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</div>
+<div class="offcanvas-overlay" id="overlay"></div>
+
+<!-- ========== CONTENUTO PRINCIPALE ========== -->
+<div class="header">
+  <header class="app-header">
+    <div class="top-navbar custom-mobile-left">
+      <button class="hamburger" id="hamburgerBtn">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+
+      <a href="index.html" class="logo">
+        <img src="images/logoinvest2a3.svg" alt="FlowChart">
+      </a>
+
+      <div class="header-title-right"></div>
+    </div>
+  </header>
+</div>
+
+<script>
+    (function() {
+        const hamburger = document.getElementById('hamburgerBtn');
+        const offcanvas = document.getElementById('offcanvasMenu');
+        const overlay = document.getElementById('overlay');
+        const closeBtn = document.getElementById('closeMenuBtn');
+        const body = document.body;
+
+        function openMenu() {
+            offcanvas.classList.add('open');
+            overlay.classList.add('active');
+            body.classList.add('menu-open');
+        }
+
+        function closeMenu() {
+            offcanvas.classList.remove('open');
+            overlay.classList.remove('active');
+            body.classList.remove('menu-open');
+        }
+
+        if (hamburger) hamburger.addEventListener('click', openMenu);
+        if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+        if (overlay) overlay.addEventListener('click', closeMenu);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && offcanvas.classList.contains('open')) closeMenu();
+        });
+
+        const toggles = document.querySelectorAll('.offcanvas-dropdown-toggle');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const parent = toggle.closest('.offcanvas-dropdown');
+                if (parent) parent.classList.toggle('active');
+            });
+        });
+
+        document.querySelectorAll('.offcanvas-submenu a').forEach(link => {
+            link.addEventListener('click', () => setTimeout(closeMenu, 100));
+        });
+    })();
+</script>
+<div style="padding: 2px;"></div>
+ <div class="header header-line">
+    <h1>₿ Wallet BTC</h1>
+    <small>*Gestione <strong>Entry BTC</strong> con Deposito e Restaking (da ATOM), prezzo di carico e valore live.</small>
+  </div>
+        </div>
+
+<div style="padding: 2px;"></div>
+      <div class="container">
+
+  <!-- PREZZO LIVE -->
+  <div class="price-live-box">
+    <span class="price-dot" id="priceDot"></span>
+    <span>BTC/EUR:</span>
+    <span class="price-val" id="btcLivePrice">--</span>
+    <span class="price-updated" id="priceUpdated">in aggiornamento…</span>
+  </div>
+
+ <!-- CARD FORM -->
+  <div class="note1">
+    <h5 class="section-title" style="color: #fff !important;">₿ Aggiungi Entry</h5>
+    <form id="entryForm" class="trade-form1">
+      <div class="form-row">
+        <label for="entryType" style="color: #8fbc8f; font-size: 0.70em;">TIPO ENTRY</label>
+        <select id="entryType" required>
+          <option value="deposito">💰 Deposito</option>
+          <option value="restaking">🔁 Restaking (da ATOM)</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="qtyBtc" style="color: #8fbc8f; font-size: 0.70em;">QUANTITÀ BTC</label>
+        <input type="number" id="qtyBtc" step="0.00000001" placeholder="0.00000000" required>
+      </div>
+      <div class="form-row">
+        <label for="spentEur" style="color: #8fbc8f; font-size: 0.70em;">IMPORTO EUR SPESI</label>
+        <input type="number" id="spentEur" placeholder="Importo EUR (€)" step="0.01" required>
+      </div>
+      <div class="form-row">
+        <label for="note" style="color: #8fbc8f; font-size: 0.70em;">NOTA (opzionale)</label>
+        <input type="text" id="note" maxlength="50" placeholder="Breve nota">
+      </div>
+      <div class="form-row">
+        <label></label>
+        <button type="submit" class="btn-edit" style="font-size:1.1rem; padding:9px 22px; min-width:220px; margin-right:20px;">
+          ➕ Aggiungi Entry
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- TOTALI -->
+  <div class="totals-row" id="totalsRow"></div>
+
+  <!-- GRAFICO -->
+  <div class="chart-wrapper">
+    <canvas id="btcChart"></canvas>
+  </div>
+  <div class="legend-row">
+    <span><span class="dot" style="background:#6fb1ff;"></span>Deposito (cumulato)</span>
+    <span><span class="dot" style="background:#c69bff;"></span>Restaking da ATOM (cumulato)</span>
+    <span><span class="dot" style="background:#f7931a;"></span>Totale BTC</span>
+  </div>
+
+  <!-- LISTA ENTRY -->
+  <div class="container">
+   <div id="note">
+    <h4 class="section-title" style="color: #ffe4b5 !important;">🎯 Portfolio BTC</h4>
+    <div id="portfolio" class="trade-card" style="margin-top: 0; overflow-x:auto;"></div>
+  </div>
+</div>
+  <!-- PULSANTE DOWNLOAD -->
+  <div class="form-container" style="margin-top: 30px; display: flex; justify-content: center; align-items: center;">
+  <button id="btnDownload_btc" class="btn-edit" style="font-size:1.1rem; padding:9px 22px;">
+    📥 Scarica Report
+  </button>
+</div>
+</div>
+
+<div style="padding: 2px;"></div>
+
+           <p style="margin: 0; color: #c3c3c3; padding-top:25px; padding-bottom:35px; text-align: center; height: 15px; line-height: 12px;">
+        ⛰️ 2026 © FlowChart by Gerardo D
+      </p>
+    </div></div>
+
+
+<!-- Bottone torna sopra principale (con freccia CSS) -->
+    <button class="back-to-top" id="backToTop" title="Torna in cima"></button>
+
+    <script>
+        function toggleBackToTopButton() {
+            const backToTop = document.getElementById('backToTop');
+            const backToTopAlt = document.getElementById('backToTopAlt');
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+                if (backToTopAlt) backToTopAlt.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+                if (backToTopAlt) backToTopAlt.classList.remove('show');
+            }
+        }
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        window.addEventListener('scroll', toggleBackToTopButton);
+        document.getElementById('backToTop').addEventListener('click', scrollToTop);
+        toggleBackToTopButton();
+    </script>
+
+<script src="js/wallet-btc.js"></script>
+
+</body>
+</html>
