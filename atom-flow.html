@@ -784,9 +784,10 @@ label {
                 <div class="input-field">
                     <label>Tipo Operazione</label>
                     <select id="operationType">
-                      <option value="deposito" style="background-color: #1a1a2e; color: #e0e0e0;">💶 Deposito (Acquisto ATOM)</option>
-<option value="staking" style="background-color: #1a1a2e; color: #e0e0e0;">📈 Re-staking (Ricompense)</option>
-                    </select>
+  <option value="deposito" style="background-color: #1a1a2e; color: #e0e0e0;">💶 Deposito (Acquisto ATOM)</option>
+  <option value="staking" style="background-color: #1a1a2e; color: #e0e0e0;">📈 Re-staking (Ricompense)</option>
+  <option value="ritiro" style="background-color: #1a1a2e; color: #e0e0e0;">💱 Ritiro (Swap in BTC/USDC)</option>
+</select>
                 </div>
             </div>
 
@@ -1033,64 +1034,92 @@ label {
 
         // Aggiorna statistiche (tutto in EUR)
         function updateStats() {
-            const totalAtom = operations.reduce((sum, op) => sum + op.totalAtom, 0);
-            const totalInvested = operations.reduce((sum, op) => sum + getOperationEURValue(op), 0);
-            const depositAtom = operations.filter(op => op.type === 'deposito').reduce((sum, op) => sum + op.totalAtom, 0);
-            const stakingAtom = operations.filter(op => op.type === 'staking').reduce((sum, op) => sum + op.totalAtom, 0);
-            const atomPriceEUR = atomPriceUSD * usdToEurRate;
-            const totalValue = totalAtom * atomPriceEUR;
-            const profitLoss = totalValue - totalInvested;
-            const roiPercent = totalInvested > 0 ? ((profitLoss / totalInvested) * 100) : 0;
+    let totalAtom = 0;
+    let depositAtom = 0;
+    let stakingAtom = 0;   // netto: ricompense - ritiri
+    let ritiroAtom = 0;    // totale ATOM ritirati/swappati
+    let totalInvested = 0;
 
-            document.getElementById('totalAtom').textContent = totalAtom.toFixed(6);
-            document.getElementById('totalInvested').textContent = '€' + totalInvested.toFixed(2);
-            document.getElementById('totalValue').textContent = '€' + totalValue.toFixed(2);
-            document.getElementById('depositAtom').textContent = depositAtom.toFixed(6);
-            document.getElementById('stakingAtom').textContent = stakingAtom.toFixed(6);
-            
-            // Aggiorna profitto/perdita con colore
-            const profitCard = document.getElementById('profitCard');
-            const profitLossElement = document.getElementById('profitLoss');
-            profitLossElement.textContent = (profitLoss >= 0 ? '+' : '') + '€' + profitLoss.toFixed(2);
-            
-            // Cambia colore del card in base al profitto/perdita
-            if (profitLoss > 0) {
-                profitCard.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
-            } else if (profitLoss < 0) {
-                profitCard.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
-            } else {
-                profitCard.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            }
-            
-            // Aggiorna ROI
-            const roiElement = document.getElementById('roiPercent');
-            roiElement.textContent = (roiPercent >= 0 ? '+' : '') + roiPercent.toFixed(2) + '%';
+    operations.forEach(op => {
+        if (op.type === 'deposito') {
+            totalAtom += op.totalAtom;
+            depositAtom += op.totalAtom;
+            totalInvested += getOperationEURValue(op);
+        } else if (op.type === 'staking') {
+            totalAtom += op.totalAtom;
+            stakingAtom += op.totalAtom;
+            totalInvested += getOperationEURValue(op);
+        } else if (op.type === 'ritiro') {
+            totalAtom -= op.totalAtom;
+            stakingAtom -= op.totalAtom;
+            ritiroAtom += op.totalAtom;
+            // il valore EUR del ritiro NON entra nel "totalInvested" (non è costo, è un'uscita)
         }
+    });
+
+    const atomPriceEUR = atomPriceUSD * usdToEurRate;
+    const totalValue = totalAtom * atomPriceEUR;
+    const profitLoss = totalValue - totalInvested;
+    const roiPercent = totalInvested > 0 ? ((profitLoss / totalInvested) * 100) : 0;
+
+    document.getElementById('totalAtom').textContent = totalAtom.toFixed(6);
+    document.getElementById('totalInvested').textContent = '€' + totalInvested.toFixed(2);
+    document.getElementById('totalValue').textContent = '€' + totalValue.toFixed(2);
+    document.getElementById('depositAtom').textContent = depositAtom.toFixed(6);
+    document.getElementById('stakingAtom').textContent = stakingAtom.toFixed(6);
+
+    // Se aggiungi una card dedicata nell'HTML con id="ritiroAtom", verrà popolata automaticamente
+    const ritiroEl = document.getElementById('ritiroAtom');
+    if (ritiroEl) ritiroEl.textContent = ritiroAtom.toFixed(6);
+
+    const profitCard = document.getElementById('profitCard');
+    const profitLossElement = document.getElementById('profitLoss');
+    profitLossElement.textContent = (profitLoss >= 0 ? '+' : '') + '€' + profitLoss.toFixed(2);
+
+    if (profitLoss > 0) {
+        profitCard.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+    } else if (profitLoss < 0) {
+        profitCard.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+    } else {
+        profitCard.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    }
+
+    document.getElementById('roiPercent').textContent = (roiPercent >= 0 ? '+' : '') + roiPercent.toFixed(2) + '%';
+}
 
         // Aggiorna tabella (colonne semplificate, importo sempre in EUR)
-        function updateTable() {
-            const tbody = document.getElementById('operationsBody');
-            tbody.innerHTML = '';
+       function updateTable() {
+    const tbody = document.getElementById('operationsBody');
+    tbody.innerHTML = '';
 
-            operations.forEach(op => {
-                const row = tbody.insertRow();
-                const typeLabel = op.type === 'deposito' ? '💶 Deposito' : '📈 Staking';
-                const eurValue = getOperationEURValue(op);
-                const validatorTag = getOperationValidatorTag(op);
-                const noteDisplay = validatorTag
-                    ? `${op.note || '-'} <small style="color:#94a3b8;">(${validatorTag})</small>`
-                    : (op.note || '-');
+    operations.forEach(op => {
+        const row = tbody.insertRow();
+        let typeLabel;
+        if (op.type === 'deposito') typeLabel = '💶 Deposito';
+        else if (op.type === 'staking') typeLabel = '📈 Staking';
+        else typeLabel = '💱 Ritiro';
 
-                row.innerHTML = `
-                    <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
-                    <td>${typeLabel}</td>
-                    <td><strong>${op.totalAtom.toFixed(6)} ATOM</strong></td>
-                    <td><strong>€${eurValue.toFixed(2)}</strong></td>
-                    <td>${noteDisplay}</td>
-                    <td><button class="btn-delete" onclick="deleteOperation(${op.id})">🗑️</button></td>
-                `;
-            });
-        }
+        const eurValue = getOperationEURValue(op);
+        const validatorTag = getOperationValidatorTag(op);
+        const noteDisplay = validatorTag
+            ? `${op.note || '-'} <small style="color:#94a3b8;">(${validatorTag})</small>`
+            : (op.note || '-');
+
+        const atomDisplay = op.type === 'ritiro'
+            ? `-${op.totalAtom.toFixed(6)} ATOM`
+            : `${op.totalAtom.toFixed(6)} ATOM`;
+        const atomColor = op.type === 'ritiro' ? 'color:#dc3545;' : '';
+
+        row.innerHTML = `
+            <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+            <td>${typeLabel}</td>
+            <td><strong style="${atomColor}">${atomDisplay}</strong></td>
+            <td><strong>€${eurValue.toFixed(2)}</strong></td>
+            <td>${noteDisplay}</td>
+            <td><button class="btn-delete" onclick="deleteOperation(${op.id})">🗑️</button></td>
+        `;
+    });
+}
 
        // Aggiorna grafici
         function updateCharts() {
@@ -1102,30 +1131,37 @@ label {
      // Grafico andamento capitale (in ATOM, la valuta non incide)
 function updateCapitalChart() {
     const ctx = document.getElementById('capitalChart').getContext('2d');
-    
-    // Calcola dati cumulativi
+
     let cumulativeAtom = 0;
     let cumulativeDeposit = 0;
     let cumulativeStaking = 0;
-    
+    let cumulativeRitiro = 0;
+
     const labels = [];
     const totalData = [];
     const depositData = [];
     const stakingData = [];
+    const ritiroData = [];
     const valueData = [];
 
     operations.forEach(op => {
-        cumulativeAtom += op.totalAtom;
         if (op.type === 'deposito') {
+            cumulativeAtom += op.totalAtom;
             cumulativeDeposit += op.totalAtom;
-        } else {
+        } else if (op.type === 'staking') {
+            cumulativeAtom += op.totalAtom;
             cumulativeStaking += op.totalAtom;
+        } else if (op.type === 'ritiro') {
+            cumulativeAtom -= op.totalAtom;
+            cumulativeStaking -= op.totalAtom;
+            cumulativeRitiro += op.totalAtom;
         }
 
         labels.push(new Date(op.date).toLocaleDateString('it-IT'));
         totalData.push(cumulativeAtom);
         depositData.push(cumulativeDeposit);
         stakingData.push(cumulativeStaking);
+        ritiroData.push(cumulativeRitiro);
         valueData.push(cumulativeAtom * atomPriceUSD * usdToEurRate);
     });
 
@@ -1139,7 +1175,7 @@ function updateCapitalChart() {
             labels: labels,
             datasets: [
                 {
-                    label: 'Totale ATOM',
+                    label: 'Totale ATOM (wallet)',
                     data: totalData,
                     borderColor: '#667eea',
                     backgroundColor: 'rgba(102, 126, 234, 0.1)',
@@ -1155,12 +1191,21 @@ function updateCapitalChart() {
                     fill: true
                 },
                 {
-                    label: 'ATOM da Staking',
+                    label: 'ATOM da Staking (netto)',
                     data: stakingData,
                     borderColor: '#ffc107',
                     backgroundColor: 'rgba(255, 193, 7, 0.1)',
                     tension: 0.4,
                     fill: true
+                },
+                {
+                    label: 'ATOM Ritirati (swap)',
+                    data: ritiroData,
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.05)',
+                    borderDash: [5, 5],
+                    tension: 0.4,
+                    fill: false
                 }
             ]
         },
@@ -1168,24 +1213,14 @@ function updateCapitalChart() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        font: {
-                            size: 11
-                        }
-                    }
-                },
+                legend: { display: true, position: 'top', labels: { font: { size: 11 } } },
                 tooltip: {
                     mode: 'index',
                     intersect: false,
                     callbacks: {
                         label: function(context) {
                             let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
+                            if (label) label += ': ';
                             label += context.parsed.y.toFixed(6) + ' ATOM';
                             return label;
                         }
@@ -1195,30 +1230,15 @@ function updateCapitalChart() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'ATOM',
-                        font: {
-                            size: 11
-                        }
-                    },
-                    ticks: {
-                        font: {
-                            size: 10
-                        }
-                    }
+                    title: { display: true, text: 'ATOM', font: { size: 11 } },
+                    ticks: { font: { size: 10 } }
                 },
-                x: {
-                    ticks: {
-                        font: {
-                            size: 10
-                        }
-                    }
-                }
+                x: { ticks: { font: { size: 10 } } }
             }
         }
     });
 }
+
 // Grafico EUR Investiti vs Valore Attuale
         function updateEurComparisonChart() {
             const ctx = document.getElementById('usdComparisonChart').getContext('2d');
@@ -1233,17 +1253,21 @@ function updateCapitalChart() {
             const currentValueData = [];
             const profitLossData = [];
 
-            operations.forEach(op => {
-                cumulativeInvested += getOperationEURValue(op);
-                cumulativeAtom += op.totalAtom;
-                const currentValue = cumulativeAtom * atomPriceEUR;
-                const profitLoss = currentValue - cumulativeInvested;
+           operations.forEach(op => {
+    if (op.type !== 'ritiro') {
+        cumulativeInvested += getOperationEURValue(op);
+        cumulativeAtom += op.totalAtom;
+    } else {
+        cumulativeAtom -= op.totalAtom;
+    }
+    const currentValue = cumulativeAtom * atomPriceEUR;
+    const profitLoss = currentValue - cumulativeInvested;
 
-                labels.push(new Date(op.date).toLocaleDateString('it-IT'));
-                investedData.push(cumulativeInvested);
-                currentValueData.push(currentValue);
-                profitLossData.push(profitLoss);
-            });
+    labels.push(new Date(op.date).toLocaleDateString('it-IT'));
+    investedData.push(cumulativeInvested);
+    currentValueData.push(currentValue);
+    profitLossData.push(profitLoss);
+});
 
             if (usdComparisonChart) {
                 usdComparisonChart.destroy();
@@ -1362,24 +1386,29 @@ function downloadTableHTML() {
 
     // Genera le righe della tabella
     let tableRows = '';
-    operations.forEach(op => {
-        const typeLabel = op.type === 'deposito' ? '💶 Deposito' : '📈 Staking';
-        const eurValue = getOperationEURValue(op);
-        const validatorTag = getOperationValidatorTag(op);
-        const noteDisplay = validatorTag
-            ? `${op.note || '-'} (${validatorTag})`
-            : (op.note || '-');
-        
-        tableRows += `
-            <tr>
-                <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
-                <td>${typeLabel}</td>
-                <td><strong>${op.totalAtom.toFixed(6)} ATOM</strong></td>
-                <td><strong>€${eurValue.toFixed(2)}</strong></td>
-                <td>${noteDisplay}</td>
-            </tr>
-        `;
-    });
+   operations.forEach(op => {
+    let typeLabel;
+    if (op.type === 'deposito') typeLabel = '💶 Deposito';
+    else if (op.type === 'staking') typeLabel = '📈 Staking';
+    else typeLabel = '💱 Ritiro';
+
+    const eurValue = getOperationEURValue(op);
+    const validatorTag = getOperationValidatorTag(op);
+    const noteDisplay = validatorTag
+        ? `${op.note || '-'} (${validatorTag})`
+        : (op.note || '-');
+    const atomDisplay = op.type === 'ritiro' ? `-${op.totalAtom.toFixed(6)}` : op.totalAtom.toFixed(6);
+
+    tableRows += `
+        <tr>
+            <td>${new Date(op.date).toLocaleDateString('it-IT')}</td>
+            <td>${typeLabel}</td>
+            <td><strong>${atomDisplay} ATOM</strong></td>
+            <td><strong>€${eurValue.toFixed(2)}</strong></td>
+            <td>${noteDisplay}</td>
+        </tr>
+    `;
+});
 
     // Template HTML completo
     const htmlContent = `<!DOCTYPE html>
