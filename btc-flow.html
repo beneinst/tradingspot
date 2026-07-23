@@ -165,14 +165,12 @@
       color: #ececf1;
     }
 
-    .chart-wrapper {
-      background: #22242a;
-      border-radius: 8px;
-      padding: 16px;
-      margin-top: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.18);
-      position: relative;
-      height: 340px;
+    .chart-container.chart-box {
+      width: 100%;
+    }
+    #btcChart {
+      width: 100% !important;
+      height: auto !important;
     }
 
     .legend-row {
@@ -217,7 +215,6 @@
                     <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
                     <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
                     <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
-					<li><a href="https://beneinst.github.io/tradingspot/btc-flow.html">Wallet BTC</a></li>
                 </ul>
             </li>
  <!-- Trade -->
@@ -366,7 +363,8 @@
   <div class="totals-row" id="totalsRow"></div>
 
   <!-- GRAFICO -->
-  <div class="chart-wrapper">
+  <div class="chart-container chart-box" style="min-height: 700px;">
+    <h2 class="title-fixed">₿ Andamento BTC</h2>
     <canvas id="btcChart"></canvas>
   </div>
   <div class="legend-row">

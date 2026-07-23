@@ -235,7 +235,7 @@
   // ---------- Render Grafico ----------
   function renderChart() {
     const canvas = document.getElementById("btcChart");
-    const wrapper = canvas ? canvas.closest(".chart-wrapper") : null;
+    const wrapper = canvas ? canvas.closest(".chart-box") : null;
     if (!canvas) return;
 
     if (typeof Chart === "undefined") {
@@ -250,22 +250,7 @@
       return;
     }
 
-    if (entries.length === 0) {
-      if (btcChart) {
-        btcChart.destroy();
-        btcChart = null;
-      }
-      if (wrapper) {
-        wrapper.innerHTML =
-          '<canvas id="btcChart"></canvas><p style="text-align:center; color:#9a9ca3; position:relative; top:-200px; margin:0; pointer-events:none;">Aggiungi la prima entry per vedere il grafico</p>';
-      }
-      return;
-    } else if (wrapper && !document.getElementById("btcChart")) {
-      // il canvas era stato rimosso dallo stato vuoto: lo ripristino
-      wrapper.innerHTML = '<canvas id="btcChart"></canvas>';
-    }
-
-    const liveCanvas = document.getElementById("btcChart");
+    const liveCanvas = canvas;
 
     const sorted = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date));
 
