@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Invest Flow - Home</title>
+  <title>Invest Flow - Backup</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="css/menusotto.css">
   <link rel="stylesheet" href="css/style.css">
@@ -242,37 +242,40 @@
             link.addEventListener('click', () => setTimeout(closeMenu, 100));
         });
     })();
+	.card1 {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);          /* Sfondo sfocato dietro la card */
+  -webkit-backdrop-filter: blur(10px);  /* Per Safari */
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Bordo leggero per definire i bordi */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
 	</script>
 <div style="padding: 2px;"></div>   
- <div class="header header-line">
-			
-    <h1>💽 Backup & Ripristino Dati</h1>
-    <small><em>*Gestione dei <strong>Backup</strong> e del ripristino di tutti i dati.</em></small>
+ <div class="container-f" style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+
+  <!-- CARD BACKUP -->
+  <div class="card1" style="flex: 1; min-width: 250px; text-align: center; padding: 30px 20px;">
+    <div style="font-size: 72px; margin-bottom: 10px;">💾</div>
+    <!-- oppure <img src="backup.png" style="width:80px;"> -->
+    <h3>Backup</h3>
+    <p style="font-size: 1.3rem; color: #666;">Salva tutti i dati in un file JSON</p>
+    <button id="btn-download-backup" class="btn-danger" style="margin-top: 15px; font-size:1rem; padding:10px 25px;">
+      📥 Scarica Backup
+    </button>
   </div>
-                
-        </div>
 
-<div style="padding: 2px;"></div>             
-      <div class="container">
+  <!-- CARD RIPRISTINA -->
+  <div class="card1" style="flex: 1; min-width: 250px; text-align: center; padding: 30px 20px;">
+    <div style="font-size: 72px; margin-bottom: 10px;">🗃️</div>
+    <!-- oppure <img src="ripristina.png" style="width:80px;"> -->
+    <h3>Ripristina</h3>
+    <p style="font-size: 1.3rem; color: #666;">Carica un file JSON per ripristinare i dati</p>
+    <input type="file" id="file-upload-backup" accept=".json" style="display:none">
+    <button id="btn-upload-backup" class="btn-danger" style="margin-top: 15px; font-size:1rem; padding:10px 25px;">
+      📤 Carica File
+    </button>
+  </div>
 
- 
-    <div class="card">
-        <p>Salva e carica tutti i dati per trasferirli tra dispositivi.</p>
-        <div style="padding: 15px;"></div>  
-        <div class="back-container" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 15px;">
-            <button id="btn-download-backup" class="btn-danger"
-                style="font-size:1rem; padding:8px 18px; min-width:150px;">
-                📥 Backup
-            </button>
-            
-            <input type="file" id="file-upload-backup" accept=".json" style="display:none">
-            
-            <button id="btn-upload-backup" class="btn-edit"
-                style="font-size:1rem; padding:8px 18px; min-width:150px;">
-                📤 Ripristina
-            </button>
-        </div>
-    </div>
 </div>
         
     
