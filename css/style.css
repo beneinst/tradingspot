@@ -1,196 +1,48 @@
 /* =========================================
-   GOOGLE FONTS IMPORT
-   ========================================= */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
-/* =========================================
-   CUSTOM FONT FACE (self-host consigliato)
+   FONT FACE
    ========================================= */
 @font-face {
   font-family: 'Bitcount';
   src: url('https://beneinst.github.io/tradingspot/componenti/BitcountPropSingle-Regular.ttf') format('truetype');
-  font-display: swap;
 }
 @font-face {
   font-family: 'Bitcount-Light';
   src: url('https://beneinst.github.io/tradingspot/componenti/BitcountPropSingle-Light.ttf') format('truetype');
-  font-display: swap;
+}
+@font-face {
+  font-family: 'AncizarSans';
+  src: url('https://beneinst.github.io/tradingspot/componenti/TitilliumWeb-Regular.ttf') format('truetype');
 }
 
 /* =========================================
    CSS VARIABLES
    ========================================= */
 :root {
-  /* Font families */
-  --font-brand: 'Bitcount', monospace;          /* Solo logo, hero, badge decorativi */
-  --font-brand-light: 'Bitcount-Light', monospace;
-  --font-heading: 'Inter', sans-serif;          /* H1-H5 funzionali */
-  --font-body: 'Inter', sans-serif;             /* Paragrafi, label, descrizioni */
-  --font-mono: 'JetBrains Mono', monospace;     /* Prezzi, balance, indirizzi, tx hash */
+  --font-heading: 'Bitcount', monospace;
+  --font-heading-light: 'Bitcount-Light', monospace;
+  --font-body: 'AncizarSans', sans-serif;
 
-  /* Colori tipografia */
-  --color-text-primary: #e2e8f0;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
-  --color-heading-1: #ffffff;
-  --color-heading-2: #f1f5f9;
-  --color-heading-3: #cbd5e1;
-  --color-heading-4: #94a3b8;
-  --color-heading-5: #64748b;
+  --color-heading-main: #FFD012;
+  --color-heading-2: #BF9900;
+  --color-heading-3: #E8BA00;
+  --color-heading-4: #FFCD04;
+  --color-heading-5: #dd7109;
+  --color-header-bg: #2e2f3b;
+  --color-border: #35354d;
+  --color-border-light: #44455a;
+  --color-heading: var(--color-heading-main);
 
-  /* Colori stato */
-  --color-positive: #22c55e;
-  --color-negative: #ef4444;
-  --color-warning: #f59e0b;
-}
+  --color-primary: #4a90e2;
+  --color-secondary: #2ecc71;
+  --color-text: #f5f6fa;
+  --color-text-muted: #999999;
+  --color-gold: #FFD012;
+  --bg-deep: #1a1a2e;
+  --bg-container: #1e1e2e;
 
-/* =========================================
-   BASE
-   ========================================= */
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--color-text-primary);
-  background-color: #0b0e14;
-}
-
-/* =========================================
-   HEADINGS
-   ========================================= */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  line-height: 1.2;
-  margin: 0 0 0.5em 0;
-  letter-spacing: -0.01em;
-}
-
-h1 {
-  font-family: var(--font-brand);   /* Bitcount solo su H1 per impatto brand */
-  font-weight: 700;
-  font-size: 2.5rem;
-  color: var(--color-heading-1);
-  letter-spacing: -0.02em;
-}
-
-h2 {
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: var(--color-heading-2);
-}
-
-h3 {
-  font-size: 1.375rem;
-  font-weight: 600;
-  color: var(--color-heading-3);
-}
-
-h4, .header-stat-label {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--color-heading-4);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-h5 {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-heading-5);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* =========================================
-   BODY TEXT
-   ========================================= */
-p, .description {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.7;
-  color: var(--color-text-primary);
-  margin: 0 0 1em 0;
-}
-
-small, .text-muted, .caption {
-  font-family: var(--font-body);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  line-height: 1.5;
-}
-
-/* =========================================
-   NUMERI, PREZZI, BALANCE, ADDRESS
-   ========================================= */
-.price,
-.balance,
-.change,
-.address,
-.tx-hash,
-.fee,
-td.numeric,
-th.numeric,
-.stat-value {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" on, "zero" on;
-  letter-spacing: -0.01em;
-}
-
-/* Stati colore per numeri */
-.positive, .up { color: var(--color-positive); }
-.negative, .down { color: var(--color-negative); }
-.neutral { color: var(--color-text-secondary); }
-
-/* =========================================
-   LABEL & BADGE (UI elementi piccoli)
-   ========================================= */
-.label,
-.badge,
-.tag,
-.nav-item,
-.tab {
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-secondary);
-}
-
-/* =========================================
-   BRAND / DECORATIVE (Bitcount)
-   ========================================= */
-.brand-logo,
-.hero-title,
-.watermark,
-.beta-badge {
-  font-family: var(--font-brand);
-  letter-spacing: 0.02em;
-}
-
-.brand-logo-light,
-.hero-subtitle {
-  font-family: var(--font-brand-light);
-}
-
-/* =========================================
-   CODE & RAW DATA
-   ========================================= */
-code, pre, .raw-json {
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-  padding: 0.125em 0.375em;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
 }
 
 /* =========================================
@@ -283,6 +135,32 @@ body::after {
   font-size: 18px;
 }
 
+/* =========================================
+   TYPOGRAPHY
+   ========================================= */
+p, .description {
+  font-family: var(--font-body);
+  color: #e0e0e0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+small, .text-muted {
+  font-family: var(--font-body);
+  color: #999999;
+  font-size: 0.9em;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-heading);
+  margin-bottom: 10px;
+}
+
+h1 { color: #ffffff; }
+h2 { color: var(--color-heading-2); }
+h3 { color: var(--color-heading-3); }
+h4, .header-stat-label { color: #BCC6CC; }
+h5 { color: var(--color-heading-5); }
 
 /* =========================================
    BUTTONS
