@@ -131,6 +131,11 @@
       color: #c69bff;
       border: 1px solid rgba(198,155,255,.4);
     }
+    .type-prelievo {
+      background: rgba(255, 77, 109, .18);
+      color: #ff8fa3;
+      border: 1px solid rgba(255,143,163,.4);
+    }
 
     .val-green { color: #3ddc84 !important; font-weight: 600; }
     .val-red   { color: #ff4d6d !important; font-weight: 600; }
@@ -204,17 +209,15 @@
     <nav class="offcanvas-nav">
         <ul class="offcanvas-main-menu">
 
-            <!-- Capitale -->
+              <!-- Capitale -->
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Capitale</div>
                 <ul class="offcanvas-submenu">
                     <li><a href="https://beneinst.github.io/tradingspot/">Panoramica</a></li>
                     <li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
                     <li><a href="https://beneinst.github.io/tradingspot/btc-flow.html">Wallet BTC</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/usdc-flow.html">Wallet USDC</a></li>
+                    
                 </ul>
             </li>
  <!-- Trade -->
@@ -232,7 +235,7 @@
                 <ul class="offcanvas-submenu">
                     <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
                     <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
+                    
                     <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
                 </ul>
             </li>
@@ -240,7 +243,12 @@
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Backup</div>
                 <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li><li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
+					<li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
+					<li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
                 </ul>
             </li>
         </ul>
@@ -312,7 +320,7 @@
 <div style="padding: 2px;"></div>
  <div class="header header-line">
     <h1>₿ Wallet BTC</h1>
-    <small>*Gestione <strong>Entry BTC</strong> con Deposito e Restaking (da ATOM), prezzo di carico e valore live.</small>
+    <small>*Gestione <strong>Entry BTC</strong> con Deposito, Restaking (da ATOM) e Prelievo, prezzo di carico e valore live.</small>
   </div>
         </div>
 
@@ -336,6 +344,7 @@
         <select id="entryType" required>
           <option value="deposito">💰 Deposito</option>
           <option value="restaking">🔁 Restaking (da ATOM)</option>
+          <option value="prelievo">📤 Prelievo</option>
         </select>
       </div>
       <div class="form-row">
@@ -343,7 +352,7 @@
         <input type="number" id="qtyBtc" step="0.00000001" placeholder="0.00000000" required>
       </div>
       <div class="form-row">
-        <label for="spentEur" style="color: #8fbc8f; font-size: 0.70em;">IMPORTO EUR SPESI</label>
+        <label for="spentEur" id="spentEurLabel" style="color: #8fbc8f; font-size: 0.70em;">IMPORTO EUR SPESI</label>
         <input type="number" id="spentEur" placeholder="Importo EUR (€)" step="0.01" required>
       </div>
       <div class="form-row">
@@ -371,7 +380,7 @@
   <div class="legend-row">
     <span><span class="dot" style="background:#6fb1ff;"></span>Deposito (cumulato)</span>
     <span><span class="dot" style="background:#c69bff;"></span>Restaking da ATOM (cumulato)</span>
-    <span><span class="dot" style="background:#f7931a;"></span>Totale BTC</span>
+    <span><span class="dot" style="background:#f7931a;"></span>Totale BTC (netto da prelievi)</span>
   </div></div>
 
   <!-- LISTA ENTRY -->
@@ -389,7 +398,7 @@
 </div>
 </div>
 
-<div style="padding: 2px;"></div>
+
 
            <p style="margin: 0; color: #c3c3c3; padding-top:25px; padding-bottom:35px; text-align: center; height: 15px; line-height: 12px;">
         ⛰️ 2026 © FlowChart by Gerardo D

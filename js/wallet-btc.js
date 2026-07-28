@@ -1,9 +1,9 @@
 /* ==========================================================
    Wallet BTC - FlowChart
    - Prezzo BTC live in EUR (CoinGecko, prezzo diretto)
-   - Gestione entry: Deposito / Restaking (da ATOM)
+   - Gestione entry: Deposito / Restaking (da ATOM) / Prelievo
    - Tabella con colore rosso/verde su prezzo di carico
-   - Grafico cumulato (deposito, restaking, totale)
+   - Grafico cumulato (deposito, restaking, totale netto da prelievi)
    - Cancellazione entry (posizione venduta/uscita dal wallet)
    - Export CSV
    ========================================================== */
@@ -84,6 +84,8 @@
 
   // ---------- Calcoli ----------
   function calcRow(entry) {
+    // Per il prelievo, "spent" rappresenta il controvalore EUR ricevuto/segnato
+    // in uscita: il rapporto spent/qty resta il prezzo per BTC a quella data.
     const costoMedio = entry.spent / entry.qty;
     const valoreAttuale = livePriceEur ? entry.qty * livePriceEur : null;
     const pnl = valoreAttuale !== null ? valoreAttuale - entry.spent : null;
@@ -92,19 +94,41 @@
   }
 
   function calcTotals() {
-    let totQty = 0,
-      totSpent = 0,
-      totDeposito = 0,
-      totRestaking = 0;
+    let totDeposito = 0,
+      totRestaking = 0,
+      totPrelievo = 0,
+      totSpesoDeposito = 0,
+      totSpesoRestaking = 0,
+      totPrelevatoEur = 0;
+
     entries.forEach((e) => {
-      totQty += e.qty;
-      totSpent += e.spent;
-      if (e.type === "deposito") totDeposito += e.qty;
-      else totRestaking += e.qty;
+      if (e.type === "deposito") {
+        totDeposito += e.qty;
+        totSpesoDeposito += e.spent;
+      } else if (e.type === "restaking") {
+        totRestaking += e.qty;
+        totSpesoRestaking += e.spent;
+      } else if (e.type === "prelievo") {
+        totPrelievo += e.qty;
+        totPrelevatoEur += e.spent;
+      }
     });
+
+    const totQty = totDeposito + totRestaking - totPrelievo;
+    const totSpent = totSpesoDeposito + totSpesoRestaking - totPrelevatoEur;
     const totValore = livePriceEur ? totQty * livePriceEur : null;
     const totPnl = totValore !== null ? totValore - totSpent : null;
-    return { totQty, totSpent, totDeposito, totRestaking, totValore, totPnl };
+
+    return {
+      totQty,
+      totSpent,
+      totDeposito,
+      totRestaking,
+      totPrelievo,
+      totPrelevatoEur,
+      totValore,
+      totPnl,
+    };
   }
 
   // ---------- Render Totali ----------
@@ -121,7 +145,7 @@
 
     box.innerHTML = `
       <div class="total-card">
-        <span class="label">Totale BTC</span>
+        <span class="label">Totale BTC (netto)</span>
         <span class="value">${t.totQty.toFixed(8)}</span>
       </div>
       <div class="total-card">
@@ -133,7 +157,11 @@
         <span class="value">${t.totRestaking.toFixed(8)}</span>
       </div>
       <div class="total-card">
-        <span class="label">Speso Totale</span>
+        <span class="label">Prelevato</span>
+        <span class="value">${t.totPrelievo.toFixed(8)}</span>
+      </div>
+      <div class="total-card">
+        <span class="label">Speso Netto</span>
         <span class="value">${fmtEur(t.totSpent)}</span>
       </div>
       <div class="total-card">
@@ -160,13 +188,16 @@
 
     const sorted = [...entries].sort((a, b) => new Date(b.date) - new Date(a.date));
 
+    const badgeInfo = {
+      deposito: { cls: "type-deposito", label: "💰 Deposito" },
+      restaking: { cls: "type-restaking", label: "🔁 Restaking" },
+      prelievo: { cls: "type-prelievo", label: "📤 Prelievo" },
+    };
+
     let rows = "";
     sorted.forEach((entry) => {
       const { costoMedio, valoreAttuale, pnl, pnlPct } = calcRow(entry);
-      const badgeClass =
-        entry.type === "deposito" ? "type-deposito" : "type-restaking";
-      const badgeLabel =
-        entry.type === "deposito" ? "💰 Deposito" : "🔁 Restaking";
+      const info = badgeInfo[entry.type] || badgeInfo.deposito;
 
       let valoreCell = "—";
       let varCell = "—";
@@ -181,7 +212,7 @@
       rows += `
         <tr>
           <td>${new Date(entry.date).toLocaleDateString("it-IT")}</td>
-          <td><span class="type-badge ${badgeClass}">${badgeLabel}</span></td>
+          <td><span class="type-badge ${info.cls}">${info.label}</span></td>
           <td>${entry.qty.toFixed(8)}</td>
           <td>${fmtEur(entry.spent)}</td>
           <td>${fmtEur(costoMedio)}</td>
@@ -261,15 +292,17 @@
 
     let cumDeposito = 0;
     let cumRestaking = 0;
+    let cumPrelievo = 0;
 
     sorted.forEach((e) => {
       if (e.type === "deposito") cumDeposito += e.qty;
-      else cumRestaking += e.qty;
+      else if (e.type === "restaking") cumRestaking += e.qty;
+      else if (e.type === "prelievo") cumPrelievo += e.qty;
 
       labels.push(new Date(e.date).toLocaleDateString("it-IT"));
       depositoData.push(cumDeposito);
       restakingData.push(cumRestaking);
-      totaleData.push(cumDeposito + cumRestaking);
+      totaleData.push(cumDeposito + cumRestaking - cumPrelievo);
     });
 
     const datasets = [
@@ -292,7 +325,7 @@
         pointRadius: 3,
       },
       {
-        label: "Totale BTC",
+        label: "Totale BTC (netto da prelievi)",
         data: totaleData,
         borderColor: "#f7931a",
         backgroundColor: "rgba(247,147,26,.10)",
@@ -348,9 +381,30 @@
   }
 
   // ---------- Form ----------
+  function updateFormLabels() {
+    const type = document.getElementById("entryType").value;
+    const spentLabel = document.getElementById("spentEurLabel");
+    const spentInput = document.getElementById("spentEur");
+    if (!spentLabel || !spentInput) return;
+
+    if (type === "prelievo") {
+      spentLabel.textContent = "CONTROVALORE EUR PRELEVATO";
+      spentInput.placeholder = "Controvalore EUR (€) al prelievo";
+    } else {
+      spentLabel.textContent = "IMPORTO EUR SPESI";
+      spentInput.placeholder = "Importo EUR (€)";
+    }
+  }
+
   function initForm() {
     const form = document.getElementById("entryForm");
+    const typeSelect = document.getElementById("entryType");
     if (!form) return;
+
+    if (typeSelect) {
+      typeSelect.addEventListener("change", updateFormLabels);
+      updateFormLabels();
+    }
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -365,6 +419,16 @@
         return;
       }
 
+      if (type === "prelievo") {
+        const { totQty } = calcTotals();
+        if (qty > totQty) {
+          const proceed = confirm(
+            "La quantità prelevata è superiore al saldo BTC attualmente disponibile nel wallet. Vuoi comunque registrare l'entry?"
+          );
+          if (!proceed) return;
+        }
+      }
+
       entries.push({
         id: uid(),
         type,
@@ -377,6 +441,7 @@
       saveEntries();
       form.reset();
       document.getElementById("entryType").value = type;
+      updateFormLabels();
       renderAll();
     });
   }
@@ -385,6 +450,12 @@
   function initDownload() {
     const btn = document.getElementById("btnDownload_btc");
     if (!btn) return;
+
+    const typeLabels = {
+      deposito: "Deposito",
+      restaking: "Restaking (ATOM)",
+      prelievo: "Prelievo",
+    };
 
     btn.addEventListener("click", () => {
       if (entries.length === 0) {
@@ -408,7 +479,7 @@
         const { costoMedio, valoreAttuale, pnl } = calcRow(e);
         return [
           new Date(e.date).toLocaleDateString("it-IT"),
-          e.type === "deposito" ? "Deposito" : "Restaking (ATOM)",
+          typeLabels[e.type] || e.type,
           e.qty.toFixed(8),
           e.spent.toFixed(2),
           costoMedio.toFixed(2),
