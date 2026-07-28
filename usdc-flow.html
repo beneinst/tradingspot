@@ -171,6 +171,7 @@
       margin-right: 6px;
       vertical-align: middle;
     }
+	
     </style>
 </head>
 <body>
@@ -349,19 +350,29 @@
     <span><span class="dot" style="background:#2775ca;"></span>Totale USDC (cumulato)</span>
   </div></div>
 
-  <!-- LISTA ENTRY -->
-  <div class="container">
-   <div id="note">
-    <h4 class="section-title" style="color: #ffe4b5 !important;">🎯 Portfolio USDC</h4>
-    <div id="portfolio" class="trade-card" style="margin-top: 0; overflow-x:auto;"></div>
-  </div>
+ <!-- Accordion Portfolio USDC -->
+<div class="accordion-item">
+    <div class="accordion-header" id="accordionHeaderPortfolio">
+        <h4>🎯 Portfolio USDC</h4>
+        <span class="accordion-icon">▼</span>
+    </div>
 
-  <!-- PULSANTE DOWNLOAD -->
-  <div class="form-container" style="margin-top: 30px; display: flex; justify-content: center; align-items: center;">
-  <button id="btnDownload_usdc" class="btn-edit" style="font-size:1.1rem; padding:9px 22px;">
-    📥 Scarica Report
-  </button>
-</div>
+    <div class="accordion-content" id="accordionContentPortfolio">
+        <!-- LISTA ENTRY -->
+        <div class="container">
+            <div id="note">
+                <h4 class="section-title">🎯 Portfolio USDC</h4>
+                <div id="portfolio" class="trade-card" style="margin-top: 0; overflow-x:auto;"></div>
+            </div>
+
+            <!-- PULSANTE DOWNLOAD -->
+            <div class="form-container" style="margin-top: 30px; display: flex; justify-content: center; align-items: center;">
+                <button id="btnDownload_usdc" class="btn-edit" style="font-size:1.1rem; padding:9px 22px;">
+                    📥 Scarica Report
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div style="padding: 2px;"></div>
@@ -393,6 +404,17 @@
         window.addEventListener('scroll', toggleBackToTopButton);
         document.getElementById('backToTop').addEventListener('click', scrollToTop);
         toggleBackToTopButton();
+		// Accordion per lo STORICO operazioni
+document.addEventListener('DOMContentLoaded', function() {
+    const accordionItem = document.querySelector('.accordion-item');
+    const accordionHeader = document.querySelector('.accordion-header');
+    
+    if (accordionHeader && accordionItem) {
+        accordionHeader.addEventListener('click', function() {
+            accordionItem.classList.toggle('open');
+        });
+    }
+});
     </script>
 
 <script src="js/wallet-usdc.js"></script>

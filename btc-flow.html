@@ -384,19 +384,29 @@
     <span><span class="dot" style="background:#f7931a;"></span>Totale BTC (netto da prelievi)</span>
   </div></div>
 
-  <!-- LISTA ENTRY -->
-  <div class="container">
-   <div id="note">
-    <h4 class="section-title" style="color: #ffe4b5 !important;">🎯 Portfolio BTC</h4>
-    <div id="portfolio" class="trade-card" style="margin-top: 0; overflow-x:auto;"></div>
-  </div>
+  <!-- Accordion Portfolio BTC -->
+<div class="accordion-item">
+    <div class="accordion-header" id="accordionHeaderBtc">
+        <h4>🎯 Portfolio BTC</h4>
+        <span class="accordion-icon">▼</span>
+    </div>
 
-  <!-- PULSANTE DOWNLOAD -->
-  <div class="form-container" style="margin-top: 30px; display: flex; justify-content: center; align-items: center;">
-  <button id="btnDownload_btc" class="btn-edit" style="font-size:1.1rem; padding:9px 22px;">
-    📥 Scarica Report
-  </button>
-</div>
+    <div class="accordion-content" id="accordionContentBtc">
+        <!-- LISTA ENTRY -->
+        <div class="container">
+            <div id="note">
+                <h4 class="section-title">🎯 Portfolio BTC</h4>
+                <div id="portfolio" class="trade-card" style="margin-top: 0; overflow-x:auto;"></div>
+            </div>
+
+            <!-- PULSANTE DOWNLOAD -->
+            <div class="form-container" style="margin-top: 30px; display: flex; justify-content: center; align-items: center;">
+                <button id="btnDownload_btc" class="btn-edit" style="font-size:1.1rem; padding:9px 22px;">
+                    📥 Scarica Report
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -428,6 +438,17 @@
         window.addEventListener('scroll', toggleBackToTopButton);
         document.getElementById('backToTop').addEventListener('click', scrollToTop);
         toggleBackToTopButton();
+		// Accordion per lo STORICO operazioni
+document.addEventListener('DOMContentLoaded', function() {
+    const accordionItem = document.querySelector('.accordion-item');
+    const accordionHeader = document.querySelector('.accordion-header');
+    
+    if (accordionHeader && accordionItem) {
+        accordionHeader.addEventListener('click', function() {
+            accordionItem.classList.toggle('open');
+        });
+    }
+});
     </script>
 
 <script src="js/wallet-btc.js"></script>
