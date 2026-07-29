@@ -935,7 +935,7 @@ h5 { color: var(--color-heading-5); }
   .input-field input,
   .input-field select,
   input, select, textarea {
-    font-size: 16px !important;
+    font-size: 14px !important;
     padding: 12px !important;
     width: 100% !important;
     max-width: 100% !important;
