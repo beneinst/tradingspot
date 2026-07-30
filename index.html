@@ -501,48 +501,198 @@
 </div>
 
 
-<div class="container" style="border: 1px solid rgba(128, 128, 128, 0.3);">
-  <h1 style="text-align:left;font-size:16px;color:white;padding-bottom:13px; padding-top:13px;">➕ Aggiungi al Wallet</h1>
-  <div class="input-group input-group-row">
-    <div class="input-field">
-      <label style="font-size: 0.70em;">DATA</label>
-      <input type="date" id="operationDate">
-    </div>
-    <div class="input-field">
-      <label style="font-size: 0.70em;">IMPORTO</label>
-      <input type="number" id="operationAmount" step="0.01" placeholder="1000.00">
-    </div>
-    <div class="input-field">
-      <label style="font-size: 0.70em;">TIPO</label>
-      <select id="operationType">
-       <option value="EUR" style="background-color: #1a1a2e; color: #e0e0e0;">💶 Deposito Euro (- Capitale iniziale)</option>
-<option value="ATOM" style="background-color: #1a1a2e; color: #e0e0e0;">🪙 ATOM (+ Movimento)</option>
-<option value="BTC" style="background-color: #1a1a2e; color: #e0e0e0;">₿ BTC (+ Movimento)</option>
-<option value="SOL" style="background-color: #1a1a2e; color: #e0e0e0;">☀️ SOL (+ Movimento)</option>
-<option value="LTC" style="background-color: #1a1a2e; color: #e0e0e0;">Ł LTC (+ Movimento)</option>
-<option value="POL" style="background-color: #1a1a2e; color: #e0e0e0;">🔷 POL (+ Movimento)</option>
-<option value="USDC" style="background-color: #1a1a2e; color: #e0e0e0;">💵 USDC (+ Stablecoin)</option>
-<option value="Trading" style="background-color: #1a1a2e; color: #e0e0e0;">📈 Profitto Trading (+ Guadagno)</option>
-      </select>
-    </div> 
-	<div class="input-field" id="costoCaricoField" style="display:none;">
-    <label>Prezzo di Carico Totale (€)</label>
-    <input type="number" id="operationCost" step="0.01" placeholder="0.00">
-</div>
-    <div class="input-field">
-      <label style="font-size: 0.70em;">NOTE</label>
-      <input type="text" id="operationNote" placeholder="Descrizione operazione">
-    </div>
-  </div>
-  <div class="input-actions">
-    <button class="btn-edit" onclick="addOperation()">➕ Aggiungi Operazione</button>
-    <!-- <button class="btn-edit" onclick="clearForm()">🔄 Pulisci Form</button> -->
-	
-    <!-- <button class="btn-edit" onclick="impostaValoriBaseTutti()">📌 Imposta Valori Base Crypto</button> -->
+ <style>
+    /* ===== STILI PER IL CONTAINER E I CAMPI ===== */
+    .container {
+      padding: 8px 20px 20px 20px;
+      box-sizing: border-box;
+    }
 
+    .input-group-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px 20px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .input-field {
+      flex: 1 1 0;
+      min-width: 130px;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+
+    /* Il campo NOTE può essere più largo */
+    .input-field:last-of-type {
+      flex: 2 1 0;
+      min-width: 160px;
+    }
+
+    .input-field label {
+      font-size: 0.70em;
+      font-weight: 600;
+      color: #b0b0c8;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .input-field input,
+    .input-field select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(128, 128, 128, 0.25);
+      background: #0f0f1f;
+      color: #e8e8f0;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-field input:focus,
+    .input-field select:focus {
+      border-color: #6c63ff;
+      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+    }
+
+    .input-field input::placeholder {
+      color: #5a5a7a;
+      opacity: 0.7;
+    }
+
+    .input-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(128, 128, 128, 0.15);
+    }
+
+    
+
+    /* Il campo "Prezzo di Carico" è nascosto di default */
+    #costoCaricoField {
+      display: none;
+    }
+
+    /* Quando è visibile, si comporta come gli altri campi */
+    #costoCaricoField.visible {
+      display: flex;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .input-field {
+        flex: 1 1 100% !important;
+        min-width: 0;
+      }
+      .input-actions {
+        flex-direction: column;
+      }
+      .btn-edit {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== IL TUO CONTAINER ORIGINALE ===== -->
+  <div class="container" style="border: 1px solid rgba(128, 128, 128, 0.3);">
+    <h1 style="text-align:left;font-size:16px;color:white;padding-bottom:13px; padding-top:13px;">➕ Aggiungi al Wallet</h1>
+
+    <div class="input-group-row">
+
+      <!-- DATA -->
+      <div class="input-field">
+        <label style="font-size: 0.70em;">DATA</label>
+        <input type="date" id="operationDate">
+      </div>
+
+      <!-- IMPORTO -->
+      <div class="input-field">
+        <label style="font-size: 0.70em;">IMPORTO</label>
+        <input type="number" id="operationAmount" step="0.01" placeholder="1000.00">
+      </div>
+
+      <!-- TIPO (con evento onchange per mostrare/nascondere il prezzo di carico) -->
+      <div class="input-field">
+        <label style="font-size: 0.70em;">TIPO</label>
+        <select id="operationType" onchange="toggleCostoCarico()">
+          <option value="EUR" style="background-color: #1a1a2e; color: #e0e0e0;">💶 Deposito Euro (- Capitale)</option>
+          <option value="ATOM" style="background-color: #1a1a2e; color: #e0e0e0;">🪙 ATOM (+ Movimento)</option>
+          <option value="BTC" style="background-color: #1a1a2e; color: #e0e0e0;">₿ BTC (+ Movimento)</option>
+          <option value="SOL" style="background-color: #1a1a2e; color: #e0e0e0;">☀️ SOL (+ Movimento)</option>
+          <option value="LTC" style="background-color: #1a1a2e; color: #e0e0e0;">Ł LTC (+ Movimento)</option>
+          <option value="POL" style="background-color: #1a1a2e; color: #e0e0e0;">🔷 POL (+ Movimento)</option>
+          <option value="USDC" style="background-color: #1a1a2e; color: #e0e0e0;">💵 USDC (+ Stablecoin)</option>
+          <option value="Trading" style="background-color: #1a1a2e; color: #e0e0e0;">📈 Trading (+ Guadagno)</option>
+        </select>
+      </div>
+
+      <!-- PREZZO DI CARICO (nascondo di default, appare solo per le cripto) -->
+      <div class="input-field" id="costoCaricoField">
+        <label>Prezzo di Carico Totale (€)</label>
+        <input type="number" id="operationCost" step="0.01" placeholder="0.00">
+      </div>
+
+      <!-- NOTE -->
+      <div class="input-field">
+        <label style="font-size: 0.70em;">NOTE</label>
+        <input type="text" id="operationNote" placeholder="Descrizione operazione">
+      </div>
+
+    </div>
+
+    <div class="input-actions">
+      <button class="btn-edit" style="font-size:1.1rem; padding:9px 22px; min-width:220px; margin-right:20px;" onclick="addOperation()">➕ Aggiungi Entry</button>
+      <!-- <button class="btn-edit" onclick="clearForm()">🔄 Pulisci Form</button> -->
+      <!-- <button class="btn-edit" onclick="impostaValoriBaseTutti()">📌 Imposta Valori Base Crypto</button> -->
+    </div>
   </div>
-  
-</div>
+
+  <!-- ===== SCRIPT PER GESTIRE LA VISIBILITÀ DEL CAMPO "PREZZO DI CARICO" ===== -->
+  <script>
+    function toggleCostoCarico() {
+      var tipo = document.getElementById('operationType').value;
+      var campoPrezzo = document.getElementById('costoCaricoField');
+
+      // Mostra il campo "Prezzo di Carico" solo se il tipo è una criptovaluta
+      // (escludiamo EUR e Trading)
+      var tipiConPrezzo = ['ATOM', 'BTC', 'SOL', 'LTC', 'POL', 'USDC'];
+      if (tipiConPrezzo.includes(tipo)) {
+        campoPrezzo.classList.add('visible');
+      } else {
+        campoPrezzo.classList.remove('visible');
+      }
+    }
+
+    // Esegui la funzione all'avvio per impostare lo stato corretto
+    window.onload = function() {
+      toggleCostoCarico();
+    };
+
+    // ===== LE TUE FUNZIONI ESISTENTI (addOperation, clearForm, ecc.) =====
+    // Esempio di funzione addOperation (adatta al tuo contesto)
+    function addOperation() {
+      var data = document.getElementById('operationDate').value;
+      var importo = document.getElementById('operationAmount').value;
+      var tipo = document.getElementById('operationType').value;
+      var costo = document.getElementById('operationCost').value;
+      var note = document.getElementById('operationNote').value;
+
+      // Qui inserisci la tua logica per aggiungere l'operazione
+      console.log('Operazione aggiunta:', { data, importo, tipo, costo, note });
+      alert('Operazione aggiunta (simulazione)');
+    }
+  </script>
 
 
 
