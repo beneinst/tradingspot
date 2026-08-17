@@ -923,7 +923,7 @@ async function loadCryptoPrices() {
         if(uR.ok) usdcPrice  = parseFloat((await uR.json()).price);
         const pe = document.getElementById('atomPrice');
         const ue = document.getElementById('lastUpdate');
-        if(pe) pe.textContent = `ATOM: €${toEUR(atomPrice).toFixed(4)} | BTC: €${toEUR(btcPrice).toFixed(2)} | SOL: €${toEUR(solPrice).toFixed(2)} | LTC: €${toEUR(ltcPrice).toFixed(2)} | POL: €${toEUR(polPrice).toFixed(4)} | USDC: €${toEUR(usdcPrice).toFixed(4)}`;
+        if(pe) pe.textContent = `ATOM: €${toEUR(atomPrice).toFixed(4)} | BTC: €${toEUR(btcPrice).toFixed(2)} | POL: €${toEUR(polPrice).toFixed(4)} | USDC: €${toEUR(usdcPrice).toFixed(4)}`;
         if(ue) ue.textContent = `Aggiornato: ${new Date().toLocaleString('it-IT')}`;
         updateDisplays();
     } catch(e) { console.error('Errore prezzi:', e); }
