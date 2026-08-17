@@ -993,32 +993,33 @@ function sommaCosto(ops) {
 
 function updateDisplays() {
     const eur=operations.filter(o=>o.type==='EUR'), atom=operations.filter(o=>o.type==='ATOM'),
-          btc=operations.filter(o=>o.type==='BTC'), sol=operations.filter(o=>o.type==='SOL'),
-          ltc=operations.filter(o=>o.type==='LTC'), pol=operations.filter(o=>o.type==='POL'),
+          btc=operations.filter(o=>o.type==='BTC'), pol=operations.filter(o=>o.type==='POL'),
           usdc=operations.filter(o=>o.type==='USDC'), trade=operations.filter(o=>o.type==='Trading');
 
     // Valori base: il "saldo di partenza" per ogni crypto si somma alle operazioni
-    const baseAtom=getBase('ATOM'), baseBtc=getBase('BTC'), baseSol=getBase('SOL'),
-          baseLtc=getBase('LTC'), basePol=getBase('POL');
+    // (SOL e LTC sono posizioni chiuse: escluse da qui in avanti)
+    const baseAtom=getBase('ATOM'), baseBtc=getBase('BTC'), basePol=getBase('POL');
 
     const tEur=eur.reduce((s,o)=>s+o.amount,0),
           tAtomQ=atom.reduce((s,o)=>s+o.amount,0), tAtomV=toEUR(tAtomQ*atomPrice), tAtomCost=baseAtom.costo + sommaCosto(atom),
           tBtcQ=btc.reduce((s,o)=>s+o.amount,0),   tBtcV=toEUR(tBtcQ*btcPrice),   tBtcCost=baseBtc.costo + sommaCosto(btc),
-          tSolQ=sol.reduce((s,o)=>s+o.amount,0),   tSolV=toEUR(tSolQ*solPrice),   tSolCost=baseSol.costo + sommaCosto(sol),
-          tLtcQ=ltc.reduce((s,o)=>s+o.amount,0),   tLtcV=toEUR(tLtcQ*ltcPrice),   tLtcCost=baseLtc.costo + sommaCosto(ltc),
           tPolQ=pol.reduce((s,o)=>s+o.amount,0),   tPolV=toEUR(tPolQ*polPrice),   tPolCost=basePol.costo + sommaCosto(pol),
           tUsdcQ=usdc.reduce((s,o)=>s+o.amount,0), tUsdcV=toEUR(tUsdcQ*usdcPrice),
           tTrade=trade.reduce((s,o)=>s+o.amount,0); // già in EUR (coerente con report/CSV)
 
     // Solo informativo: totale del prezzo di carico di tutte le crypto (base + operazioni).
-    const totalCryptoCost = tAtomCost + tBtcCost + tSolCost + tLtcCost + tPolCost;
+    // SOL e LTC sono posizioni chiuse (azzerate manualmente): il loro eventuale
+    // costo base residuo in localStorage non deve più contribuire al totale,
+    // quindi vengono esclusi qui in modo esplicito.
+    const totalCryptoCost = tAtomCost + tBtcCost + tPolCost;
 
     // Il capitale investito resta rappresentato da "Capitale Depositato" (tEur).
     // Il prezzo di carico/valori base servono solo per il P&L per asset e per il grafico.
     // NB: SOL e LTC non sono più mostrati singolarmente in UI; le posizioni sono
-    // state azzerate manualmente con operazioni a importo negativo, quindi
-    // tSolV/tLtcV restano a 0 e non alterano il calcolo del rendimento netto.
-    const net = tAtomV+tBtcV+tSolV+tLtcV+tPolV+tUsdcV+tTrade - tEur;
+    // state azzerate manualmente con operazioni a importo negativo, e sono
+    // escluse esplicitamente sia dal Capitale Crypto sia dal Rendimento Netto
+    // per evitare che un eventuale costo base residuo li faccia rientrare.
+    const net = tAtomV+tBtcV+tPolV+tUsdcV+tTrade - tEur;
 
     const s=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t;};
 
@@ -1107,14 +1108,14 @@ function updateList(cid, type) {
 
 function updateChart() {
     const d=[];
-    const baseAtom=getBase('ATOM'), baseBtc=getBase('BTC'), baseSol=getBase('SOL'),
-          baseLtc=getBase('LTC'), basePol=getBase('POL');
+    const baseAtom=getBase('ATOM'), baseBtc=getBase('BTC'), basePol=getBase('POL');
 
     let cE=0,
-        cA=0, cB=0, cS=0, cL=0, cP=0, cU=0, cT=0,
+        cA=0, cB=0, cP=0, cU=0, cT=0,
         // Il costo base parte già valorizzato: rappresenta il prezzo di carico
         // di quantità che sono già dentro le operazioni (quindi già in cA/cB/...).
-        cCosto = baseAtom.costo+baseBtc.costo+baseSol.costo+baseLtc.costo+basePol.costo;
+        // SOL e LTC sono escluse: posizioni chiuse, non devono più contribuire.
+        cCosto = baseAtom.costo+baseBtc.costo+basePol.costo;
     
     // Etichette accorciate per mobile
     const isMobile = window.innerWidth <= 760;
@@ -1130,11 +1131,11 @@ function updateChart() {
     };
     
     // "Capitale Depositato" (cE) resta SOLO i depositi EUR.
-    // cA/cB/cS/cL/cP si costruiscono unicamente dalle operazioni (la quantità
+    // cA/cB/cP si costruiscono unicamente dalle operazioni (la quantità
     // era già tutta lì); il costo base si aggiunge solo a cCosto, come
     // riferimento visivo separato, non al valore delle crypto.
-    // cS e cL (SOL/LTC) continuano a essere calcolati per il RENDIMENTO NETTO,
-    // ma non vengono più disegnati come linee separate nel grafico.
+    // SOL e LTC (posizioni chiuse) sono escluse del tutto: non contribuiscono
+    // né al grafico né al costo né al RENDIMENTO NETTO.
     [...operations].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(op=>{
         if(op.type==='EUR') {
             cE+=op.amount;
@@ -1144,12 +1145,6 @@ function updateChart() {
         } else if(op.type==='BTC') {
             cB+=toEUR(op.amount*btcPrice);
             cCosto+=(op.costEur||0);
-        } else if(op.type==='SOL') {
-            cS+=toEUR(op.amount*solPrice);
-            cCosto+=(op.costEur||0);
-        } else if(op.type==='LTC') {
-            cL+=toEUR(op.amount*ltcPrice);
-            cCosto+=(op.costEur||0);
         } else if(op.type==='POL') {
             cP+=toEUR(op.amount*polPrice);
             cCosto+=(op.costEur||0);
@@ -1158,7 +1153,7 @@ function updateChart() {
         } else if(op.type==='Trading') {
             cT+=op.amount; // già in EUR
         }
-        d.push({date:new Date(op.date).toLocaleDateString('it-IT'),eurOut:-cE,atomValue:cA,btcValue:cB,polValue:cP,usdcValue:cU,trading:cT,costoCarico:-cCosto,netEquity:cA+cB+cS+cL+cP+cU+cT-cE});
+        d.push({date:new Date(op.date).toLocaleDateString('it-IT'),eurOut:-cE,atomValue:cA,btcValue:cB,polValue:cP,usdcValue:cU,trading:cT,costoCarico:-cCosto,netEquity:cA+cB+cP+cU+cT-cE});
     });
     
     const cv=document.getElementById('equityChart'); 
