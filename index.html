@@ -459,16 +459,6 @@
         <div class="subvalue" id="totalBtcQty">0 BTC</div>
       </div>
       <div class="ts-grid-item">
-        <h4>☀️ Valore SOL</h4>
-        <div class="value profit-positive" id="totalSolValue">$0.00</div>
-        <div class="subvalue" id="totalSolQty">0 SOL</div>
-      </div>
-      <div class="ts-grid-item">
-        <h4>Ł Valore LTC</h4>
-        <div class="value profit-positive" id="totalLtcValue">$0.00</div>
-        <div class="subvalue" id="totalLtcQty">0 LTC</div>
-      </div>
-      <div class="ts-grid-item">
         <h4>🔷 Valore POL</h4>
         <div class="value profit-positive" id="totalPolValue">$0.00</div>
         <div class="subvalue" id="totalPolQty">0 POL</div>
@@ -629,8 +619,6 @@
           <option value="EUR" style="background-color: #1a1a2e; color: #e0e0e0;">💶 Deposito Euro (- Capitale)</option>
           <option value="ATOM" style="background-color: #1a1a2e; color: #e0e0e0;">🪙 ATOM (+ Movimento)</option>
           <option value="BTC" style="background-color: #1a1a2e; color: #e0e0e0;">₿ BTC (+ Movimento)</option>
-          <option value="SOL" style="background-color: #1a1a2e; color: #e0e0e0;">☀️ SOL (+ Movimento)</option>
-          <option value="LTC" style="background-color: #1a1a2e; color: #e0e0e0;">Ł LTC (+ Movimento)</option>
           <option value="POL" style="background-color: #1a1a2e; color: #e0e0e0;">🔷 POL (+ Movimento)</option>
           <option value="USDC" style="background-color: #1a1a2e; color: #e0e0e0;">💵 USDC (+ Stablecoin)</option>
           <option value="Trading" style="background-color: #1a1a2e; color: #e0e0e0;">📈 Trading (+ Guadagno)</option>
@@ -666,7 +654,7 @@
 
       // Mostra il campo "Prezzo di Carico" solo se il tipo è una criptovaluta
       // (escludiamo EUR e Trading)
-      var tipiConPrezzo = ['ATOM', 'BTC', 'SOL', 'LTC', 'POL', 'USDC'];
+      var tipiConPrezzo = ['ATOM', 'BTC', 'POL', 'USDC'];
       if (tipiConPrezzo.includes(tipo)) {
         campoPrezzo.classList.add('visible');
       } else {
@@ -735,28 +723,6 @@
                     <table class="data-table">
                         <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
                         <tbody id="btcList"></tbody>
-                    </table>
-                </div>
-
-                <div>
-                    <div class="data-title-row">
-                        <h3 class="data-title">☀️ Movimenti SOL (+)</h3>
-                        <button class="btn-download-csv" onclick="downloadCSV('SOL')">⬇️ CSV</button>
-                    </div>
-                    <table class="data-table">
-                        <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
-                        <tbody id="solList"></tbody>
-                    </table>
-                </div>
-
-                <div>
-                    <div class="data-title-row">
-                        <h3 class="data-title">Ł Movimenti LTC (+)</h3>
-                        <button class="btn-download-csv" onclick="downloadCSV('LTC')">⬇️ CSV</button>
-                    </div>
-                    <table class="data-table">
-                        <thead><tr><th>Data</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
-                        <tbody id="ltcList"></tbody>
                     </table>
                 </div>
 
@@ -837,7 +803,7 @@ let chart = null;
 
 // Tipi di crypto per cui si può registrare un prezzo di carico (informativo)
 // e un valore base di partenza
-const CRYPTO_CON_CARICO = ['ATOM','BTC','SOL','LTC','POL'];
+const CRYPTO_CON_CARICO = ['ATOM','BTC','POL'];
 
 // ------------------------------------------------------------------
 //  VALORI BASE (saldo di partenza per asset)
@@ -1049,6 +1015,9 @@ function updateDisplays() {
 
     // Il capitale investito resta rappresentato da "Capitale Depositato" (tEur).
     // Il prezzo di carico/valori base servono solo per il P&L per asset e per il grafico.
+    // NB: SOL e LTC non sono più mostrati singolarmente in UI; le posizioni sono
+    // state azzerate manualmente con operazioni a importo negativo, quindi
+    // tSolV/tLtcV restano a 0 e non alterano il calcolo del rendimento netto.
     const net = tAtomV+tBtcV+tSolV+tLtcV+tPolV+tUsdcV+tTrade - tEur;
 
     const s=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t;};
@@ -1061,12 +1030,6 @@ function updateDisplays() {
 
     s('totalBtcValue', `+€${tBtcV.toFixed(2)}`);
     s('totalBtcQty', formatQtyConPnl(tBtcQ,'BTC',8,tBtcV,tBtcCost));
-
-    s('totalSolValue', `+€${tSolV.toFixed(2)}`);
-    s('totalSolQty', formatQtyConPnl(tSolQ,'SOL',6,tSolV,tSolCost));
-
-    s('totalLtcValue', `+€${tLtcV.toFixed(2)}`);
-    s('totalLtcQty', formatQtyConPnl(tLtcQ,'LTC',8,tLtcV,tLtcCost));
 
     s('totalPolValue', `+€${tPolV.toFixed(2)}`);
     s('totalPolQty', formatQtyConPnl(tPolQ,'POL',6,tPolV,tPolCost));
@@ -1091,7 +1054,7 @@ function formatQtyConPnl(qty, simbolo, decimali, valoreAttuale, costo) {
 
 function updateAllLists() {
     updateList('eurList','EUR'); updateList('atomList','ATOM'); updateList('btcList','BTC');
-    updateList('solList','SOL'); updateList('ltcList','LTC');  updateList('polList','POL');
+    updateList('polList','POL');
     updateList('usdcList','USDC'); updateList('tradingList','Trading');
 }
 
@@ -1159,8 +1122,6 @@ function updateChart() {
         'Capitale Depositato (-)': isMobile ? 'Deposito (-)' : 'Capitale Depositato (-)',
         'Val ATOM (+)': isMobile ? 'ATOM (+)' : 'Val ATOM (+)',
         'Val BTC (+)': isMobile ? 'BTC (+)' : 'Val BTC (+)',
-        'Val SOL (+)': isMobile ? 'SOL (+)' : 'Val SOL (+)',
-        'Val LTC (+)': isMobile ? 'LTC (+)' : 'Val LTC (+)',
         'Val POL (+)': isMobile ? 'POL (+)' : 'Val POL (+)',
         'Val USDC (+)': isMobile ? 'USDC (+)' : 'Val USDC (+)',
         'Trading Profit (+)': isMobile ? 'Trading (+)' : 'Trading Profit (+)',
@@ -1172,6 +1133,8 @@ function updateChart() {
     // cA/cB/cS/cL/cP si costruiscono unicamente dalle operazioni (la quantità
     // era già tutta lì); il costo base si aggiunge solo a cCosto, come
     // riferimento visivo separato, non al valore delle crypto.
+    // cS e cL (SOL/LTC) continuano a essere calcolati per il RENDIMENTO NETTO,
+    // ma non vengono più disegnati come linee separate nel grafico.
     [...operations].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(op=>{
         if(op.type==='EUR') {
             cE+=op.amount;
@@ -1195,7 +1158,7 @@ function updateChart() {
         } else if(op.type==='Trading') {
             cT+=op.amount; // già in EUR
         }
-        d.push({date:new Date(op.date).toLocaleDateString('it-IT'),eurOut:-cE,atomValue:cA,btcValue:cB,solValue:cS,ltcValue:cL,polValue:cP,usdcValue:cU,trading:cT,costoCarico:-cCosto,netEquity:cA+cB+cS+cL+cP+cU+cT-cE});
+        d.push({date:new Date(op.date).toLocaleDateString('it-IT'),eurOut:-cE,atomValue:cA,btcValue:cB,polValue:cP,usdcValue:cU,trading:cT,costoCarico:-cCosto,netEquity:cA+cB+cS+cL+cP+cU+cT-cE});
     });
     
     const cv=document.getElementById('equityChart'); 
@@ -1211,8 +1174,6 @@ function updateChart() {
                 {label:labels['Capitale Depositato (-)'],data:d.map(x=>x.eurOut),   borderColor:'#e74c3c',backgroundColor:'rgba(231,76,60,0.1)',  tension:0.4,fill:false},
                 {label:labels['Val ATOM (+)'],           data:d.map(x=>x.atomValue),borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,0.1)', tension:0.4,fill:false},
                 {label:labels['Val BTC (+)'],            data:d.map(x=>x.btcValue), borderColor:'#f39c12',backgroundColor:'rgba(243,156,18,0.1)', tension:0.4,fill:false},
-                {label:labels['Val SOL (+)'],            data:d.map(x=>x.solValue), borderColor:'#1abc9c',backgroundColor:'rgba(26,188,156,0.1)', tension:0.4,fill:false},
-                {label:labels['Val LTC (+)'],            data:d.map(x=>x.ltcValue), borderColor:'#95a5a6',backgroundColor:'rgba(149,165,166,0.1)',tension:0.4,fill:false},
                 {label:labels['Val POL (+)'],            data:d.map(x=>x.polValue), borderColor:'#8e44ad',backgroundColor:'rgba(142,68,173,0.1)', tension:0.4,fill:false},
                 {label:labels['Val USDC (+)'],           data:d.map(x=>x.usdcValue),borderColor:'#16a085',backgroundColor:'rgba(22,160,133,0.1)', tension:0.4,fill:false},
                 {label:labels['Trading Profit (+)'],     data:d.map(x=>x.trading),  borderColor:'#3498db',backgroundColor:'rgba(52,152,219,0.1)', tension:0.4,fill:false},
