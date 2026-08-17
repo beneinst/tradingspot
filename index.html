@@ -940,6 +940,37 @@ function addOperation() {
 
     if (!date || !amount || isNaN(amount)) { alert('⚠️ Inserisci data e importo validi'); return; }
 
+    // Se l'importo è NEGATIVO su una crypto con Costo Base tracciato (es. stai
+    // togliendo ATOM per convertirlo in USDC/BTC), il Costo Base di quell'asset
+    // NON si riduce da solo: resterebbe agganciato alla quantità vecchia e
+    // gonfierebbe "Capitale Crypto"/"Rendimento Netto" al prossimo inserimento.
+    // Qui calcoliamo la riduzione proporzionale e la proponiamo per conferma
+    // PRIMA di salvare l'operazione.
+    if (isCrypto && amount < 0) {
+        const opsAsset = operations.filter(o => o.type === type);
+        const qtyBefore = opsAsset.reduce((s,o) => s + o.amount, 0);
+        const base = getBase(type);
+        const costBasisBefore = base.costo + sommaCosto(opsAsset);
+
+        if (qtyBefore > 0 && costBasisBefore > 0) {
+            const proporzione = Math.min(Math.abs(amount) / qtyBefore, 1);
+            const suggerito = costBasisBefore * proporzione;
+            const input = prompt(
+                `Stai togliendo ${Math.abs(amount)} ${type} (su ${qtyBefore.toFixed(6)} posseduti).\n` +
+                `Costo Base attuale di ${type}: €${costBasisBefore.toFixed(2)}.\n` +
+                `Quanto va sottratto dal Costo Base (proporzionale suggerito, modificabile)?`,
+                suggerito.toFixed(2)
+            );
+            if (input !== null) {
+                const daSottrarre = parseFloat(input) || 0;
+                const basi = getValoriBase();
+                const nuovoCosto = Math.max(0, (basi[type]?.costo || 0) - daSottrarre);
+                basi[type] = { costo: nuovoCosto };
+                salvaValoriBase(basi);
+            }
+        }
+    }
+
     const newOp = {id:Date.now(), date, amount, type, note};
     // Il prezzo di carico è puramente informativo (P&L per asset + riferimento
     // nel grafico): NON viene sottratto una seconda volta dal capitale, perché
