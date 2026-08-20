@@ -520,6 +520,7 @@ label {
 @media (max-width: 768px) {
   .title-fixed {
     font-size: 14px;
+	padding-top: 5px;
     text-align: center;   /* centrato su smartphone */
   }
 }
@@ -713,7 +714,7 @@ label {
 <div style="padding: 2px;"></div>   
  <div class="header header-line">
 			
-    <h1>🎍 Staking ATOM | Tracker</h1>
+    <h1 style="color: #8fbc8f";>🎍 Staking ATOM | Tracker</h1>
     <small>
         *Gestione <strong>Entry ATOM</strong> | 
         <span class="price-inline"> <strong id="atomPrice">Caricamento...</strong></span>
@@ -728,7 +729,7 @@ label {
  
 	   
 	    
-         <div class="chart-container chart-box" style="min-height: 600px;">
+         <div class="chart-container chart-box" style="min-height: 580px;">
 		 <h2 class="title-fixed">📈 Capitale vs Valore</h2>
       <canvas id="usdComparisonChart"></canvas>
     </div>
@@ -774,18 +775,18 @@ label {
  <div style="padding: 6px;"></div>
          <!-- Form Inserimento -->
         <div class="container">
-		<h2 class="title-fixed" style="padding-bottom: 15px";>➕ Aggiungi al Wallet</h2>
+		<h2 class="title-fixed" style="padding-bottom: 12px";>➕ Aggiungi al Wallet</h2>
            
 
 
             
             <div class="input-group input-group-row">
                 <div class="input-field">
-                    <label>Data</label>
+                    <label style="color: #8fbc8f; font-size: 0.70em;">Data</label>
                     <input type="date" id="operationDate">
                 </div>
                 <div class="input-field">
-                    <label>Tipo Operazione</label>
+                    <label style="color: #8fbc8f; font-size: 0.70em;">Tipo Operazione</label>
                     <select id="operationType">
   <option value="deposito" style="background-color: #1a1a2e; color: #e0e0e0;">💶 Deposito (Acquisto ATOM)</option>
   <option value="staking" style="background-color: #1a1a2e; color: #e0e0e0;">📈 Re-staking (Ricompense)</option>
@@ -798,18 +799,18 @@ label {
             <div class="validator-section">
                 <div class="validator-inputs">
                     <div class="input-field">
-                        <label>ATOM</label>
+                        <label style="color: #8fbc8f; font-size: 0.70em;">ATOM</label>
                         <input type="number" id="atomAmount" step="0.000001" placeholder="0.000000">
                     </div>
                     <div class="input-field">
-                        <label>Spesa EUR</label>
+                        <label style="color: #8fbc8f; font-size: 0.70em;">Spesa EUR</label>
                         <input type="number" id="eurAmount" step="0.01" placeholder="0.00">
                     </div>
                 </div>
             </div>
 
             <div class="input-field">
-                <label>Note</label>
+                <label style="color: #8fbc8f; font-size: 0.70em;">Note</label>
                 <input type="text" id="operationNote" placeholder="Descrizione operazione">
             </div>
 
@@ -822,7 +823,7 @@ label {
  <div style="padding: 3px;"></div>
 
         <!-- Grafico Andamento Capitale -->
-        <div class="chart-container chart-box" style="min-height: 600px;">
+        <div class="chart-container chart-box" style="min-height: 580px;">
 		<h2 class="title-fixed">👜️ Andamento Capitale</h2>
 		 
           
