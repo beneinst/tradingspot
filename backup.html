@@ -114,6 +114,14 @@
     line-height: 1.6;
     white-space: pre-wrap;
 }
+
+.card1 {
+  background-color: rgba(15, 20, 28, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
 </style>
 </head>
 <body>
@@ -244,13 +252,6 @@
             link.addEventListener('click', () => setTimeout(closeMenu, 100));
         });
     })();
-	.card1 {
-  background-color: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);          /* Sfondo sfocato dietro la card */
-  -webkit-backdrop-filter: blur(10px);  /* Per Safari */
-  border: 1px solid rgba(255, 255, 255, 0.3); /* Bordo leggero per definire i bordi */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
 	</script>
 <div style="padding: 2px;"></div>   
  <div class="container-f" style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
@@ -283,6 +284,16 @@
 <p style="text-align:center;">
 <button class="btn-danger" a href="index.html">← Torna alla Panoramica</a></button>
 </p></div>
+
+<div class="container-f" style="padding-top: 1px;">
+  <div class="card1" style="width: 100%; padding: 24px 20px;">
+    <h3>Copie locali</h3>
+    <p style="font-size: 1.05rem; color: #666; text-align: center;">
+      Le copie sono conservate solo in questo browser. Per trasferirle su un altro PC scarica il file e caricalo nella stessa pagina.
+    </p>
+    <div id="backup-archive" style="display: grid; gap: 10px; margin-top: 18px;"></div>
+  </div>
+</div>
         
     
     <div style="padding: 4px;"></div>  
@@ -358,9 +369,11 @@ function caricaBackupCompleto(file) {
       )
         return;
 
+      const archivioLocale = localStorage.getItem(CHIAVE_COPIE_LOCALI);
       localStorage.clear();
 
       Object.keys(nuovoStorage).forEach(k => {
+        if (k === CHIAVE_COPIE_LOCALI) return;
         const raw = nuovoStorage[k];
         let parsed = raw;
 
@@ -375,6 +388,7 @@ function caricaBackupCompleto(file) {
 
         localStorage.setItem(k, typeof parsed === 'object' ? JSON.stringify(parsed) : parsed);
       });
+      if (archivioLocale) localStorage.setItem(CHIAVE_COPIE_LOCALI, archivioLocale);
 
       alert('✅ Backup ripristinato con successo!');
       location.reload();
@@ -439,7 +453,9 @@ document.addEventListener('DOMContentLoaded', () => {
  * @param {boolean} silenzioso - Se true, non mostra feedback visivo
  */
 function scaricaBackupCompleto(silenzioso = false) {
-  const blob = new Blob([JSON.stringify(localStorage, null, 2)], {
+  const backup = creaDatiBackup();
+  salvaCopiaLocale(backup);
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {
     type: 'application/json'
   });
   const url = URL.createObjectURL(blob);
@@ -461,6 +477,96 @@ function scaricaBackupCompleto(silenzioso = false) {
     console.log('✅ Backup manuale completato');
   }
 }
+
+const CHIAVE_COPIE_LOCALI = 'flowchatBackupArchive';
+const MASSIMO_COPIE_LOCALI = 10;
+
+function creaDatiBackup() {
+  const dati = {};
+  Object.keys(localStorage).forEach(chiave => {
+    if (chiave !== CHIAVE_COPIE_LOCALI) dati[chiave] = localStorage.getItem(chiave);
+  });
+  return dati;
+}
+
+function leggiCopieLocali() {
+  try {
+    const copie = JSON.parse(localStorage.getItem(CHIAVE_COPIE_LOCALI) || '[]');
+    return Array.isArray(copie) ? copie : [];
+  } catch {
+    return [];
+  }
+}
+
+function salvaCopiaLocale(dati) {
+  const copie = leggiCopieLocali();
+  copie.unshift({ id: Date.now(), data: new Date().toISOString(), dati });
+  localStorage.setItem(CHIAVE_COPIE_LOCALI, JSON.stringify(copie.slice(0, MASSIMO_COPIE_LOCALI)));
+  mostraCopieLocali();
+}
+
+function scaricaCopiaLocale(id) {
+  const copia = leggiCopieLocali().find(elemento => elemento.id === id);
+  if (!copia) return;
+  const blob = new Blob([JSON.stringify(copia.dati, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `backup-${new Date(copia.data).toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function ripristinaCopiaLocale(id) {
+  const copia = leggiCopieLocali().find(elemento => elemento.id === id);
+  if (!copia || !confirm('Questo sovrascriverà tutti i dati correnti dell’app. Procedere?')) return;
+  const archivioLocale = localStorage.getItem(CHIAVE_COPIE_LOCALI);
+  localStorage.clear();
+  Object.keys(copia.dati).forEach(chiave => localStorage.setItem(chiave, copia.dati[chiave]));
+  if (archivioLocale) localStorage.setItem(CHIAVE_COPIE_LOCALI, archivioLocale);
+  alert('Backup locale ripristinato con successo.');
+  location.reload();
+}
+
+function eliminaCopiaLocale(id) {
+  const copie = leggiCopieLocali().filter(elemento => elemento.id !== id);
+  localStorage.setItem(CHIAVE_COPIE_LOCALI, JSON.stringify(copie));
+  mostraCopieLocali();
+}
+
+function mostraCopieLocali() {
+  const archivio = document.getElementById('backup-archive');
+  if (!archivio) return;
+  const copie = leggiCopieLocali();
+  archivio.innerHTML = copie.length ? copie.map(copia => {
+    const data = new Date(copia.data).toLocaleString('it-IT');
+    return `<div style="display:flex; gap:8px; align-items:center; justify-content:space-between; flex-wrap:wrap; border-bottom:1px solid var(--color-border); padding:10px 0;">
+      <strong>${data}</strong>
+      <span style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn-danger" type="button" data-backup-action="download" data-backup-id="${copia.id}">📥 Scarica</button>
+        <button class="btn-danger" type="button" data-backup-action="restore" data-backup-id="${copia.id}">📤 Ripristina</button>
+        <button class="btn-danger" type="button" data-backup-action="delete" data-backup-id="${copia.id}">🗑️ Elimina</button>
+      </span>
+    </div>`;
+  }).join('') : '<p style="text-align:center; color:#888;">Nessuna copia locale ancora salvata.</p>';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  mostraCopieLocali();
+  const archivio = document.getElementById('backup-archive');
+  if (!archivio) return;
+  archivio.addEventListener('click', event => {
+    const pulsante = event.target.closest('[data-backup-action]');
+    if (!pulsante) return;
+    const id = Number(pulsante.dataset.backupId);
+    const azione = pulsante.dataset.backupAction;
+    if (azione === 'download') scaricaCopiaLocale(id);
+    if (azione === 'restore') ripristinaCopiaLocale(id);
+    if (azione === 'delete') eliminaCopiaLocale(id);
+  });
+});
 
 /**
  * Verifica se è necessario fare un backup automatico giornaliero.
