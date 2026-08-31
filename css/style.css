@@ -22,23 +22,23 @@
   --font-heading-light: 'Bitcount-Light', monospace;
   --font-body: 'AncizarSans', sans-serif;
 
-  --color-heading-main: #FFD012;
-  --color-heading-2: #BF9900;
-  --color-heading-3: #E8BA00;
-  --color-heading-4: #FFCD04;
-  --color-heading-5: #dd7109;
-  --color-header-bg: #2e2f3b;
-  --color-border: #35354d;
-  --color-border-light: #44455a;
+  --color-heading-main: #8fbc8f;
+  --color-heading-2: #76a878;
+  --color-heading-3: #a8d0a6;
+  --color-heading-4: #8fbc8f;
+  --color-heading-5: #d7b56d;
+  --color-header-bg: #18241d;
+  --color-border: #294334;
+  --color-border-light: #3b5d46;
   --color-heading: var(--color-heading-main);
 
-  --color-primary: #4a90e2;
-  --color-secondary: #2ecc71;
-  --color-text: #f5f6fa;
-  --color-text-muted: #999999;
-  --color-gold: #FFD012;
-  --bg-deep: #1a1a2e;
-  --bg-container: #1e1e2e;
+  --color-primary: #8fbc8f;
+  --color-secondary: #4f9d69;
+  --color-text: #edf5ef;
+  --color-text-muted: #9eb0a2;
+  --color-gold: #d7b56d;
+  --bg-deep: #0d1410;
+  --bg-container: #162019;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -65,8 +65,8 @@ body {
   padding: 0;
   min-height: 100vh;
   position: relative;
-  background-color: #121216;
-  color: #e0e0e0;
+  background-color: #0d1410;
+  color: var(--color-text);
   font-family: var(--font-body);
   overflow-x: hidden;
 }
@@ -87,7 +87,7 @@ body::after {
   content: '';
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(18, 18, 24, 0.65);
+  background: rgba(10, 18, 13, 0.72);
   z-index: -1;
   pointer-events: none;
 }
@@ -147,7 +147,7 @@ p, .description {
 
 small, .text-muted {
   font-family: var(--font-body);
-  color: #999999;
+  color: var(--color-text-muted);
   font-size: 0.8em;
 }
 
@@ -156,10 +156,10 @@ h1, h2, h3, h4, h5 {
   margin-bottom: 10px;
 }
 
-h1 { color: #ffffff; }
+h1 { color: #edf5ef; }
 h2 { color: var(--color-heading-2); }
 h3 { color: var(--color-heading-3); }
-h4, .header-stat-label { color: #BCC6CC; }
+h4, .header-stat-label { color: #cfe0d1; }
 h5 { color: var(--color-heading-5); }
 
 /* =========================================
@@ -180,8 +180,8 @@ h5 { color: var(--color-heading-5); }
   color: white;
 }
 .btn-primary:hover {
-  background-color: #357ab8;
-  box-shadow: 0 5px 15px rgba(74,144,226,0.18);
+  background-color: #a8d0a6;
+  box-shadow: 0 5px 15px rgba(143,188,143,0.22);
   transform: translateY(-2px);
 }
 
@@ -191,15 +191,15 @@ h5 { color: var(--color-heading-5); }
   margin-right: 10px;
 }
 .btn-secondary:hover {
-  background-color: #27ae60;
-  box-shadow: 0 5px 15px rgba(46,204,113,0.18);
+  background-color: #6fb47f;
+  box-shadow: 0 5px 15px rgba(79,157,105,0.22);
   transform: translateY(-2px);
 }
 
 .btn-edit {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(188, 204, 233, 0.2);
-  color: #bccce9;
+  border: 1px solid rgba(143, 188, 143, 0.28);
+  color: #a8d0a6;
   padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -208,15 +208,15 @@ h5 { color: var(--color-heading-5); }
   backdrop-filter: blur(5px);
 }
 .btn-edit:hover {
-  background: rgba(188, 204, 233, 0.15);
-  border-color: #bccce9;
+  background: rgba(143, 188, 143, 0.15);
+  border-color: #8fbc8f;
   color: #fff;
 }
 .btn-edit.active {
-  background: #bccce9;
+  background: #8fbc8f;
   color: #333 !important;
   font-weight: 600;
-  box-shadow: 0 0 15px rgba(188, 204, 233, 0.4);
+  box-shadow: 0 0 15px rgba(143, 188, 143, 0.4);
 }
 
 .btn-danger {
@@ -244,16 +244,16 @@ h5 { color: var(--color-heading-5); }
   padding: 12px 20px;
   margin: 8px 12px 8px 0;
   font-size: 1em;
-  border: 2px solid #FFD012;
+  border: 2px solid #8fbc8f;
   border-radius: 8px;
   background: transparent;
-  color: #FFD012;
+  color: #8fbc8f;
   text-decoration: none;
   transition: all 0.3s ease-in-out;
 }
 .btn-outline:hover {
-  background-color: #FFD012;
-  color: #1e1e1e;
+  background-color: #8fbc8f;
+  color: #0d1410;
 }
 
 .btn-icon-muted {
@@ -451,7 +451,7 @@ h5 { color: var(--color-heading-5); }
 .card h4 {
   margin-bottom: 15px;
   font-size: 1.4em;
-  color: #FFD012;
+  color: #8fbc8f;
 }
 
 .card_v {
@@ -463,7 +463,7 @@ h5 { color: var(--color-heading-5); }
 }
 
 .card-header_v {
-  background-color: #222831;
+  background-color: rgba(24, 36, 29, 0.88);
   padding: 20px 25px;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.7);

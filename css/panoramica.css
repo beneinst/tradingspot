@@ -1,18 +1,18 @@
 :root {
-  --primary-color: #739bf2;       /* Blu-grigio elegante */
-  --secondary-color: #393e46;     /* Grigio scuro */
+  --primary-color: #8fbc8f;
+  --secondary-color: #1d2b21;
   --accent-color: #f44336;        /* Rosso */
-  --background-color: #232526;    /* Sfondo principale */
-  --card-color: #2c2c2c;          /* Sfondo card */
-  --border-color: #393e46;        /* Bordo elementi/tabella */
-  --text-color: #e0e0e0;          /* Testo principale chiaro */
-  --text-light: #bfc9d1;          /* Testo secondario */
-  --highlight-light: #ffe58f;     /* Evidenziato corrente */
-  --highlight-green: #c7ffc7;     /* Evidenziato verde */
-  --highlight-red: #ffc7c7;       /* Evidenziato rosso */
-  --header-bg: #333a56;           /* Sfondo header */
-  --hover-link: #ffdb58;          /* Hover link footer */
-  --color-header-bg: #2a2a2a;
+  --background-color: #0d1410;
+  --card-color: #162019;
+  --border-color: #294334;
+  --text-color: #edf5ef;
+  --text-light: #9eb0a2;
+  --highlight-light: #d7b56d;
+  --highlight-green: #8fbc8f;
+  --highlight-red: #ff7d86;
+  --header-bg: #18241d;
+  --hover-link: #a8d0a6;
+  --color-header-bg: #18241d;
 }
 
 

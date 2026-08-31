@@ -1,23 +1,23 @@
 /* ========== VARIABILI GLOBALI (aggiungo toni grigio per offcanvas) ========== */
 :root {
     /* Sfondo del pannello offcanvas: 70% di opacità (trasparente) */
-    --offcanvas-bg: rgba(20, 20, 25, 0.7);
+    --offcanvas-bg: rgba(13, 20, 16, 0.84);
 
     /* Overlay esterno: riduci l'opacità per far vedere lo sfondo sottostante */
     --offcanvas-overlay-bg: rgba(0, 0, 0, 0.4); /* o anche 0.3 se vuoi più trasparente */
 
     /* Le altre variabili restano invariate */
-    --color-bg: #121212;
-    --color-menu-bg: rgba(30, 30, 30, 0.75);
-    --color-submenu-bg: rgba(25, 25, 35, 0.95);
-    --color-primary: #bccce9;
-    --color-text: #f5f6fa;
-    --color-accent: #ec7704;
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --color-bg: #0d1410;
+    --color-menu-bg: rgba(18, 30, 22, 0.88);
+    --color-submenu-bg: rgba(20, 35, 25, 0.94);
+    --color-primary: #8fbc8f;
+    --color-text: #edf5ef;
+    --color-accent: #d7b56d;
+    --glass-border: rgba(143, 188, 143, 0.18);
     --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
     --offcanvas-border: rgba(255, 255, 255, 0.08);
-    --offcanvas-hover: rgba(255, 255, 255, 0.08);
-    --offcanvas-text: #e0e0e0;
+    --offcanvas-hover: rgba(143, 188, 143, 0.12);
+    --offcanvas-text: #edf5ef;
 }
 
 /* ========== HEADER & TOP NAVBAR ========== */
