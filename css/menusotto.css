@@ -135,7 +135,7 @@
     font-size: 11px;
     cursor: pointer;
     color: var(--color-text);
-    width: 16px;
+    width: 18px;
     height: 16px;
     min-width: 16px;
     border-radius: 20px;
@@ -145,6 +145,7 @@
     flex-shrink: 0;
     line-height: 1;
     padding: 0;
+    transform: translateX(-2px);
 }
 .close-menu-btn:hover {
     background: rgba(255, 255, 255, 0.15);
@@ -207,7 +208,7 @@
 .offcanvas-dropdown.active > .offcanvas-submenu {
     max-height: 380px;
     overflow-y: auto;
-    padding: 8px;
+    padding: 5px 8px;
 }
 .offcanvas-submenu .offcanvas-dropdown.active > .offcanvas-submenu {
     max-height: 220px;
