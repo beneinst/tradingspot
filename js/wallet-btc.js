@@ -220,7 +220,10 @@
           <td>${varCell}</td>
           <td>${entry.note ? entry.note : "—"}</td>
           <td>
-            <button class="btn-del" data-id="${entry.id}" title="Rimuovi (posizione venduta)">
+            <button class="btn-del" data-id="${entry.id}" data-action="edit" title="Modifica">
+              ✏️
+            </button>
+            <button class="btn-del" data-id="${entry.id}" data-action="delete" title="Rimuovi (posizione venduta)">
               🗑️
             </button>
           </td>
@@ -247,7 +250,7 @@
       </table>
     `;
 
-    container.querySelectorAll(".btn-del").forEach((btn) => {
+    container.querySelectorAll('.btn-del[data-action="delete"]').forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-id");
         if (
@@ -260,6 +263,81 @@
           renderAll();
         }
       });
+    });
+
+    container.querySelectorAll('.btn-del[data-action="edit"]').forEach((btn) => {
+      btn.addEventListener("click", () => {
+        openEditModal(btn.getAttribute("data-id"));
+      });
+    });
+  }
+
+  /* ==========================================================
+     EDITING COMPLETO (data, tipo, quantità BTC, speso EUR, nota) —
+     vale per tutte le entry, manuali o auto-importate dalla
+     sincronizzazione blockchain.
+     ========================================================== */
+  function openEditModal(id) {
+    const entry = entries.find((e) => e.id === id);
+    if (!entry) return;
+    const dateVal = new Date(entry.date).toISOString().slice(0, 10);
+    const spentLabel = entry.type === "prelievo" ? "Controvalore EUR prelevato" : "Speso EUR";
+
+    const overlay = document.createElement("div");
+    overlay.id = "editBtcModalOverlay";
+    overlay.style.cssText =
+      "position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;";
+    overlay.innerHTML = `
+      <div style="background:#1b1b2f;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:24px;width:min(420px,90vw);box-shadow:0 10px 40px rgba(0,0,0,0.6);">
+        <h3 style="color:#F2BB66;margin-bottom:16px;">✏️ Modifica entry BTC</h3>
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Data</label>
+        <input type="date" id="editBtcDate" value="${dateVal}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Tipo</label>
+        <select id="editBtcType" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+          <option value="deposito" ${entry.type === "deposito" ? "selected" : ""}>💰 Deposito</option>
+          <option value="restaking" ${entry.type === "restaking" ? "selected" : ""}>🔁 Restaking (da ATOM)</option>
+          <option value="prelievo" ${entry.type === "prelievo" ? "selected" : ""}>📤 Prelievo</option>
+        </select>
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Quantità BTC</label>
+        <input type="number" step="any" id="editBtcQty" value="${entry.qty}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">${spentLabel}</label>
+        <input type="number" step="any" id="editBtcSpent" value="${entry.spent}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Nota</label>
+        <input type="text" id="editBtcNote" value="${(entry.note || "").replace(/"/g, "&quot;")}" style="width:100%;padding:8px 10px;margin-bottom:16px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button class="btn-del" onclick="document.getElementById('editBtcModalOverlay').remove();">Annulla</button>
+          <button class="btn-del" id="saveBtcEditBtn" style="background:linear-gradient(135deg,#4a90e2,#667eea);">💾 Salva</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    document.getElementById("saveBtcEditBtn").addEventListener("click", () => {
+      const date = document.getElementById("editBtcDate").value;
+      const type = document.getElementById("editBtcType").value;
+      const qty = parseFloat(document.getElementById("editBtcQty").value);
+      const spent = parseFloat(document.getElementById("editBtcSpent").value);
+      const note = document.getElementById("editBtcNote").value;
+
+      if (!date || isNaN(qty) || qty <= 0 || isNaN(spent) || spent < 0) {
+        alert("⚠️ Data, quantità o importo non validi");
+        return;
+      }
+
+      entry.date = new Date(date).toISOString();
+      entry.type = type;
+      entry.qty = qty;
+      entry.spent = spent;
+      entry.note = note;
+
+      saveEntries();
+      overlay.remove();
+      renderAll();
     });
   }
 

@@ -172,7 +172,10 @@
           <td>${varCell}</td>
           <td>${entry.note ? entry.note : "—"}</td>
           <td>
-            <button class="btn-del" data-id="${entry.id}" title="Rimuovi (posizione venduta)">
+            <button class="btn-del" data-id="${entry.id}" data-action="edit" title="Modifica">
+              ✏️
+            </button>
+            <button class="btn-del" data-id="${entry.id}" data-action="delete" title="Rimuovi (posizione venduta)">
               🗑️
             </button>
           </td>
@@ -198,7 +201,7 @@
       </table>
     `;
 
-    container.querySelectorAll(".btn-del").forEach((btn) => {
+    container.querySelectorAll('.btn-del[data-action="delete"]').forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-id");
         if (
@@ -211,6 +214,71 @@
           renderAll();
         }
       });
+    });
+
+    container.querySelectorAll('.btn-del[data-action="edit"]').forEach((btn) => {
+      btn.addEventListener("click", () => {
+        openEditModal(btn.getAttribute("data-id"));
+      });
+    });
+  }
+
+  /* ==========================================================
+     EDITING COMPLETO (data, quantità USDC, speso EUR, nota) —
+     vale per tutte le entry, manuali o auto-importate dalla
+     sincronizzazione blockchain.
+     ========================================================== */
+  function openEditModal(id) {
+    const entry = entries.find((e) => e.id === id);
+    if (!entry) return;
+    const dateVal = new Date(entry.date).toISOString().slice(0, 10);
+
+    const overlay = document.createElement("div");
+    overlay.id = "editUsdcModalOverlay";
+    overlay.style.cssText =
+      "position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;";
+    overlay.innerHTML = `
+      <div style="background:#1b1b2f;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:24px;width:min(420px,90vw);box-shadow:0 10px 40px rgba(0,0,0,0.6);">
+        <h3 style="color:#F2BB66;margin-bottom:16px;">✏️ Modifica entry USDC</h3>
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Data</label>
+        <input type="date" id="editUsdcDate" value="${dateVal}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Quantità USDC</label>
+        <input type="number" step="any" id="editUsdcQty" value="${entry.qty}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Speso EUR</label>
+        <input type="number" step="any" id="editUsdcSpent" value="${entry.spent}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Nota</label>
+        <input type="text" id="editUsdcNote" value="${(entry.note || "").replace(/"/g, "&quot;")}" style="width:100%;padding:8px 10px;margin-bottom:16px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button class="btn-del" onclick="document.getElementById('editUsdcModalOverlay').remove();">Annulla</button>
+          <button class="btn-del" id="saveUsdcEditBtn" style="background:linear-gradient(135deg,#4a90e2,#667eea);">💾 Salva</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    document.getElementById("saveUsdcEditBtn").addEventListener("click", () => {
+      const date = document.getElementById("editUsdcDate").value;
+      const qty = parseFloat(document.getElementById("editUsdcQty").value);
+      const spent = parseFloat(document.getElementById("editUsdcSpent").value);
+      const note = document.getElementById("editUsdcNote").value;
+
+      if (!date || isNaN(qty) || qty <= 0 || isNaN(spent) || spent < 0) {
+        alert("⚠️ Data, quantità o importo non validi");
+        return;
+      }
+
+      entry.date = new Date(date).toISOString();
+      entry.qty = qty;
+      entry.spent = spent;
+      entry.note = note;
+
+      saveEntries();
+      overlay.remove();
+      renderAll();
     });
   }
 

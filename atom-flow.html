@@ -1022,6 +1022,80 @@ label {
             }
         }
 
+        /* ==================================================================
+           EDITING COMPLETO (data, tipo, quantità ATOM, valore EUR, nota) —
+           vale per tutte le voci, manuali o auto-importate dalla
+           sincronizzazione blockchain.
+           ================================================================== */
+        function openEditModalAtom(id) {
+            const op = operations.find(o => o.id === id);
+            if (!op) return;
+            const dateVal = new Date(op.date).toISOString().slice(0,10);
+            const valoreLabel = op.currency === 'EUR' ? 'Valore (€)' : 'Valore (USD storico)';
+
+            const overlay = document.createElement('div');
+            overlay.id = 'editModalAtomOverlay';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            overlay.innerHTML = `
+              <div style="background:#1b1b2f;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:24px;width:min(420px,90vw);box-shadow:0 10px 40px rgba(0,0,0,0.6);">
+                <h3 style="color:#F2BB66;margin-bottom:16px;">✏️ Modifica operazione ATOM</h3>
+
+                <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Data</label>
+                <input type="date" id="editAtomDate" value="${dateVal}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+                <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Tipo</label>
+                <select id="editAtomType" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+                  <option value="deposito" ${op.type==='deposito'?'selected':''}>💶 Deposito</option>
+                  <option value="staking" ${op.type==='staking'?'selected':''}>📈 Staking</option>
+                  <option value="ritiro" ${op.type==='ritiro'?'selected':''}>💱 Ritiro</option>
+                </select>
+
+                <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Quantità ATOM</label>
+                <input type="number" step="any" id="editAtomQty" value="${op.totalAtom}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+                <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">${valoreLabel}</label>
+                <input type="number" step="any" id="editAtomValue" value="${op.totalUsd}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+                <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Nota</label>
+                <input type="text" id="editAtomNote" value="${(op.note||'').replace(/"/g,'&quot;')}" style="width:100%;padding:8px 10px;margin-bottom:16px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+                <div style="display:flex;gap:10px;justify-content:flex-end;">
+                  <button class="btn-delete" onclick="closeEditModalAtom()">Annulla</button>
+                  <button class="btn-delete" onclick="saveEditModalAtom(${op.id})" style="background:linear-gradient(135deg,#4a90e2,#667eea);">💾 Salva</button>
+                </div>
+              </div>`;
+            document.body.appendChild(overlay);
+        }
+
+        function closeEditModalAtom() {
+            const el = document.getElementById('editModalAtomOverlay');
+            if (el) el.remove();
+        }
+
+        function saveEditModalAtom(id) {
+            const op = operations.find(o => o.id === id);
+            if (!op) return;
+
+            const date = document.getElementById('editAtomDate').value;
+            const type = document.getElementById('editAtomType').value;
+            const qty = parseFloat(document.getElementById('editAtomQty').value);
+            const value = parseFloat(document.getElementById('editAtomValue').value);
+            const note = document.getElementById('editAtomNote').value;
+
+            if (!date || isNaN(qty) || isNaN(value)) { alert('⚠️ Data, quantità o valore non validi'); return; }
+
+            op.date = new Date(date).toISOString();
+            op.type = type;
+            op.totalAtom = qty;
+            op.totalUsd = value; // rispetta la valuta originale dell'operazione (op.currency)
+            op.note = note;
+
+            operations.sort((a,b) => new Date(a.date) - new Date(b.date));
+            saveData();
+            closeEditModalAtom();
+            updateDisplay();
+        }
+
         // Pulisci form
         function clearForm() {
             document.getElementById('atomAmount').value = '';
@@ -1120,7 +1194,7 @@ label {
             <td><strong style="${atomColor}">${atomDisplay}</strong></td>
             <td><strong>€${eurValue.toFixed(2)}</strong></td>
             <td>${noteDisplay}</td>
-            <td><button class="btn-delete" onclick="deleteOperation(${op.id})">🗑️</button></td>
+            <td><button class="btn-delete" onclick="openEditModalAtom(${op.id})" title="Modifica data, tipo, quantità, valore e nota" style="margin-right:6px;">✏️</button><button class="btn-delete" onclick="deleteOperation(${op.id})">🗑️</button></td>
         `;
     });
 }

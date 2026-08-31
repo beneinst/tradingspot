@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="css/menusotto.css">
 	<link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/sync-core.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 	<style>
 :root {
@@ -486,7 +487,10 @@
       <button class="btn-edit" onclick="exportDataHTML()">📊 Esporta Dati</button>
       <button class="btn-edit" onclick="exportChartHTML()">📈 Esporta Grafico</button>
       <button class="btn-edit" onclick="loadAllData()">🔄 Aggiorna</button>
+      <button class="btn-edit" id="syncNowBtn" onclick="sincronizzaDaPanoramica()">🔗 Sincronizza Blockchain</button>
     </div>
+    <div id="syncPanoramicaStatus" style="font-size:0.85em;color:#a0a0a0;margin-top:8px;"></div>
+    <div id="syncPanoramicaLog" style="display:none;background:rgba(15,15,25,0.5);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:10px 14px;margin-top:10px;max-height:220px;overflow-y:auto;font-size:0.85em;"></div>
   </div>
 </div>
 
@@ -1022,6 +1026,116 @@ function sommaCosto(ops) {
     return ops.reduce((s,o) => s + (o.costEur || 0), 0);
 }
 
+/* ======================================================================
+   SINCRONIZZAZIONE BLOCKCHAIN DA PANORAMICA
+   Usa il motore condiviso js/sync-core.js (stesso di sync.html) così le
+   transazioni auto-importate finiscono direttamente qui e nelle pagine
+   Wallet dedicate, senza dover aprire una pagina separata.
+   ====================================================================== */
+async function sincronizzaDaPanoramica() {
+    if (typeof SyncEngine === 'undefined') {
+        alert('⚠️ js/sync-core.js non trovato. Verifica di averlo caricato nel repo.');
+        return;
+    }
+    const btn = document.getElementById('syncNowBtn');
+    const status = document.getElementById('syncPanoramicaStatus');
+    const logBox = document.getElementById('syncPanoramicaLog');
+    logBox.style.display = 'block';
+    logBox.innerHTML = '';
+    btn.disabled = true;
+    status.textContent = 'Sincronizzazione in corso…';
+
+    const log = (msg, cls) => {
+        const row = document.createElement('div');
+        row.style.padding = '3px 0';
+        row.style.color = cls === 'err' ? '#e74c3c' : cls === 'ok' ? '#2ecc71' : '#a0a0a0';
+        row.textContent = msg;
+        logBox.prepend(row);
+    };
+
+    const totale = await SyncEngine.sincronizzaTutto(log);
+    status.textContent = `Ultima sincronizzazione: ${new Date().toLocaleString('it-IT')} — ${totale} nuove transazioni.`;
+    btn.disabled = false;
+
+    // Ricarica operations dal localStorage (appena scritto da SyncEngine) e ridisegna tutto.
+    loadAllData();
+}
+
+/* ======================================================================
+   EDITING COMPLETO (data, importo, nota, prezzo di carico) — vale per
+   TUTTE le operazioni, manuali o auto-importate: sono voci identiche
+   nello stesso array "operations", quindi trattate allo stesso modo.
+   ====================================================================== */
+function openEditModal(id) {
+    const op = operations.find(o => o.id === id);
+    if (!op) return;
+
+    const isCrypto = CRYPTO_CON_CARICO.includes(op.type);
+    const dateVal = new Date(op.date).toISOString().slice(0,10);
+
+    const overlay = document.createElement('div');
+    overlay.id = 'editModalOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    overlay.innerHTML = `
+      <div style="background:#1b1b2f;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:24px;width:min(420px,90vw);box-shadow:0 10px 40px rgba(0,0,0,0.6);">
+        <h3 style="color:#F2BB66;margin-bottom:16px;">✏️ Modifica operazione (${op.type})</h3>
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Data</label>
+        <input type="date" id="editDate" value="${dateVal}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Importo (${op.type})</label>
+        <input type="number" step="any" id="editAmount" value="${op.amount}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Nota</label>
+        <input type="text" id="editNote" value="${(op.note||'').replace(/"/g,'&quot;')}" style="width:100%;padding:8px 10px;margin-bottom:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+
+        ${isCrypto ? `
+        <label style="display:block;color:#F2BB66;font-size:0.85em;margin-bottom:4px;">Prezzo di carico totale (€, vuoto = nessuno)</label>
+        <input type="number" step="any" id="editCostEur" value="${op.costEur != null ? op.costEur : ''}" style="width:100%;padding:8px 10px;margin-bottom:16px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(35,35,59,0.6);color:#e0e0e0;">
+        ` : ''}
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button class="btn-edit" onclick="closeEditModal()">Annulla</button>
+          <button class="btn-edit" onclick="saveEditModal(${op.id})" style="background:linear-gradient(135deg,#4a90e2,#667eea);">💾 Salva</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+}
+
+function closeEditModal() {
+    const el = document.getElementById('editModalOverlay');
+    if (el) el.remove();
+}
+
+function saveEditModal(id) {
+    const op = operations.find(o => o.id === id);
+    if (!op) return;
+
+    const date = document.getElementById('editDate').value;
+    const amount = parseFloat(document.getElementById('editAmount').value);
+    const note = document.getElementById('editNote').value;
+    if (!date || isNaN(amount)) { alert('⚠️ Data o importo non validi'); return; }
+
+    op.date = new Date(date).toISOString();
+    op.amount = amount;
+    op.note = note;
+
+    const costInput = document.getElementById('editCostEur');
+    if (costInput) {
+        const raw = costInput.value.trim();
+        if (raw === '') delete op.costEur;
+        else {
+            const v = parseFloat(raw);
+            if (!isNaN(v) && v >= 0) op.costEur = v;
+        }
+    }
+
+    operations.sort((a,b) => new Date(a.date) - new Date(b.date));
+    localStorage.setItem('cryptoOperations', JSON.stringify(operations));
+    closeEditModal();
+    loadAllData();
+}
+
 function updateDisplays() {
     const eur=operations.filter(o=>o.type==='EUR'), atom=operations.filter(o=>o.type==='ATOM'),
           btc=operations.filter(o=>o.type==='BTC'), pol=operations.filter(o=>o.type==='POL'),
@@ -1131,7 +1245,7 @@ function updateList(cid, type) {
             <td>${type==='EUR'?'-':'+'}${fmt(op)}</td>
             <td>${op.note||''}</td>
             <td class="actions">
-                ${isCryptoConCarico ? `<button class="btn-icon-muted" onclick="editCosto(${op.id})" title="Assegna/modifica prezzo di carico">✏️</button>` : ''}
+                <button class="btn-icon-muted" onclick="openEditModal(${op.id})" title="Modifica data, importo, nota${isCryptoConCarico ? ' e prezzo di carico' : ''}">✏️</button>
                 <button class="btn-icon-muted" onclick="removeOperation(${op.id})">🗑️</button>
             </td>
         </tr>`).join('');
