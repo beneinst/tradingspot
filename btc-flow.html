@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -201,10 +201,10 @@
 <div style="padding: 4px;"></div>
 
  <!-- ========== MENU LATERALE E OVERLAY (FUORI DAL CONTAINER) ========== -->
-<div class="offcanvas" id="offcanvasMenu">
+<div class="offcanvas glass-panel" id="offcanvasMenu">
     <div class="offcanvas-header">
-        <span>💱 FlowChart</span>
-        <button class="close-menu-btn" id="closeMenuBtn">✕</button>
+        <img src="images/logoinvest2a3.svg" alt="FlowChart">
+        <button class="close-menu-btn" id="closeMenuBtn">&#10132;</button>
     </div>
     <nav class="offcanvas-nav">
         <ul class="offcanvas-main-menu">
@@ -288,12 +288,14 @@
             offcanvas.classList.add('open');
             overlay.classList.add('active');
             body.classList.add('menu-open');
+            hamburger.classList.add('open');
         }
 
         function closeMenu() {
             offcanvas.classList.remove('open');
             overlay.classList.remove('active');
             body.classList.remove('menu-open');
+            hamburger.classList.remove('open');
         }
 
         if (hamburger) hamburger.addEventListener('click', openMenu);
@@ -455,3 +457,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
+
+
+

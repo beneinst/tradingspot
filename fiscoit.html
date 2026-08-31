@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -11,10 +11,10 @@
 
 <!-- HEADER -->
 <!-- ========== MENU LATERALE E OVERLAY (FUORI DAL CONTAINER) ========== -->
-<div class="offcanvas" id="offcanvasMenu">
+<div class="offcanvas glass-panel" id="offcanvasMenu">
     <div class="offcanvas-header">
-        <span>💱 FlowChart</span>
-        <button class="close-menu-btn" id="closeMenuBtn">✕</button>
+        <img src="images/logoinvest2a3.svg" alt="FlowChart">
+        <button class="close-menu-btn" id="closeMenuBtn">&#10132;</button>
     </div>
     <nav class="offcanvas-nav">
         <ul class="offcanvas-main-menu">
@@ -28,15 +28,6 @@
                     <li><a href="https://beneinst.github.io/tradingspot/btc-flow.html">Wallet BTC</a></li>
                     <li><a href="https://beneinst.github.io/tradingspot/usdc-flow.html">Wallet USDC</a></li>
                     
-                </ul>
-            </li>
- <!-- Trade -->
-            <li class="offcanvas-dropdown">
-                <div class="offcanvas-dropdown-toggle">Trade</div>
-                <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Trade attivi</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
                 </ul>
             </li>
             <!-- Strategia -->
@@ -59,6 +50,15 @@
                     <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
                     <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
 					<li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
+                    <li><a href="https://beneinst.github.io/tradingspot/sync.html">Wallet Sync</a></li>
+                    <li class="offcanvas-dropdown">
+                        <div class="offcanvas-dropdown-toggle">Trade</div>
+                        <ul class="offcanvas-submenu">
+                            <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Trade attivi</a></li>
+                            <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
+                            <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </li>
         </ul>
@@ -102,12 +102,14 @@
             offcanvas.classList.add('open');
             overlay.classList.add('active');
             body.classList.add('menu-open');
+            hamburger.classList.add('open');
         }
 
         function closeMenu() {
             offcanvas.classList.remove('open');
             overlay.classList.remove('active');
             body.classList.remove('menu-open');
+            hamburger.classList.remove('open');
         }
 
         if (hamburger) hamburger.addEventListener('click', openMenu);
@@ -296,7 +298,7 @@
 
         <div class="form-actions">
           <button type="submit" class="btn-accent">+ Aggiungi operazione</button>
-          <button type="button" class="btn-ghost" id="btnResetForm">✕ Cancella</button>
+          <button type="button" class="btn-ghost" id="btnResetForm">X Cancella</button>
         </div>
       </form>
     </section>
@@ -586,7 +588,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <h3>Modifica operazione</h3>
-      <button class="modal-close" id="modalClose">✕</button>
+      <button class="modal-close" id="modalClose">X</button>
     </div>
     <form id="formEdit" class="form-grid">
       <input type="hidden" id="editId">
@@ -632,3 +634,7 @@
 <script src="js/fisco.js"></script>
 </body>
 </html>
+
+
+
+
