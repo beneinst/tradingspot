@@ -28,7 +28,18 @@
   function getWalletStore(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
   function saveWalletStore(key, arr) { localStorage.setItem(key, JSON.stringify(arr)); }
   function uidWallet() { return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
-  function startOfToday() { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); }
+  function startOfYesterday() {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - 1);
+    return d.getTime();
+  }
+
+  function syncSince(state, key) {
+    const yesterday = startOfYesterday();
+    const savedSince = state[key] && Number(state[key].since);
+    return Number.isFinite(savedSince) ? Math.min(savedSince, yesterday) : yesterday;
+  }
 
   /* --------------------------------------------------------
      CACHE PREZZI STORICI COINGECKO (EUR)
@@ -166,37 +177,77 @@
   /* --------------------------------------------------------
      COSMOS / ATOM — LCD pubblico
      -------------------------------------------------------- */
+  function decodeCosmosValue(value) {
+    if (typeof value !== 'string') return '';
+    try {
+      const decoded = atob(value);
+      return /^[\x20-\x7E]*$/.test(decoded) ? decoded : value;
+    } catch (_) {
+      return value;
+    }
+  }
+
+  function atomAmountFromValue(value) {
+    const decoded = decodeCosmosValue(value);
+    const matches = decoded.match(/(?:^|,)(\d+)uatom\b/g) || [];
+    return matches.reduce((total, item) => total + Number(item.replace(/[^0-9]/g, '')), 0);
+  }
+
+  function cosmosTransferEvents(txResp) {
+    const events = [];
+    (txResp.logs || []).forEach(logEntry => events.push(...(logEntry.events || [])));
+    (txResp.events || []).forEach(event => events.push(event));
+    return events.filter(event => event.type === 'transfer');
+  }
+
+  async function fetchCosmosTxs(address, direction, onLog) {
+    const query = `transfer.${direction === 'in' ? 'recipient' : 'sender'}='${address}'`;
+    const lcds = [
+      'https://rest.cosmos.directory/cosmoshub',
+      'https://cosmos-rest.publicnode.com',
+      'https://cosmos-api.polkachu.com',
+    ];
+    const params = [
+      `query=${encodeURIComponent(query)}&order_by=ORDER_BY_DESC&pagination.limit=100`,
+      `events=${encodeURIComponent(query)}&order_by=ORDER_BY_DESC&pagination.limit=100`,
+    ];
+    let lastError = null;
+
+    for (const lcd of lcds) {
+      for (const param of params) {
+        try {
+          const res = await fetch(`${lcd}/cosmos/tx/v1beta1/txs?${param}`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          if (Array.isArray(data.tx_responses)) return data.tx_responses;
+          throw new Error('risposta Cosmos senza tx_responses');
+        } catch (error) {
+          lastError = error;
+        }
+      }
+    }
+
+    throw new Error(`Cosmos LCD ${direction} non disponibile: ${lastError ? lastError.message : 'errore sconosciuto'}`);
+  }
+
   async function sincronizzaAtom(address, sinceMs, onLog) {
-    const LCD = 'https://rest.cosmos.directory/cosmoshub';
     const grezze = [];
 
-    for (const [direction, query] of [
-      ['in', `transfer.recipient='${address}'`],
-      ['out', `transfer.sender='${address}'`],
-    ]) {
-      const url = `${LCD}/cosmos/tx/v1beta1/txs?query=${encodeURIComponent(query)}&order_by=ORDER_BY_DESC&pagination.limit=50`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Cosmos LCD HTTP ${res.status} (${direction})`);
-      const data = await res.json();
-
-      (data.tx_responses || []).forEach(txResp => {
+    for (const direction of ['in', 'out']) {
+      const txResponses = await fetchCosmosTxs(address, direction, onLog);
+      txResponses.forEach(txResp => {
         const tsMs = new Date(txResp.timestamp).getTime();
-        if (tsMs < sinceMs) return;
+        if (!Number.isFinite(tsMs) || tsMs < sinceMs) return;
 
         let uatom = 0;
-        (txResp.logs || []).forEach(logEntry => {
-          (logEntry.events || []).filter(e => e.type === 'transfer').forEach(ev => {
-            const attrs = ev.attributes;
-            const recipient = attrs.find(a => a.key === 'recipient');
-            const sender = attrs.find(a => a.key === 'sender');
-            const amount = attrs.find(a => a.key === 'amount');
-            const amountStr = amount ? amount.value : '';
-            const match = amountStr.match(/(\d+)uatom/);
-            if (!match) return;
-            const val = parseInt(match[1], 10);
-            if (direction === 'in' && recipient && recipient.value === address) uatom += val;
-            if (direction === 'out' && sender && sender.value === address) uatom -= val;
-          });
+        cosmosTransferEvents(txResp).forEach(ev => {
+          const attrs = ev.attributes || [];
+          const get = key => attrs.find(a => decodeCosmosValue(a.key) === key);
+          const recipient = decodeCosmosValue(get('recipient')?.value);
+          const sender = decodeCosmosValue(get('sender')?.value);
+          const amount = atomAmountFromValue(get('amount')?.value);
+          if (direction === 'in' && recipient === address) uatom += amount;
+          if (direction === 'out' && sender === address) uatom -= amount;
         });
         if (uatom === 0) return;
 
@@ -292,9 +343,9 @@
     let totaleImportate = 0;
 
     const jobs = [
-      { key: 'btc', label: 'Bitcoin', addr: cfg.btc, fn: () => sincronizzaBtc(cfg.btc, (state.btc && state.btc.since) || startOfToday(), log) },
-      { key: 'atom', label: 'Cosmos', addr: cfg.atom, fn: () => sincronizzaAtom(cfg.atom, (state.atom && state.atom.since) || startOfToday(), log) },
-      { key: 'evm', label: 'Polygon', addr: cfg.evm, fn: () => sincronizzaPolygon(cfg.evm, cfg.polygonscanKey, (state.evm && state.evm.since) || startOfToday(), log) },
+      { key: 'btc', label: 'Bitcoin', addr: cfg.btc, fn: () => sincronizzaBtc(cfg.btc, syncSince(state, 'btc'), log) },
+      { key: 'atom', label: 'Cosmos', addr: cfg.atom, fn: () => sincronizzaAtom(cfg.atom, syncSince(state, 'atom'), log) },
+      { key: 'evm', label: 'Polygon', addr: cfg.evm, fn: () => sincronizzaPolygon(cfg.evm, cfg.polygonscanKey, syncSince(state, 'evm'), log) },
     ];
 
     for (const job of jobs) {
