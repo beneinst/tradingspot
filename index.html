@@ -769,7 +769,7 @@ function closeMenu() {
             </div>
 
             <div class="export-buttons" style="margin-top:18px;">
-                <button class="btn-edit" onclick="downloadCSV('ALL')">⬇️ Scarica Tutto lo Storico (CSV)</button>
+                <button class="btn-edit" onclick="downloadAllHistoryHTML()">⬇️ Scarica Tutto lo Storico (HTML)</button>
             </div>
         </div>
     </div>
@@ -1420,6 +1420,88 @@ function downloadCSV(type) {
     const a = document.createElement('a');
     a.href = url; a.download = filename; a.click();
     URL.revokeObjectURL(url);
+}
+
+function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[character]));
+}
+
+function downloadAllHistoryHTML() {
+    if (!operations.length) {
+        alert('⚠️ Nessun movimento da esportare');
+        return;
+    }
+
+    const now = new Date();
+    const sorted = [...operations].sort((a, b) => new Date(a.date) - new Date(b.date));
+    const rows = sorted.map(op => {
+        const sign = op.type === 'EUR' ? '-' : '+';
+        const amount = `${sign}${formatEuro(op.amount)} ${unitSuffix(op.type)}`;
+        const cost = op.costEur ? `&euro;${Number(op.costEur).toFixed(2)}` : '';
+        return `<tr>
+            <td>${escapeHTML(new Date(op.date).toLocaleString('it-IT'))}</td>
+            <td><span class="asset asset-${escapeHTML(op.type.toLowerCase())}">${escapeHTML(op.type)}</span></td>
+            <td class="amount">${escapeHTML(amount)}</td>
+            <td class="amount">${cost}</td>
+            <td>${escapeHTML(op.note || '')}</td>
+        </tr>`;
+    }).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storico completo FlowChart</title>
+<style>
+    :root { color-scheme: light; --ink:#1d2939; --muted:#667085; --line:#d9e2ec; --blue:#2259ae; --paper:#f5f7fb; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:32px; background:var(--paper); color:var(--ink); font:14px/1.5 Arial,sans-serif; }
+    main { max-width:1100px; margin:0 auto; background:#fff; padding:32px; box-shadow:0 8px 28px rgba(16,24,40,.10); }
+    header { display:flex; justify-content:space-between; gap:24px; align-items:flex-start; border-bottom:3px solid var(--blue); padding-bottom:20px; margin-bottom:24px; }
+    h1 { margin:0 0 6px; font-size:28px; color:var(--blue); }
+    .subtitle, .generated { color:var(--muted); }
+    .summary { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:24px; }
+    .summary div { border:1px solid var(--line); padding:10px 16px; min-width:150px; }
+    .summary strong { display:block; font-size:20px; color:var(--blue); }
+    table { width:100%; border-collapse:collapse; }
+    th { background:var(--blue); color:#fff; text-align:left; padding:10px 12px; }
+    td { border-bottom:1px solid var(--line); padding:9px 12px; vertical-align:top; }
+    tr:nth-child(even) { background:#f8fafc; }
+    .amount { text-align:right; white-space:nowrap; }
+    .asset { font-weight:bold; }
+    .asset-eur { color:#9a3412; }
+    .asset-atom, .asset-btc, .asset-pol, .asset-usdc { color:#166534; }
+    @media print { body { padding:0; background:#fff; } main { box-shadow:none; max-width:none; } }
+    @media (max-width:700px) { body, main { padding:16px; } header { display:block; } .generated { margin-top:8px; } th, td { padding:8px 6px; } }
+</style>
+</head>
+<body>
+<main>
+    <header>
+        <div><h1>Storico completo FlowChart</h1><div class="subtitle">Transazioni della Panoramica</div></div>
+        <div class="generated">Generato il ${escapeHTML(now.toLocaleString('it-IT'))}</div>
+    </header>
+    <div class="summary">
+        <div><strong>${sorted.length}</strong>transazioni</div>
+        <div><strong>${escapeHTML(new Date(sorted[0].date).toLocaleDateString('it-IT'))}</strong>prima operazione</div>
+        <div><strong>${escapeHTML(new Date(sorted[sorted.length - 1].date).toLocaleDateString('it-IT'))}</strong>ultima operazione</div>
+    </div>
+    <table>
+        <thead><tr><th>Data e ora</th><th>Tipo</th><th class="amount">Importo</th><th class="amount">Prezzo di carico</th><th>Note</th></tr></thead>
+        <tbody>${rows}</tbody>
+    </table>
+</main>
+</body>
+</html>`;
+
+    downloadFile(html, `storico-completo-${now.toISOString().split('T')[0]}.html`);
 }
 
 function exportDataHTML() {
