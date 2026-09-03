@@ -769,6 +769,9 @@ label {
     <div class="stat-label">ATOM da Deposito</div>
     <div class="stat-value" id="depositAtom">0.00</div>
   </div>
+    <div class="ts-grid-item" id="atomBreakEvenBox" style="border-color: #f2bb66;">
+        Pareggio ATOM: calcolo in corso...
+    </div>
   <div class="ts-grid-item">
     <div class="stat-label">ATOM da Staking</div>
     <div class="stat-value" id="stakingAtom">0.00</div>
@@ -1334,6 +1337,7 @@ function updateCapitalChart() {
             const investedData = [];
             const currentValueData = [];
             const profitLossData = [];
+            const breakEvenData = [];
 
            operations.forEach(op => {
     if (op.type !== 'ritiro') {
@@ -1350,6 +1354,15 @@ function updateCapitalChart() {
     currentValueData.push(currentValue);
     profitLossData.push(profitLoss);
 });
+
+            const breakEvenAtomPrice = cumulativeAtom > 0 ? cumulativeInvested / cumulativeAtom : 0;
+            breakEvenData.push(...labels.map(() => cumulativeInvested));
+            const breakEvenBox = document.getElementById('atomBreakEvenBox');
+            if (breakEvenBox) {
+                breakEvenBox.textContent = breakEvenAtomPrice > 0
+                    ? `Pareggio ATOM: €${breakEvenAtomPrice.toFixed(4)} per ATOM (Totale ATOM ${cumulativeAtom.toFixed(6)} = EUR Investiti €${cumulativeInvested.toFixed(2)})`
+                    : 'Pareggio ATOM: dati insufficienti';
+            }
 
             if (usdComparisonChart) {
                 usdComparisonChart.destroy();
@@ -1387,6 +1400,17 @@ function updateCapitalChart() {
                             fill: true,
                             borderWidth: 2,
                             borderDash: [5, 5]
+                        },
+                        {
+                            label: 'Capitale depositato / pareggio',
+                            data: breakEvenData,
+                            borderColor: '#f2bb66',
+                            backgroundColor: 'rgba(242, 187, 102, 0.1)',
+                            tension: 0,
+                            fill: false,
+                            borderWidth: 2,
+                            borderDash: [8, 4],
+                            pointRadius: 0
                         }
                     ]
                 },
