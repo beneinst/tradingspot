@@ -1449,9 +1449,11 @@ function updateCapitalChart() {
                         y: {
                             title: {
                                 display: true,
-                                text: 'EUR'
+                                text: 'EUR',
+                                color: '#c3c3c3'
                             },
                             ticks: {
+                                color: '#c3c3c3',
                                 callback: function(value) {
                                     return '€' + value.toFixed(0);
                                 }
@@ -1462,10 +1464,10 @@ function updateCapitalChart() {
                             title: {
                                 display: true,
                                 text: 'EUR / ATOM',
-                                color: '#ffea00'
+                                color: '#c3c3c3'
                             },
                             ticks: {
-                                color: '#ffea00',
+                                color: '#c3c3c3',
                                 callback: function(value) {
                                     return '€' + value.toFixed(2);
                                 }
