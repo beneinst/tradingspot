@@ -1337,7 +1337,6 @@ function updateCapitalChart() {
             const investedData = [];
             const currentValueData = [];
             const profitLossData = [];
-            const breakEvenData = [];
 
            operations.forEach(op => {
     if (op.type !== 'ritiro') {
@@ -1356,7 +1355,7 @@ function updateCapitalChart() {
 });
 
             const breakEvenAtomPrice = cumulativeAtom > 0 ? cumulativeInvested / cumulativeAtom : 0;
-            breakEvenData.push(...labels.map(() => cumulativeInvested));
+            const breakEvenPriceData = labels.map(() => breakEvenAtomPrice);
             const breakEvenBox = document.getElementById('atomBreakEvenBox');
             if (breakEvenBox) {
                 breakEvenBox.textContent = breakEvenAtomPrice > 0
@@ -1376,8 +1375,8 @@ function updateCapitalChart() {
                         {
                             label: 'EUR Investiti',
                             data: investedData,
-                            borderColor: '#dc3545',
-                            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                            borderColor: '#ff1744',
+                            backgroundColor: 'rgba(255, 23, 68, 0.1)',
                             tension: 0.4,
                             fill: false,
                             borderWidth: 2
@@ -1385,8 +1384,8 @@ function updateCapitalChart() {
                         {
                             label: 'Valore Attuale EUR',
                             data: currentValueData,
-                            borderColor: '#28a745',
-                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            borderColor: '#00e676',
+                            backgroundColor: 'rgba(0, 230, 118, 0.1)',
                             tension: 0.4,
                             fill: false,
                             borderWidth: 2
@@ -1394,22 +1393,23 @@ function updateCapitalChart() {
                         {
                             label: 'Profitto/Perdita',
                             data: profitLossData,
-                            borderColor: '#667eea',
-                            backgroundColor: 'rgba(102, 126, 234, 0.2)',
-    tension: 0.4,
+                            borderColor: '#00b8d4',
+                            backgroundColor: 'rgba(0, 184, 212, 0.2)',
+                            tension: 0.4,
                             fill: true,
                             borderWidth: 2,
                             borderDash: [5, 5]
                         },
                         {
-                            label: 'Capitale depositato / pareggio',
-                            data: breakEvenData,
-                            borderColor: '#f2bb66',
-                            backgroundColor: 'rgba(242, 187, 102, 0.1)',
+                            label: 'Prezzo ATOM di pareggio (EUR/ATOM)',
+                            data: breakEvenPriceData,
+                            yAxisID: 'priceAxis',
+                            borderColor: '#ffea00',
+                            backgroundColor: 'rgba(255, 234, 0, 0.1)',
                             tension: 0,
                             fill: false,
                             borderWidth: 2,
-                            borderDash: [8, 4],
+                            borderDash: [6, 4],
                             pointRadius: 0
                         }
                     ]
@@ -1432,6 +1432,9 @@ function updateCapitalChart() {
                                         label += ': ';
                                     }
                                     const value = context.parsed.y;
+                                    if (context.dataset.yAxisID === 'priceAxis') {
+                                        return label + '€' + value.toFixed(4) + ' / ATOM';
+                                    }
                                     if (label.includes('Profitto')) {
                                         label += (value >= 0 ? '+' : '') + '€' + value.toFixed(2);
                                     } else {
@@ -1452,6 +1455,23 @@ function updateCapitalChart() {
                                 callback: function(value) {
                                     return '€' + value.toFixed(0);
                                 }
+                            }
+                        },
+                        priceAxis: {
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'EUR / ATOM',
+                                color: '#ffea00'
+                            },
+                            ticks: {
+                                color: '#ffea00',
+                                callback: function(value) {
+                                    return '€' + value.toFixed(2);
+                                }
+                            },
+                            grid: {
+                                drawOnChartArea: false
                             }
                         }
                     }
