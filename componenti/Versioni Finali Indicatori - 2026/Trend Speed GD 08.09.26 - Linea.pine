@@ -1,0 +1,221 @@
+// This work is licensed under a Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) https://creativecommons.org/licenses/by-nc-sa/4.0/
+// © Zeiierman / Modificato da gerardo_dorrico
+
+//@version=6
+indicator('Trend Speed GD - Linea', shorttitle = '⚡ Trend Speed Linea', overlay = false)
+
+// ~~ Tooltips {
+string t1 = 'Maximum Length: Questo parametro imposta il limite superiore per il numero di barre considerate nella media mobile dinamica. Un valore più alto smussa la linea di trend.'
+string t2 = 'Accelerator Multiplier: Regola la reattività della media mobile dinamica alle variazioni di prezzo.'
+string t6 = 'Collection Period: Definisce il numero di barre utilizzate per normalizzare i valori di velocità del trend.'
+string t7 = 'Enable Table: Attiva una tabella statistica con la panoramica delle metriche chiave (altezza media onde, dominanza, ecc.).'
+string t8 = 'Lookback Period: Determina quante barre storiche vengono utilizzate per il calcolo dei dati sulle onde bullish e bearish.'
+string t9 = 'Start Date: Imposta il punto di partenza per tutti i calcoli.'
+string t10 = 'Timer Option: Seleziona se usare una data di inizio personalizzata o partire dalla prima barra disponibile.'
+
+// Tooltips per Celle Tabella
+string tt1 = 'Average Wave: Dimensione media delle onde bullish o bearish durante il periodo di lookback.'
+string tt2 = 'Max Wave: Mostra l\'onda bullish o bearish più grande durante il periodo di lookback.'
+string tt3 = 'Current Wave Ratio (Average): Confronta la dimensione dell\'onda attuale con la media storica.'
+string tt4 = 'Current Wave Ratio (Max): Confronta la dimensione dell\'onda attuale con l\'onda massima storica.'
+string tt5 = 'Dominance (Average): Differenza netta tra le dimensioni medie delle onde bullish e bearish.'
+string tt6 = 'Dominance (Max): Differenza netta tra le onde massime bullish e bearish.'
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+
+// ========== PARAMETRI INPUT ==========
+
+max_length       = input.int(50, minval = 1, title = 'Maximum Length', group = 'Dynamic Moving Average', tooltip = t1)
+accel_multiplier = input.float(5.0, minval = 0.0, step = 1.1, title = 'Accelerator Multiplier', group = 'Dynamic Moving Average', tooltip = t2)
+
+tbl_            = input.bool(true, title = 'Enable Table', group = 'Wave Analysis', tooltip = t7)
+lookback_period = input.int(100, minval = 1, step = 1, title = 'Lookback Period', group = 'Wave Analysis', tooltip = t8)
+
+collen = input.int(100, step = 10, minval = 5, title = 'Collection Period', group = 'Trend Visualization', tooltip = t6)
+
+line_style_input = input.string('Scalini (quadrata)', title = 'Formato linea', options = ['Scalini (quadrata)', 'Continua', 'Scalini con rombi'], group = 'Impostazioni linea Trend Speed')
+line_width_input = input.int(2, title = 'Spessore linea (px)', minval = 2, maxval = 5, step = 1, group = 'Impostazioni linea Trend Speed')
+
+zero_line_color = input.color(color.gray, title = 'Colore linea dello zero', group = 'Linea di separazione positivi / negativi')
+zero_line_width = input.int(1, title = 'Spessore linea dello zero (px)', minval = 1, maxval = 5, step = 1, group = 'Linea di separazione positivi / negativi')
+
+trend_speed_style = switch line_style_input
+    'Continua' => plot.style_line
+    'Scalini con rombi' => plot.style_stepline_diamond
+    => plot.style_stepline
+
+up_col = input.color(#26a69a, title = 'Dynamic Trend', group = 'Trend Visualization', inline = 'Trend')
+dn_col = input.color(#ef5350, title = '', group = 'Trend Visualization', inline = 'Trend')
+up_hist_col  = input.color(#82ffc3, title = 'Trend Speed Up', group = 'Trend Visualization', inline = 'up')
+up_hist_col_ = input.color(#26a69a, title = '', group = 'Trend Visualization', inline = 'up')
+dn_hist_col  = input.color(#ef5350, title = 'Trend Speed Dn', group = 'Trend Visualization', inline = 'dn')
+dn_hist_col_ = input.color(#f78c8c, title = '', group = 'Trend Visualization', inline = 'dn')
+
+start = input.time(timestamp('1 Jan 2020 00:00 +0000'), title = 'Start Date', group = 'Time Settings', tooltip = t9, inline = 'startdate')
+timer = input.string('From start', title = 'Timer Option', options = ['Custom', 'From start'], group = 'Time Settings', tooltip = t10, inline = 'startdate')
+
+// Impostazioni Layout Tabella (Mobile / Desktop)
+group_dash = 'Impostazioni Layout Tabella'
+tablePositionInput = input.string("top_right", "Posizione Tabella", options=["top_right", "bottom_right", "top_left", "bottom_left"], group=group_dash)
+tableSizeInput     = input.string("tiny", "Dimensioni Tabella (Ottimizzato Mobile)", options=["tiny", "small", "normal"], group=group_dash)
+
+table_position = tablePositionInput == "top_right" ? position.top_right : tablePositionInput == "bottom_right" ? position.bottom_right : tablePositionInput == "top_left" ? position.top_left : position.bottom_left
+table_size     = tableSizeInput == "tiny" ? size.tiny : tableSizeInput == "small" ? size.small : size.normal
+
+// ========== DYNAMIC AVERAGE ==========
+
+counts_diff         = close
+max_abs_counts_diff = ta.highest(math.abs(counts_diff), 200)
+counts_diff_norm    = (counts_diff + max_abs_counts_diff) / (2 * max_abs_counts_diff)
+dyn_length          = 5 + counts_diff_norm * (max_length - 5)
+
+calc_accel_factor(float counts_diff, float prev_counts_diff) =>
+    delta_counts_diff = math.abs(counts_diff - prev_counts_diff)
+    float max_delta_counts_diff = ta.highest(delta_counts_diff, 200)
+    max_delta_counts_diff := max_delta_counts_diff == 0 ? 1 : max_delta_counts_diff
+    float accel_factor = delta_counts_diff / max_delta_counts_diff
+    accel_factor
+
+adjust_alpha(float dyn_length, float accel_factor, float accel_multiplier) =>
+    alpha_base = 2 / (dyn_length + 1)
+    alpha = alpha_base * (1 + accel_factor * accel_multiplier)
+    alpha := math.min(1, alpha)
+    alpha
+
+accel_factor = calc_accel_factor(counts_diff, nz(counts_diff[1]))
+alpha        = adjust_alpha(dyn_length, accel_factor, accel_multiplier)
+
+var float dyn_ema = na
+dyn_ema := na(dyn_ema[1]) ? close : alpha * close + (1 - alpha) * dyn_ema[1]
+
+// ========== TREND SPEED LOGIC ==========
+
+trend   = dyn_ema
+bullsrc = close
+bearsrc = close
+
+type TrendData
+    array<float> change
+    array<int> t
+
+StartTime() =>
+    time > start
+
+var bullish = TrendData.new(array.new<float>(), array.new<int>())
+var bearish = TrendData.new(array.new<float>(), array.new<int>())
+var x1 = int(na)
+var y1 = float(na)
+var pos = 0
+var speed = 0.0
+c = ta.rma(close, 10)
+o = ta.rma(open, 10)
+
+if na(x1) and StartTime() or na(x1) and timer == 'From start'
+    x1 := bar_index
+    y1 := o
+
+if StartTime() or timer == 'From start'
+    if bullsrc > trend and bullsrc[1] <= trend
+        bearish.change.unshift(ta.lowest(speed, bar_index - x1))
+        bearish.t.unshift(bar_index - x1)
+        x1 := bar_index
+        y1 := bullsrc
+        pos := 1
+        speed := c - o
+    if bearsrc < trend and bearsrc[1] >= trend
+        bullish.change.unshift(ta.highest(speed, bar_index - x1))
+        bullish.t.unshift(bar_index - x1)
+        x1 := bar_index
+        y1 := bearsrc
+        pos := -1
+        speed := c - o
+
+speed := speed + c - o
+speedGradient = color.from_gradient(speed, ta.min(-speed / 3), ta.max(speed / 3), dn_col, up_col)
+trendspeed = ta.hma(speed, 5)
+
+// ========== PLOTS & OVERLAYS ==========
+
+rma_dyn_ema(x, p) =>
+    ta.rma(dyn_ema[x], p)
+
+dark_green  = color.new(up_col, 0)
+light_green = color.new(up_col, 65)
+dark_red    = color.new(dn_col, 0)
+light_red   = color.new(dn_col, 65)
+
+is_bullish = ta.wma(close, 2) > dyn_ema
+dark_color  = is_bullish ? dark_green : dark_red
+light_color = is_bullish ? light_green : light_red
+
+fillColor = rma_dyn_ema(0, 5) > rma_dyn_ema(1, 5) ? color.new(up_col, 70) : color.new(dn_col, 70)
+
+p1_dark  = plot(dyn_ema, color = dark_color, linewidth = 3, style = plot.style_circles, title = 'Trend Dark', force_overlay = true)
+p1_light = plot(dyn_ema, color = light_color, linewidth = 2, style = plot.style_cross, title = 'Trend Light', force_overlay = true)
+p2       = plot(ta.rma(hl2, 50), display = display.none, editable = false, force_overlay = true)
+
+min_speed = ta.lowest(speed, collen)
+max_speed = ta.highest(speed, collen)
+normalized_speed = (speed - min_speed) / (max_speed - min_speed)
+speedGradient1   = speed < 0 ? color.from_gradient(normalized_speed, 0.0, 0.5, dn_hist_col, dn_hist_col_) : color.from_gradient(normalized_speed, 0.5, 1.0, up_hist_col, up_hist_col_)
+
+// Linea multicolore: trasparenza zero, formato selezionabile e spessore da 2 a 5 px.
+plot(StartTime() or timer == 'From start' ? trendspeed : na, title = 'Trend Speed', color = color.new(speedGradient1, 0), linewidth = line_width_input, style = trend_speed_style)
+// Separazione tra velocità positiva e negativa.
+hline(0, title = 'Zero - Separazione positivi e negativi', color = zero_line_color, linestyle = hline.style_solid, linewidth = zero_line_width)
+
+// ========== TABELLA STATISTICA OTTIMIZZATA ==========
+
+if barstate.islast and tbl_
+    bullish_recent = bullish.change.slice(0, math.min(lookback_period, bullish.change.size()))
+    bearish_recent = bearish.change.slice(0, math.min(lookback_period, bearish.change.size()))
+
+    bull_max = bullish_recent.max()
+    bear_max = bearish_recent.min()
+    bull_avg = bullish_recent.avg()
+    bear_avg = bearish_recent.avg()
+
+    wave_size_ratio_avg = bull_avg / math.abs(bear_avg)
+    wave_size_text_avg  = str.tostring(math.round(wave_size_ratio_avg, 2)) + 'x'
+    wave_size_color_avg = wave_size_ratio_avg > 0 ? color.lime : color.red
+
+    wave_size_ratio_max = bull_max / math.abs(bear_max)
+    wave_size_text_max  = str.tostring(math.round(wave_size_ratio_max, 2)) + 'x'
+    wave_size_color_max = wave_size_ratio_max > 0 ? color.lime : color.red
+
+    dominance_avg_value = bull_avg - math.abs(bear_avg)
+    dominance_avg_text  = dominance_avg_value > 0 ? 'Bullish +' + str.tostring(math.round(wave_size_ratio_avg, 2)) + 'x' : 'Bearish -' + str.tostring(math.round(1 / wave_size_ratio_avg, 2)) + 'x'
+    dominance_avg_color = dominance_avg_value > 0 ? color.lime : color.red
+
+    dominance_max_value = bull_max - math.abs(bear_max)
+    dominance_max_text  = dominance_max_value > 0 ? 'Bullish +' + str.tostring(math.round(wave_size_ratio_max, 2)) + 'x' : 'Bearish -' + str.tostring(math.round(1 / wave_size_ratio_max, 2)) + 'x'
+    dominance_max_color = dominance_max_value > 0 ? color.lime : color.red
+
+    current_wave       = speed
+    current_wave_color = current_wave > 0 ? color.lime : color.red
+
+    current_ratio_avg = current_wave > 0 ? current_wave / bull_avg : current_wave / math.abs(bear_avg)
+    current_ratio_max = current_wave > 0 ? current_wave / bull_max : current_wave / math.abs(bear_max)
+
+    current_text_avg = str.tostring(math.round(current_ratio_avg, 2)) + 'x'
+    current_text_max = str.tostring(math.round(current_ratio_max, 2)) + 'x'
+
+    current_color_avg = current_ratio_avg > 0 ? color.lime : color.red
+    current_color_max = current_ratio_max > 0 ? color.lime : color.red
+
+    // Tabella con sfondo scuro semitrasparente
+    var tbl = table.new(table_position, 3, 3, bgcolor = color.new(color.black, 85), border_width = 1, border_color = color.new(color.gray, 70), force_overlay = true)
+
+    // Header Row
+    table.cell(tbl, 0, 0, '', text_color = color.white, text_size = table_size)
+    table.cell(tbl, 0, 1, 'Average Wave', text_color = color.white, bgcolor = color.new(#2041bb, 80), text_size = table_size, tooltip = tt1)
+    table.cell(tbl, 0, 2, 'Max Wave', text_color = color.white, bgcolor = color.new(#2041bb, 80), text_size = table_size, tooltip = tt2)
+
+    // Current Wave Ratio Row
+    table.cell(tbl, 1, 0, 'Current Ratio', text_color = color.white, bgcolor = color.new(#774ae2, 80), text_size = table_size)
+    table.cell(tbl, 1, 1, current_text_avg, text_color = current_color_avg, text_size = table_size, tooltip = tt3)
+    table.cell(tbl, 1, 2, current_text_max, text_color = current_color_max, text_size = table_size, tooltip = tt4)
+
+    // Dominance Row
+    table.cell(tbl, 2, 0, 'Dominance', text_color = color.white, bgcolor = color.new(#774ae2, 80), text_size = table_size)
+    table.cell(tbl, 2, 1, dominance_avg_text, text_color = dominance_avg_color, text_size = table_size, tooltip = tt5)
+    table.cell(tbl, 2, 2, dominance_max_text, text_color = dominance_max_color, text_size = table_size, tooltip = tt6)

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATOM — Fasce DCA & soglia BTC</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --paper: #F1EDE3;
+    --ink: #26221C;
+    --rule: #C9C0A8;
+    --green: #3C6E52;
+    --green-bg: #E4EBDF;
+    --amber: #93641B;
+    --amber-bg: #F1E7CD;
+    --red: #9C3B2E;
+    --red-bg: #F2E1DA;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    --serif: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .page{
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 40px 24px 64px;
+  }
+
+  header h1{
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+
+  header .sub{
+    margin: 0;
+    color: #57503F;
+    font-size: 14px;
+    max-width: 46ch;
+  }
+
+  section{
+    border-top: 1px solid var(--rule);
+    padding-top: 22px;
+    margin-top: 28px;
+  }
+
+  h2{
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 18px;
+    margin: 0 0 16px;
+  }
+
+  .row{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 7px 0;
+  }
+
+  .row label{
+    color: #57503F;
+    font-size: 13.5px;
+  }
+
+  .row input{
+    width: 130px;
+    text-align: right;
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 14.5px;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 2px 0;
+  }
+
+  .row input:focus{
+    outline: none;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  button{
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 9px 16px;
+    margin-top: 12px;
+    cursor: pointer;
+  }
+
+  button:hover{ opacity: 0.85; }
+
+  .status{
+    font-size: 12.5px;
+    color: #57503F;
+    margin: 8px 0 0;
+    min-height: 1.2em;
+  }
+
+  /* ladder */
+  .ladder{
+    position: relative;
+    display: flex;
+    height: 46px;
+    border: 1px solid var(--ink);
+    margin-top: 34px;
+  }
+
+  .band{ height: 100%; }
+  .band.full{ background: var(--green-bg); }
+  .band.marginal{ background: var(--amber-bg); }
+  .band.stop{ background: var(--red-bg); }
+
+  .marker{
+    position: absolute;
+    top: -10px;
+    bottom: -10px;
+    width: 2px;
+    background: var(--ink);
+  }
+  .marker .marker-label{
+    position: absolute;
+    top: -22px;
+    transform: translateX(-50%);
+    font-size: 12px;
+    white-space: nowrap;
+    background: var(--paper);
+    padding: 0 3px;
+  }
+
+  .tick{
+    position: absolute;
+    top: 100%;
+    width: 1px;
+    height: 8px;
+    background: var(--ink);
+  }
+  .tick .tick-label{
+    position: absolute;
+    top: 12px;
+    transform: translateX(-50%);
+    font-size: 11.5px;
+    color: #57503F;
+    white-space: nowrap;
+  }
+
+  .ladder-wrap{ position: relative; padding-bottom: 30px; }
+
+  .legend{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 40px;
+    font-size: 13px;
+  }
+  .legend .item{ display: flex; align-items: baseline; gap: 8px; }
+  .legend .swatch{ width: 10px; height: 10px; flex: none; margin-top: 2px; }
+  .legend .swatch.full{ background: var(--green); }
+  .legend .swatch.marginal{ background: var(--amber); }
+  .legend .swatch.stop{ background: var(--red); }
+
+  .verdict{
+    margin: 18px 0 0;
+    padding: 12px 14px;
+    border-left: 3px solid var(--ink);
+    font-size: 14px;
+    background: rgba(0,0,0,0.02);
+  }
+
+  .btc-box{
+    padding: 14px 16px;
+    border: 1px solid var(--ink);
+  }
+  .btc-box.ok{ background: var(--green-bg); border-color: var(--green); }
+  .btc-box.stop{ background: var(--red-bg); border-color: var(--red); }
+
+  .btc-status{
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 17px;
+    margin-bottom: 6px;
+  }
+  .btc-detail{ font-size: 13.5px; color: #4A4436; }
+
+  footer{
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    font-size: 12px;
+    color: #78715D;
+  }
+
+  @media (max-width: 480px){
+    .row input{ width: 100px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>ATOM — fasce DCA &amp; soglia BTC</h1>
+    <p class="sub">Inserisci quantità e capitale per calcolare i prezzi di carico e vedere in quale fascia si trova il prezzo attuale.</p>
+  </header>
+
+  <section class="inputs">
+    <h2>I tuoi numeri</h2>
+    <div class="row"><label for="qty">Quantità ATOM (unità)</label><input id="qty" type="number" value="4100" step="1"></div>
+    <div class="row"><label for="capNetto">Capitale netto investito (€)</label><input id="capNetto" type="number" value="10593" step="1"></div>
+    <div class="row"><label for="capStorico">Capitale storico totale (€) — opzionale</label><input id="capStorico" type="number" value="15235" step="1"></div>
+    <div class="row"><label for="atomPrice">Prezzo ATOM attuale (€)</label><input id="atomPrice" type="number" value="1.61" step="0.01"></div>
+    <div class="row"><label for="btcThreshold">Soglia BTC (€)</label><input id="btcThreshold" type="number" value="70000" step="500"></div>
+    <div class="row"><label for="btcPrice">Prezzo BTC attuale (€)</label><input id="btcPrice" type="number" value="68000" step="100"></div>
+    <button id="fetchLive" type="button">Aggiorna prezzi live</button>
+    <p class="status" id="fetchStatus"></p>
+  </section>
+
+  <section>
+    <h2>Fasce di prezzo ATOM</h2>
+    <div class="ladder-wrap">
+      <div class="ladder" id="ladder">
+        <div class="band full" id="bandFull"></div>
+        <div class="band marginal" id="bandMarginal"></div>
+        <div class="band stop" id="bandStop"></div>
+        <div class="marker" id="marker"><span class="marker-label" id="markerLabel"></span></div>
+        <div class="tick" id="tickNetto"><span class="tick-label" id="tickNettoLabel"></span></div>
+        <div class="tick" id="tickStorico"><span class="tick-label" id="tickStoricoLabel"></span></div>
+      </div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <p class="verdict" id="verdict"></p>
+  </section>
+
+  <section>
+    <h2>Soglia BTC</h2>
+    <div class="btc-box" id="btcBox">
+      <div class="btc-status" id="btcStatus"></div>
+      <div class="btc-detail" id="btcDetail"></div>
+    </div>
+  </section>
+
+  <footer>
+    Strumento di calcolo personale — non è consulenza finanziaria. Le fasce riflettono le soglie che hai definito tu, non una previsione di prezzo.
+  </footer>
+
+</div>
+
+<script>
+  const qtyEl = document.getElementById('qty');
+  const capNettoEl = document.getElementById('capNetto');
+  const capStoricoEl = document.getElementById('capStorico');
+  const atomPriceEl = document.getElementById('atomPrice');
+  const btcThresholdEl = document.getElementById('btcThreshold');
+  const btcPriceEl = document.getElementById('btcPrice');
+
+  const bandFull = document.getElementById('bandFull');
+  const bandMarginal = document.getElementById('bandMarginal');
+  const bandStop = document.getElementById('bandStop');
+  const marker = document.getElementById('marker');
+  const markerLabel = document.getElementById('markerLabel');
+  const tickNetto = document.getElementById('tickNetto');
+  const tickNettoLabel = document.getElementById('tickNettoLabel');
+  const tickStorico = document.getElementById('tickStorico');
+  const tickStoricoLabel = document.getElementById('tickStoricoLabel');
+  const legend = document.getElementById('legend');
+  const verdict = document.getElementById('verdict');
+  const btcBox = document.getElementById('btcBox');
+  const btcStatus = document.getElementById('btcStatus');
+  const btcDetail = document.getElementById('btcDetail');
+
+  function eur(n){
+    return n.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  }
+  function eur0(n){
+    return Math.round(n).toLocaleString('it-IT') + ' €';
+  }
+
+  function recalc(){
+    const qty = parseFloat(qtyEl.value);
+    const capNetto = parseFloat(capNettoEl.value);
+    const capStoricoRaw = parseFloat(capStoricoEl.value);
+    const atomPrice = parseFloat(atomPriceEl.value);
+    const btcThreshold = parseFloat(btcThresholdEl.value);
+    const btcPrice = parseFloat(btcPriceEl.value);
+
+    if(!qty || qty <= 0 || !capNetto || capNetto <= 0 || isNaN(atomPrice)){
+      verdict.textContent = 'Inserisci quantità ATOM e capitale netto per calcolare le fasce.';
+      legend.innerHTML = '';
+      bandFull.style.width = '100%';
+      bandMarginal.style.width = '0%';
+      bandStop.style.width = '0%';
+      marker.style.display = 'none';
+      tickNetto.style.display = 'none';
+      tickStorico.style.display = 'none';
+      return;
+    }
+
+    const caricoNetto = capNetto / qty;
+    const hasStorico = capStoricoRaw && capStoricoRaw > 0;
+    const caricoStorico = hasStorico ? capStoricoRaw / qty : caricoNetto * 1.5;
+
+    // display range: a bit beyond the upper boundary
+    const maxDisplay = caricoStorico * 1.35;
+
+    const fullPct = (caricoNetto / maxDisplay) * 100;
+    const marginalPct = ((caricoStorico - caricoNetto) / maxDisplay) * 100;
+    const stopPct = 100 - fullPct - marginalPct;
+
+    bandFull.style.width = fullPct + '%';
+    bandMarginal.style.width = Math.max(marginalPct, 0) + '%';
+    bandStop.style.width = Math.max(stopPct, 0) + '%';
+
+    // marker position (clamped within display range)
+    const clampedPrice = Math.min(Math.max(atomPrice, 0), maxDisplay);
+    const markerPct = (clampedPrice / maxDisplay) * 100;
+    marker.style.display = 'block';
+    marker.style.left = markerPct + '%';
+    markerLabel.textContent = eur(atomPrice);
+
+    // ticks
+    tickNetto.style.display = 'block';
+    tickNetto.style.left = (caricoNetto / maxDisplay) * 100 + '%';
+    tickNettoLabel.textContent = eur(caricoNetto);
+
+    if(hasStorico){
+      tickStorico.style.display = 'block';
+      tickStorico.style.left = (caricoStorico / maxDisplay) * 100 + '%';
+      tickStoricoLabel.textContent = eur(caricoStorico);
+    } else {
+      tickStorico.style.display = 'none';
+    }
+
+    legend.innerHTML =
+      '<div class="item"><span class="swatch full"></span><span>Accumulo pieno — sotto ' + eur(caricoNetto) + '</span></div>' +
+      '<div class="item"><span class="swatch marginal"></span><span>Marginale — tra ' + eur(caricoNetto) + ' e ' + eur(caricoStorico) + (hasStorico ? '' : ' (stima, senza capitale storico impostato)') + '</span></div>' +
+      '<div class="item"><span class="swatch stop"></span><span>Stop DCA — sopra ' + eur(caricoStorico) + '</span></div>';
+
+    let verdictText;
+    if(atomPrice < caricoNetto){
+      verdictText = 'Prezzo attuale ' + eur(atomPrice) + ': sei sotto ' + eur(caricoNetto) + '. Ogni acquisto qui abbassa il prezzo medio e accelera il recupero del capitale netto.';
+    } else if(atomPrice < caricoStorico){
+      verdictText = 'Prezzo attuale ' + eur(atomPrice) + ': sei tra ' + eur(caricoNetto) + ' e ' + eur(caricoStorico) + '. Il capitale netto è già recuperabile; comprare qui ha senso solo se l\'obiettivo è recuperare anche il capitale storico.';
+    } else {
+      verdictText = 'Prezzo attuale ' + eur(atomPrice) + ': sei sopra ' + eur(caricoStorico) + '. Un acquisto qui alzerebbe la media sopra il pieno recupero storico — da qui in poi è più un nuovo investimento che una media sulla posizione esistente.';
+    }
+    verdict.textContent = verdictText;
+
+    // BTC section
+    if(!isNaN(btcPrice) && !isNaN(btcThreshold) && btcThreshold > 0){
+      const diffPct = ((btcPrice - btcThreshold) / btcThreshold) * 100;
+      if(btcPrice < btcThreshold){
+        btcBox.className = 'btc-box ok';
+        btcStatus.textContent = 'Sotto soglia — accumulo possibile';
+        btcDetail.textContent = eur0(btcPrice) + ' rispetto alla soglia di ' + eur0(btcThreshold) + ' (' + diffPct.toFixed(1) + '%)';
+      } else {
+        btcBox.className = 'btc-box stop';
+        btcStatus.textContent = 'Sopra soglia — solo hold';
+        btcDetail.textContent = eur0(btcPrice) + ' rispetto alla soglia di ' + eur0(btcThreshold) + ' (+' + diffPct.toFixed(1) + '%)';
+      }
+    } else {
+      btcBox.className = 'btc-box';
+      btcStatus.textContent = 'Inserisci prezzo BTC e soglia';
+      btcDetail.textContent = '';
+    }
+  }
+
+  [qtyEl, capNettoEl, capStoricoEl, atomPriceEl, btcThresholdEl, btcPriceEl].forEach(el => {
+    el.addEventListener('input', recalc);
+  });
+
+  document.getElementById('fetchLive').addEventListener('click', async () => {
+    const status = document.getElementById('fetchStatus');
+    status.textContent = 'Recupero prezzi…';
+    try{
+      const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=cosmos,bitcoin&vs_currencies=eur');
+      if(!res.ok) throw new Error('network');
+      const data = await res.json();
+      if(data.cosmos && data.cosmos.eur) atomPriceEl.value = data.cosmos.eur.toFixed(2);
+      if(data.bitcoin && data.bitcoin.eur) btcPriceEl.value = Math.round(data.bitcoin.eur);
+      status.textContent = 'Prezzi aggiornati.';
+      recalc();
+    } catch(e){
+      status.textContent = 'Impossibile recuperare i prezzi live — inserisci i valori manualmente.';
+    }
+  });
+
+  recalc();
+</script>
+</body>
+</html>
