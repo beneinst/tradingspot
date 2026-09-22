@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -16,14 +16,14 @@
  //      }
  //    });
   </script>
-	<link rel="icon" type="image/png" href="favicon.png"> 
+	<link rel="icon" type="image/png" href="favicon.png">
 	<link rel="stylesheet" href="css/menusotto.css">
 	<link rel="stylesheet" href="css/style.css">
-	
-	
+
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-      
+
         h1 {
             text-align: center;
             color: white;
@@ -32,7 +32,7 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-      
+
 
         h2 {
             color: #667eea;
@@ -76,7 +76,7 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-      
+
 
         .validator-header {
             font-weight: 700;
@@ -153,7 +153,7 @@
             font-weight: 700;
         }
 
-       
+
 
         canvas {
             max-height: 700px;
@@ -210,12 +210,12 @@
             .validator-inputs {
                 grid-template-columns: 1fr;
             }
-            
+
             .stats-grid {
                 grid-template-columns: 1fr;
             }
         }
-		
+
 		.ts-grid-item {
   background-color: var(--bg-container);
   padding: 20px;
@@ -271,7 +271,7 @@
 	width: 100%;                        /* FIX: era assente */
   max-width: 1400px;
   margin: 0 auto;
-  
+
 }
 
 /* Stile Campi Input (Date, Select, Number) */
@@ -452,12 +452,12 @@ label {
   padding: 1.5rem;
   border-radius: 1rem;
   margin-top: 1.5rem;
-  
+
   width: 100%;                        /* FIX: era assente */
   max-width: 1400px;
   margin: 0 auto;
-  
-  
+
+
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -585,8 +585,9 @@ label {
     }
 }
     </style>
+<link rel="stylesheet" href="css/portfolio-layout.css">
 </head>
-<body>
+<body class="portfolio-page wallet-page">
 <div style="padding: 4px;"></div>
 
  <!-- ========== MENU LATERALE E OVERLAY (FUORI DAL CONTAINER) ========== -->
@@ -597,45 +598,45 @@ label {
     </div>
     <nav class="offcanvas-nav">
         <ul class="offcanvas-main-menu">
-           
+
              <!-- Capitale -->
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Capitale</div>
                 <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/">Panoramica</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/btc-flow.html">Wallet BTC</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/usdc-flow.html">Wallet USDC</a></li>
-                    
+                    <li><a href="./">Panoramica</a></li>
+                    <li><a href="./atom-flow.html">Wallet Atom</a></li>
+                    <li><a href="./btc-flow.html">Wallet BTC</a></li>
+                    <li><a href="./usdc-flow.html">Wallet USDC</a></li>
+
                 </ul>
             </li>
             <!-- Strategia -->
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Strategia</div>
                 <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
-                    
-                    <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+                    <li><a href="./blocco-note.html">Blocco Note</a></li>
+                    <li><a href="./regole-trading.html">Regole</a></li>
+
+                    <li><a href="./Strategia-Trading.html">Indicatore 4H</a></li>
                 </ul>
             </li>
             <!-- Backup -->
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Backup</div>
                 <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
-					<li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
-					<li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/sync.html">Wallet Sync</a></li>
+                    <li><a href="./backup.html">Backup</a></li>
+					<li><a href="./staking2.html">Ledger</a></li>
+                    <li><a href="./staking.html">Figment</a></li>
+                    <li><a href="./staking3.html">Meria</a></li>
+                    <li><a href="./staking4.html">StakeLab</a></li>
+					<li><a href="./fiscoit.html">Fisco</a></li>
+                    <li><a href="./sync.html">Wallet Sync</a></li>
                     <li class="offcanvas-dropdown">
                         <div class="offcanvas-dropdown-toggle">Trade</div>
                         <ul class="offcanvas-submenu">
-                            <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Trade attivi</a></li>
-                            <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
-                            <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
+                            <li><a href="./flowchart.html">Trade attivi</a></li>
+                            <li><a href="./operativita.html">Operatività</a></li>
+                            <li><a href="./analisi.html">Analisi</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -715,34 +716,35 @@ label {
         });
     })();
 	</script>
-<div style="padding: 2px;"></div>   
- <div class="header header-line">
-			
-    <h1 style="color: #8fbc8f";>🎍 Staking ATOM | Tracker</h1>
+<div style="padding: 2px;"></div>
+ <nav class="portfolio-nav" aria-label="Portafogli"><a href="index.html">Panoramica</a><a href="atom-flow.html" aria-current="page">ATOM</a><a href="btc-flow.html">BTC</a><a href="usdc-flow.html">USDC</a></nav>
+<div class="header header-line">
+
+    <h1>⚛️ Wallet ATOM</h1>
     <small>
-        *Gestione <strong>Entry ATOM</strong> | 
+        *Gestione <strong>Entry ATOM</strong> |
         <span class="price-inline"> <strong id="atomPrice">Caricamento...</strong></span>
     </small>
   </div>
-                
+
         </div>
 
-<div style="padding: 2px;"></div>             
-      
+<div style="padding: 2px;"></div>
 
- 
-	   
-	    
+
+
+
+
          <div class="chart-container chart-box" style="min-height: 580px;">
 		 <h2 class="title-fixed">📈 Capitale vs Valore</h2>
       <canvas id="usdComparisonChart"></canvas>
     </div>
-            
-       
+
+
 
  <div style="padding: 3px;"></div>
-   
-   
+
+
 
     <div class="ts-stats-grid">
   <div class="ts-grid-item">
@@ -778,15 +780,35 @@ label {
   </div>
 </div>
 
-      
+
  <div style="padding: 6px;"></div>
-         <!-- Form Inserimento -->
+
+<!-- Grafico Andamento Capitale -->
+        <div class="chart-container chart-box" style="min-height: 580px;">
+		<h2 class="title-fixed">👜️ Andamento Capitale</h2>
+
+
+            <canvas id="capitalChart"></canvas>
+        </div>
+ <div style="padding: 5px;"></div>
+
+ <!-- Grafico USD Investiti vs Valore Attuale -->
+
+
+<!--<div class="container">
+        <!-- Grafico Distribuzione per Validatore
+        <div class="chart-container">
+            <h3>🥧 Distribuzione ATOM per Validatore</h3>
+    <canvas id="validatorChart" style="height: 400px; width: 100%; display: block;"></canvas>
+        </div></div><div style="padding: 8x;">-->
+
+    <details class="wallet-entry"><summary>Aggiungi un movimento ATOM<span>Acquisti, ricompense e ritiri</span></summary><!-- Form Inserimento -->
         <div class="container">
 		<h2 class="title-fixed" style="padding-bottom: 11px";>➕ Aggiungi al Wallet</h2>
-           
 
 
-            
+
+
             <div class="input-group input-group-row">
                 <div class="input-field">
                     <label style="color: #8fbc8f; font-size: 0.990em;">Data</label>
@@ -823,30 +845,13 @@ label {
 
             <div class="input-actions" style="padding-top: 21px; padding-bottom:0px;" >
                 <button class="btn-edit" style="font-size:1.1rem; padding:9px 12px; min-width:220px; margin-right:20px;" onclick="addOperation()">➕ Aggiungi Entry</button>
-                <!-- <button class="btn-edit" onclick="clearForm()">🔄 Pulisci Form</button> --> 
+                <!-- <button class="btn-edit" onclick="clearForm()">🔄 Pulisci Form</button> -->
             </div>
         </div>
 
  <div style="padding: 6px;"></div>
 
-        <!-- Grafico Andamento Capitale -->
-        <div class="chart-container chart-box" style="min-height: 580px;">
-		<h2 class="title-fixed">👜️ Andamento Capitale</h2>
-		 
-          
-            <canvas id="capitalChart"></canvas>
-        </div>
- <div style="padding: 5px;"></div>
-
- <!-- Grafico USD Investiti vs Valore Attuale -->
- 
-
-<!--<div class="container">
-        <!-- Grafico Distribuzione per Validatore 
-        <div class="chart-container">
-            <h3>🥧 Distribuzione ATOM per Validatore</h3>
-    <canvas id="validatorChart" style="height: 400px; width: 100%; display: block;"></canvas>
-        </div></div><div style="padding: 8x;">-->
+        </details>
 
     <!-- Accordion Operazioni -->
     <div class="accordion-item">
@@ -878,17 +883,17 @@ label {
     </div>
 </div></div>
 </div>
-	
+
 		<div  style="padding-top: 1px; padding-bottom: 3px;">
-      
+
       		   <p style="margin: 0; color: #c3c3c3; padding-top:25px; padding-bottom:35px; text-align: center; height: 15px; line-height: 12px;">
         ⛰️ 2026 © FlowChart by Gerardo D
       </p>
     </div></div>
 
 <!-- Bottone torna sopra principale (con freccia CSS) -->
-    <button class="back-to-top" id="backToTop" title="Torna in cima"></button>  
-    
+    <button class="back-to-top" id="backToTop" title="Torna in cima"></button>
+
 
     <script>
         // Dati globali
@@ -911,18 +916,18 @@ label {
         document.addEventListener('DOMContentLoaded', function() {
             // Imposta data odierna
             document.getElementById('operationDate').valueAsDate = new Date();
-            
+
             // Carica dati salvati (e applica la migrazione di formato se necessario)
             loadData();
-            
+
             // Ottieni tasso di cambio e prezzo ATOM
             fetchExchangeRate();
             fetchAtomPrice();
-            
+
             // Aggiorna prezzo e cambio periodicamente
             setInterval(fetchAtomPrice, 30000);      // ogni 30 secondi
             setInterval(fetchExchangeRate, 300000);  // ogni 5 minuti
-            
+
             // Aggiorna visualizzazione
             updateDisplay();
         });
@@ -1014,7 +1019,7 @@ label {
 
             operations.push(operation);
             operations.sort((a, b) => new Date(a.date) - new Date(b.date));
-            
+
             saveData();
             updateDisplay();
             clearForm();
@@ -1327,12 +1332,12 @@ function updateCapitalChart() {
 // Grafico EUR Investiti vs Valore Attuale
         function updateEurComparisonChart() {
             const ctx = document.getElementById('usdComparisonChart').getContext('2d');
-            
+
             // Calcola dati cumulativi
             let cumulativeInvested = 0;
             let cumulativeAtom = 0;
             const atomPriceEUR = atomPriceUSD * usdToEurRate;
-            
+
             const labels = [];
             const investedData = [];
             const currentValueData = [];
@@ -1504,7 +1509,7 @@ function updateCapitalChart() {
                 });
             }
         }
-		
+
 		// Scarica tabella in formato HTML (colonne semplificate, importi in EUR)
 function downloadTableHTML() {
     if (operations.length === 0) {
@@ -1633,7 +1638,7 @@ function downloadTableHTML() {
     <div class="container">
         <h1>📋 STORICO Operazioni ATOM Staking</h1>
         <p class="export-date">Esportato il: ${new Date().toLocaleString('it-IT')} — Importi in EUR</p>
-        
+
         <table>
             <thead>
                 <tr>
@@ -1648,7 +1653,7 @@ function downloadTableHTML() {
                 ${tableRows}
             </tbody>
         </table>
-        
+
         <div class="footer">
             <p>⛰️ FlowChart by Gerardo D - ${new Date().getFullYear()}</p>
         </div>
@@ -1660,11 +1665,11 @@ function downloadTableHTML() {
     const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    
+
     link.setAttribute('href', url);
     link.setAttribute('download', `atom-staking-STORICO-${new Date().toISOString().split('T')[0]}.html`);
     link.style.visibility = 'hidden';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -1674,7 +1679,7 @@ function downloadTableHTML() {
 document.addEventListener('DOMContentLoaded', function() {
     const accordionItem = document.querySelector('.accordion-item');
     const accordionHeader = document.querySelector('.accordion-header');
-    
+
     if (accordionHeader && accordionItem) {
         accordionHeader.addEventListener('click', function() {
             accordionItem.classList.toggle('open');
