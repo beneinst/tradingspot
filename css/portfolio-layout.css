@@ -1,0 +1,78 @@
+/* Shared presentation only: no changes to chart heights or accounting. */
+.portfolio-page { --portfolio-surface:rgba(143,188,143,.045); --portfolio-hover:rgba(143,188,143,.09); }
+.portfolio-nav { display:flex; flex-wrap:wrap; gap:8px; max-width:1400px; margin:16px auto 24px; padding:0 12px; }
+.portfolio-nav a { padding:11px 17px; border-radius:12px; color:#c4d3c9; background:transparent; text-decoration:none; font:inherit; font-size:.9rem; }
+.portfolio-nav a:hover { background:rgba(143,188,143,.07); }
+.portfolio-nav a[aria-current=page] { color:#d8efdd; background:rgba(143,188,143,.14); font-weight:700; }
+.portfolio-page .header-line { max-width:1400px; margin:0 auto 24px; padding:0 16px; background:transparent; border:0; box-shadow:none; }
+.portfolio-page .header-line h1 { letter-spacing:-.035em; font-size:clamp(1.6rem,4vw,2.4rem); line-height:1.2; }
+.portfolio-page .header-line small { display:block; line-height:1.7; color:#b8c9bd; margin-top:8px; }
+.portfolio-page .container,.portfolio-page .note1,.portfolio-page .chart-container,.portfolio-page .wallet-main-chart,.portfolio-page .ts-chart-box,.portfolio-page .accordion-item,.portfolio-page .accordion-content,.portfolio-page .trade-card { background:transparent !important; border:0 !important; box-shadow:none !important; border-radius:18px; }
+.portfolio-page .ts-grid-item,.portfolio-page .totals-row .total-card { background:var(--portfolio-surface) !important; border:0 !important; box-shadow:none !important; border-radius:16px; padding:18px; min-width:0; overflow-wrap:anywhere; }
+.portfolio-page .ts-grid-item:hover,.portfolio-page .totals-row .total-card:hover { background:var(--portfolio-hover) !important; transform:none; }
+.portfolio-page .ts-stats-grid,.portfolio-page .totals-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; max-width:1400px; margin:20px auto 28px; }
+.portfolio-page .stat-label,.portfolio-page .totals-row .label { color:#b5c7bb; font-size:.8rem; line-height:1.5; }
+.portfolio-page .stat-value,.portfolio-page .totals-row .value { font-variant-numeric:tabular-nums; line-height:1.35; }
+.portfolio-page .price-live-box { background:rgba(143,188,143,.04); border:0; border-radius:14px; display:flex; flex-wrap:wrap; gap:10px; }
+.wallet-entry { max-width:1400px; margin:24px auto; padding:0 16px; border-radius:18px; background:rgba(143,188,143,.035); }
+.wallet-entry summary { cursor:pointer; padding:20px 4px; color:#d5e9da; font-weight:600; }
+.wallet-entry summary span { display:block; color:#adbbb1; font-size:.85rem; font-weight:400; margin:8px 0 0 18px; }
+.wallet-entry .container,.wallet-entry .note1 { margin:0; width:100%; max-width:none; padding:12px 0 22px; }
+.wallet-entry .trade-form1 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.wallet-entry .form-row { display:flex; flex-direction:column; gap:8px; margin:0; min-width:0; }
+.wallet-entry input,.wallet-entry select { box-sizing:border-box; width:100%; min-width:0; min-height:44px; }
+.wallet-entry button { margin-right:0 !important; min-height:44px; }
+.portfolio-page .accordion-header { background:rgba(143,188,143,.06); border:0; border-radius:14px; padding:18px; }
+.portfolio-page .legend-row { flex-wrap:wrap; gap:14px; margin-top:16px; }
+.portfolio-page .export-buttons { gap:10px; padding:10px 0; }
+.portfolio-page :is(a,button,input,select,summary):focus-visible { outline:2px solid #c8dba7; outline-offset:4px; }
+@media(max-width:640px) {
+ .portfolio-nav { gap:4px; padding:0 8px; margin:12px auto 20px; }
+ .portfolio-nav a { padding:10px 12px; font-size:.8rem; }
+ .portfolio-page .ts-stats-grid,.portfolio-page .totals-row { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+ .portfolio-page .ts-grid-item,.portfolio-page .totals-row .total-card { padding:14px 10px; }
+ .wallet-entry .trade-form1 { grid-template-columns:1fr; }
+ .wallet-entry { margin:20px 8px; padding:0 12px; }
+ .wallet-entry button { min-width:0 !important; width:100%; }
+}
+/* Titoli e moduli leggibili anche con gli stili storici delle singole pagine. */
+.portfolio-page .header-line { display:block !important; height:auto; position:relative; }
+.portfolio-page .header-line h1 { display:block !important; color:#d8e9dd; }
+.wallet-entry .form-row { border:0; padding:0; text-align:left; }
+.wallet-entry .form-row label { text-align:left; }
+.wallet-entry input,.wallet-entry select { background:rgba(15,22,18,.65); color:#e0ebe3; border:1px solid rgba(160,190,170,.22); border-radius:10px; padding:12px; }
+.wallet-entry select option { background:#19231d; color:#e0ebe3; }
+/* Titoli compatti, allineati con il contenuto dei wallet. */
+.portfolio-page .header-line { text-align:left !important; align-items:flex-start; }
+.portfolio-page .header-line h1 { text-align:left !important; font-size:clamp(1.15rem,3vw,1.5rem) !important; margin-left:0; margin-right:0; }
+.home-refresh .export-buttons .archive-shortcut { display:inline-flex; align-items:center; justify-content:center; min-height:44px; }
+.home-refresh .header-line .price-line { display:flex; flex-wrap:wrap; white-space:normal; justify-content:flex-start; max-width:100%; gap:6px; }
+.home-refresh .header-line #lastUpdate { white-space:normal; overflow-wrap:anywhere; }
+/* Un solo stile per moduli apribili e storici dei quattro portafogli. */
+.portfolio-page .wallet-entry,
+.portfolio-page .wallet-entry *,
+.portfolio-page .accordion-item,
+.portfolio-page .accordion-item * { font-family:Arial, Helvetica, sans-serif !important; }
+.portfolio-page .accordion-item { max-width:1400px; margin:24px auto; }
+.portfolio-page .wallet-entry { background:rgba(143,188,143,.035); border-radius:18px; }
+.portfolio-page .accordion-header { background:rgba(143,188,143,.035); border-radius:18px; padding:20px; gap:12px; }
+.portfolio-page .accordion-header h4,
+.portfolio-page .wallet-entry summary { font-size:1rem !important; font-weight:600; color:#d5e9da; line-height:1.5; letter-spacing:normal; text-transform:none; }
+.portfolio-page .accordion-header h4 { margin:0; padding:0; border:0; }
+.portfolio-page .wallet-entry summary { list-style:none; position:relative; padding-right:28px; }
+.portfolio-page .wallet-entry summary::-webkit-details-marker { display:none; }
+.portfolio-page .wallet-entry summary span { margin-left:0; }
+.portfolio-page .accordion-icon,
+.portfolio-page .wallet-entry summary::after { content:''; display:block; width:8px; height:8px; flex-shrink:0; border-right:2px solid #b9d3bf; border-bottom:2px solid #b9d3bf; font-size:0; transform:rotate(45deg); transition:transform .2s; }
+.portfolio-page .wallet-entry summary::after { position:absolute; right:5px; top:26px; }
+.portfolio-page .accordion-item.open .accordion-icon,
+.portfolio-page .wallet-entry[open] summary::after { transform:rotate(225deg); }
+.portfolio-page .stat-value[data-tone=positive] { color:#4ade80 !important; }
+.portfolio-page .stat-value[data-tone=negative] { color:#f87171 !important; }
+.portfolio-page .stat-value[data-tone=neutral] { color:#edf5ef !important; }
+.portfolio-page .ts-grid-item[data-tone=positive] { background:rgba(74,222,128,.065) !important; }
+.portfolio-page .ts-grid-item[data-tone=negative] { background:rgba(248,113,113,.065) !important; }
+.portfolio-page .ts-grid-item[data-tone=neutral] { background:var(--portfolio-surface) !important; }
+@media(max-width:640px) { .portfolio-page .accordion-item { margin:20px 8px; } }
+@media(prefers-reduced-motion:reduce) { .portfolio-page .accordion-icon,.portfolio-page .wallet-entry summary::after { transition:none; } }
+@media(max-width:640px) { .portfolio-page .accordion-item { width:calc(100% - 16px); box-sizing:border-box; } }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -123,8 +123,12 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 </style>
+  <link rel="stylesheet" href="css/archivio.css">
+  <script src="js/documenti-fiscali.js" defer></script>
+<link rel="stylesheet" href="css/app-shell.css">
+<script src="js/app-shell.js" defer></script>
 </head>
-<body>
+<body class="backup-page">
 <div style="padding: 4px;"></div>
 
  <!-- ========== MENU LATERALE E OVERLAY (FUORI DAL CONTAINER) ========== -->
@@ -140,10 +144,10 @@
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Capitale</div>
                 <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/">Panoramica</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/btc-flow.html">Wallet BTC</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/usdc-flow.html">Wallet USDC</a></li>
+                    <li><a href="./">Panoramica</a></li>
+                    <li><a href="./atom-flow.html">Wallet Atom</a></li>
+                    <li><a href="./btc-flow.html">Wallet BTC</a></li>
+                    <li><a href="./usdc-flow.html">Wallet USDC</a></li>
                     
                 </ul>
             </li>
@@ -151,29 +155,29 @@
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Strategia</div>
                 <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
+                    <li><a href="./blocco-note.html">Blocco Note</a></li>
+                    <li><a href="./regole-trading.html">Regole</a></li>
                     
-                    <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+                    <li><a href="./Strategia-Trading.html">Indicatore 4H</a></li>
                 </ul>
             </li>
             <!-- Backup -->
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Backup</div>
                 <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
-					<li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
-					<li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/sync.html">Wallet Sync</a></li>
+                    <li><a href="./backup.html">Backup</a></li>
+					<li><a href="./staking2.html">Ledger</a></li>
+                    <li><a href="./staking.html">Figment</a></li>
+                    <li><a href="./staking3.html">Meria</a></li>
+                    <li><a href="./staking4.html">StakeLab</a></li>
+					<li><a href="./fiscoit.html">Fisco</a></li>
+                    <li><a href="./sync.html">Wallet Sync</a></li>
                     <li class="offcanvas-dropdown">
                         <div class="offcanvas-dropdown-toggle">Trade</div>
                         <ul class="offcanvas-submenu">
-                            <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Trade attivi</a></li>
-                            <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
-                            <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
+                            <li><a href="./flowchart.html">Trade attivi</a></li>
+                            <li><a href="./operativita.html">Operatività</a></li>
+                            <li><a href="./analisi.html">Analisi</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -261,7 +265,7 @@
     <div style="font-size: 72px; margin-bottom: 10px;">💾</div>
     <!-- oppure <img src="backup.png" style="width:80px;"> -->
     <h3>Backup</h3>
-    <p style="font-size: 1.3rem; color: #666;">Salva tutti i dati in un file JSON</p>
+    <p style="font-size: 1.3rem; color: #666;">Salva i dati del tracker in un file JSON. I documenti fiscali si esportano separatamente qui sotto.</p>
     <button id="btn-download-backup" class="btn-danger" style="margin-top: 15px; font-size:1rem; padding:10px 25px;">
       📥 Scarica Backup
     </button>
@@ -272,7 +276,7 @@
     <div style="font-size: 72px; margin-bottom: 10px;">🗃️</div>
     <!-- oppure <img src="ripristina.png" style="width:80px;"> -->
     <h3>Ripristina</h3>
-    <p style="font-size: 1.3rem; color: #666;">Carica un file JSON per ripristinare i dati</p>
+    <p style="font-size: 1.3rem; color: #666;">Ripristina i dati del tracker. I documenti fiscali già archiviati restano conservati.</p>
     <input type="file" id="file-upload-backup" accept=".json" style="display:none">
     <button id="btn-upload-backup" class="btn-danger" style="margin-top: 15px; font-size:1rem; padding:10px 25px;">
       📤 Carica File
@@ -285,11 +289,11 @@
 <a href="index.html" class="btn-danger" style="display: inline-block; text-decoration: none;">← Torna alla Panoramica</a>
 </p></div>
 
-<div class="container-f" style="padding-top: 1px;">
+<div class="container-f">
   <div class="card1" style="width: 100%; padding: 24px 20px;">
     <h3>Copie locali</h3>
     <p style="font-size: 1.05rem; color: #666; text-align: center;">
-      Le copie sono conservate solo in questo browser. Per trasferirle su un altro PC scarica il file e caricalo nella stessa pagina.
+      Le copie contengono i dati del tracker, senza allegati fiscali, e sono conservate solo in questo browser. Per trasferirle su un altro PC scarica il file e caricalo nella stessa pagina.
     </p>
     <div id="backup-archive" style="display: grid; gap: 10px; margin-top: 18px;"></div>
   </div>
@@ -297,12 +301,41 @@
         
     
     <div style="padding: 4px;"></div>  
+<div class="container-f" >
+<section class="docs-panel" id="docs-panel" aria-labelledby="docs-title">
+ <div class="docs-heading">
+  <div><span class="docs-eyebrow">Il tuo archivio personale</span><h3 id="docs-title">Documenti fiscali</h3>
+   <p>Report, ricevute e dichiarazioni, ordinati per anno.</p></div>
+  <div class="docs-actions"><button type="button" id="docs-export">Esporta archivio documenti</button><button type="button" id="docs-import">Importa archivio documenti</button></div>
+ </div>
+ <p>I file restano in questo browser: non vengono inviati online. Per conservarli anche fuori dal browser usa <strong>Esporta archivio documenti</strong>. Il backup del tracker non contiene questi allegati.</p>
+ <input type="file" id="docs-import-file" accept=".json" hidden aria-label="Importa archivio documenti fiscali">
+ <form id="docs-form">
+  <div class="docs-fields">
+   <label for="docs-year">Anno fiscale<input type="number" id="docs-year" min="2000" max="2100" required></label>
+   <label for="docs-category">Categoria<select id="docs-category" required></select></label>
+  </div>
+  <label for="docs-files">Documenti<input type="file" id="docs-files" accept=".pdf,.png,.jpg,.jpeg,.webp,.csv,.xls,.xlsx,.doc,.docx,.odt,.ods,.txt,.zip" multiple required aria-describedby="docs-file-help"></label>
+  <p id="docs-file-help">PDF, immagini, fogli di calcolo, documenti e ZIP. Massimo 20 MB per file, 100 MB per caricamento. I duplicati vengono riconosciuti dal contenuto.</p>
+  <label for="docs-notes">Note (facoltative)<textarea id="docs-notes" rows="2" maxlength="1000" placeholder="Es. report annuale exchange, ricevuta del commercialista…"></textarea></label>
+  <div class="docs-actions"><button class="docs-primary" type="submit" id="docs-save">Archivia documenti</button><button type="button" id="docs-cancel" hidden>Annulla modifica</button></div>
+ </form>
+ <p id="docs-status" role="status" aria-live="polite"></p>
+ <div class="docs-filters">
+  <label for="docs-search">Cerca<input type="search" id="docs-search" placeholder="Nome del file o note"></label>
+  <label for="docs-filter-year">Anno<select id="docs-filter-year"><option value="">Tutti gli anni</option></select></label>
+  <label for="docs-filter-category">Categoria<select id="docs-filter-category"><option value="">Tutte le categorie</option></select></label>
+ </div>
+ <p id="docs-summary"></p><div id="docs-list"></div>
+ <p>L’esportazione include tutti i documenti (fino a 100 MB complessivi); per archivi più grandi scarica i file singolarmente. L’importazione aggiunge i documenti mancanti senza sostituire quelli presenti.</p>
+</section>
+
     <!-- Card Container Scelte rapide 
     <div class="card container">
       <h4>🧭 Scelte rapide</h4>
 
-      <a href="https://beneinst.github.io/tradingspot/operativita.html" class="btn-outline">Operatività di trading</a>
-      <a href="https://beneinst.github.io/tradingspot/Trade12.html" class="btn-outline">Trade Attivi e panoramica Capitale</a>
+      <a href="./operativita.html" class="btn-outline">Operatività di trading</a>
+      <a href="./Trade12.html" class="btn-outline">Trade Attivi e panoramica Capitale</a>
       
 
       <div style="margin-top: 20px;">
@@ -360,7 +393,10 @@ function caricaBackupCompleto(file) {
     try {
       const nuovoStorage = JSON.parse(e.target.result);
 
-      if (typeof nuovoStorage !== 'object') throw 'Formato non valido';
+      if (!nuovoStorage || typeof nuovoStorage !== 'object' || Array.isArray(nuovoStorage)) throw 'Formato non valido';
+      if (nuovoStorage.format === 'flowchart-documenti-fiscali') throw 'Questo è un archivio documenti: usa Importa archivio documenti nella sezione dedicata.';
+      const chiaviTracker = ['cryptoOperations','atomOperations','btcWalletEntries','usdcWalletEntries','singleTrades','datiCapitale','cryptoWatchedAddresses','ultimoBackupAutomatico'];
+      if (!chiaviTracker.some(k => Object.prototype.hasOwnProperty.call(nuovoStorage, k))) throw 'Il file non contiene dati riconoscibili del tracker';
 
       if (
         !confirm(
@@ -422,10 +458,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (window.pageYOffset > 300) {
                 backToTop.classList.add('show');
-                backToTopAlt.classList.add('show');
+                backToTopAlt?.classList.add('show');
             } else {
                 backToTop.classList.remove('show');
-                backToTopAlt.classList.remove('show');
+                backToTopAlt?.classList.remove('show');
             }
         }
         
@@ -441,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('scroll', toggleBackToTopButton);
         
         document.getElementById('backToTop').addEventListener('click', scrollToTop);
-        document.getElementById('backToTopAlt').addEventListener('click', scrollToTop);
+        document.getElementById('backToTopAlt')?.addEventListener('click', scrollToTop);
         
         // Controlla subito se mostrare il bottone
         toggleBackToTopButton();

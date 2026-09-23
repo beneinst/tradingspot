@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,7 @@
  //     }
  //   });
   </script>
-	<link rel="icon" type="image/png" href="favicon.png"> 
+	<link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="css/trade.css">
 	<link rel="stylesheet" href="css/tracker.css">
 	<link rel="stylesheet" href="css/panoramica.css">
@@ -87,7 +87,7 @@
 
 .chart-section {
     background: linear-gradient(135deg, rgba(58,58,58,0.15) 0%, rgba(96,96,96,0.2) 100%);
-   
+
     border-top: 3px solid var(--color-primary);
     border-radius: 8px;
     padding: 25px;
@@ -297,8 +297,12 @@
 .ts-chart-box-large { width:100%; min-height:700px; }
 #equityChart { width:100% !important; height:auto !important; }
 </style>
+<link rel="stylesheet" href="css/home-refresh.css">
+<link rel="stylesheet" href="css/portfolio-layout.css">
+<link rel="stylesheet" href="css/app-shell.css">
+<script src="js/app-shell.js" defer></script>
 </head>
-<body>
+<body class="home-refresh portfolio-page">
 <div style="padding: 4px;"></div>
 
  <!-- ========== MENU LATERALE E OVERLAY (FUORI DAL CONTAINER) ========== -->
@@ -309,48 +313,48 @@
     </div>
     <nav class="offcanvas-nav">
         <ul class="offcanvas-main-menu">
-           
+
               <!-- Capitale -->
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Capitale</div>
                 <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/">Panoramica</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/atom-flow.html">Wallet Atom</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/btc-flow.html">Wallet BTC</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/usdc-flow.html">Wallet USDC</a></li>
-                    
+                    <li><a href="./">Panoramica</a></li>
+                    <li><a href="./atom-flow.html">Wallet Atom</a></li>
+                    <li><a href="./btc-flow.html">Wallet BTC</a></li>
+                    <li><a href="./usdc-flow.html">Wallet USDC</a></li>
+
                 </ul>
             </li>
             <!-- Strategia -->
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Strategia</div>
                 <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/blocco-note.html">Blocco Note</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/regole-trading.html">Regole</a></li>
-                    
-                    <li><a href="https://beneinst.github.io/tradingspot/Strategia-Trading.html">Indicatore 4H</a></li>
+                    <li><a href="./blocco-note.html">Blocco Note</a></li>
+                    <li><a href="./regole-trading.html">Regole</a></li>
+
+                    <li><a href="./Strategia-Trading.html">Indicatore 4H</a></li>
                 </ul>
             </li>
             <!-- Backup -->
             <li class="offcanvas-dropdown">
                 <div class="offcanvas-dropdown-toggle">Backup</div>
                 <ul class="offcanvas-submenu">
-                    <li><a href="https://beneinst.github.io/tradingspot/backup.html">Backup</a></li>
-					<li><a href="https://beneinst.github.io/tradingspot/staking2.html">Ledger</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking.html">Figment</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking3.html">Meria</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/staking4.html">StakeLab</a></li>
-					<li><a href="https://beneinst.github.io/tradingspot/fiscoit.html">Fisco</a></li>
-                    <li><a href="https://beneinst.github.io/tradingspot/sync.html">Wallet Sync</a></li>
+                    <li><a href="./backup.html">Backup</a></li>
+					<li><a href="./staking2.html">Ledger</a></li>
+                    <li><a href="./staking.html">Figment</a></li>
+                    <li><a href="./staking3.html">Meria</a></li>
+                    <li><a href="./staking4.html">StakeLab</a></li>
+					<li><a href="./fiscoit.html">Fisco</a></li>
+                    <li><a href="./sync.html">Wallet Sync</a></li>
                     <li class="offcanvas-dropdown">
                         <div class="offcanvas-dropdown-toggle">Trade</div>
                         <ul class="offcanvas-submenu">
-                            <li><a href="https://beneinst.github.io/tradingspot/flowchart.html">Trade attivi</a></li>
-                            <li><a href="https://beneinst.github.io/tradingspot/operativita.html">Operatività</a></li>
-                            <li><a href="https://beneinst.github.io/tradingspot/analisi.html">Analisi</a></li>
+                            <li><a href="./flowchart.html">Trade attivi</a></li>
+                            <li><a href="./operativita.html">Operatività</a></li>
+                            <li><a href="./analisi.html">Analisi</a></li>
                         </ul>
                     </li>
-					
+
                 </ul>
             </li>
         </ul>
@@ -427,22 +431,24 @@ function closeMenu() {
         });
     })();
 	</script>
-<div style="padding: 2px;"></div>   
- <div class="header header-line">
-			
-    <h1>💼 Panoramica</h1>
+<div style="padding: 2px;"></div>
+ <nav class="portfolio-nav" aria-label="Portafogli"><a href="index.html" aria-current="page">Panoramica</a><a href="atom-flow.html">ATOM</a><a href="btc-flow.html">BTC</a><a href="usdc-flow.html">USDC</a></nav>
+<div class="header header-line">
+
+    <h1>Il tuo portafoglio</h1>
+
     <small><small class="price-line">
       <span id="atomPrice">$0.0000</span> · <span id="lastUpdate">Caricamento...</span>
     </small></small>
   </div>
-                
+
         </div>
 
-           
-     
 
-  
-    
+
+
+
+
     <div class="ts-chart-box ts-chart-box-large">
       <canvas id="equityChart"></canvas>
     </div>
@@ -491,6 +497,7 @@ function closeMenu() {
       <button class="btn-edit" onclick="exportChartHTML()">📈 Esporta Grafico</button>
       <button class="btn-edit" onclick="loadAllData()">🔄 Aggiorna</button>
       <button class="btn-edit" id="syncNowBtn" onclick="sincronizzaDaPanoramica()">🔗 Sincronizza Blockchain</button>
+      <a class="archive-shortcut" href="backup.html#docs-panel">Documenti fiscali ↗</a>
     </div>
     <div id="syncPanoramicaStatus" style="font-size:0.85em;color:#a0a0a0;margin-top:8px;"></div>
     <div id="syncPanoramicaLog" style="display:none;background:rgba(15,15,25,0.5);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:10px 14px;margin-top:10px;max-height:220px;overflow-y:auto;font-size:0.85em;"></div>
@@ -571,7 +578,7 @@ function closeMenu() {
       border-top: 1px solid rgba(128, 128, 128, 0.15);
     }
 
-    
+
 
     /* Il campo "Prezzo di Carico" è nascosto di default */
     #costoCaricoField {
@@ -601,6 +608,7 @@ function closeMenu() {
 </head>
 <body>
 
+<details class="wallet-entry"><summary>Aggiungi un movimento<span>Depositi, acquisti e profitti di trading</span></summary>
   <!-- ===== IL TUO CONTAINER ORIGINALE ===== -->
   <div class="container" style="border: 1px solid rgba(128, 128, 128, 0.3);">
     <h1 style="text-align:left;font-size:16px;color:white;padding-bottom:13px; padding-top:13px;">➕ Aggiungi al Wallet</h1>
@@ -653,6 +661,8 @@ function closeMenu() {
     </div>
   </div>
 
+</details>
+
   <!-- ===== SCRIPT PER GESTIRE LA VISIBILITÀ DEL CAMPO "PREZZO DI CARICO" ===== -->
   <script>
     function toggleCostoCarico() {
@@ -694,7 +704,7 @@ function closeMenu() {
     <!-- Accordion per Operazioni Registrate -->
     <div class="accordion-item" id="accordionOperazioni">
         <div class="accordion-header">
-            <h4 >🗃️ Storico Main</h4>
+            <h4>🗃️ Storico Main</h4>
             <span class="accordion-icon">▼</span>
         </div>
         <div class="accordion-content">
@@ -775,7 +785,7 @@ function closeMenu() {
     </div>
 
 
-	
+
   <p style="margin:0;color:#c3c3c3;padding-top:25px;padding-bottom:35px;text-align:center;height:15px;line-height:12px;">
     ⛰️ 2026 © FlowChart by Gerardo D
   </p>
@@ -1264,7 +1274,7 @@ function updateChart() {
         // di quantità che sono già dentro le operazioni (quindi già in cA/cB/...).
         // SOL e LTC sono escluse: posizioni chiuse, non devono più contribuire.
         cCosto = baseAtom.costo+baseBtc.costo+basePol.costo;
-    
+
     // Etichette accorciate per mobile
     const isMobile = window.innerWidth <= 760;
     const labels = {
@@ -1277,7 +1287,7 @@ function updateChart() {
         'Costo Carico Cripto': isMobile ? 'Carico' : 'Costo Carico Cripto',
         'RENDIMENTO NETTO': isMobile ? 'Netto' : 'RENDIMENTO NETTO'
     };
-    
+
     // "Capitale Depositato" (cE) resta SOLO i depositi EUR.
     // cA/cB/cP si costruiscono unicamente dalle operazioni (la quantità
     // era già tutta lì); il costo base si aggiunge solo a cCosto, come
@@ -1303,12 +1313,12 @@ function updateChart() {
         }
         d.push({date:new Date(op.date).toLocaleDateString('it-IT'),eurOut:-cE,atomValue:cA,btcValue:cB,polValue:cP,usdcValue:cU,trading:cT,costoCarico:-cCosto,netEquity:cA+cB+cP+cU+cT-cE});
     });
-    
-    const cv=document.getElementById('equityChart'); 
+
+    const cv=document.getElementById('equityChart');
     if(!cv)return;
-    
+
     if(chart)chart.destroy();
-    
+
     chart=new Chart(cv.getContext('2d'),{
         type:'line',
         data:{
@@ -1542,7 +1552,7 @@ init();
 document.addEventListener('DOMContentLoaded', function() {
     const accordionItem = document.querySelector('.accordion-item');
     const accordionHeader = document.querySelector('.accordion-header');
-    
+
     if (accordionHeader && accordionItem) {
         accordionHeader.addEventListener('click', function() {
             accordionItem.classList.toggle('open');
