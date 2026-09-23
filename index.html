@@ -301,6 +301,7 @@
 <link rel="stylesheet" href="css/portfolio-layout.css">
 <link rel="stylesheet" href="css/app-shell.css">
 <script src="js/app-shell.js" defer></script>
+<script src="js/export-quality.js"></script>
 </head>
 <body class="home-refresh portfolio-page">
 <div style="padding: 4px;"></div>
@@ -1533,16 +1534,13 @@ function exportDataHTML() {
     downloadFile(html,`report-completo-${now.toISOString().split('T')[0]}.html`);
 }
 
-function exportChartHTML() {
-    const canvas=document.getElementById('equityChart');
-    if(!canvas){alert('Grafico non trovato');return;}
-    html2canvas(canvas,{backgroundColor:'#232335',scale:2}).then(c=>{
-        const a=document.createElement('a');a.download=`grafico-portfolio-${new Date().toISOString().split('T')[0]}.png`;a.href=c.toDataURL();a.click();
-    });
+async function exportChartHTML() {
+    try { await FlowExport.chartPNG('equityChart', 'Panoramica del portafoglio'); }
+    catch (error) { alert(error.message); }
 }
 
 function downloadFile(content,filename) {
-    const blob=new Blob([content],{type:'text/html'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+    const blob=new Blob([FlowExport.polish(content)],{type:'text/html'}),url=URL.createObjectURL(blob),a=document.createElement('a');
     a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
 }
 

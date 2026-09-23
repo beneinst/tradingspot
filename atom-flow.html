@@ -588,6 +588,7 @@ label {
 <link rel="stylesheet" href="css/portfolio-layout.css">
 <link rel="stylesheet" href="css/app-shell.css">
 <script src="js/app-shell.js" defer></script>
+<script src="js/export-quality.js"></script>
 </head>
 <body class="portfolio-page wallet-page">
 <div style="padding: 4px;"></div>
@@ -1677,7 +1678,7 @@ function downloadTableHTML() {
 </html>`;
 
     // Crea e scarica il file
-    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+    const blob = new Blob([FlowExport.polish(htmlContent)], { type: 'text/html;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
 
