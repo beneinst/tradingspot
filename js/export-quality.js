@@ -61,7 +61,8 @@
   const charts={usdComparisonChart:'ATOM · Capitale e valore',capitalChart:'ATOM · Andamento capitale',btcChart:'Wallet BTC',usdcChart:'Wallet USDC'};
   Object.entries(charts).forEach(([id,title])=>{
    const canvas=document.getElementById(id);if(!canvas)return;
-   const row=document.createElement('div');row.className='export-buttons';
+   const row=document.createElement('div');row.className='export-buttons chart-export-actions';
+   if (id === 'usdComparisonChart' || id === 'capitalChart') row.classList.add('container');
    const button=document.createElement('button');button.className='btn-edit';button.textContent='📈 Scarica grafico HD';button.type='button';
    button.onclick=async()=>{button.disabled=true;try{await chartPNG(id,title);}catch(e){alert(e.message);}finally{button.disabled=false;}};
    row.append(button);canvas.parentElement.after(row);

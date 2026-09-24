@@ -76,3 +76,42 @@
 @media(max-width:640px) { .portfolio-page .accordion-item { margin:20px 8px; } }
 @media(prefers-reduced-motion:reduce) { .portfolio-page .accordion-icon,.portfolio-page .wallet-entry summary::after { transition:none; } }
 @media(max-width:640px) { .portfolio-page .accordion-item { width:calc(100% - 16px); box-sizing:border-box; } }
+
+/* Azioni di esportazione ATOM allineate al contenitore dei grafici. */
+.portfolio-page .container.chart-export-actions {
+ display:flex; flex-wrap:wrap; align-items:center; gap:12px;
+ width:100%; max-width:1400px; box-sizing:border-box;
+ margin:12px auto 24px; padding:12px 25px;
+ background:transparent !important;
+}
+@media(max-width:640px) {
+ .portfolio-page .container.chart-export-actions { padding:10px 12px; }
+ .portfolio-page .container.chart-export-actions button { width:100%; min-width:0; }
+}
+.atom-threshold-content { padding:0 4px 20px; color:#b9cbbf; line-height:1.6; font-size:.9rem; }
+.atom-threshold-content label { display:block; margin-top:20px; color:#e0ede4; }
+.atom-threshold-content input { max-width:180px; margin:8px 0; }
+#atom-threshold-status { font-size:1.05rem; font-weight:700; padding:14px; border-radius:12px; background:rgba(143,188,143,.05); }
+#atom-threshold-status[data-state=above] { color:#4ade80; background:rgba(74,222,128,.06); }
+#atom-threshold-status[data-state=below] { color:#f87171; background:rgba(248,113,113,.06); }
+#atom-threshold-status[data-state=equal] { color:#e2c17b; }
+#atom-threshold-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:20px 0; }
+.threshold-level { padding:16px; border-radius:14px; background:rgba(143,188,143,.05); }
+.threshold-level p { margin:8px 0 0; font-size:.85rem; }
+.threshold-level[data-tone=above] strong { color:#8ad7a0; }
+.threshold-level[data-tone=below] strong { color:#b6cce8; }
+.threshold-level[data-tone=equal] strong { color:#e2c17b; }
+.threshold-selected { grid-column:1/-1; }
+.threshold-selected[data-reached=true] { background:rgba(100,170,240,.12); color:#bfdbfe; }
+/* Fondo più coprente per la leggibilità del pannello soglie ATOM. */
+.portfolio-page .wallet-entry.atom-threshold-panel {
+ background:rgba(20,34,26,.35);
+}
+/* Ritmo verticale della pagina ATOM: grafici, riepiloghi e pannelli. */
+.atom-page .chart-container.chart-box { margin-top:24px; margin-bottom:0; }
+.atom-page .container.chart-export-actions { margin-top:8px; margin-bottom:24px; }
+.atom-page .ts-stats-grid { margin-top:24px; margin-bottom:24px; }
+.atom-page .wallet-entry,.atom-page .accordion-item { margin-top:24px; margin-bottom:24px; }
+@media(max-width:640px) {
+ .atom-page .ts-stats-grid,.atom-page .wallet-entry,.atom-page .accordion-item { margin-top:18px; margin-bottom:18px; }
+}
