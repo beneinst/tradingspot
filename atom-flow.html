@@ -590,6 +590,7 @@ label {
 <script src="js/app-shell.js" defer></script>
 <script src="js/export-quality.js"></script>
 <script src="js/atom-thresholds.js"></script>
+<script src="js/atom-target-simulator.js"></script>
 </head>
 <body class="portfolio-page wallet-page atom-page">
 <div style="padding: 4px;"></div>
@@ -806,6 +807,42 @@ label {
   <div id="atom-threshold-grid"></div>
   <p>Le fasce descrivono il prezzo rispetto al capitale registrato: non prevedono il mercato. Il pareggio segue i tuoi riepiloghi, comprese ricompense e ritiri; non include le commissioni di un eventuale nuovo acquisto.</p>
  </div>
+<section class="atom-target-simulator" aria-label="Simulatore prezzo target ATOM">
+<h3>Simulatore prezzo target ATOM</h3>
+<p class="sub">Calcola il prezzo necessario per raggiungere un totale in euro, oppure il valore totale a un prezzo ipotizzato. I target indicano il valore lordo della posizione, non il profitto netto.</p>
+
+<div class="card">
+  <h4>Parametri</h4>
+  <div class="row">
+    <div><label for="atom-target-qty">Quantità ATOM</label><input id="atom-target-qty" type="number" inputmode="decimal" step="any" value="" min="0"></div>
+    <div><label for="atom-target-t1">Target 1 (€)</label><input id="atom-target-t1" type="number" inputmode="decimal" step="any" value="10461" min="0"></div>
+    <div><label for="atom-target-t2">Target 2 (€)</label><input id="atom-target-t2" type="number" inputmode="decimal" step="any" value="15395" min="0"></div>
+  </div>
+  <p id="atom-target-source" class="sub">Quantità collegata al wallet. Puoi modificarla per simulare.</p><button type="button" id="atom-target-reset">Usa quantità e prezzo del wallet</button>
+<div class="chips" id="atom-target-chips"></div>
+</div>
+
+<div class="card">
+  <h4>Prezzo da raggiungere</h4>
+  <div class="row">
+    <div class="res"><small id="atom-target-l1"></small><b id="atom-target-r1">–</b></div>
+    <div class="res"><small id="atom-target-l2"></small><b id="atom-target-r2">–</b></div>
+  </div>
+</div>
+
+<div class="card">
+  <h4>Simulazione inversa: dato un prezzo, quanto vale il totale?</h4>
+  <div class="row">
+    <div><label for="atom-target-pr">Prezzo ATOM (€)</label><input id="atom-target-pr" type="number" inputmode="decimal" step="any" value="" min="0"></div>
+    <div class="res"><small>Totale con la quantità inserita</small><b id="atom-target-tot" style="color:var(--tx)">–</b></div>
+  </div>
+</div>
+
+<div class="card">
+  <h4>Lettura pratica</h4>
+  <div class="scroll"><table id="atom-target-tbl"></table></div>
+</div>
+</section>
 </details>
 
  
@@ -1170,6 +1207,7 @@ label {
 
     const atomPriceEUR = atomPriceUSD * usdToEurRate;
     window.AtomThresholds?.update({qty:totalAtom, invested:totalInvested, price:atomPriceEUR});
+    window.AtomTargetSimulator?.update({qty:totalAtom, price:atomPriceEUR});
     const totalValue = totalAtom * atomPriceEUR;
     const profitLoss = totalValue - totalInvested;
     const roiPercent = totalInvested > 0 ? ((profitLoss / totalInvested) * 100) : 0;
