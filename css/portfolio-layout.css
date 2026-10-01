@@ -115,3 +115,27 @@
 @media(max-width:640px) {
  .atom-page .ts-stats-grid,.atom-page .wallet-entry,.atom-page .accordion-item { margin-top:18px; margin-bottom:18px; }
 }
+/* Storico Main: massimo tre riquadri per riga e campi leggibili. */
+.home-refresh #accordionOperazioni .data-tables-grid {
+ grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px;
+}
+.home-refresh #accordionOperazioni .data-tables-grid>div { min-width:0; }
+.home-refresh #accordionOperazioni .data-table :is(th,td) {
+ padding:7px 5px; white-space:normal; overflow-wrap:anywhere;
+ text-overflow:clip; vertical-align:top;
+}
+.home-refresh #accordionOperazioni .data-table :is(th,td):nth-child(1) { width:88px; }
+.home-refresh #accordionOperazioni .data-table :is(th,td):nth-child(2) { width:108px; font-variant-numeric:tabular-nums; }
+.home-refresh #accordionOperazioni .data-table :is(th,td):nth-child(4) { width:44px; }
+.home-refresh #accordionOperazioni .data-table td small { display:block; }
+@media(max-width:1319px) {
+ .home-refresh #accordionOperazioni .data-tables-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:899px) {
+ .home-refresh #accordionOperazioni .data-tables-grid { grid-template-columns:minmax(0,1fr); }
+}
+@media(max-width:480px) {
+ .home-refresh #accordionOperazioni .data-table :is(th,td):nth-child(1) { width:80px; }
+ .home-refresh #accordionOperazioni .data-table :is(th,td):nth-child(2) { width:94px; }
+ .home-refresh #accordionOperazioni .data-table :is(th,td):nth-child(4) { width:40px; }
+}
