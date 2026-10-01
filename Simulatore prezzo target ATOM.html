@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulatore prezzo target ATOM</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--tx:#14161f;--mu:#667085;--ac:#5b5bd6;--bd:#e3e6ee;--ok:#12805c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1117;--card:#181b25;--tx:#eceef5;--mu:#98a0b3;--ac:#8b8bf0;--bd:#2a2e3c;--ok:#4fd1a1}}
+:root[data-theme="dark"]{--bg:#0f1117;--card:#181b25;--tx:#eceef5;--mu:#98a0b3;--ac:#8b8bf0;--bd:#2a2e3c;--ok:#4fd1a1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+main{max-width:760px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.4rem;margin:0 0 4px}
+p.sub{color:var(--mu);margin:0 0 18px;font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+h2{font-size:1rem;margin:0 0 12px}
+label{display:block;font-size:.8rem;color:var(--mu);margin-bottom:4px}
+input{width:100%;font:inherit;font-size:1.05rem;padding:10px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+input:focus{outline:2px solid var(--ac);border-color:transparent}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.res{text-align:center;padding:14px 10px;border:1px solid var(--bd);border-radius:12px;background:var(--bg)}
+.res small{color:var(--mu);display:block;font-size:.8rem}
+.res b{font-size:1.7rem;color:var(--ok);display:block;margin-top:2px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-size:.85rem;padding:6px 12px;border-radius:999px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+button:hover{border-color:var(--ac);color:var(--ac)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:420px}
+th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--bd)}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--mu);font-weight:600;font-size:.8rem}
+tr.me td{background:color-mix(in srgb,var(--ac) 12%,transparent);font-weight:600}
+</style>
+</head>
+<body>
+<main>
+<h1>Simulatore prezzo target ATOM</h1>
+<p class="sub">Inserisci quanti ATOM possiedi e il totale in euro che vuoi raggiungere: ti dico a che prezzo deve arrivare ATOM.</p>
+
+<div class="card">
+  <h2>Parametri</h2>
+  <div class="row">
+    <div><label for="qty">Quantità ATOM</label><input id="qty" type="number" inputmode="decimal" step="any" value="4246.716732"></div>
+    <div><label for="t1">Target 1 (€)</label><input id="t1" type="number" inputmode="decimal" step="any" value="10461"></div>
+    <div><label for="t2">Target 2 (€)</label><input id="t2" type="number" inputmode="decimal" step="any" value="15395"></div>
+  </div>
+  <div class="chips" id="chips"></div>
+</div>
+
+<div class="card">
+  <h2>Prezzo da raggiungere</h2>
+  <div class="row">
+    <div class="res"><small id="l1"></small><b id="r1">–</b></div>
+    <div class="res"><small id="l2"></small><b id="r2">–</b></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Simulazione inversa: dato un prezzo, quanto vale il totale?</h2>
+  <div class="row">
+    <div><label for="pr">Prezzo ATOM (€)</label><input id="pr" type="number" inputmode="decimal" step="any" value="2.5"></div>
+    <div class="res"><small>Totale con la quantità inserita</small><b id="tot" style="color:var(--tx)">–</b></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Lettura pratica</h2>
+  <div class="scroll"><table id="tbl"></table></div>
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const nf=(n,d)=>n.toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d});
+const eur=(n,d=2)=>'€ '+nf(n,d);
+const val=id=>parseFloat($(id).value);
+const presets=[['10.000',10000],['10.461',10461],['15.000',15000],['15.395',15395]];
+presets.forEach(([l,v])=>{const b=document.createElement('button');b.textContent='€ '+l;
+ b.onclick=()=>{const t=v<=10461?'t1':'t2';$(t).value=v;calc()};$('chips').appendChild(b)});
+function priceFor(t,q){return q>0&&t>0?t/q:NaN}
+function calc(){
+ const q=val('qty'),t1=val('t1'),t2=val('t2'),p=val('pr');
+ $('l1').textContent='Per fare '+eur(t1,0);
+ $('l2').textContent='Per fare '+eur(t2,0);
+ $('r1').textContent=isNaN(priceFor(t1,q))?'–':eur(priceFor(t1,q),4);
+ $('r2').textContent=isNaN(priceFor(t2,q))?'–':eur(priceFor(t2,q),4);
+ $('tot').textContent=(q>=0&&p>=0)?eur(q*p):'–';
+ const list=[1000,2500,5000,7500,10000];
+ if(q>0&&!list.includes(q))list.push(q);
+ list.sort((a,b)=>a-b);
+ let h='<tr><th>ATOM</th><th>Prezzo per '+eur(t1,0)+'</th><th>Prezzo per '+eur(t2,0)+'</th></tr>';
+ list.forEach(n=>{h+='<tr'+(n===q?' class="me"':'')+'><td>'+nf(n,n===q?6:0)+(n===q?' (tuoi)':'')+'</td><td>'+(isNaN(priceFor(t1,n))?'–':eur(priceFor(t1,n),4))+'</td><td>'+(isNaN(priceFor(t2,n))?'–':eur(priceFor(t2,n),4))+'</td></tr>'});
+ $('tbl').innerHTML=h;
+}
+['qty','t1','t2','pr'].forEach(i=>$(i).addEventListener('input',calc));
+calc();
+</script>
+</body>
+</html>
