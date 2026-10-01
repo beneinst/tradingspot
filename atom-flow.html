@@ -814,11 +814,11 @@ label {
 <div class="card">
   <h4>Parametri</h4>
   <div class="row">
-    <div><label for="atom-target-qty">Quantità ATOM</label><input id="atom-target-qty" type="number" inputmode="decimal" step="any" value="" min="0"></div>
+    <div><label for="atom-target-qty">Quantità ATOM</label><input id="atom-target-qty" type="number" inputmode="decimal" step="any" value="4246.716732" min="0"></div>
     <div><label for="atom-target-t1">Target 1 (€)</label><input id="atom-target-t1" type="number" inputmode="decimal" step="any" value="10461" min="0"></div>
     <div><label for="atom-target-t2">Target 2 (€)</label><input id="atom-target-t2" type="number" inputmode="decimal" step="any" value="15395" min="0"></div>
   </div>
-  <p id="atom-target-source" class="sub">Quantità collegata al wallet. Puoi modificarla per simulare.</p><button type="button" id="atom-target-reset">Usa quantità e prezzo del wallet</button>
+  <p id="atom-target-source" class="sub" role="status">Inserisci i tuoi valori: calcolo e salvataggio sono automatici, senza pulsante di invio.</p>
 <div class="chips" id="atom-target-chips"></div>
 </div>
 
@@ -833,8 +833,8 @@ label {
 <div class="card">
   <h4>Simulazione inversa: dato un prezzo, quanto vale il totale?</h4>
   <div class="row">
-    <div><label for="atom-target-pr">Prezzo ATOM (€)</label><input id="atom-target-pr" type="number" inputmode="decimal" step="any" value="" min="0"></div>
-    <div class="res"><small>Totale con la quantità inserita</small><b id="atom-target-tot" style="color:var(--tx)">–</b></div>
+    <div><label for="atom-target-pr">Prezzo ATOM (€)</label><input id="atom-target-pr" type="number" inputmode="decimal" step="any" value="2.5" min="0"></div>
+    <div class="res"><small>Totale con la quantità inserita</small><b id="atom-target-tot">–</b></div>
   </div>
 </div>
 
@@ -1207,7 +1207,6 @@ label {
 
     const atomPriceEUR = atomPriceUSD * usdToEurRate;
     window.AtomThresholds?.update({qty:totalAtom, invested:totalInvested, price:atomPriceEUR});
-    window.AtomTargetSimulator?.update({qty:totalAtom, price:atomPriceEUR});
     const totalValue = totalAtom * atomPriceEUR;
     const profitLoss = totalValue - totalInvested;
     const roiPercent = totalInvested > 0 ? ((profitLoss / totalInvested) * 100) : 0;
