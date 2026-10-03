@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catalogo audiolibri</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eff2ef;--panel:#fff;--ink:#17292a;--mute:#5d706f;--line:#d3dcd9;--acc:#0f5f5a;--acc-ink:#fff;--warn:#a85a12;--warn-bg:#fbefdf;--ok-bg:#dff0ec}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111918;--panel:#182322;--ink:#e6efed;--mute:#93a8a5;--line:#2c3b39;--acc:#5fc4ba;--acc-ink:#0b1b1a;--warn:#f0a561;--warn-bg:#33261a;--ok-bg:#1b3532}}
+:root[data-theme="dark"]{--bg:#111918;--panel:#182322;--ink:#e6efed;--mute:#93a8a5;--line:#2c3b39;--acc:#5fc4ba;--acc-ink:#0b1b1a;--warn:#f0a561;--warn-bg:#33261a;--ok-bg:#1b3532}
+*,*:before,*:after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Instrument Sans",system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+h1{font:600 clamp(28px,5vw,40px)/1.1 "Newsreader",Georgia,serif;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 22px}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 16px;min-width:130px}
+.stat b{display:block;font:600 26px/1.1 "Newsreader",Georgia,serif}
+.stat span{color:var(--mute);font-size:14px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+input,select,button,textarea{font:inherit;color:inherit}
+input,select{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 12px;min-height:42px}
+#q{flex:1 1 220px}
+button{cursor:pointer;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:9px 14px;min-height:42px}
+button.pri{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+button.sm{min-height:34px;padding:4px 10px;font-size:14px}
+button.danger{color:var(--warn)}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.list{display:grid;gap:8px}
+.row{display:grid;grid-template-columns:1fr auto;gap:6px 14px;align-items:center;background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--acc);border-radius:10px;padding:12px 14px}
+.row.todo{border-left-color:var(--warn)}
+.row h3{margin:0;font:600 19px/1.25 "Newsreader",Georgia,serif}
+.meta{color:var(--mute);font-size:14px;display:flex;flex-wrap:wrap;gap:4px 14px}
+.badge{font-size:13px;font-weight:600;padding:2px 10px;border-radius:99px;background:var(--ok-bg);color:var(--acc);white-space:nowrap}
+.todo .badge{background:var(--warn-bg);color:var(--warn)}
+.acts{display:flex;gap:6px;align-items:center;grid-row:span 2;grid-column:2}
+.empty{text-align:center;color:var(--mute);padding:40px 10px;border:1px dashed var(--line);border-radius:10px}
+.backup{margin-top:30px;padding:16px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.backup h2{font:600 22px "Newsreader",Georgia,serif;margin:0 0 4px}
+.backup p{margin:0 0 12px;color:var(--mute);font-size:14px}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);padding:20px;width:min(440px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h2{font:600 24px "Newsreader",Georgia,serif;margin:0 0 12px}
+label{display:block;font-size:14px;font-weight:500;margin:10px 0 4px}
+dialog input,dialog select{width:100%}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.end{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+#msg{min-height:22px;font-size:14px;color:var(--acc);margin-top:8px}
+footer{text-align:center;color:var(--mute);font-size:14px;margin-top:36px;padding-top:16px;border-top:1px solid var(--line)}
+@media(max-width:560px){.row{grid-template-columns:1fr}.acts{grid-column:1;grid-row:auto}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Catalogo audiolibri</h1>
+  <p class="sub">Cosa hai già e cosa manca ancora, in un colpo d'occhio.</p>
+
+  <section class="stats" id="stats" aria-live="polite"></section>
+
+  <div class="bar">
+    <input id="q" type="search" placeholder="Cerca per titolo, autore o playlist" aria-label="Cerca">
+    <select id="pl" aria-label="Filtra per playlist"></select>
+    <select id="ord" aria-label="Ordina">
+      <option value="titolo">Ordina: titolo</option>
+      <option value="autore">Ordina: autore</option>
+      <option value="playlist">Ordina: playlist</option>
+      <option value="durata">Ordina: durata</option>
+    </select>
+    <button class="pri" id="add">Aggiungi audiolibro</button>
+  </div>
+
+  <div class="tabs" role="group" aria-label="Stato">
+    <button data-f="tutti" aria-pressed="true">Tutti</button>
+    <button data-f="presente" aria-pressed="false">Già presenti</button>
+    <button data-f="da-aggiungere" aria-pressed="false">Da aggiungere</button>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <section class="backup">
+    <h2>Backup dei dati</h2>
+    <p id="lastBackup"></p>
+    <div class="bar" style="margin:0">
+      <button class="pri" id="exp">Scarica backup (JSON)</button>
+      <button id="expcsv">Esporta CSV</button>
+      <button id="imp">Ripristina da backup</button>
+      <input type="file" id="file" accept=".json,application/json" hidden>
+    </div>
+    <div id="msg" role="status"></div>
+  </section>
+
+  <footer>© 2026 Beneinst - Onde letterarie e audiolibri</footer>
+</main>
+
+<dialog id="dlg">
+  <form method="dialog" id="frm">
+    <h2 id="dt">Nuovo audiolibro</h2>
+    <label for="f-t">Titolo</label><input id="f-t" required>
+    <label for="f-a">Autore</label><input id="f-a" required>
+    <label for="f-p">Playlist</label><input id="f-p" list="pls" placeholder="es. Classici italiani">
+    <datalist id="pls"></datalist>
+    <div class="two">
+      <div><label for="f-h">Durata (ore)</label><input id="f-h" type="number" min="0" max="999" value="0"></div>
+      <div><label for="f-m">Minuti</label><input id="f-m" type="number" min="0" max="59" value="0"></div>
+    </div>
+    <label for="f-s">Stato</label>
+    <select id="f-s"><option value="presente">Già presente</option><option value="da-aggiungere">Da aggiungere</option></select>
+    <div class="end"><button type="button" id="cancel">Annulla</button><button class="pri" type="submit">Salva</button></div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+  var KEY='catalogo-audiolibri-v1', META='catalogo-audiolibri-meta';
+  var data=[], filtro='tutti', editId=null, lastBackup=null;
+  var $=function(id){return document.getElementById(id)};
+
+  function load(){
+    try{data=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(data))data=[]}catch(e){data=[]}
+    try{lastBackup=localStorage.getItem(META)}catch(e){lastBackup=null}
+  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){say('Salvataggio nel browser non riuscito: scarica un backup.')}}
+  function say(t){$('msg').textContent=t}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function fmt(min){var h=Math.floor(min/60),m=min%60;return h+'h '+(m<10?'0':'')+m+'m'}
+  function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+  function render(){
+    var q=$('q').value.trim().toLowerCase(), pl=$('pl').value, ord=$('ord').value;
+    var pls=Array.from(new Set(data.map(function(b){return b.playlist}).filter(Boolean))).sort();
+    var cur=$('pl').value;
+    $('pl').innerHTML='<option value="">Tutte le playlist</option>'+pls.map(function(p){return '<option'+(p===cur?' selected':'')+' value="'+esc(p)+'">'+esc(p)+'</option>'}).join('');
+    $('pls').innerHTML=pls.map(function(p){return '<option value="'+esc(p)+'">'}).join('');
+
+    var pres=data.filter(function(b){return b.stato==='presente'}), todo=data.length-pres.length;
+    var tot=pres.reduce(function(s,b){return s+b.durata},0);
+    $('stats').innerHTML='<div class="stat"><b>'+pres.length+'</b><span>già presenti</span></div>'+
+      '<div class="stat"><b>'+todo+'</b><span>da aggiungere</span></div>'+
+      '<div class="stat"><b>'+fmt(tot)+'</b><span>di ascolto in archivio</span></div>';
+
+    var rows=data.filter(function(b){
+      if(filtro!=='tutti'&&b.stato!==filtro)return false;
+      if(pl&&b.playlist!==pl)return false;
+      return !q||(b.titolo+' '+b.autore+' '+b.playlist).toLowerCase().indexOf(q)>-1;
+    });
+    rows.sort(function(a,b){return ord==='durata'?b.durata-a.durata:String(a[ord]).localeCompare(String(b[ord]),'it')});
+
+    $('list').innerHTML=rows.length?rows.map(function(b){
+      return '<article class="row '+(b.stato==='presente'?'':'todo')+'">'+
+        '<div><h3>'+esc(b.titolo)+'</h3><div class="meta"><span>'+esc(b.autore)+'</span>'+(b.playlist?'<span>Playlist: '+esc(b.playlist)+'</span>':'')+'<span>'+fmt(b.durata)+'</span></div></div>'+
+        '<div class="acts"><span class="badge">'+(b.stato==='presente'?'Già presente':'Da aggiungere')+'</span>'+
+        '<button class="sm" data-a="st" data-id="'+b.id+'">'+(b.stato==='presente'?'Segna da aggiungere':'Segna presente')+'</button>'+
+        '<button class="sm" data-a="ed" data-id="'+b.id+'">Modifica</button>'+
+        '<button class="sm danger" data-a="del" data-id="'+b.id+'">Elimina</button></div></article>';
+    }).join(''):'<div class="empty">'+(data.length?'Nessun audiolibro corrisponde alla ricerca.':'Il catalogo è vuoto. Aggiungi il primo audiolibro o ripristina un backup.')+'</div>';
+
+    $('lastBackup').textContent=lastBackup?'Ultimo backup scaricato: '+new Date(lastBackup).toLocaleString('it-IT')+'.':'Non hai ancora scaricato nessun backup. I dati sono salvati solo in questo browser.';
+  }
+
+  function openDlg(b){
+    editId=b?b.id:null;
+    $('dt').textContent=b?'Modifica audiolibro':'Nuovo audiolibro';
+    $('f-t').value=b?b.titolo:'';$('f-a').value=b?b.autore:'';$('f-p').value=b?b.playlist:'';
+    $('f-h').value=b?Math.floor(b.durata/60):0;$('f-m').value=b?b.durata%60:0;
+    $('f-s').value=b?b.stato:'presente';
+    $('dlg').showModal();$('f-t').focus();
+  }
+
+  $('add').onclick=function(){openDlg(null)};
+  $('cancel').onclick=function(){$('dlg').close()};
+  $('frm').onsubmit=function(e){
+    e.preventDefault();
+    var o={titolo:$('f-t').value.trim(),autore:$('f-a').value.trim(),playlist:$('f-p').value.trim(),
+      durata:(parseInt($('f-h').value,10)||0)*60+(parseInt($('f-m').value,10)||0),stato:$('f-s').value};
+    if(!o.titolo||!o.autore)return;
+    if(editId){data=data.map(function(b){return b.id===editId?Object.assign({},b,o):b})}
+    else{o.id=uid();data.push(o)}
+    save();$('dlg').close();render();
+  };
+
+  $('list').onclick=function(e){
+    var t=e.target.closest('button');if(!t)return;
+    var id=t.dataset.id,b=data.find(function(x){return x.id===id});if(!b)return;
+    if(t.dataset.a==='ed')openDlg(b);
+    if(t.dataset.a==='st'){b.stato=b.stato==='presente'?'da-aggiungere':'presente';save();render()}
+    if(t.dataset.a==='del'&&confirm('Eliminare "'+b.titolo+'" dal catalogo?')){data=data.filter(function(x){return x.id!==id});save();render()}
+  };
+  document.querySelector('.tabs').onclick=function(e){
+    var t=e.target.closest('button');if(!t)return;
+    filtro=t.dataset.f;
+    document.querySelectorAll('.tabs button').forEach(function(b){b.setAttribute('aria-pressed',b===t)});
+    render();
+  };
+  ['q','pl','ord'].forEach(function(id){$(id).oninput=render});
+
+  function download(name,text,type){
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([text],{type:type}));a.download=name;
+    document.body.appendChild(a);a.click();a.remove();
+  }
+  var day=function(){return new Date().toISOString().slice(0,10)};
+
+  $('exp').onclick=function(){
+    download('audiolibri-backup-'+day()+'.json',JSON.stringify({versione:1,esportato:new Date().toISOString(),audiolibri:data},null,2),'application/json');
+    lastBackup=new Date().toISOString();try{localStorage.setItem(META,lastBackup)}catch(e){}
+    say('Backup scaricato ('+data.length+' audiolibri). Conservalo in un posto sicuro.');render();
+  };
+  $('expcsv').onclick=function(){
+    var q=function(s){return '"'+String(s).replace(/"/g,'""')+'"'};
+    var csv='\ufefftitolo,autore,playlist,durata_minuti,stato\n'+data.map(function(b){return [q(b.titolo),q(b.autore),q(b.playlist),b.durata,b.stato].join(',')}).join('\n');
+    download('audiolibri-'+day()+'.csv',csv,'text/csv');say('CSV esportato.');
+  };
+  $('imp').onclick=function(){$('file').click()};
+  $('file').onchange=function(){
+    var f=this.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var j=JSON.parse(r.result),arr=Array.isArray(j)?j:j.audiolibri;
+        if(!Array.isArray(arr))throw 0;
+        var ok=arr.filter(function(b){return b&&b.titolo&&b.autore}).map(function(b){
+          return{id:b.id||uid(),titolo:String(b.titolo),autore:String(b.autore),playlist:String(b.playlist||''),
+            durata:Math.max(0,parseInt(b.durata,10)||0),stato:b.stato==='da-aggiungere'?'da-aggiungere':'presente'};
+        });
+        if(!ok.length)throw 0;
+        var sostituisci=confirm('Trovati '+ok.length+' audiolibri.\n\nOK = sostituisci il catalogo attuale\nAnnulla = unisci al catalogo attuale');
+        if(sostituisci)data=ok;
+        else{var ids={};data.forEach(function(b){ids[b.id]=1});ok.forEach(function(b){if(!ids[b.id])data.push(b)})}
+        save();render();say('Ripristino completato: ora il catalogo ha '+data.length+' audiolibri.');
+      }catch(e){say('File non valido: scegli un backup JSON scaricato da questa app.')}
+    };
+    r.readAsText(f);this.value='';
+  };
+
+  load();render();
+})();
+</script>
+</body>
+</html>
