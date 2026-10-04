@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bilancio Familiare</title>
+<link rel="icon" href="favicon.png" type="image/x-icon">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f3f5f9;--card:#fff;--tx:#1d2433;--mu:#6b7488;--bd:#dde2ec;--in:#16a34a;--out:#dc2626;--ac:#2563eb}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141c;--card:#1a2030;--tx:#e8ecf4;--mu:#97a1b6;--bd:#2c3448;--in:#4ade80;--out:#f87171;--ac:#60a5fa}}
+:root[data-theme="dark"]{--bg:#10141c;--card:#1a2030;--tx:#e8ecf4;--mu:#97a1b6;--bd:#2c3448;--in:#4ade80;--out:#f87171;--ac:#60a5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:18px 16px 4px;max-width:1100px;margin:auto}
+h1{margin:0;font-size:26px}h1 small{display:block;font-size:13px;color:var(--mu);font-weight:400}
+main{max-width:1100px;margin:auto;padding:8px 16px 40px;display:grid;gap:16px}
+section{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;min-width:0}
+h2{margin:0 0 10px;font-size:17px}h3{margin:14px 0 6px;font-size:14px;color:var(--mu)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+input,select,button{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:7px 9px;min-width:0}
+button{cursor:pointer;background:var(--ac);color:#fff;border:0;font-weight:600}
+button.g{background:var(--bg);color:var(--tx);border:1px solid var(--bd)}button.d{background:var(--out)}
+button.on{background:var(--ac);color:#fff}
+canvas{width:100%;height:300px;display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.box{border:1px solid var(--bd);border-radius:10px;padding:10px;background:var(--bg)}
+.box b{display:block;font-size:19px}.box span{color:var(--mu);font-size:12px}
+.in{color:var(--in)}.out{color:var(--out)}
+.cb{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}
+.cb i{display:block;height:9px;border-radius:5px}.cb em{min-width:110px;font-style:normal}
+.tip{border-left:4px solid var(--ac);padding:8px 10px;margin:6px 0;background:var(--bg);border-radius:6px;font-size:13px}
+.tip.w{border-color:var(--out)}.tip.ok{border-color:var(--in)}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:5px 6px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+td input,td select{width:100%}
+.row{display:grid;grid-template-columns:130px 100px 1fr 1.2fr 100px 34px;gap:6px;margin-bottom:6px}
+@media(max-width:700px){.row{grid-template-columns:1fr 1fr}.row .n{grid-column:span 2}}
+.cat{display:grid;grid-template-columns:40px 1fr 100px 110px 34px;gap:6px;margin-bottom:6px}
+</style></head><body>
+<header><h1>👨‍👩‍👧 Bilancio Familiare<small>Entrate e uscite di casa</small></h1></header>
+<main>
+<section id="s1"><h2>📈 Andamento</h2>
+<div class="bar"><button id="mG" class="on">Giornaliero</button><button id="mM" class="g">Mensile</button>
+<input type="month" id="ym"></div>
+<canvas id="cv"></canvas></section>
+
+<section><h2>📊 Risultati</h2><div class="grid" id="tot"></div>
+<h3 id="subT">Totali intermedi</h3><div class="grid" id="sub"></div>
+<h3>Uscite per categoria (periodo)</h3><div id="cb"></div>
+<h3>Consigli di accantonamento</h3><div id="tips"></div></section>
+
+<section><h2>➕ Inserimento multiplo</h2><div id="rows"></div>
+<div class="bar"><button class="g" id="addR">+ Riga</button><button id="saveR">Salva tutte</button></div>
+<h3>Movimenti del periodo</h3><div class="wrap"><table id="list"></table></div></section>
+
+<section><h2>🏷️ Categorie</h2><div id="cats"></div>
+<div class="bar"><input id="cn" placeholder="Nuova categoria"><select id="ct"><option value="e">Uscita</option><option value="i">Entrata</option></select>
+<select id="cr"><option value="m">Mensile</option><option value="a">Annuale/periodica</option></select><button id="cadd">Aggiungi</button></div></section>
+
+<section><h2>💾 Export e backup</h2><div class="bar">
+<button id="xh">Tabelle HTML</button><button id="xp">Grafico PNG</button><button id="xb">Backup JSON</button>
+<button class="g" id="xr">Ripristina…</button><input type="file" id="fr" accept=".json" hidden></div>
+<p style="color:var(--mu);font-size:12px;margin:0">I dati restano salvati nel browser di questo dispositivo: fai backup regolari.</p></section>
+</main>
+<script>
+const $=s=>document.querySelector(s),K='fba_v1',E=n=>(+n||0).toLocaleString('it-IT',{style:'currency',currency:'EUR'});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+function def(){const c=(n,t,r,col)=>({id:uid(),n,t,r,c:col});
+return{cats:[c('Stipendio','i','m','#16a34a'),c('Altre entrate','i','m','#0d9488'),c('Alimentari','e','m','#f59e0b'),c('Casa / Affitto','e','m','#6366f1'),c('Bollette','e','m','#0ea5e9'),c('Assicurazione','e','a','#8b5cf6'),c('Auto / Carburante','e','m','#ef4444'),c('Salute','e','m','#ec4899'),c('Svago','e','m','#f97316'),c('Tasse / Bollo','e','a','#64748b'),c('Scuola','e','m','#84cc16')],tx:[]}}
+let S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
+if(!S||!S.cats)S=def();
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const cat=id=>S.cats.find(c=>c.id===id)||{n:'(eliminata)',t:'e',r:'m',c:'#888'};
+const today=new Date().toISOString().slice(0,10);
+let mode='g',ym=today.slice(0,7);$('#ym').value=ym;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const inP=t=>mode==='g'?t.d.startsWith(ym):t.d.startsWith(ym.slice(0,4));
+
+function buckets(){let n,lab;
+if(mode==='g'){const [y,m]=ym.split('-');n=new Date(y,m,0).getDate();lab=[...Array(n)].map((_,i)=>String(i+1))}
+else{n=12;lab=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic']}
+const I=Array(n).fill(0),U=Array(n).fill(0);
+S.tx.filter(inP).forEach(t=>{const k=mode==='g'?+t.d.slice(8,10)-1:+t.d.slice(5,7)-1;(t.t==='i'?I:U)[k]+=t.a});
+return{n,lab,I,U}}
+
+function draw(){const cv=$('#cv'),r=devicePixelRatio||1,W=cv.clientWidth,H=300;cv.width=W*r;cv.height=H*r;
+const x=cv.getContext('2d');x.scale(r,r);x.fillStyle=css('--card');x.fillRect(0,0,W,H);
+const b=buckets(),pl=52,pb=26,pt=12,pr=10,w=W-pl-pr,h=H-pt-pb;
+let cum=0;const C=b.I.map((v,i)=>cum+=v-b.U[i]);
+const mx=Math.max(1,...b.I,...b.U,...C),mn=Math.min(0,...C),rg=mx-mn;
+const Y=v=>pt+h-(v-mn)/rg*h;
+x.font='11px system-ui';x.fillStyle=css('--mu');x.strokeStyle=css('--bd');
+for(let i=0;i<=4;i++){const v=mn+rg*i/4,y=Y(v);x.beginPath();x.moveTo(pl,y);x.lineTo(W-pr,y);x.stroke();x.textAlign='right';x.fillText(Math.round(v),pl-6,y+4)}
+const bw=w/b.n;x.textAlign='center';
+b.lab.forEach((l,i)=>{const cx=pl+bw*i+bw/2,k=bw*.34;
+if(b.n<=12||i%2==0)x.fillText(l,cx,H-8);
+x.fillStyle=css('--in');x.fillRect(cx-k,Y(b.I[i]),k,Y(0)-Y(b.I[i]));
+x.fillStyle=css('--out');x.fillRect(cx,Y(b.U[i]),k,Y(0)-Y(b.U[i]));x.fillStyle=css('--mu')});
+x.strokeStyle=css('--ac');x.lineWidth=2;x.beginPath();
+C.forEach((v,i)=>{const cx=pl+bw*i+bw/2;i?x.lineTo(cx,Y(v)):x.moveTo(cx,Y(v))});x.stroke();
+x.lineWidth=1;x.textAlign='left';let lx=pl+4;
+[['Entrate','--in'],['Uscite','--out'],['Saldo cumulato','--ac']].forEach(([t,c])=>{x.fillStyle=css(c);x.fillRect(lx,4,10,8);x.fillStyle=css('--mu');x.fillText(t,lx+14,12);lx+=x.measureText(t).width+34});
+return b}
+
+function render(){
+$('#mG').className=mode==='g'?'on':'g';$('#mM').className=mode==='m'?'on':'g';
+const b=draw(),ti=b.I.reduce((a,v)=>a+v,0),tu=b.U.reduce((a,v)=>a+v,0);
+$('#tot').innerHTML=`<div class="box"><span>Entrate</span><b class="in">${E(ti)}</b></div><div class="box"><span>Uscite</span><b class="out">${E(tu)}</b></div><div class="box"><span>Saldo</span><b class="${ti>=tu?'in':'out'}">${E(ti-tu)}</b></div><div class="box"><span>Media uscite / ${mode==='g'?'giorno':'mese'}</span><b>${E(tu/(mode==='g'?b.n:12))}</b></div>`;
+const grp=mode==='g'?[[0,7],[7,14],[14,21],[21,b.n]]:[[0,3],[3,6],[6,9],[9,12]];
+$('#subT').textContent=mode==='g'?'Totali per settimana':'Totali per trimestre';
+$('#sub').innerHTML=grp.filter(g=>g[0]<g[1]).map((g,i)=>{const a=b.I.slice(g[0],g[1]).reduce((p,v)=>p+v,0),u=b.U.slice(g[0],g[1]).reduce((p,v)=>p+v,0);
+return`<div class="box"><span>${mode==='g'?`Giorni ${g[0]+1}–${g[1]}`:`T${i+1}`}</span><b class="${a>=u?'in':'out'}">${E(a-u)}</b><span class="in">+${E(a)}</span> · <span class="out">−${E(u)}</span></div>`}).join('');
+const by={};S.tx.filter(t=>inP(t)&&t.t==='e').forEach(t=>by[t.c]=(by[t.c]||0)+t.a);
+const ent=Object.entries(by).sort((a,b)=>b[1]-a[1]),mxv=ent.length?ent[0][1]:1;
+$('#cb').innerHTML=ent.map(([id,v])=>`<div class="cb"><em>${esc(cat(id).n)}</em><i style="width:${Math.max(3,v/mxv*55)}%;background:${cat(id).c}"></i><span>${E(v)} (${tu?Math.round(v/tu*100):0}%)</span></div>`).join('')||'<span style="color:var(--mu)">Nessuna spesa nel periodo.</span>';
+tips();list()}
+
+function tips(){const T=[],ms=new Set(S.tx.map(t=>t.d.slice(0,7)));const nm=Math.max(1,ms.size);
+if(!S.tx.length){$('#tips').innerHTML='<div class="tip">Inserisci alcuni movimenti per ricevere consigli personalizzati.</div>';return}
+const inc=S.tx.filter(t=>t.t==='i').reduce((a,t)=>a+t.a,0)/nm,exp=S.tx.filter(t=>t.t==='e').reduce((a,t)=>a+t.a,0)/nm;
+const rate=inc?(inc-exp)/inc*100:0;
+T.push(`<div class="tip ${rate<10?'w':'ok'}">Su ${nm} mesi con dati: entrate medie ${E(inc)}, uscite medie ${E(exp)}. Risparmio ${Math.round(rate)}% (obiettivo indicativo 20%). ${rate<10?'Valuta di ridurre le spese variabili.':'Buon equilibrio.'}</div>`);
+const lim=new Date();lim.setFullYear(lim.getFullYear()-1);const l12=lim.toISOString().slice(0,10);
+S.cats.filter(c=>c.t==='e').forEach(c=>{const tx=S.tx.filter(t=>t.c===c.id);if(!tx.length)return;
+const tot=tx.reduce((a,t)=>a+t.a,0),avg=tot/nm,sh=inc?avg/inc*100:0;
+if(c.r==='a'){const y=tx.filter(t=>t.d>=l12).reduce((a,t)=>a+t.a,0);
+T.push(`<div class="tip"><b>${esc(c.n)}</b> (periodica): spesa ultimi 12 mesi ${E(y)} → metti da parte <b>${E(y/12)}/mese</b> (${Math.round(inc?y/12/inc*100:0)}% delle entrate).</div>`)}
+else{const q=avg*1.05;T.push(`<div class="tip ${sh>25?'w':''}"><b>${esc(c.n)}</b>: media ${E(avg)}/mese (${Math.round(sh)}% delle entrate). Budget consigliato <b>${E(q)}</b>${sh>25?' — incidenza alta, prova a contenerla':''}.</div>`)}});
+const fix=Math.max(0,inc*.2);T.push(`<div class="tip ok">Fondo emergenze/risparmio: punta a mettere da parte almeno <b>${E(fix)}/mese</b> (20% delle entrate medie).</div>`);
+$('#tips').innerHTML=T.join('')}
+
+function opts(t,sel){return S.cats.filter(c=>c.t===t).map(c=>`<option value="${c.id}"${c.id===sel?' selected':''}>${esc(c.n)}</option>`).join('')}
+function addRow(){const d=document.createElement('div');d.className='row';
+d.innerHTML=`<input type="date" value="${today}"><select class="t"><option value="e">Uscita</option><option value="i">Entrata</option></select><select class="c">${opts('e')}</select><input class="n" placeholder="Nota"><input type="number" step="0.01" min="0" placeholder="Importo €"><button class="g">✕</button>`;
+d.querySelector('.t').onchange=e=>d.querySelector('.c').innerHTML=opts(e.target.value==='i'?'i':'e');
+d.querySelector('button').onclick=()=>d.remove();$('#rows').append(d)}
+$('#addR').onclick=addRow;for(let i=0;i<3;i++)addRow();
+$('#saveR').onclick=()=>{let n=0;document.querySelectorAll('#rows .row').forEach(r=>{const[ i,tt,cc,nt,am]=r.querySelectorAll('input,select');
+const a=parseFloat(am.value);if(!(a>0)||!i.value)return;S.tx.push({id:uid(),d:i.value,t:tt.value==='i'?'i':'e',c:cc.value,n:nt.value,a});n++;nt.value='';am.value=''});
+if(n){save();render()}else alert('Compila almeno data e importo.')};
+
+function list(){const tx=S.tx.filter(inP).sort((a,b)=>b.d.localeCompare(a.d));
+$('#list').innerHTML='<tr><th>Data</th><th>Categoria</th><th>Nota</th><th>Importo</th><th></th></tr>'+tx.map(t=>`<tr><td>${t.d.split('-').reverse().join('/')}</td><td>${esc(cat(t.c).n)}</td><td>${esc(t.n)}</td><td class="${t.t==='i'?'in':'out'}">${t.t==='i'?'+':'−'}${E(t.a)}</td><td><button class="g" data-x="${t.id}">✕</button></td></tr>`).join('');
+document.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{S.tx=S.tx.filter(t=>t.id!==b.dataset.x);save();render()})}
+
+function cats(){$('#cats').innerHTML=S.cats.map(c=>`<div class="cat" data-id="${c.id}"><input type="color" value="${c.c}"><input value="${esc(c.n)}"><select><option value="e"${c.t==='e'?' selected':''}>Uscita</option><option value="i"${c.t==='i'?' selected':''}>Entrata</option></select><select><option value="m"${c.r==='m'?' selected':''}>Mensile</option><option value="a"${c.r==='a'?' selected':''}>Periodica</option></select><button class="d">✕</button></div>`).join('');
+document.querySelectorAll('.cat').forEach(r=>{const c=cat(r.dataset.id),[co,nm,t,rc]=r.querySelectorAll('input,select');
+const up=()=>{c.c=co.value;c.n=nm.value||c.n;c.t=t.value;c.r=rc.value;save();render();refreshRows()};
+[co,nm,t,rc].forEach(e=>e.onchange=up);
+r.querySelector('button').onclick=()=>{const used=S.tx.some(x=>x.c===c.id);
+if(confirm(used?'Categoria con movimenti: eliminando, i movimenti resteranno come "(eliminata)". Procedere?':'Eliminare la categoria?')){S.cats=S.cats.filter(x=>x.id!==c.id);save();cats();render();refreshRows()}}})}
+function refreshRows(){document.querySelectorAll('#rows .row').forEach(r=>{const t=r.querySelector('.t').value,s=r.querySelector('.c');s.innerHTML=opts(t==='i'?'i':'e',s.value)})}
+$('#cadd').onclick=()=>{const n=$('#cn').value.trim();if(!n)return;S.cats.push({id:uid(),n,t:$('#ct').value,r:$('#cr').value,c:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')});$('#cn').value='';save();cats();refreshRows();render()};
+
+const dl=(n,b)=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
+$('#xb').onclick=()=>dl(`fam-bria-aldo-backup-${today}.json`,new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));
+$('#xr').onclick=()=>$('#fr').click();
+$('#fr').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.cats||!x.tx)throw 0;
+if(confirm('Sostituire tutti i dati attuali con il backup?')){S=x;save();cats();refreshRows();render()}}catch(_){alert('File di backup non valido.')}};r.readAsText(f);e.target.value=''};
+$('#xp').onclick=()=>$('#cv').toBlob(b=>dl(`grafico-${mode==='g'?ym:ym.slice(0,4)}.png`,b));
+$('#xh').onclick=()=>{const tx=[...S.tx].sort((a,b)=>a.d.localeCompare(b.d));const ms={};
+tx.forEach(t=>{const m=t.d.slice(0,7);ms[m]=ms[m]||[0,0];ms[m][t.t==='i'?0:1]+=t.a});
+const cs={};tx.filter(t=>t.t==='e').forEach(t=>cs[t.c]=(cs[t.c]||0)+t.a);
+const tb=(h,r)=>`<table border="1" cellpadding="5" style="border-collapse:collapse"><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${r.map(x=>`<tr>${x.map(y=>`<td>${esc(y)}</td>`).join('')}</tr>`).join('')}</table>`;
+const html=`<!DOCTYPE html><html lang="it"><meta charset="utf-8"><title>Fam. Bria Aldo - Export</title><body style="font-family:sans-serif"><h1>Fam. Bria Aldo</h1><p>Esportato il ${new Date().toLocaleDateString('it-IT')}</p><h2>Riepilogo mensile</h2>${tb(['Mese','Entrate','Uscite','Saldo'],Object.entries(ms).sort().map(([m,v])=>[m,E(v[0]),E(v[1]),E(v[0]-v[1])]))}<h2>Uscite per categoria</h2>${tb(['Categoria','Totale'],Object.entries(cs).map(([k,v])=>[cat(k).n,E(v)]))}<h2>Movimenti</h2>${tb(['Data','Tipo','Categoria','Nota','Importo'],tx.map(t=>[t.d,t.t==='i'?'Entrata':'Uscita',cat(t.c).n,t.n,E(t.a)]))}</body></html>`;
+dl(`fam-bria-aldo-${today}.html`,new Blob([html],{type:'text/html'}))};
+
+$('#mG').onclick=()=>{mode='g';render()};$('#mM').onclick=()=>{mode='m';render()};
+$('#ym').onchange=e=>{if(e.target.value){ym=e.target.value;render()}};
+addEventListener('resize',draw);
+matchMedia('(prefers-color-scheme:dark)').addEventListener?.('change',draw);
+cats();render();
+</script></body></html>
