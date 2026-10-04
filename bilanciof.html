@@ -14,13 +14,16 @@ header{padding:18px 16px 4px;max-width:1100px;margin:auto}
 h1{margin:0;font-size:26px}h1 small{display:block;font-size:13px;color:var(--mu);font-weight:400}
 main{max-width:1100px;margin:auto;padding:8px 16px 40px;display:grid;gap:16px}
 section{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;min-width:0}
-h2{margin:0 0 10px;font-size:17px}h3{margin:14px 0 6px;font-size:14px;color:var(--mu)}
+h2{margin:0 0 10px;font-size:17px}
+summary{font-size:17px;font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}summary::after{content:"▾";color:var(--mu);transition:transform .2s}
+details[open]>summary::after{transform:rotate(180deg)}h3{margin:14px 0 6px;font-size:14px;color:var(--mu)}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
 input,select,button{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:7px 9px;min-width:0}
 button{cursor:pointer;background:var(--ac);color:#fff;border:0;font-weight:600}
 button.g{background:var(--bg);color:var(--tx);border:1px solid var(--bd)}button.d{background:var(--out)}
 button.on{background:var(--ac);color:#fff}
-canvas{width:100%;height:300px;display:block}
+canvas{width:100%;height:440px;display:block}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .box{border:1px solid var(--bd);border-radius:10px;padding:10px;background:var(--bg)}
 .box b{display:block;font-size:19px}.box span{color:var(--mu);font-size:12px}
@@ -36,7 +39,7 @@ td input,td select{width:100%}
 @media(max-width:700px){.row{grid-template-columns:1fr 1fr}.row .n{grid-column:span 2}}
 .cat{display:grid;grid-template-columns:40px 1fr 100px 110px 34px;gap:6px;margin-bottom:6px}
 </style></head><body>
-<header><h1>👨‍👩‍👧 Bilancio Familiare<small>Entrate e uscite di casa</small></h1></header>
+<header style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h1>👨‍👩‍👧 Bilancio Familiare<small>Entrate e uscite di casa</small></h1><button class="g" id="th" title="Cambia tema" style="font-size:18px">🌙</button></header>
 <main>
 <section id="s1"><h2>📈 Andamento</h2>
 <div class="bar"><button id="mG" class="on">Giornaliero</button><button id="mM" class="g">Mensile</button>
@@ -45,19 +48,19 @@ td input,td select{width:100%}
 
 <section><h2>📊 Risultati</h2><div class="grid" id="tot"></div>
 <h3 id="subT">Totali intermedi</h3><div class="grid" id="sub"></div>
-<h3>Uscite per categoria (periodo)</h3><div id="cb"></div>
+<h3>Uscite per categoria (periodo)</h3><div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center"><canvas id="dn" style="width:240px;height:240px;flex:none;margin:auto"></canvas><div id="cb" style="flex:1;min-width:240px"></div></div>
 <h3>Consigli di accantonamento</h3><div id="tips"></div></section>
 
 <section><h2>➕ Inserimento multiplo</h2><div id="rows"></div>
 <div class="bar"><button class="g" id="addR">+ Riga</button><button id="saveR">Salva tutte</button></div>
 <h3>Movimenti del periodo</h3><div class="wrap"><table id="list"></table></div></section>
 
-<section><h2>🏷️ Categorie</h2><div id="cats"></div>
+<section><details><summary>🏷️ Categorie</summary><div id="cats" style="margin-top:12px"></div>
 <div class="bar"><input id="cn" placeholder="Nuova categoria"><select id="ct"><option value="e">Uscita</option><option value="i">Entrata</option></select>
-<select id="cr"><option value="m">Mensile</option><option value="a">Annuale/periodica</option></select><button id="cadd">Aggiungi</button></div></section>
+<select id="cr"><option value="m">Mensile</option><option value="a">Annuale/periodica</option></select><button id="cadd">Aggiungi</button></div></details></section>
 
 <section><h2>💾 Export e backup</h2><div class="bar">
-<button id="xh">Tabelle HTML</button><button id="xp">Grafico PNG</button><button id="xb">Backup JSON</button>
+<button id="xh">Tabelle HTML</button><button id="xp">Grafico PNG</button><button id="xd">Ciambella PNG</button><button id="xb">Backup JSON</button>
 <button class="g" id="xr">Ripristina…</button><input type="file" id="fr" accept=".json" hidden></div>
 <p style="color:var(--mu);font-size:12px;margin:0">I dati restano salvati nel browser di questo dispositivo: fai backup regolari.</p></section>
 </main>
@@ -83,9 +86,9 @@ const I=Array(n).fill(0),U=Array(n).fill(0);
 S.tx.filter(inP).forEach(t=>{const k=mode==='g'?+t.d.slice(8,10)-1:+t.d.slice(5,7)-1;(t.t==='i'?I:U)[k]+=t.a});
 return{n,lab,I,U}}
 
-function draw(){const cv=$('#cv'),r=devicePixelRatio||1,W=cv.clientWidth,H=300;cv.width=W*r;cv.height=H*r;
+function draw(){const cv=$('#cv'),r=devicePixelRatio||1,W=cv.clientWidth,H=440;cv.width=W*r;cv.height=H*r;
 const x=cv.getContext('2d');x.scale(r,r);x.fillStyle=css('--card');x.fillRect(0,0,W,H);
-const b=buckets(),pl=52,pb=26,pt=12,pr=10,w=W-pl-pr,h=H-pt-pb;
+const b=buckets(),pl=52,pb=58,pt=14,pr=10,w=W-pl-pr,h=H-pt-pb;
 let cum=0;const C=b.I.map((v,i)=>cum+=v-b.U[i]);
 const mx=Math.max(1,...b.I,...b.U,...C),mn=Math.min(0,...C),rg=mx-mn;
 const Y=v=>pt+h-(v-mn)/rg*h;
@@ -93,13 +96,14 @@ x.font='11px system-ui';x.fillStyle=css('--mu');x.strokeStyle=css('--bd');
 for(let i=0;i<=4;i++){const v=mn+rg*i/4,y=Y(v);x.beginPath();x.moveTo(pl,y);x.lineTo(W-pr,y);x.stroke();x.textAlign='right';x.fillText(Math.round(v),pl-6,y+4)}
 const bw=w/b.n;x.textAlign='center';
 b.lab.forEach((l,i)=>{const cx=pl+bw*i+bw/2,k=bw*.34;
-if(b.n<=12||i%2==0)x.fillText(l,cx,H-8);
+if(b.n<=12||i%2==0)x.fillText(l,cx,H-36);
 x.fillStyle=css('--in');x.fillRect(cx-k,Y(b.I[i]),k,Y(0)-Y(b.I[i]));
 x.fillStyle=css('--out');x.fillRect(cx,Y(b.U[i]),k,Y(0)-Y(b.U[i]));x.fillStyle=css('--mu')});
 x.strokeStyle=css('--ac');x.lineWidth=2;x.beginPath();
 C.forEach((v,i)=>{const cx=pl+bw*i+bw/2;i?x.lineTo(cx,Y(v)):x.moveTo(cx,Y(v))});x.stroke();
-x.lineWidth=1;x.textAlign='left';let lx=pl+4;
-[['Entrate','--in'],['Uscite','--out'],['Saldo cumulato','--ac']].forEach(([t,c])=>{x.fillStyle=css(c);x.fillRect(lx,4,10,8);x.fillStyle=css('--mu');x.fillText(t,lx+14,12);lx+=x.measureText(t).width+34});
+x.lineWidth=1;x.textAlign='left';const L=[['Entrate','--in'],['Uscite','--out'],['Saldo cumulato','--ac']];
+const tw=L.reduce((a,[t])=>a+x.measureText(t).width+34,-20);let lx=(W-tw)/2;
+L.forEach(([t,c])=>{x.fillStyle=css(c);x.fillRect(lx,H-17,10,8);x.fillStyle=css('--mu');x.fillText(t,lx+14,H-9);lx+=x.measureText(t).width+34});
 return b}
 
 function render(){
@@ -113,7 +117,15 @@ return`<div class="box"><span>${mode==='g'?`Giorni ${g[0]+1}–${g[1]}`:`T${i+1}
 const by={};S.tx.filter(t=>inP(t)&&t.t==='e').forEach(t=>by[t.c]=(by[t.c]||0)+t.a);
 const ent=Object.entries(by).sort((a,b)=>b[1]-a[1]),mxv=ent.length?ent[0][1]:1;
 $('#cb').innerHTML=ent.map(([id,v])=>`<div class="cb"><em>${esc(cat(id).n)}</em><i style="width:${Math.max(3,v/mxv*55)}%;background:${cat(id).c}"></i><span>${E(v)} (${tu?Math.round(v/tu*100):0}%)</span></div>`).join('')||'<span style="color:var(--mu)">Nessuna spesa nel periodo.</span>';
-tips();list()}
+DN=[ent,tu];dn();tips();list()}
+let DN=[[],0];
+function dn(){const [ent,tu]=DN,cv=$('#dn'),r=devicePixelRatio||1,S0=240;cv.width=S0*r;cv.height=S0*r;
+const x=cv.getContext('2d');x.scale(r,r);x.fillStyle=css('--card');x.fillRect(0,0,S0,S0);
+const c=S0/2,R=c-22;x.lineWidth=36;x.lineCap='butt';
+if(!tu){x.strokeStyle=css('--bd');x.beginPath();x.arc(c,c,R,0,7);x.stroke()}
+else{let a=-Math.PI/2;ent.forEach(([id,v])=>{const e=a+v/tu*Math.PI*2;x.strokeStyle=cat(id).c;x.beginPath();x.arc(c,c,R,a,e-(ent.length>1?.012:0));x.stroke();a=e})}
+x.textAlign='center';x.fillStyle=css('--mu');x.font='12px system-ui';x.fillText('Uscite',c,c-8);
+x.fillStyle=css('--tx');x.font='bold 18px system-ui';x.fillText(E(tu),c,c+16)}
 
 function tips(){const T=[],ms=new Set(S.tx.map(t=>t.d.slice(0,7)));const nm=Math.max(1,ms.size);
 if(!S.tx.length){$('#tips').innerHTML='<div class="tip">Inserisci alcuni movimenti per ricevere consigli personalizzati.</div>';return}
@@ -165,9 +177,16 @@ const tb=(h,r)=>`<table border="1" cellpadding="5" style="border-collapse:collap
 const html=`<!DOCTYPE html><html lang="it"><meta charset="utf-8"><title>Fam. Bria Aldo - Export</title><body style="font-family:sans-serif"><h1>Fam. Bria Aldo</h1><p>Esportato il ${new Date().toLocaleDateString('it-IT')}</p><h2>Riepilogo mensile</h2>${tb(['Mese','Entrate','Uscite','Saldo'],Object.entries(ms).sort().map(([m,v])=>[m,E(v[0]),E(v[1]),E(v[0]-v[1])]))}<h2>Uscite per categoria</h2>${tb(['Categoria','Totale'],Object.entries(cs).map(([k,v])=>[cat(k).n,E(v)]))}<h2>Movimenti</h2>${tb(['Data','Tipo','Categoria','Nota','Importo'],tx.map(t=>[t.d,t.t==='i'?'Entrata':'Uscita',cat(t.c).n,t.n,E(t.a)]))}</body></html>`;
 dl(`fam-bria-aldo-${today}.html`,new Blob([html],{type:'text/html'}))};
 
+$('#xd').onclick=()=>$('#dn').toBlob(b=>dl(`uscite-categorie-${mode==='g'?ym:ym.slice(0,4)}.png`,b));
 $('#mG').onclick=()=>{mode='g';render()};$('#mM').onclick=()=>{mode='m';render()};
 $('#ym').onchange=e=>{if(e.target.value){ym=e.target.value;render()}};
 addEventListener('resize',draw);
 matchMedia('(prefers-color-scheme:dark)').addEventListener?.('change',draw);
+const isDark=()=>{const t=document.documentElement.dataset.theme;return t?t==='dark':matchMedia('(prefers-color-scheme:dark)').matches};
+function setTheme(t,persist){document.documentElement.dataset.theme=t;$('#th').textContent=t==='dark'?'☀️':'🌙';
+if(persist)try{localStorage.setItem('fba_theme',t)}catch(e){}draw();dn()}
+try{const t=localStorage.getItem('fba_theme');if(t)document.documentElement.dataset.theme=t}catch(e){}
+$('#th').textContent=isDark()?'☀️':'🌙';
+$('#th').onclick=()=>setTheme(isDark()?'light':'dark',true);
 cats();render();
 </script></body></html>
