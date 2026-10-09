@@ -845,7 +845,117 @@ label {
 </section>
 </details>
 
- 
+ <!-- Simulatore ATOM a soglie dinamiche: incolla questo blocco nella pagina (CSS, HTML e JS inclusi, nomi con prefisso atom-sim) -->
+<style>
+.atom-sim-panel .atom-sim-body{padding:10px 2px}
+.atom-sim-panel .as-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));column-gap:28px;row-gap:0;margin-bottom:12px}
+.atom-sim-panel .as-grid label{display:grid;grid-template-columns:minmax(0,1fr) 140px;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.25);font-size:.85rem;opacity:1}
+.atom-sim-panel .as-grid label input,.atom-sim-panel .as-grid label select{text-align:right}
+.atom-sim-panel .as-grid label select{text-align-last:right}
+@media(max-width:420px){.atom-sim-panel .as-grid label{grid-template-columns:minmax(0,1fr) 120px}}
+.atom-sim-panel input,.atom-sim-panel select{font:inherit;color:inherit;background:transparent;border:1px solid rgba(128,128,128,.4);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box}
+.atom-sim-panel table{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:8px}
+.atom-sim-panel th,.atom-sim-panel td{padding:5px 4px;text-align:left}
+.atom-sim-panel th{opacity:.7;font-weight:500;border-bottom:1px solid rgba(128,128,128,.35)}
+.atom-sim-panel td input{max-width:90px}
+.atom-sim-panel .as-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.atom-sim-panel .as-kpi div{border-left:3px solid #14b89a;padding:2px 10px}
+.atom-sim-panel .as-kpi b{display:block;font-size:1.1rem}
+.atom-sim-panel .as-kpi span{font-size:.78rem;opacity:.75}
+.atom-sim-panel canvas{width:100%;height:280px;display:block;margin-top:6px}
+.atom-sim-panel .as-leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;opacity:.85;margin-bottom:10px}
+.atom-sim-panel .as-leg i{display:inline-block;width:16px;border-top:3px solid;vertical-align:middle;margin-right:5px}
+.atom-sim-panel .as-note{font-size:.8rem;opacity:.75}
+.atom-sim-panel .as-scroll{overflow-x:auto}
+</style>
+<details class="wallet-entry atom-sim-panel">
+<summary>📈 Simulatore ritiri e soglie dinamiche<span>Ricompense in USDC con soglie che seguono il carico medio</span></summary>
+<div class="atom-sim-body">
+<p class="as-note">L'ATOM di base resta a deposito. Ogni mese le ricompense di staking vanno in USDC o in restaking in base al prezzo. Sotto la prima soglia si restaka tutto e si può comprare con l'USDC accumulato.</p>
+<div class="as-grid">
+<label>Quantità ATOM a deposito<input data-k="qty" type="number" inputmode="decimal" value="4246.716732" min="0" step="any"></label>
+<label>Prezzo di carico (€)<input data-k="cost" type="number" inputmode="decimal" value="2.46" min="0" step="any"></label>
+<label>Prezzo attuale (€)<input data-k="p0" type="number" inputmode="decimal" value="1.80" min="0.1" step="any"></label>
+<label>Staking annuo (APR %)<input data-k="apr" type="number" inputmode="decimal" value="15" min="0" step="0.5"></label>
+<label>Mesi simulati<input data-k="months" type="number" value="36" min="6" max="120" step="6"></label>
+<label>Scenario di prezzo<select data-k="scen"><option value="peak">Picco sopra 3,62 e ritorno a 2,4</option><option value="up">Rialzo graduale</option><option value="cycle">Cicli ampi</option><option value="dip">Ribasso poi rialzo</option><option value="side">Laterale</option><option value="down">Ribasso prolungato</option></select></label>
+<label>Soglie<select data-k="dyn"><option value="1">Dinamiche: seguono il carico medio</option><option value="0">Fisse</option></select></label>
+<label>Ritiro completo all'ultima soglia<select data-k="exit"><option value="0">No, solo ricompense</option><option value="1">Sì, vendi tutto</option></select></label>
+<label>% USDC reinvestita al mese sotto la prima soglia<input data-k="reinv" type="number" value="30" min="0" max="100"></label>
+</div>
+<div class="as-scroll"><table>
+<tr><th>Fascia di prezzo</th><th>Da (€)</th><th>% ricompense in USDC</th></tr>
+<tr><td>Sotto la prima soglia</td><td><input data-k="t1" type="number" value="2.05" step="0.01"></td><td><input data-k="a0" type="number" value="0" min="0" max="100"></td></tr>
+<tr><td>Fascia 1</td><td><input data-k="t2" type="number" value="2.46" step="0.01"></td><td><input data-k="a1" type="number" value="20" min="0" max="100"></td></tr>
+<tr><td>Fascia 2</td><td><input data-k="t3" type="number" value="3.00" step="0.01"></td><td><input data-k="a2" type="number" value="40" min="0" max="100"></td></tr>
+<tr><td>Fascia 3</td><td><input data-k="t4" type="number" value="3.62" step="0.01"></td><td><input data-k="a3" type="number" value="70" min="0" max="100"></td></tr>
+<tr><td>Sopra l'ultima soglia</td><td>ultima soglia</td><td><input data-k="a4" type="number" value="100" min="0" max="100"></td></tr>
+</table></div>
+<p class="as-note" data-k="saved" role="status">I parametri restano salvati in questo browser.</p>
+<div class="as-kpi" data-k="kpi" role="status" aria-live="polite"></div>
+<canvas data-k="c1" aria-label="Prezzo, carico medio e soglie"></canvas><div class="as-leg" data-k="l1"></div>
+<canvas data-k="c2" aria-label="Valore totale strategia contro solo restaking"></canvas><div class="as-leg" data-k="l2"></div>
+<p class="as-note">Simulazione concettuale con prezzi inventati, non una previsione né una consulenza finanziaria. Il carico delle ricompense restakate è il prezzo del mese in cui arrivano. Commissioni e Quadro RT non sono inclusi.</p>
+</div>
+<script>
+(function(){
+const R=document.currentScript?document.currentScript.parentElement:document.querySelector('.atom-sim-panel');
+const Q=k=>R.querySelector('[data-k="'+k+'"]'),num=k=>parseFloat(Q(k).value)||0,KEY='atomSimParams';
+const SC={peak:[[0,1],[.25,1.5],[.45,2.15],[.7,1.35],[1,1.6]],up:[[0,1],[.3,1.15],[.6,1.7],[1,2.4]],cycle:[[0,1],[.15,1.4],[.3,1.15],[.5,1.9],[.65,1.4],[.8,2.1],[1,1.7]],dip:[[0,1],[.3,.65],[.5,.9],[.8,1.9],[1,2.3]],side:[[0,1],[.25,1.25],[.5,.95],[.75,1.35],[1,1.2]],down:[[0,1],[.3,.8],[.6,.6],[1,.7]]};
+const COL=['#e5574a','#e0a526','#4f8fe8','#14b89a'];
+const fe=v=>v.toLocaleString('it-IT',{maximumFractionDigits:0})+' €',f2=v=>v.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
+const inputs=[...R.querySelectorAll('input[data-k],select[data-k]')];
+try{const s=JSON.parse(localStorage.getItem(KEY)||'{}');inputs.forEach(e=>{if(s[e.dataset.k]!=null)e.value=s[e.dataset.k]})}catch(e){}
+function prices(n,p0,k){const pts=SC[k],o=[];for(let i=0;i<=n;i++){const x=i/n;let j=0;while(j<pts.length-2&&x>pts[j+1][0])j++;const a=pts[j],b=pts[j+1],m=a[1]+(b[1]-a[1])*(x-a[0])/(b[0]-a[0]);o.push(p0*m*(1+.05*Math.sin(i*1.7)+.03*Math.sin(i*.9+1)))}return o}
+function sim(){
+ const n=Math.round(num('months')),q=num('qty'),c=num('cost')||1,apr=num('apr')/100,P=prices(n,num('p0'),Q('scen').value);
+ const T=['t1','t2','t3','t4'].map(num),A=['a0','a1','a2','a3','a4'].map(num),reinv=num('reinv')/100,ex=Q('exit').value==='1',dyn=Q('dyn').value==='1';
+ let st=q,cost=q*c,usdc=0,done=false,exitM=null,hq=q;const avg=[],val=[],hold=[],TS=[[],[],[],[]];
+ for(let i=0;i<=n;i++){const p=P[i];
+  if(i>0){hq+=hq*apr/12;
+   if(!done){const k=dyn&&st>0?cost/st/c:1,Tm=T.map(t=>t*k),r=st*apr/12,z=p<Tm[0]?0:p<Tm[1]?1:p<Tm[2]?2:p<Tm[3]?3:4,sold=r*A[z]/100,keep=r-sold;
+    usdc+=sold*p;st+=keep;cost+=keep*p;
+    if(z===0&&usdc>0){const b=usdc*reinv;usdc-=b;st+=b/p;cost+=b}
+    if(z===4&&ex){usdc+=st*p;st=0;cost=0;done=true;exitM=i}}}
+  const kk=dyn&&st>0?cost/st/c:1;T.forEach((t,j)=>TS[j].push(st>0||!dyn?t*kk:null));
+  avg.push(st>0?cost/st:null);val.push(st*p+usdc);hold.push(hq*p)}
+ return{n,P,T,TS,dyn,avg,val,hold,st,usdc,exitM,q,c}}
+function draw(id,series,lines,n){
+ const cv=Q(id),w=cv.clientWidth,h=cv.clientHeight;if(!w)return;
+ const d=window.devicePixelRatio||1;cv.width=w*d;cv.height=h*d;
+ const g=cv.getContext('2d');g.scale(d,d);const ink=getComputedStyle(R).color;
+ const L=48,Rr=8,Tp=8,B=22;let all=[];series.forEach(s=>s.d.forEach(v=>v!=null&&all.push(v)));lines.forEach(l=>all.push(l.y));
+ let lo=Math.min(...all),hi=Math.max(...all);const pad=(hi-lo)*.06||1;lo-=pad;hi+=pad;
+ const X=i=>L+(w-L-Rr)*i/n,Y=v=>Tp+(h-Tp-B)*(1-(v-lo)/(hi-lo));
+ g.font='11px system-ui';g.fillStyle=ink;g.textAlign='right';
+ for(let k=0;k<=4;k++){const v=lo+(hi-lo)*k/4,y=Y(v);g.globalAlpha=.15;g.strokeStyle=ink;g.beginPath();g.moveTo(L,y);g.lineTo(w-Rr,y);g.stroke();g.globalAlpha=.7;g.fillText(hi>100?Math.round(v/1000)+'k':v.toFixed(2),L-6,y+4)}
+ g.textAlign='center';for(let m=0;m<=n;m+=Math.max(1,Math.round(n/6)))g.fillText(m,X(m),h-6);
+ g.globalAlpha=1;
+ lines.forEach(l=>{g.strokeStyle=l.c;g.setLineDash([5,4]);g.lineWidth=1;g.beginPath();g.moveTo(L,Y(l.y));g.lineTo(w-Rr,Y(l.y));g.stroke()});
+ series.forEach(s=>{g.setLineDash(s.dash?[5,4]:[]);g.strokeStyle=s.c==='ink'?ink:s.c;g.lineWidth=s.w||2;g.beginPath();let on=false;s.d.forEach((v,i)=>{if(v==null){on=false;return}on?g.lineTo(X(i),Y(v)):g.moveTo(X(i),Y(v));on=true});g.stroke()});g.setLineDash([])}
+function legend(k,items){Q(k).innerHTML=items.map(([c,t,dash])=>'<span><i style="border-color:'+(c==='ink'?'currentColor':c)+';border-top-style:'+(dash?'dashed':'solid')+'"></i>'+t+'</span>').join('')}
+function run(){
+ const s=sim(),dv=s.val[s.n]-s.hold[s.n],qf=v=>v.toLocaleString('it-IT',{maximumFractionDigits:2});
+ Q('kpi').innerHTML=[
+  [qf(s.st),'ATOM rimasti (partivi da '+qf(s.q)+')'],
+  [s.avg[s.n]?f2(s.avg[s.n])+' €':'uscita totale','Carico medio finale (partivi da '+f2(s.c)+' €)'],
+  [fe(s.usdc),'USDC accumulati'],
+  [Math.round(s.st*s.P[s.n]/(s.q*s.c)*100)+' %','Valore ATOM rimasti contro capitale al carico iniziale'],
+  [fe(s.val[s.n]),'Valore totale a fine simulazione'],
+  [(dv>=0?'+':'')+fe(dv),'Contro solo restaking ('+fe(s.hold[s.n])+')'],
+  [s.exitM?'mese '+s.exitM:'non raggiunta','Uscita completa in USDC']
+ ].map(([b,t])=>'<div><b>'+b+'</b><span>'+t+'</span></div>').join('');
+ draw('c1',[{d:s.P,c:'ink',w:2},{d:s.avg,c:'#e0a526',w:2.5}].concat(s.dyn?s.TS.map((d,i)=>({d,c:COL[i],w:1.2,dash:1})):[]),s.dyn?[]:s.T.map((y,i)=>({y,c:COL[i]})),s.n);
+ legend('l1',[['ink','Prezzo ATOM'],['#e0a526','Carico medio']].concat(s.T.map((t,i)=>[COL[i],'Soglia '+(i+1)+(s.dyn?' (parte da ':': ')+f2(t)+(s.dyn?', segue il carico)':''),1])));
+ draw('c2',[{d:s.hold,c:'#8a96a3',w:2},{d:s.val,c:'#14b89a',w:2.5}],[{y:s.q*s.c,c:'#e5574a'}],s.n);
+ legend('l2',[['#14b89a','Strategia (ATOM + USDC)'],['#8a96a3','Solo restaking, nessun ritiro'],['#e5574a','Capitale al carico iniziale',1]])}
+function save(){try{const s={};inputs.forEach(e=>s[e.dataset.k]=e.value);localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+inputs.forEach(e=>e.addEventListener('input',()=>{save();run()}));
+R.addEventListener('toggle',run);addEventListener('resize',run);run();
+})();
+</script>
+</details>
+
 
  <!-- Grafico USD Investiti vs Valore Attuale -->
 
@@ -939,12 +1049,7 @@ label {
 </div></div>
 </div>
 
-		<div  style="padding-top: 1px; padding-bottom: 3px;">
-
-      		   <p style="margin: 0; color: #c3c3c3; padding-top:25px; padding-bottom:35px; text-align: center; height: 15px; line-height: 12px;">
-        ⛰️ 2026 © FlowChart by Gerardo D
-      </p>
-    </div></div>
+		
 
 <!-- Bottone torna sopra principale (con freccia CSS) -->
     <button class="back-to-top" id="backToTop" title="Torna in cima"></button>

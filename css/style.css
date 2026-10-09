@@ -113,7 +113,6 @@ body::after {
   max-width: 1400px;
 }
 
-.app-footer,
 .container-f p[style*="c3c3c3"] {
   width: min(100%, 1400px) !important;
   height: auto !important;
@@ -133,7 +132,6 @@ body::after {
 }
 
 @media (max-width: 600px) {
-  .app-footer,
   .container-f p[style*="c3c3c3"] {
     margin-top: 12px !important;
     margin-bottom: 0 !important;
@@ -1274,3 +1272,21 @@ h5:has(+ table) {
 .label {
     font-size: 0.97em;  /* oppure 0.97rem se preferisci rispetto al root */
 }
+
+.flow-footer{
+  box-sizing:border-box;
+  width:calc(100% - 32px);
+  max-width:1400px;
+  margin:8px auto calc(24px + env(safe-area-inset-bottom,0px));
+  padding:10px 14px;
+  text-align:center;
+  font-size:.85rem;
+  letter-spacing:.02em;
+  color:inherit;
+  background:rgba(128,128,128,.1);
+  border:1px solid rgba(128,128,128,.3);
+  border-radius:10px;
+  -webkit-backdrop-filter:blur(6px);
+  backdrop-filter:blur(6px);
+}
+.flow-footer span{opacity:.8}

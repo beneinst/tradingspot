@@ -9,7 +9,7 @@
    if(parent!==document.body && !parent.children.length && !parent.textContent.trim()) parent.remove();
   }
  });
- const footer=document.createElement('footer');footer.className='app-footer';
+ const footer=document.createElement('footer');footer.className='flow-footer';
  const text=document.createElement('p');text.textContent=copyright;footer.append(text);document.body.append(footer);
  const menu=document.getElementById('offcanvasMenu'), trigger=document.getElementById('hamburgerBtn');
  if(!menu || !trigger) return;
