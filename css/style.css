@@ -1283,8 +1283,8 @@ h5:has(+ table) {
   font-size:.85rem;
   letter-spacing:.02em;
   color:inherit;
-  background:rgba(128,128,128,.1);
-  border:1px solid rgba(128,128,128,.3);
+  background:transparent;
+  border:0;
   border-radius:10px;
   -webkit-backdrop-filter:blur(6px);
   backdrop-filter:blur(6px);

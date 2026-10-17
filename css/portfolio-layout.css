@@ -108,6 +108,7 @@
  background:rgba(20,34,26,.35);
 }
 /* Ritmo verticale della pagina ATOM: grafici, riepiloghi e pannelli. */
+.atom-page .chart-container.chart-box { background:transparent !important; }
 .atom-page .chart-container.chart-box { margin-top:24px; margin-bottom:0; }
 .atom-page .container.chart-export-actions { margin-top:8px; margin-bottom:24px; }
 .atom-page .ts-stats-grid { margin-top:24px; margin-bottom:24px; }
