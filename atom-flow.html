@@ -584,13 +584,66 @@ label {
         display: block;
     }
 }
+.atom-soglie {
+    --as-bg: #0b0e17;
+    --as-panel: #121726;
+    --as-line: #232b42;
+    --as-text: #e6e9f2;
+    --as-muted: #8d96b3;
+    --as-b3: #0e9f8e;
+    --as-b2: #2fb36b;
+    --as-b1: #7fc24a;
+    --as-b0: #c9c23a;
+    --as-w: #d9a441;
+    --as-s1: #e9a23b;
+    --as-s2: #e8803a;
+    --as-s3: #e0603f;
+    --as-s4: #d9464f;
+    --as-s5: #ef3f7a;
+    --as-stop: #6b7ff0;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    margin-inline: auto;
+    padding: 20px;
+    background: transparent;
+    color: var(--as-text);
+    border-radius: 8px;
+    font: 15px/1.5 "Segoe UI", system-ui, sans-serif;
+}
+.atom-soglie *, .atom-soglie *::before, .atom-soglie *::after { box-sizing: border-box; }
+.atom-soglie h1 { font-size: 22px; margin: 0 0 4px; color: var(--as-text); }
+.atom-soglie h2 { font-size: 16px; margin: 0 0 12px; color: var(--as-text); }
+.atom-soglie .sub { color: var(--as-muted); margin-bottom: 18px; }
+.atom-soglie .panel { background: rgba(18, 23, 38, .48); border: 1px solid var(--as-line); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.atom-soglie .price { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+.atom-soglie .big { font-size: 38px; font-weight: 700; }
+.atom-soglie .zone-badge { padding: 6px 12px; border-radius: 6px; font-weight: 600; color: #08101a; }
+.atom-soglie .row { display: flex; flex-wrap: wrap; gap: 12px; }
+.atom-soglie .field { flex: 1 1 150px; }
+.atom-soglie .field label { display: block; color: var(--as-muted); font-size: 12px; margin: 0 0 3px; }
+.atom-soglie input { width: 100%; background: rgba(11, 15, 28, .62); border: 1px solid var(--as-line); color: var(--as-text); border-radius: 6px; padding: 7px 9px; font: inherit; }
+.atom-soglie input:focus-visible, .atom-soglie button:focus-visible { outline: 2px solid var(--as-stop); outline-offset: 1px; }
+.atom-soglie button { background: rgba(27, 35, 64, .68); color: var(--as-text); border: 1px solid var(--as-line); border-radius: 6px; padding: 7px 12px; font: inherit; cursor: pointer; }
+.atom-soglie .src { color: var(--as-muted); font-size: 12px; }
+.atom-soglie svg { width: 100%; height: auto; display: block; }
+.atom-soglie .scroll { overflow-x: auto; }
+.atom-soglie table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px; }
+.atom-soglie th, .atom-soglie td { padding: 7px 9px; text-align: left; border-bottom: 1px solid var(--as-line); }
+.atom-soglie th { color: var(--as-muted); font-weight: 500; }
+.atom-soglie tr.act { background: #1a2342; outline: 2px solid var(--as-stop); outline-offset: -2px; }
+.atom-soglie .dot { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 7px; vertical-align: -1px; }
+.atom-soglie .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.atom-soglie .kpi { background: rgba(14, 19, 34, .58); border: 1px solid var(--as-line); border-radius: 8px; padding: 12px; }
+.atom-soglie .kpi b { display: block; font-size: 20px; }
+.atom-soglie .kpi span { color: var(--as-muted); font-size: 12.5px; }
+.atom-soglie .note { color: var(--as-muted); font-size: 13px; margin-top: 10px; }
+@media (max-width: 600px) { .atom-soglie { padding: 14px; } .atom-soglie .big { font-size: 30px; } }
     </style>
 <link rel="stylesheet" href="css/portfolio-layout.css">
 <link rel="stylesheet" href="css/app-shell.css">
 <script src="js/app-shell.js" defer></script>
 <script src="js/export-quality.js"></script>
-<script src="js/atom-thresholds.js"></script>
-<script src="js/atom-target-simulator.js"></script>
 </head>
 <body class="portfolio-page wallet-page atom-page">
 <div style="padding: 4px;"></div>
@@ -798,165 +851,148 @@ label {
 
 <details class="wallet-entry atom-threshold-panel">
  <summary>🎯 Pareggio e soglie ATOM<span>Situazione del wallet e livelli percentuali sul tuo capitale</span></summary>
- <div class="atom-threshold-content">
-  <p id="atom-threshold-status" role="status" aria-live="polite">Attendo i dati del wallet…</p>
-  <p id="atom-threshold-detail"></p>
-  <label for="atom-threshold-discount">Soglia da monitorare sotto il pareggio (%)</label>
-  <input id="atom-threshold-discount" type="number" min="0.1" max="99" step="0.1" value="10" aria-describedby="atom-threshold-help">
-  <p id="atom-threshold-help">Il 10% è un esempio modificabile. Limite = prezzo di pareggio × (1 − percentuale / 100). La percentuale scelta resta salvata in questo browser.</p>
-  <div id="atom-threshold-grid"></div>
-  <p>Le fasce descrivono il prezzo rispetto al capitale registrato: non prevedono il mercato. Il pareggio segue i tuoi riepiloghi, comprese ricompense e ritiri; non include le commissioni di un eventuale nuovo acquisto.</p>
+ <div class="atom-soglie">
+    <h1>ATOM – Soglie di acquisto e prelievo</h1>
+    <div class="sub">Zone calcolate dal tuo versato, dalla quantità di ATOM e dal prezzo di carico. Modifica i campi e tutto si aggiorna.</div>
+
+    <div class="panel price">
+     <div><div class="src" id="src">Carico il prezzo…</div><div class="big" id="px">–</div></div>
+     <div><span class="zone-badge" id="badge">–</span><div class="src" id="zdesc" style="margin-top:6px"></div></div>
+     <div><button id="refresh" type="button">Aggiorna ora</button></div>
+    </div>
+
+    <div class="panel">
+     <h2>I tuoi dati</h2>
+     <div class="row">
+        <div class="field"><label for="versato">Totale versato (€)</label><input id="versato" type="number" step="any"></div>
+        <div class="field"><label for="qty">ATOM posseduti</label><input id="qty" type="number" step="any"></div>
+        <div class="field"><label for="carico">ATOM in carico (€ spesi)</label><input id="carico" type="number" step="any"></div>
+        <div class="field"><label for="rossa">Linea rossa acquisto (€)</label><input id="rossa" type="number" step="0.01"></div>
+        <div class="field"><label for="apr">APR staking (%)</label><input id="apr" type="number" step="0.1"></div>
+        <div class="field"><label for="manuale">Prezzo manuale (€, opzionale)</label><input id="manuale" type="number" step="0.0001" placeholder="vuoto = live"></div>
+     </div>
+     <div class="note">Soglia 100% = versato ÷ ATOM. Prezzo di carico = ATOM in carico ÷ ATOM. Il carico e il versato sono quelli dell’immagine: aggiornali dopo ogni acquisto.</div>
+    </div>
+
+    <div class="panel">
+     <h2>Mappa delle zone</h2>
+     <svg id="chart" viewBox="0 0 900 190" role="img" aria-label="Barra delle zone di prezzo con il prezzo attuale"></svg>
+    </div>
+
+    <div class="panel">
+     <h2>Cosa fare adesso</h2>
+     <div class="grid" id="kpis"></div>
+    </div>
+
+    <div class="panel">
+     <h2>Tabella soglie</h2>
+     <div class="scroll"><table id="tbl"></table></div>
+     <div class="note">Dei guadagni di staking il 20% va sempre in BTC. Il restante 80% si divide così: sotto la linea rossa tutto in restaking; sopra, la percentuale USDC indicata (calcolata sull’80%) e il resto in restaking. Il capitale delegato non si tocca mai.</div>
+    </div>
+
+    <div class="panel">
+     <h2>Simulazioni</h2>
+     <div class="row"><div class="field"><label for="target">Prezzo di vendita ipotetico (€)</label><input id="target" type="number" step="any" value="15"></div></div>
+     <div class="grid" id="sim" style="margin-top:12px"></div>
+    </div>
  </div>
-<section class="atom-target-simulator" aria-label="Simulatore prezzo target ATOM">
-<h3>Simulatore prezzo target ATOM</h3>
-<p class="sub">Calcola il prezzo necessario per raggiungere un totale in euro, oppure il valore totale a un prezzo ipotizzato. I target indicano il valore lordo della posizione, non il profitto netto.</p>
+ <script>
+ (function(){
+    "use strict";
+    var $=function(id){return document.getElementById(id)};
+    var fmt=function(n,d){return isFinite(n)?n.toLocaleString("it-IT",{minimumFractionDigits:d==null?2:d,maximumFractionDigits:d==null?2:d}):"–"};
+    var DEF={versato:15455,qty:4338.4,carico:10595,rossa:2,apr:15,target:15};
+    var ids=["versato","qty","carico","rossa","apr","target"];
+    var live=null,liveSrc="";
+    function load(){var s={};try{s=JSON.parse(localStorage.getItem("atomsoglie")||"{}")}catch(e){}
+     ids.forEach(function(k){$(k).value=s[k]!=null?s[k]:DEF[k]});
+     if(s.manuale)$("manuale").value=s.manuale}
+    function save(){var s={};ids.concat(["manuale"]).forEach(function(k){s[k]=$(k).value});
+     try{localStorage.setItem("atomsoglie",JSON.stringify(s))}catch(e){}}
+    function val(k){return parseFloat($(k).value)}
 
-<div class="card">
-  <h4>Parametri</h4>
-  <div class="row">
-    <div><label for="atom-target-qty">Quantità ATOM</label><input id="atom-target-qty" type="number" inputmode="decimal" step="any" value="4246.716732" min="0"></div>
-    <div><label for="atom-target-t1">Target 1 (€)</label><input id="atom-target-t1" type="number" inputmode="decimal" step="any" value="10461" min="0"></div>
-    <div><label for="atom-target-t2">Target 2 (€)</label><input id="atom-target-t2" type="number" inputmode="decimal" step="any" value="15395" min="0"></div>
-  </div>
-  <p id="atom-target-source" class="sub" role="status">Inserisci i tuoi valori: calcolo e salvataggio sono automatici, senza pulsante di invio.</p>
-<div class="chips" id="atom-target-chips"></div>
-</div>
+    function zones(){
+     var R=val("rossa"),BE=val("versato")/val("qty"),s=(BE-R)/4,C=val("carico")/val("qty");
+     var z=[
+        {a:0,b:1,buy:50,c:"var(--as-b3)",n:"Sotto 1 €"},
+        {a:1,b:1.3,buy:40,c:"var(--as-b2)",n:"1,00 – 1,30"},
+        {a:1.3,b:1.5,buy:30,c:"var(--as-b1)",n:"1,30 – 1,50"},
+        {a:1.5,b:1.8,buy:20,c:"var(--as-b0)",n:"1,50 – 1,80"},
+        {a:1.8,b:R,buy:10,c:"var(--as-w)",n:"1,80 – "+fmt(R)}];
+     var pc=[15,30,50,75],cols=["var(--as-s1)","var(--as-s2)","var(--as-s3)","var(--as-s4)"];
+     for(var i=0;i<4;i++)z.push({a:R+s*i,b:R+s*(i+1),u:pc[i],c:cols[i],n:fmt(R+s*i)+" – "+fmt(R+s*(i+1))});
+     z.push({a:BE,b:Infinity,u:100,c:"var(--as-s5)",n:"Oltre "+fmt(BE)});
+     return {z:z,R:R,BE:BE,C:C}}
 
-<div class="card">
-  <h4>Prezzo da raggiungere</h4>
-  <div class="row">
-    <div class="res"><small id="atom-target-l1"></small><b id="atom-target-r1">–</b></div>
-    <div class="res"><small id="atom-target-l2"></small><b id="atom-target-r2">–</b></div>
-  </div>
-</div>
+    function current(){var m=parseFloat($("manuale").value);return m>0?m:live}
+    function find(z,p){for(var i=0;i<z.length;i++)if(p>=z[i].a&&p<z[i].b)return z[i];return z[0]}
 
-<div class="card">
-  <h4>Simulazione inversa: dato un prezzo, quanto vale il totale?</h4>
-  <div class="row">
-    <div><label for="atom-target-pr">Prezzo ATOM (€)</label><input id="atom-target-pr" type="number" inputmode="decimal" step="any" value="2.5" min="0"></div>
-    <div class="res"><small>Totale con la quantità inserita</small><b id="atom-target-tot">–</b></div>
-  </div>
-</div>
+    function render(){
+     var Z=zones(),z=Z.z,p=current();
+     if(!(Z.BE>Z.R)){$("tbl").innerHTML="<tr><td>La soglia 100% deve essere sopra la linea rossa: controlla i dati.</td></tr>";return}
+     $("px").textContent=p?fmt(p,4)+" €":"–";
+     var cur=p?find(z,p):null;
+    $("badge").textContent=cur?(cur.buy?"Acquisto DCA "+cur.buy+" €":"USDC "+cur.u+"%"):"–";
+     $("badge").style.background=cur?cur.c:"#333";
+     $("zdesc").textContent=cur?(cur.buy?"Sotto la linea rossa: acquisti, tutto lo staking in restaking (tranne il 20% BTC)":"Acquisti fermi: ritiro in USDC attivo"):"";
+     var max=Math.max(Z.BE*1.18,(p||0)*1.1),X=function(v){return 20+Math.min(v,max)/max*860};
+     var h='';
+     z.forEach(function(q){var x1=X(q.a),x2=X(Math.min(q.b,max));
+        h+='<rect x="'+x1+'" y="70" width="'+Math.max(x2-x1,1)+'" height="38" fill="'+q.c+'"'+(cur===q?' stroke="#fff" stroke-width="2"':'')+'/>';
+        var w=x2-x1;if(w>34)h+='<text x="'+(x1+w/2)+'" y="94" text-anchor="middle" font-size="12" font-weight="700" fill="#08101a">'+(q.buy?q.buy+"€":q.u+"%")+'</text>'});
+     var ticks=[0,1,1.3,1.5,1.8,Z.R,Z.R+(Z.BE-Z.R)/4,Z.R+(Z.BE-Z.R)/2,Z.R+(Z.BE-Z.R)*.75,Z.BE];
+     ticks.forEach(function(t,i){var x=X(t),up=i%2;
+        h+='<line x1="'+x+'" x2="'+x+'" y1="108" y2="'+(up?126:118)+'" stroke="#8d96b3"/><text x="'+x+'" y="'+(up?140:132)+'" text-anchor="middle" font-size="11" fill="#8d96b3">'+fmt(t)+'</text>'});
+     h+='<line x1="'+X(Z.R)+'" x2="'+X(Z.R)+'" y1="58" y2="108" stroke="#fff" stroke-width="2" stroke-dasharray="4 3"/><text x="'+X(Z.R)+'" y="52" text-anchor="middle" font-size="11" fill="#fff">linea rossa</text>';
+     h+='<line x1="'+X(Z.C)+'" x2="'+X(Z.C)+'" y1="66" y2="112" stroke="#fff" stroke-width="1.5"/><text x="'+X(Z.C)+'" y="164" text-anchor="middle" font-size="11" fill="#d9a441">carico '+fmt(Z.C)+'</text>';
+     h+='<text x="'+X(Z.BE)+'" y="164" text-anchor="middle" font-size="11" fill="#ef3f7a">100% '+fmt(Z.BE)+'</text>';
+     if(p){var xp=X(p);h+='<path d="M'+xp+' 66 l-8 -16 h16z" fill="#fff"/><text x="'+xp+'" y="36" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">'+fmt(p,4)+' €</text>'}
+     $("chart").innerHTML=h;
+     var t='<tr><th>Zona (€ per ATOM)</th><th>Azione</th><th>BTC</th><th>USDC</th><th>Restaking</th></tr>';
+     z.forEach(function(q){var u=q.u||0;
+        t+='<tr'+(cur===q?' class="act"':'')+'><td><span class="dot" style="background:'+q.c+'"></span>'+q.n+'</td><td>'+(q.buy?"Acquisto "+q.buy+" € a ingresso":"Nessun acquisto")+'</td><td>20%</td><td>'+fmt(80*u/100,0)+'%</td><td>'+fmt(80*(100-u)/100,0)+'%</td></tr>'});
+     $("tbl").innerHTML=t;
+     var qty=val("qty"),car=val("carico"),ver=val("versato");
+     var rew=qty*val("apr")/100/12,u2=cur&&cur.u?cur.u:0;
+     var btc=rew*.2,usdc=rew*.8*u2/100,rest=rew*.8-usdc;
+     var k=function(a,b){return '<div class="kpi"><b>'+a+'</b><span>'+b+'</span></div>'};
+     var kh='';
+     if(cur&&cur.buy){var na=cur.buy/p,nq=qty+na,nc=car+cur.buy;
+        kh+=k("+"+fmt(cur.buy,0)+" € → "+fmt(na,2)+" ATOM","Acquisto per ogni ingresso in questa zona")
+         +k(fmt(nc/nq,4)+" €","Nuovo prezzo di carico dopo l’ingresso (ora "+fmt(Z.C,4)+")")
+         +k(fmt(ver+cur.buy,0)+" €","Nuovo totale versato; nuova soglia 100% a "+fmt((ver+cur.buy)/nq,4)+" €")}
+     else if(cur){kh+=k("Acquisti fermi","Sopra la linea rossa non entra nuovo capitale")}
+     kh+=k("≈ "+fmt(rew,1)+" ATOM / mese","Ricompense stimate con APR "+fmt(val("apr"),1)+"% (≈ "+fmt(rew*(p||0),0)+" €)")
+        +k(fmt(btc,1)+" ATOM → BTC","20% mensile, sempre attivo")
+        +k(fmt(usdc,1)+" ATOM → USDC","≈ "+fmt(usdc*(p||0),0)+" € questo mese")
+        +k(fmt(rest,1)+" ATOM in restaking","Va ad aumentare il capitale delegato");
+     $("kpis").innerHTML=kh;
+     var T=val("target"),value=qty*T;
+     $("sim").innerHTML=k(fmt(value,0)+" €","Valore di "+fmt(qty,1)+" ATOM a "+fmt(T)+" €")
+        +k(fmt(value-ver,0)+" €","Guadagno rispetto al totale versato")
+        +k(fmt(value-car,0)+" €","Guadagno rispetto al carico in ATOM")
+        +k(fmt(Z.C/(p||Z.C)*100-100,0)+"%","Distanza prezzo attuale → carico (positiva = prezzo sotto il carico)");
+    }
 
-<div class="card">
-  <h4>Lettura pratica</h4>
-  <div class="scroll"><table id="atom-target-tbl"></table></div>
-</div>
-</section>
+    function fetchJ(url){return fetch(url).then(function(r){if(!r.ok)throw 0;return r.json()})}
+    function getPrice(){
+     $("src").textContent="Aggiorno…";
+     fetchJ("https://api.coingecko.com/api/v3/simple/price?ids=cosmos&vs_currencies=eur")
+        .then(function(d){live=d.cosmos.eur;liveSrc="CoinGecko"})
+        .catch(function(){return fetchJ("https://api.binance.com/api/v3/ticker/price?symbol=ATOMEUR").then(function(d){live=parseFloat(d.price);liveSrc="Binance"})})
+        .catch(function(){liveSrc=""})
+        .then(function(){
+         $("src").textContent=liveSrc?("Prezzo live da "+liveSrc+" – "+new Date().toLocaleTimeString("it-IT")):(current()?"Prezzo manuale (live non raggiungibile)":"Prezzo live non raggiungibile: inserisci il prezzo manuale");
+         render()});
+    }
+    load();
+    ids.concat(["manuale"]).forEach(function(k){$(k).addEventListener("input",function(){save();render()})});
+    $("refresh").addEventListener("click",getPrice);
+    render();getPrice();setInterval(getPrice,60000);
+ })();
+ </script>
+
 </details>
-
- <!-- Simulatore ATOM a soglie dinamiche: incolla questo blocco nella pagina (CSS, HTML e JS inclusi, nomi con prefisso atom-sim) -->
-<style>
-.atom-sim-panel .atom-sim-body{padding:10px 2px}
-.atom-sim-panel .as-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));column-gap:28px;row-gap:0;margin-bottom:12px}
-.atom-sim-panel .as-grid label{display:grid;grid-template-columns:minmax(0,1fr) 140px;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.25);font-size:.85rem;opacity:1}
-.atom-sim-panel .as-grid label input,.atom-sim-panel .as-grid label select{text-align:right}
-.atom-sim-panel .as-grid label select{text-align-last:right}
-@media(max-width:420px){.atom-sim-panel .as-grid label{grid-template-columns:minmax(0,1fr) 120px}}
-.atom-sim-panel input,.atom-sim-panel select{font:inherit;color:inherit;background:transparent;border:1px solid rgba(128,128,128,.4);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box}
-.atom-sim-panel table{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:8px}
-.atom-sim-panel th,.atom-sim-panel td{padding:5px 4px;text-align:left}
-.atom-sim-panel th{opacity:.7;font-weight:500;border-bottom:1px solid rgba(128,128,128,.35)}
-.atom-sim-panel td input{max-width:90px}
-.atom-sim-panel .as-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
-.atom-sim-panel .as-kpi div{border-left:3px solid #14b89a;padding:2px 10px}
-.atom-sim-panel .as-kpi b{display:block;font-size:1.1rem}
-.atom-sim-panel .as-kpi span{font-size:.78rem;opacity:.75}
-.atom-sim-panel canvas{width:100%;height:280px;display:block;margin-top:6px}
-.atom-sim-panel .as-leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;opacity:.85;margin-bottom:10px}
-.atom-sim-panel .as-leg i{display:inline-block;width:16px;border-top:3px solid;vertical-align:middle;margin-right:5px}
-.atom-sim-panel .as-note{font-size:.8rem;opacity:.75}
-.atom-sim-panel .as-scroll{overflow-x:auto}
-</style>
-<details class="wallet-entry atom-sim-panel">
-<summary>📈 Simulatore ritiri e soglie dinamiche<span>Ricompense in USDC con soglie che seguono il carico medio</span></summary>
-<div class="atom-sim-body">
-<p class="as-note">L'ATOM di base resta a deposito. Ogni mese le ricompense di staking vanno in USDC o in restaking in base al prezzo. Sotto la prima soglia si restaka tutto e si può comprare con l'USDC accumulato.</p>
-<div class="as-grid">
-<label>Quantità ATOM a deposito<input data-k="qty" type="number" inputmode="decimal" value="4246.716732" min="0" step="any"></label>
-<label>Prezzo di carico (€)<input data-k="cost" type="number" inputmode="decimal" value="2.46" min="0" step="any"></label>
-<label>Prezzo attuale (€)<input data-k="p0" type="number" inputmode="decimal" value="1.80" min="0.1" step="any"></label>
-<label>Staking annuo (APR %)<input data-k="apr" type="number" inputmode="decimal" value="15" min="0" step="0.5"></label>
-<label>Mesi simulati<input data-k="months" type="number" value="36" min="6" max="120" step="6"></label>
-<label>Scenario di prezzo<select data-k="scen"><option value="peak">Picco sopra 3,62 e ritorno a 2,4</option><option value="up">Rialzo graduale</option><option value="cycle">Cicli ampi</option><option value="dip">Ribasso poi rialzo</option><option value="side">Laterale</option><option value="down">Ribasso prolungato</option></select></label>
-<label>Soglie<select data-k="dyn"><option value="1">Dinamiche: seguono il carico medio</option><option value="0">Fisse</option></select></label>
-<label>Ritiro completo all'ultima soglia<select data-k="exit"><option value="0">No, solo ricompense</option><option value="1">Sì, vendi tutto</option></select></label>
-<label>% USDC reinvestita al mese sotto la prima soglia<input data-k="reinv" type="number" value="30" min="0" max="100"></label>
-</div>
-<div class="as-scroll"><table>
-<tr><th>Fascia di prezzo</th><th>Da (€)</th><th>% ricompense in USDC</th></tr>
-<tr><td>Sotto la prima soglia</td><td><input data-k="t1" type="number" value="2.05" step="0.01"></td><td><input data-k="a0" type="number" value="0" min="0" max="100"></td></tr>
-<tr><td>Fascia 1</td><td><input data-k="t2" type="number" value="2.46" step="0.01"></td><td><input data-k="a1" type="number" value="20" min="0" max="100"></td></tr>
-<tr><td>Fascia 2</td><td><input data-k="t3" type="number" value="3.00" step="0.01"></td><td><input data-k="a2" type="number" value="40" min="0" max="100"></td></tr>
-<tr><td>Fascia 3</td><td><input data-k="t4" type="number" value="3.62" step="0.01"></td><td><input data-k="a3" type="number" value="70" min="0" max="100"></td></tr>
-<tr><td>Sopra l'ultima soglia</td><td>ultima soglia</td><td><input data-k="a4" type="number" value="100" min="0" max="100"></td></tr>
-</table></div>
-<p class="as-note" data-k="saved" role="status">I parametri restano salvati in questo browser.</p>
-<div class="as-kpi" data-k="kpi" role="status" aria-live="polite"></div>
-<canvas data-k="c1" aria-label="Prezzo, carico medio e soglie"></canvas><div class="as-leg" data-k="l1"></div>
-<canvas data-k="c2" aria-label="Valore totale strategia contro solo restaking"></canvas><div class="as-leg" data-k="l2"></div>
-<p class="as-note">Simulazione concettuale con prezzi inventati, non una previsione né una consulenza finanziaria. Il carico delle ricompense restakate è il prezzo del mese in cui arrivano. Commissioni e Quadro RT non sono inclusi.</p>
-</div>
-<script>
-(function(){
-const R=document.currentScript?document.currentScript.parentElement:document.querySelector('.atom-sim-panel');
-const Q=k=>R.querySelector('[data-k="'+k+'"]'),num=k=>parseFloat(Q(k).value)||0,KEY='atomSimParams';
-const SC={peak:[[0,1],[.25,1.5],[.45,2.15],[.7,1.35],[1,1.6]],up:[[0,1],[.3,1.15],[.6,1.7],[1,2.4]],cycle:[[0,1],[.15,1.4],[.3,1.15],[.5,1.9],[.65,1.4],[.8,2.1],[1,1.7]],dip:[[0,1],[.3,.65],[.5,.9],[.8,1.9],[1,2.3]],side:[[0,1],[.25,1.25],[.5,.95],[.75,1.35],[1,1.2]],down:[[0,1],[.3,.8],[.6,.6],[1,.7]]};
-const COL=['#e5574a','#e0a526','#4f8fe8','#14b89a'];
-const fe=v=>v.toLocaleString('it-IT',{maximumFractionDigits:0})+' €',f2=v=>v.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
-const inputs=[...R.querySelectorAll('input[data-k],select[data-k]')];
-try{const s=JSON.parse(localStorage.getItem(KEY)||'{}');inputs.forEach(e=>{if(s[e.dataset.k]!=null)e.value=s[e.dataset.k]})}catch(e){}
-function prices(n,p0,k){const pts=SC[k],o=[];for(let i=0;i<=n;i++){const x=i/n;let j=0;while(j<pts.length-2&&x>pts[j+1][0])j++;const a=pts[j],b=pts[j+1],m=a[1]+(b[1]-a[1])*(x-a[0])/(b[0]-a[0]);o.push(p0*m*(1+.05*Math.sin(i*1.7)+.03*Math.sin(i*.9+1)))}return o}
-function sim(){
- const n=Math.round(num('months')),q=num('qty'),c=num('cost')||1,apr=num('apr')/100,P=prices(n,num('p0'),Q('scen').value);
- const T=['t1','t2','t3','t4'].map(num),A=['a0','a1','a2','a3','a4'].map(num),reinv=num('reinv')/100,ex=Q('exit').value==='1',dyn=Q('dyn').value==='1';
- let st=q,cost=q*c,usdc=0,done=false,exitM=null,hq=q;const avg=[],val=[],hold=[],TS=[[],[],[],[]];
- for(let i=0;i<=n;i++){const p=P[i];
-  if(i>0){hq+=hq*apr/12;
-   if(!done){const k=dyn&&st>0?cost/st/c:1,Tm=T.map(t=>t*k),r=st*apr/12,z=p<Tm[0]?0:p<Tm[1]?1:p<Tm[2]?2:p<Tm[3]?3:4,sold=r*A[z]/100,keep=r-sold;
-    usdc+=sold*p;st+=keep;cost+=keep*p;
-    if(z===0&&usdc>0){const b=usdc*reinv;usdc-=b;st+=b/p;cost+=b}
-    if(z===4&&ex){usdc+=st*p;st=0;cost=0;done=true;exitM=i}}}
-  const kk=dyn&&st>0?cost/st/c:1;T.forEach((t,j)=>TS[j].push(st>0||!dyn?t*kk:null));
-  avg.push(st>0?cost/st:null);val.push(st*p+usdc);hold.push(hq*p)}
- return{n,P,T,TS,dyn,avg,val,hold,st,usdc,exitM,q,c}}
-function draw(id,series,lines,n){
- const cv=Q(id),w=cv.clientWidth,h=cv.clientHeight;if(!w)return;
- const d=window.devicePixelRatio||1;cv.width=w*d;cv.height=h*d;
- const g=cv.getContext('2d');g.scale(d,d);const ink=getComputedStyle(R).color;
- const L=48,Rr=8,Tp=8,B=22;let all=[];series.forEach(s=>s.d.forEach(v=>v!=null&&all.push(v)));lines.forEach(l=>all.push(l.y));
- let lo=Math.min(...all),hi=Math.max(...all);const pad=(hi-lo)*.06||1;lo-=pad;hi+=pad;
- const X=i=>L+(w-L-Rr)*i/n,Y=v=>Tp+(h-Tp-B)*(1-(v-lo)/(hi-lo));
- g.font='11px system-ui';g.fillStyle=ink;g.textAlign='right';
- for(let k=0;k<=4;k++){const v=lo+(hi-lo)*k/4,y=Y(v);g.globalAlpha=.15;g.strokeStyle=ink;g.beginPath();g.moveTo(L,y);g.lineTo(w-Rr,y);g.stroke();g.globalAlpha=.7;g.fillText(hi>100?Math.round(v/1000)+'k':v.toFixed(2),L-6,y+4)}
- g.textAlign='center';for(let m=0;m<=n;m+=Math.max(1,Math.round(n/6)))g.fillText(m,X(m),h-6);
- g.globalAlpha=1;
- lines.forEach(l=>{g.strokeStyle=l.c;g.setLineDash([5,4]);g.lineWidth=1;g.beginPath();g.moveTo(L,Y(l.y));g.lineTo(w-Rr,Y(l.y));g.stroke()});
- series.forEach(s=>{g.setLineDash(s.dash?[5,4]:[]);g.strokeStyle=s.c==='ink'?ink:s.c;g.lineWidth=s.w||2;g.beginPath();let on=false;s.d.forEach((v,i)=>{if(v==null){on=false;return}on?g.lineTo(X(i),Y(v)):g.moveTo(X(i),Y(v));on=true});g.stroke()});g.setLineDash([])}
-function legend(k,items){Q(k).innerHTML=items.map(([c,t,dash])=>'<span><i style="border-color:'+(c==='ink'?'currentColor':c)+';border-top-style:'+(dash?'dashed':'solid')+'"></i>'+t+'</span>').join('')}
-function run(){
- const s=sim(),dv=s.val[s.n]-s.hold[s.n],qf=v=>v.toLocaleString('it-IT',{maximumFractionDigits:2});
- Q('kpi').innerHTML=[
-  [qf(s.st),'ATOM rimasti (partivi da '+qf(s.q)+')'],
-  [s.avg[s.n]?f2(s.avg[s.n])+' €':'uscita totale','Carico medio finale (partivi da '+f2(s.c)+' €)'],
-  [fe(s.usdc),'USDC accumulati'],
-  [Math.round(s.st*s.P[s.n]/(s.q*s.c)*100)+' %','Valore ATOM rimasti contro capitale al carico iniziale'],
-  [fe(s.val[s.n]),'Valore totale a fine simulazione'],
-  [(dv>=0?'+':'')+fe(dv),'Contro solo restaking ('+fe(s.hold[s.n])+')'],
-  [s.exitM?'mese '+s.exitM:'non raggiunta','Uscita completa in USDC']
- ].map(([b,t])=>'<div><b>'+b+'</b><span>'+t+'</span></div>').join('');
- draw('c1',[{d:s.P,c:'ink',w:2},{d:s.avg,c:'#e0a526',w:2.5}].concat(s.dyn?s.TS.map((d,i)=>({d,c:COL[i],w:1.2,dash:1})):[]),s.dyn?[]:s.T.map((y,i)=>({y,c:COL[i]})),s.n);
- legend('l1',[['ink','Prezzo ATOM'],['#e0a526','Carico medio']].concat(s.T.map((t,i)=>[COL[i],'Soglia '+(i+1)+(s.dyn?' (parte da ':': ')+f2(t)+(s.dyn?', segue il carico)':''),1])));
- draw('c2',[{d:s.hold,c:'#8a96a3',w:2},{d:s.val,c:'#14b89a',w:2.5}],[{y:s.q*s.c,c:'#e5574a'}],s.n);
- legend('l2',[['#14b89a','Strategia (ATOM + USDC)'],['#8a96a3','Solo restaking, nessun ritiro'],['#e5574a','Capitale al carico iniziale',1]])}
-function save(){try{const s={};inputs.forEach(e=>s[e.dataset.k]=e.value);localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
-inputs.forEach(e=>e.addEventListener('input',()=>{save();run()}));
-R.addEventListener('toggle',run);addEventListener('resize',run);run();
-})();
-</script>
-</details>
-
-
  <!-- Grafico USD Investiti vs Valore Attuale -->
 
 

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATOM – Soglie di strategia</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--line:#232b42;--tx:#e6e9f2;--mut:#8d96b3;
+--b3:#0e9f8e;--b2:#2fb36b;--b1:#7fc24a;--b0:#c9c23a;--w:#d9a441;--s1:#e9a23b;--s2:#e8803a;--s3:#e0603f;--s4:#d9464f;--s5:#ef3f7a;--stop:#6b7ff0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 "Segoe UI",system-ui,sans-serif;padding:20px;max-width:1000px;margin-inline:auto}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:0 0 12px}
+.sub{color:var(--mut);margin-bottom:18px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.price{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.big{font-size:38px;font-weight:700;letter-spacing:-1px}
+.zone-badge{padding:6px 12px;border-radius:6px;font-weight:600;color:#08101a}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.field{flex:1 1 150px}.field label{display:block;color:var(--mut);font-size:12px;margin-bottom:3px}
+input{width:100%;background:#0b0f1c;border:1px solid var(--line);color:var(--tx);border-radius:6px;padding:7px 9px;font:inherit}
+input:focus-visible,button:focus-visible{outline:2px solid var(--stop);outline-offset:1px}
+button{background:#1b2340;color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:7px 12px;font:inherit;cursor:pointer}
+.src{color:var(--mut);font-size:12px}
+svg{width:100%;height:auto;display:block}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+th,td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:500}
+tr.act{background:#1a2342;outline:2px solid var(--stop);outline-offset:-2px}
+.dot{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.kpi{background:#0e1322;border:1px solid var(--line);border-radius:8px;padding:12px}
+.kpi b{display:block;font-size:20px}.kpi span{color:var(--mut);font-size:12.5px}
+.note{color:var(--mut);font-size:13px;margin-top:10px}
+@media (max-width:600px){.big{font-size:30px}}
+</style>
+</head>
+<body>
+<h1>ATOM – Soglie di acquisto e prelievo</h1>
+<div class="sub">Zone calcolate dal tuo versato, dalla quantità di ATOM e dal prezzo di carico. Modifica i campi e tutto si aggiorna.</div>
+
+<div class="panel price">
+  <div><div class="src" id="src">Carico il prezzo…</div><div class="big" id="px">–</div></div>
+  <div><span class="zone-badge" id="badge">–</span><div class="src" id="zdesc" style="margin-top:6px"></div></div>
+  <div><button id="refresh">Aggiorna ora</button></div>
+</div>
+
+<div class="panel">
+  <h2>I tuoi dati</h2>
+  <div class="row">
+    <div class="field"><label>Totale versato (€)</label><input id="versato" type="number" step="any"></div>
+    <div class="field"><label>ATOM posseduti</label><input id="qty" type="number" step="any"></div>
+    <div class="field"><label>ATOM in carico (€ spesi)</label><input id="carico" type="number" step="any"></div>
+    <div class="field"><label>Linea rossa acquisto (€)</label><input id="rossa" type="number" step="0.01"></div>
+    <div class="field"><label>APR staking (%)</label><input id="apr" type="number" step="0.1"></div>
+    <div class="field"><label>Prezzo manuale (€, opzionale)</label><input id="manuale" type="number" step="0.0001" placeholder="vuoto = live"></div>
+  </div>
+  <div class="note">Soglia 100% = versato ÷ ATOM. Prezzo di carico = ATOM in carico ÷ ATOM. Il carico e il versato sono quelli dell’immagine: aggiornali dopo ogni acquisto.</div>
+</div>
+
+<div class="panel">
+  <h2>Mappa delle zone</h2>
+  <svg id="chart" viewBox="0 0 900 190" role="img" aria-label="Barra delle zone di prezzo con il prezzo attuale"></svg>
+</div>
+
+<div class="panel">
+  <h2>Cosa fare adesso</h2>
+  <div class="grid" id="kpis"></div>
+</div>
+
+<div class="panel">
+  <h2>Tabella soglie</h2>
+  <div class="scroll"><table id="tbl"></table></div>
+  <div class="note">Dei guadagni di staking il 20% va sempre in BTC. Il restante 80% si divide così: sotto la linea rossa tutto in restaking; sopra, la percentuale USDC indicata (calcolata sull’80%) e il resto in restaking. Il capitale delegato non si tocca mai.</div>
+</div>
+
+<div class="panel">
+  <h2>Simulazioni</h2>
+  <div class="row">
+    <div class="field"><label>Prezzo di vendita ipotetico (€)</label><input id="target" type="number" step="any" value="15"></div>
+  </div>
+  <div class="grid" id="sim" style="margin-top:12px"></div>
+</div>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+var fmt=function(n,d){return isFinite(n)?n.toLocaleString("it-IT",{minimumFractionDigits:d==null?2:d,maximumFractionDigits:d==null?2:d}):"–"};
+var DEF={versato:15455,qty:4338.4,carico:10595,rossa:2,apr:15,target:15};
+var ids=["versato","qty","carico","rossa","apr","target"];
+var live=null,liveSrc="";
+function load(){var s={};try{s=JSON.parse(localStorage.getItem("atomsoglie")||"{}")}catch(e){}
+ ids.forEach(function(k){$(k).value=s[k]!=null?s[k]:DEF[k]});
+ if(s.manuale)$("manuale").value=s.manuale}
+function save(){var s={};ids.concat(["manuale"]).forEach(function(k){s[k]=$(k).value});
+ try{localStorage.setItem("atomsoglie",JSON.stringify(s))}catch(e){}}
+function val(k){return parseFloat($(k).value)}
+
+function zones(){
+ var R=val("rossa"),BE=val("versato")/val("qty"),s=(BE-R)/4,C=val("carico")/val("qty");
+ var z=[
+ {a:0,b:1,buy:50,c:"var(--b3)",n:"Sotto 1 €"},
+ {a:1,b:1.3,buy:40,c:"var(--b2)",n:"1,00 – 1,30"},
+ {a:1.3,b:1.5,buy:30,c:"var(--b1)",n:"1,30 – 1,50"},
+ {a:1.5,b:1.8,buy:20,c:"var(--b0)",n:"1,50 – 1,80"},
+ {a:1.8,b:R,buy:10,c:"var(--w)",n:"1,80 – "+fmt(R)}];
+ var pc=[15,30,50,75],cols=["var(--s1)","var(--s2)","var(--s3)","var(--s4)"];
+ for(var i=0;i<4;i++)z.push({a:R+s*i,b:R+s*(i+1),u:pc[i],c:cols[i],n:fmt(R+s*i)+" – "+fmt(R+s*(i+1))});
+ z.push({a:BE,b:Infinity,u:100,c:"var(--s5)",n:"Oltre "+fmt(BE)});
+ return {z:z,R:R,BE:BE,C:C}}
+
+function current(){var m=parseFloat($("manuale").value);return m>0?m:live}
+function find(z,p){for(var i=0;i<z.length;i++)if(p>=z[i].a&&p<z[i].b)return z[i];return z[0]}
+
+function render(){
+ var Z=zones(),z=Z.z,p=current();
+ if(!(Z.BE>Z.R)){$("tbl").innerHTML="<tr><td>La soglia 100% deve essere sopra la linea rossa: controlla i dati.</td></tr>";return}
+ $("px").textContent=p?fmt(p,4)+" €":"–";
+ var cur=p?find(z,p):null;
+ $("badge").textContent=cur?(cur.buy?"Acquisto DCA "+cur.buy+" €":"USDC "+cur.u+"%"):"–";
+ $("badge").style.background=cur?cur.c:"#333";
+ $("zdesc").textContent=cur?(cur.buy?"Sotto la linea rossa: acquisti, tutto lo staking in restaking (tranne il 20% BTC)":"Acquisti fermi: ritiro in USDC attivo"):"";
+ // chart
+ var max=Math.max(Z.BE*1.18,(p||0)*1.1),X=function(v){return 20+Math.min(v,max)/max*860};
+ var h='';
+ z.forEach(function(q){var x1=X(q.a),x2=X(Math.min(q.b,max));
+  h+='<rect x="'+x1+'" y="70" width="'+Math.max(x2-x1,1)+'" height="38" fill="'+q.c+'"'+(cur===q?' stroke="#fff" stroke-width="2"':'')+'/>';
+  var w=x2-x1;if(w>34)h+='<text x="'+(x1+w/2)+'" y="94" text-anchor="middle" font-size="12" font-weight="700" fill="#08101a">'+(q.buy?q.buy+"€":q.u+"%")+'</text>'});
+ var ticks=[0,1,1.3,1.5,1.8,Z.R,Z.R+(Z.BE-Z.R)/4,Z.R+(Z.BE-Z.R)/2,Z.R+(Z.BE-Z.R)*.75,Z.BE];
+ ticks.forEach(function(t,i){var x=X(t),up=i%2;
+  h+='<line x1="'+x+'" x2="'+x+'" y1="108" y2="'+(up?126:118)+'" stroke="#8d96b3"/><text x="'+x+'" y="'+(up?140:132)+'" text-anchor="middle" font-size="11" fill="#8d96b3">'+fmt(t)+'</text>'});
+ h+='<line x1="'+X(Z.R)+'" x2="'+X(Z.R)+'" y1="58" y2="108" stroke="#fff" stroke-width="2" stroke-dasharray="4 3"/><text x="'+X(Z.R)+'" y="52" text-anchor="middle" font-size="11" fill="#fff">linea rossa</text>';
+ h+='<line x1="'+X(Z.C)+'" x2="'+X(Z.C)+'" y1="66" y2="112" stroke="#fff" stroke-width="1.5"/><text x="'+X(Z.C)+'" y="164" text-anchor="middle" font-size="11" fill="#d9a441">carico '+fmt(Z.C)+'</text>';
+ h+='<text x="'+X(Z.BE)+'" y="164" text-anchor="middle" font-size="11" fill="#ef3f7a">100% '+fmt(Z.BE)+'</text>';
+ if(p){var xp=X(p);h+='<path d="M'+xp+' 66 l-8 -16 h16z" fill="#fff"/><text x="'+xp+'" y="36" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">'+fmt(p,4)+' €</text>'}
+ $("chart").innerHTML=h;
+ // table
+ var t='<tr><th>Zona (€ per ATOM)</th><th>Azione</th><th>BTC</th><th>USDC</th><th>Restaking</th></tr>';
+ z.forEach(function(q){var u=q.u||0;
+  t+='<tr'+(cur===q?' class="act"':'')+'><td><span class="dot" style="background:'+q.c+'"></span>'+q.n+'</td><td>'+(q.buy?"Acquisto "+q.buy+" € a ingresso":"Nessun acquisto")+'</td><td>20%</td><td>'+fmt(80*u/100,0)+'%</td><td>'+fmt(80*(100-u)/100,0)+'%</td></tr>'});
+ $("tbl").innerHTML=t;
+ // kpis
+ var qty=val("qty"),car=val("carico"),ver=val("versato");
+ var rew=qty*val("apr")/100/12,u2=cur&&cur.u?cur.u:0;
+ var btc=rew*.2,usdc=rew*.8*u2/100,rest=rew*.8-usdc;
+ var k=function(a,b){return '<div class="kpi"><b>'+a+'</b><span>'+b+'</span></div>'};
+ var kh='';
+ if(cur&&cur.buy){var na=cur.buy/p,nq=qty+na,nc=car+cur.buy;
+  kh+=k("+"+fmt(cur.buy,0)+" € → "+fmt(na,2)+" ATOM","Acquisto per ogni ingresso in questa zona")
+   +k(fmt(nc/nq,4)+" €","Nuovo prezzo di carico dopo l’ingresso (ora "+fmt(Z.C,4)+")")
+   +k(fmt(ver+cur.buy,0)+" €","Nuovo totale versato; nuova soglia 100% a "+fmt((ver+cur.buy)/nq,4)+" €")}
+ else if(cur){kh+=k("Acquisti fermi","Sopra la linea rossa non entra nuovo capitale")}
+ kh+=k("≈ "+fmt(rew,1)+" ATOM / mese","Ricompense stimate con APR "+fmt(val("apr"),1)+"% (≈ "+fmt(rew*(p||0),0)+" €)")
+  +k(fmt(btc,1)+" ATOM → BTC","20% mensile, sempre attivo")
+  +k(fmt(usdc,1)+" ATOM → USDC","≈ "+fmt(usdc*(p||0),0)+" € questo mese")
+  +k(fmt(rest,1)+" ATOM in restaking","Va ad aumentare il capitale delegato");
+ $("kpis").innerHTML=kh;
+ // sim
+ var T=val("target"),val_=qty*T;
+ $("sim").innerHTML=k(fmt(val_,0)+" €","Valore di "+fmt(qty,1)+" ATOM a "+fmt(T)+" €")
+  +k(fmt(val_-ver,0)+" €","Guadagno rispetto al totale versato")
+  +k(fmt(val_-car,0)+" €","Guadagno rispetto al carico in ATOM")
+  +k(fmt(Z.C/(p||Z.C)*100-100,0)+"%","Distanza prezzo attuale → carico (positiva = prezzo sotto il carico)");
+}
+
+function fetchJ(u){return fetch(u).then(function(r){if(!r.ok)throw 0;return r.json()})}
+function getPrice(){
+ $("src").textContent="Aggiorno…";
+ fetchJ("https://api.coingecko.com/api/v3/simple/price?ids=cosmos&vs_currencies=eur")
+ .then(function(d){live=d.cosmos.eur;liveSrc="CoinGecko"})
+ .catch(function(){return fetchJ("https://api.binance.com/api/v3/ticker/price?symbol=ATOMEUR").then(function(d){live=parseFloat(d.price);liveSrc="Binance"})})
+ .catch(function(){liveSrc=""})
+ .then(function(){
+  $("src").textContent=liveSrc?("Prezzo live da "+liveSrc+" – "+new Date().toLocaleTimeString("it-IT")):(current()?"Prezzo manuale (live non raggiungibile)":"Prezzo live non raggiungibile: inserisci il prezzo manuale");
+  render()});
+}
+load();
+ids.concat(["manuale"]).forEach(function(k){$(k).addEventListener("input",function(){save();render()})});
+$("refresh").addEventListener("click",getPrice);
+render();getPrice();setInterval(getPrice,60000);
+</script>
+</body>
+</html>
