@@ -877,7 +877,7 @@ label {
           <div class="field"><label>Prezzo manuale (€, opzionale)</label><input id="manuale" type="number" step="0.0001" placeholder="vuoto = live"></div>
      </div>
          <div class="note" id="wallet-data-source" role="status" aria-live="polite"></div>
-      <div class="note">Nessuna soglia è un prezzo fisso: linea rossa e scaglioni sono percentuali del prezzo di carico (ATOM in carico ÷ ATOM posseduti), che a sua volta si aggiorna con ogni acquisto. Le percentuali di partenza riproducono la tua struttura attuale (2,00 / 1,80 / 1,50 / 1,30 / 1,00 con carico 2,44). Soglia 100% = versato ÷ ATOM. Aggiorna i valori dopo ogni acquisto.</div>
+      <div class="note">Nessuna soglia è un prezzo fisso: linea rossa e scaglioni sono percentuali del prezzo di carico (ATOM in carico ÷ ATOM posseduti), che a sua volta si aggiorna con ogni acquisto. Le percentuali di partenza riproducono la tua struttura attuale (2,00 / 1,80 / 1,50 / 1,30 / 1,00 con carico 2,44). Soglia 100% = (capitale depositato − valore BTC − valore POL − valore USDC) ÷ ATOM: BTC, POL e USDC già attivi nel wallet sono esclusi dal capitale della soglia. Aggiorna i valori dopo ogni acquisto.</div>
     </div>
 
      <div class="panel">
@@ -936,7 +936,7 @@ label {
     var fmt=function(n,d){return isFinite(n)?n.toLocaleString("it-IT",{minimumFractionDigits:d==null?2:d,maximumFractionDigits:d==null?2:d}):"–"};
      var DEF={versato:15455,qty:4338.4466,carico:10595.79,rossapct:81.9,p1:40.9,p2:53.2,p3:61.4,p4:73.7,sim_add:3500,apr:9,btcq:30,mesi:3,target:15};
     var ids=["rossapct","p1","p2","p3","p4","sim_add","apr","btcq","mesi","target"];
-    var walletData={versato:DEF.versato,qty:DEF.qty,carico:DEF.carico};
+    var walletData={versato:DEF.versato,depositato:DEF.versato,btcValue:0,polValue:0,usdcValue:0,qty:DEF.qty,carico:DEF.carico};
     var live=null,liveSrc="";
     function load(){var raw=null,s={};try{raw=localStorage.getItem("atomsoglie2");s=JSON.parse(raw||"{}")}catch(e){}
      ids.forEach(function(k){$(k).value=s[k]!=null?s[k]:DEF[k]});
@@ -947,13 +947,30 @@ label {
         function val(k){return Object.prototype.hasOwnProperty.call(walletData,k)?walletData[k]:parseFloat($(k).value)}
 
         function syncDepositedCapital(){
+         var deposited=null,snapshot=null;
          try{
             var source=JSON.parse(localStorage.getItem("cryptoOperations")||"null");
-            if(Array.isArray(source))walletData.versato=Math.abs(source.reduce(function(total,op){return total+(op.type==="EUR"?(Number(op.amount)||0):0)},0));
-         }catch(e){}
+            if(Array.isArray(source))deposited=Math.abs(source.reduce(function(total,op){return total+(op.type==="EUR"?(Number(op.amount)||0):0)},0));
+         }catch(e){console.error("Errore nella lettura dei depositi per le soglie ATOM:",e)}
+         try{snapshot=JSON.parse(localStorage.getItem("cryptoThresholdCapitalSnapshot")||"null")}
+         catch(e){console.error("Errore nella lettura dei valori BTC/USDC per le soglie ATOM:",e)}
+         if(snapshot&&Number.isFinite(snapshot.deposited)&&snapshot.deposited>=0&&Number.isFinite(snapshot.btcValue)&&snapshot.btcValue>=0&&Number.isFinite(snapshot.usdcValue)&&snapshot.usdcValue>=0){
+            if(deposited===null)deposited=snapshot.deposited;
+            walletData.btcValue=snapshot.btcValue;
+            walletData.polValue=Number.isFinite(snapshot.polValue)&&snapshot.polValue>=0?snapshot.polValue:0;
+            walletData.usdcValue=snapshot.usdcValue;
+         }else{
+            walletData.btcValue=0;
+            walletData.polValue=0;
+            walletData.usdcValue=0;
+         }
+         if(deposited!==null){
+            walletData.depositato=deposited;
+            walletData.versato=Math.max(0,deposited-walletData.btcValue-walletData.polValue-walletData.usdcValue);
+         }
         }
         function showWalletData(){
-         $("wallet-data-source").textContent="Dati automatici · ATOM "+fmt(walletData.qty,6)+" · investiti "+fmt(walletData.carico)+" € · capitale depositato "+fmt(walletData.versato)+" €";
+         $("wallet-data-source").textContent="Dati automatici · ATOM "+fmt(walletData.qty,6)+" · investiti "+fmt(walletData.carico)+" € · depositi "+fmt(walletData.depositato)+" € − BTC "+fmt(walletData.btcValue)+" € − POL "+fmt(walletData.polValue)+" € − USDC "+fmt(walletData.usdcValue)+" € = capitale per soglie "+fmt(walletData.versato)+" €";
         }
         function updateWalletData(values){
          if(values&&Number.isFinite(values.qty))walletData.qty=values.qty;
@@ -1010,7 +1027,7 @@ label {
       $("whatif").innerHTML=kk(fmt(C0,4)+" → "+fmt(C1,4)+" €","Prezzo di carico prima → dopo")
         +kk(fmt(val("rossapct")/100*C1,2)+" €","Nuova linea rossa (inizio acquisti, 10 €)")
         +kk(fmt(val("p4")/100*C1,2)+" / "+fmt(val("p3")/100*C1,2)+" / "+fmt(val("p2")/100*C1,2)+" / "+fmt(val("p1")/100*C1,2),"Nuovi scaglioni 20 € · 30 € · 40 € · 50 €")
-        +kk(fmt(BE1,4)+" €","Nuova soglia 100% (versato ÷ ATOM)");
+        +kk(fmt(BE1,4)+" €","Nuova soglia 100% (capitale netto per soglie ÷ ATOM)");
       var st=parseFloat($("passo").value)||0.05,fl=parseFloat($("floor").value)||0.5,ne=0,cap=0,at=0;
       var bz=z.filter(function(q){return q.buy}),pr=Math.min(Z.R,p||Z.R)-st;
       for(;pr>=fl-1e-9&&ne<2000;pr-=st){var qz=find(bz,pr);ne++;cap+=qz.buy;at+=qz.buy/pr}
@@ -1045,7 +1062,7 @@ label {
      $("kpis").innerHTML=kh;
      var T=val("target"),value=qty*T;
      $("sim").innerHTML=k(fmt(value,0)+" €","Valore di "+fmt(qty,1)+" ATOM a "+fmt(T)+" €")
-        +k(fmt(value-ver,0)+" €","Guadagno rispetto al totale versato")
+        +k(fmt(value-ver,0)+" €","Differenza rispetto al capitale netto per soglie")
         +k(fmt(value-car,0)+" €","Guadagno rispetto al carico in ATOM")
         +k(fmt(Z.C/(p||Z.C)*100-100,0)+"%","Distanza prezzo attuale → carico (positiva = prezzo sotto il carico)");
     }
@@ -1063,7 +1080,7 @@ label {
     }
     load();syncDepositedCapital();showWalletData();
     window.AtomSoglie5={updateWallet:updateWalletData};
-    window.addEventListener("storage",function(event){if(event.key==="cryptoOperations"){syncDepositedCapital();showWalletData();render()}});
+    window.addEventListener("storage",function(event){if(event.key==="cryptoOperations"||event.key==="cryptoThresholdCapitalSnapshot"){syncDepositedCapital();showWalletData();render()}});
     window.addEventListener("pageshow",function(){syncDepositedCapital();showWalletData();render()});
     ids.concat(["manuale"]).forEach(function(k){$(k).addEventListener("input",function(){save();render()})});
     $("refresh").addEventListener("click",getPrice);$("sim_on").addEventListener("change",render);
@@ -1989,7 +2006,5 @@ document.addEventListener('DOMContentLoaded', function() {
     </script>
 </body>
 </html>
-
-
 
 

@@ -1180,6 +1180,17 @@ function updateDisplays() {
     // per evitare che un eventuale costo base residuo li faccia rientrare.
     const net = tAtomV+tBtcV+tPolV+tUsdcV+tTrade - tEur;
 
+    try {
+        localStorage.setItem('cryptoThresholdCapitalSnapshot', JSON.stringify({
+            deposited: tEur,
+            btcValue: tBtcV,
+            polValue: tPolV,
+            usdcValue: tUsdcV
+        }));
+    } catch (error) {
+        console.error('Errore nel salvataggio dei dati per le soglie ATOM:', error);
+    }
+
     const s=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t;};
 
     s('totalEur',`-€${tEur.toFixed(2)}`);
@@ -1560,7 +1571,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-
-
 
 
