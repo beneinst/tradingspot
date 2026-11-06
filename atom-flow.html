@@ -840,7 +840,7 @@ label {
     <div class="stat-value" id="depositAtom">0.00</div>
   </div>
     <div class="ts-grid-item" id="atomBreakEvenBox" style="border-color: #f2bb66;">
-        Pareggio ATOM: calcolo in corso...
+        Soglia netta ATOM: calcolo in corso...
     </div>
   <div class="ts-grid-item">
     <div class="stat-label">ATOM da Staking</div>
@@ -959,6 +959,7 @@ label {
             walletData.btcValue=snapshot.btcValue;
             walletData.polValue=Number.isFinite(snapshot.polValue)&&snapshot.polValue>=0?snapshot.polValue:0;
             walletData.usdcValue=snapshot.usdcValue;
+            if(Number.isFinite(snapshot.atomQty)&&snapshot.atomQty>0)walletData.qty=snapshot.atomQty;
          }else{
             walletData.btcValue=0;
             walletData.polValue=0;
@@ -976,6 +977,9 @@ label {
          if(values&&Number.isFinite(values.qty))walletData.qty=values.qty;
          if(values&&Number.isFinite(values.invested))walletData.carico=values.invested;
          syncDepositedCapital();showWalletData();render();
+        }
+        function getThresholdData(){
+         return {capital:walletData.versato,depositato:walletData.depositato,btcValue:walletData.btcValue,polValue:walletData.polValue,usdcValue:walletData.usdcValue,qty:walletData.qty};
         }
 
      function base(){var v=val("versato"),q=val("qty"),c=val("carico"),add=parseFloat($("sim_add").value)||0,p=current()||0;
@@ -1079,7 +1083,7 @@ label {
          render()});
     }
     load();syncDepositedCapital();showWalletData();
-    window.AtomSoglie5={updateWallet:updateWalletData};
+    window.AtomSoglie5={updateWallet:updateWalletData,getThresholdData:getThresholdData};
     window.addEventListener("storage",function(event){if(event.key==="cryptoOperations"||event.key==="cryptoThresholdCapitalSnapshot"){syncDepositedCapital();showWalletData();render()}});
     window.addEventListener("pageshow",function(){syncDepositedCapital();showWalletData();render()});
     ids.concat(["manuale"]).forEach(function(k){$(k).addEventListener("input",function(){save();render()})});
@@ -1678,10 +1682,19 @@ function updateCapitalChart() {
             const breakEvenAtomPrice = cumulativeAtom > 0 ? cumulativeInvested / cumulativeAtom : 0;
             const breakEvenPriceData = labels.map(() => breakEvenAtomPrice);
             const breakEvenBox = document.getElementById('atomBreakEvenBox');
+            const thresholdData = window.AtomSoglie5?.getThresholdData();
+            const netThresholdPrice = thresholdData && thresholdData.qty > 0
+                ? thresholdData.capital / thresholdData.qty
+                : 0;
             if (breakEvenBox) {
-                breakEvenBox.textContent = breakEvenAtomPrice > 0
-                    ? `Pareggio ATOM: €${breakEvenAtomPrice.toFixed(4)} per ATOM (Totale ATOM ${cumulativeAtom.toFixed(6)} = EUR Investiti €${cumulativeInvested.toFixed(2)})`
-                    : 'Pareggio ATOM: dati insufficienti';
+                breakEvenBox.textContent = [
+                    netThresholdPrice > 0
+                        ? `Soglia netta wallet: €${netThresholdPrice.toFixed(4)}/ATOM (${thresholdData.capital.toFixed(2)} € = ${thresholdData.depositato.toFixed(2)} € − BTC ${thresholdData.btcValue.toFixed(2)} € − POL ${thresholdData.polValue.toFixed(2)} € − USDC ${thresholdData.usdcValue.toFixed(2)} €, ÷ ${thresholdData.qty.toFixed(6)} ATOM da Panoramica)`
+                        : 'Soglia netta wallet: dati Panoramica non disponibili',
+                    breakEvenAtomPrice > 0
+                        ? `Pareggio costo acquisti: €${breakEvenAtomPrice.toFixed(4)}/ATOM (${cumulativeInvested.toFixed(2)} € ÷ ${cumulativeAtom.toFixed(6)} ATOM)`
+                        : 'Pareggio costo acquisti: dati insufficienti'
+                ].join(' · ');
             }
 
             if (usdComparisonChart) {
@@ -2006,5 +2019,3 @@ document.addEventListener('DOMContentLoaded', function() {
     </script>
 </body>
 </html>
-
-

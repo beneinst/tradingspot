@@ -1183,6 +1183,7 @@ function updateDisplays() {
     try {
         localStorage.setItem('cryptoThresholdCapitalSnapshot', JSON.stringify({
             deposited: tEur,
+            atomQty: tAtomQ,
             btcValue: tBtcV,
             polValue: tPolV,
             usdcValue: tUsdcV
@@ -1571,5 +1572,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-
 
