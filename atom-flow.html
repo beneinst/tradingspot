@@ -1689,11 +1689,11 @@ function updateCapitalChart() {
             if (breakEvenBox) {
                 breakEvenBox.textContent = [
                     netThresholdPrice > 0
-                        ? `Soglia netta wallet: €${netThresholdPrice.toFixed(4)}/ATOM (${thresholdData.capital.toFixed(2)} € = ${thresholdData.depositato.toFixed(2)} € − BTC ${thresholdData.btcValue.toFixed(2)} € − POL ${thresholdData.polValue.toFixed(2)} € − USDC ${thresholdData.usdcValue.toFixed(2)} €, ÷ ${thresholdData.qty.toFixed(6)} ATOM da Panoramica)`
-                        : 'Soglia netta wallet: dati Panoramica non disponibili',
+                        ? `Totale in Cripto: €${netThresholdPrice.toFixed(4)}/ATOM (${thresholdData.capital.toFixed(2)} € = ${thresholdData.depositato.toFixed(2)} € − BTC ${thresholdData.btcValue.toFixed(2)} € − POL ${thresholdData.polValue.toFixed(2)} € − USDC ${thresholdData.usdcValue.toFixed(2)} €, ÷ ${thresholdData.qty.toFixed(6)} ATOM da Panoramica)`
+                        : 'Totale in Cripto: dati Panoramica non disponibili',
                     breakEvenAtomPrice > 0
-                        ? `Pareggio costo acquisti: €${breakEvenAtomPrice.toFixed(4)}/ATOM (${cumulativeInvested.toFixed(2)} € ÷ ${cumulativeAtom.toFixed(6)} ATOM)`
-                        : 'Pareggio costo acquisti: dati insufficienti'
+                        ? `Totale in ATOM (pareggio acquisti): €${breakEvenAtomPrice.toFixed(4)}/ATOM (${cumulativeInvested.toFixed(2)} € ÷ ${cumulativeAtom.toFixed(6)} ATOM)`
+                        : 'Totale in ATOM (pareggio acquisti): dati insufficienti'
                 ].join(' · ');
             }
 
